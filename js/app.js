@@ -53,12 +53,26 @@
     registry[panel].push({ elId, build });
   }
 
+  // ECharts option 内的中文（series 名/轴名/图例/标注）按当前语言翻译
+  function i18nOption(o) {
+    if (!window.MC_I18N || MC_I18N.lang() === "zh" || o == null) return o;
+    if (Array.isArray(o)) { o.forEach(i18nOption); return o; }
+    if (typeof o === "object") {
+      for (const k of Object.keys(o)) {
+        const v = o[k];
+        if (typeof v === "string" && /[一-鿿]/.test(v)) o[k] = MC_I18N.translate(v);
+        else if (v && typeof v === "object") i18nOption(v);
+      }
+    }
+    return o;
+  }
+
   async function buildOne(elId, build) {
     const el = document.getElementById(elId);
     if (!el) return;
     if (built.has(elId)) { built.get(elId).dispose(); }
     try {
-      const option = await build(pal());
+      const option = i18nOption(await build(pal()));
       const inst = echarts.init(el, null, { renderer: "canvas" });
       built.set(elId, inst);
       inst.setOption(option);
@@ -252,9 +266,9 @@
         <div class="card"><h3>估值与质量 vs 同篮子</h3><div class="chart short" id="${basket}-fd-peers-ch"></div></div>
       </div>
       <div class="stock-nav">
-        <a href="#${basket}/${safeTicker(prev[0])}">← ${prev[1]} ${prev[0]}</a>
-        <a href="#${basket}">回到${cfg.anchorLabel}</a>
-        <a href="#${basket}/${safeTicker(next[0])}">${next[1]} ${next[0]} →</a>
+        <a href="#${basket}/${safeTicker(prev[0])}">← <span>${prev[1]}</span> ${prev[0]}</a>
+        <a href="#${basket}"><span>回到</span><span>${cfg.anchorLabel}</span></a>
+        <a href="#${basket}/${safeTicker(next[0])}"><span>${next[1]}</span> ${next[0]} →</a>
       </div>`;
 
     // 关键数据条
@@ -368,7 +382,7 @@
   }
 
   // ---------------- 个股基本面章节（数据可用才显示对应章） ----------------
-  const CN_NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"];
+  const CN_NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五"];
 
   function renumberChapters(scope) {
     [...scope.querySelectorAll(".chapter")].forEach((ch, i) => {
@@ -1397,5 +1411,8 @@
     document.getElementById("meta-line").textContent =
       "美股编年史 · 自用版 · 数据更新于 " + m.updated.slice(0, 10);
   }).catch(() => {});
-  route();
+  if (window.MC_I18N) {
+    MC_I18N.onChange(() => rebuildAll()); // canvas 里的文字随语言重建
+    MC_I18N.ready.then(route);
+  } else route();
 })();

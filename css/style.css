@@ -126,8 +126,9 @@ body {
   border-bottom-color: var(--accent);
 }
 .top-controls { display: flex; align-items: center; gap: 10px; margin-left: 18px; }
-/* 窄屏收起品牌副题，给 tab 让位 */
+/* 窄屏收起品牌副题，给 tab 让位；非中文界面下主名已译为英文，副题冗余 */
 @media (max-width: 1560px) { .brand em { display: none; } }
+html:not([lang^="zh"]) .brand em { display: none; }
 .lang-switch {
   white-space: nowrap;
   flex-shrink: 0;

@@ -15,6 +15,7 @@
     "LEAPS 窗口": ["LEAPS Window", "Fenêtre LEAPS", "LEAPS-Fenster", "Ventana LEAPS"],
     "宏观": ["Macro", "Macro", "Makro", "Macro"],
     "纳指 100": ["Nasdaq-100", "Nasdaq-100", "Nasdaq-100", "Nasdaq-100"],
+    "纳指综指": ["Nasdaq Composite", "Nasdaq Composite", "Nasdaq Composite", "Nasdaq Composite"],
     "XLF 金融": ["XLF Financials", "XLF Finance", "XLF Finanzen", "XLF Finanzas"],
     "XLP 必需消费": ["XLP Staples", "XLP conso. de base", "XLP Basiskonsum", "XLP básico"],
     "XLY 可选消费": ["XLY Discretionary", "XLY conso. cyclique", "XLY Zyklisch", "XLY discrecional"],
@@ -289,7 +290,247 @@
     "标普 500 · 仅供个人研究": ["", "", "", ""],
     "仅供个人研究，不构成投资建议": ["Personal research only — not investment advice", "Recherche personnelle — pas un conseil en investissement", "Nur private Recherche — keine Anlageberatung", "Solo investigación personal; no es asesoramiento de inversión"],
     "数据源：Yahoo Finance / CNN Fear & Greed / multpl.com": ["Data: Yahoo Finance / CNN Fear & Greed / multpl.com", "Données : Yahoo Finance / CNN Fear & Greed / multpl.com", "Daten: Yahoo Finance / CNN Fear & Greed / multpl.com", "Datos: Yahoo Finance / CNN Fear & Greed / multpl.com"],
+
+    // ---- 图表 series / 轴名 / 图例（进 ECharts option）----
+    "等权组合": ["Equal-weight basket", "Panier équipondéré", "Gleichgew. Korb", "Cesta equiponderada"],
+    "CNN 恐贪": ["CNN F&G", "CNN F&G", "CNN F&G", "CNN F&G"],
+    "已实现波动率(20d)": ["Realized vol (20d)", "Vol réalisée (20 j)", "Real. Vol (20T)", "Vol realizada (20d)"],
+    "已实现波动率(60d)": ["Realized vol (60d)", "Vol réalisée (60 j)", "Real. Vol (60T)", "Vol realizada (60d)"],
+    "距前高": ["From peak", "Depuis le sommet", "Vom Hoch", "Desde máximo"],
+    "滚动5年年化": ["Rolling 5y CAGR", "TCAC glissant 5 ans", "Roll. 5J-CAGR", "TCAC móvil 5a"],
+    "全年收益": ["Annual return", "Rendement annuel", "Jahresrendite", "Rendimiento anual"],
+    "年内最大回撤": ["Intra-year max DD", "Repli intra-annuel", "Unterj. Max-DD", "Caída intraanual"],
+    "平均涨跌": ["Avg return", "Rendement moyen", "Ø Rendite", "Rendimiento medio"],
+    "上涨概率": ["Win rate", "Taux de hausse", "Gewinnquote", "Prob. de subida"],
+    "EPS 变化": ["EPS change", "Variation BPA", "EPS-Änderung", "Variación BPA"],
+    "估值变化": ["Multiple change", "Variation du multiple", "Multiple-Änderung", "Variación del múltiplo"],
+    "全年回报": ["Full-year return", "Rendement annuel", "Jahresrendite", "Rendimiento anual"],
+    "目标上限": ["Fed target (upper)", "Cible Fed (haut)", "Fed-Ziel (oben)", "Objetivo Fed (sup.)"],
+    "非农新增": ["Nonfarm payrolls", "Emplois non agricoles", "Beschäftigung", "Nóminas"],
+    "失业率": ["Unemployment", "Chômage", "Arbeitslosenquote", "Desempleo"],
+    "高收益 OAS": ["High-yield OAS", "OAS haut rendement", "High-Yield-OAS", "OAS alto rendimiento"],
+    "投资级 OAS": ["Investment-grade OAS", "OAS investment grade", "Investment-Grade-OAS", "OAS grado de inversión"],
+    "CPI 同比": ["CPI YoY", "CPI a/a", "CPI ggü. Vj.", "CPI interanual"],
+    "核心 PCE 同比": ["Core PCE YoY", "PCE core a/a", "Kern-PCE ggü. Vj.", "PCE núcleo interanual"],
+    "PPI 同比": ["PPI YoY", "PPI a/a", "PPI ggü. Vj.", "PPI interanual"],
+    "GDP 环比年化": ["GDP QoQ ann.", "PIB t/t ann.", "BIP annualisiert", "PIB anualizado"],
+    "企业利润同比": ["Corp. profits YoY", "Profits a/a", "Gewinne ggü. Vj.", "Beneficios interanual"],
+    "倒挂线": ["Inversion line", "Ligne d'inversion", "Inversionslinie", "Línea de inversión"],
+    "开仓阈值 25": ["Entry threshold 25", "Seuil 25", "Schwelle 25", "Umbral 25"],
+    "2% 目标": ["2% target", "Cible 2 %", "2%-Ziel", "Objetivo 2 %"],
+    "年数": ["Years", "Années", "Jahre", "Años"],
+    "天数(log)": ["Days (log)", "Jours (log)", "Tage (log)", "Días (log)"],
+    "千人": ["Thousands", "Milliers", "Tsd.", "Miles"],
+    "失业率%": ["Unemp. %", "Chômage %", "ALQ %", "Desempleo %"],
+    "起点=100": ["Start = 100", "Base 100", "Start = 100", "Base 100"],
+    "家数": ["Count", "Nombre", "Anzahl", "Número"],
+    "🐂 牛": ["🐂 Bull", "🐂 Hausse", "🐂 Bulle", "🐂 Alcista"],
+    "🐻 熊": ["🐻 Bear", "🐻 Baisse", "🐻 Bär", "🐻 Bajista"],
+    "1月": ["Jan", "janv.", "Jan.", "ene"], "2月": ["Feb", "févr.", "Feb.", "feb"],
+    "3月": ["Mar", "mars", "März", "mar"], "4月": ["Apr", "avr.", "Apr.", "abr"],
+    "5月": ["May", "mai", "Mai", "may"], "6月": ["Jun", "juin", "Juni", "jun"],
+    "7月": ["Jul", "juil.", "Juli", "jul"], "8月": ["Aug", "août", "Aug.", "ago"],
+    "9月": ["Sep", "sept.", "Sep.", "sep"], "10月": ["Oct", "oct.", "Okt.", "oct"],
+    "11月": ["Nov", "nov.", "Nov.", "nov"], "12月": ["Dec", "déc.", "Dez.", "dic"],
+
+    // ---- 状态卡 / 文案残留 ----
+    "未触发（K ≥ 1）": ["Not triggered (K ≥ 1)", "Non déclenché (K ≥ 1)", "Nicht ausgelöst (K ≥ 1)", "No activada (K ≥ 1)"],
+    "★ 金风玉露相逢 — 信号触发": ["★ Signal triggered", "★ Signal déclenché", "★ Signal ausgelöst", "★ Señal activada"],
+    "窗口关闭（≥ 25）": ["Window closed (≥ 25)", "Fenêtre fermée (≥ 25)", "Fenster geschlossen (≥ 25)", "Ventana cerrada (≥ 25)"],
+    "★ 窗口开启 — 极端恐惧": ["★ Window open — extreme fear", "★ Fenêtre ouverte — peur extrême", "★ Fenster offen — extreme Angst", "★ Ventana abierta — miedo extremo"],
+    "连续交易日聚为一次": ["Consecutive days = one window", "Jours consécutifs = une fenêtre", "Folgetage = ein Fenster", "Días consecutivos = una ventana"],
+    "免费源暂缺，参考 TTM": ["No free source; see TTM", "Pas de source gratuite ; voir TTM", "Keine freie Quelle; siehe TTM", "Sin fuente gratuita; ver TTM"],
+    "免费源暂缺": ["No free source", "Pas de source gratuite", "Keine freie Quelle", "Sin fuente gratuita"],
+    "全历史 / 近50年 / 2010→": ["All history / 50y / 2010→", "Tout l'historique / 50 ans / 2010→", "Gesamt / 50 J / 2010→", "Todo / 50a / 2010→"],
+    "持仓加权": ["Holdings-weighted", "Pondéré par positions", "Bestandsgewichtet", "Ponderado por cartera"],
+    "同为 ETF 口径": ["Same ETF basis", "Même base ETF", "Gleiche ETF-Basis", "Misma base ETF"],
+    "贵于历史中枢": ["Above its historical anchor", "Au-dessus de l'ancre historique", "Über dem histor. Anker", "Sobre su ancla histórica"],
+    "低于历史中枢": ["Below its historical anchor", "Sous l'ancre historique", "Unter dem histor. Anker", "Bajo su ancla histórica"],
+    "yfinance 快照": ["yfinance snapshot", "Instantané yfinance", "yfinance-Momentaufnahme", "Instantánea de yfinance"],
+    "回到": ["Back to ", "Retour à ", "Zurück zu ", "Volver a "],
+    "美股编年史 · 自用版": ["Market Chronicle · personal edition", "Market Chronicle · édition personnelle", "Market Chronicle · private Ausgabe", "Market Chronicle · edición personal"],
+    "数据更新中，稍后自动出现 · data updating": ["Data updating — will appear shortly", "Données en cours de mise à jour", "Daten werden aktualisiert", "Actualizando datos"],
+
+    // ---- 长图注 / sub ----
+    "每年收盘对收盘的价格回报": ["Close-to-close price return per year", "Rendement prix clôture à clôture", "Jahresrendite Schluss zu Schluss", "Rendimiento precio cierre a cierre"],
+    "年度回报分桶 · 悬停查看每桶年份": ["Annual returns bucketed · hover for years", "Rendements par tranche · survolez pour les années", "Jahresrenditen in Klassen · Hover zeigt Jahre", "Rendimientos por tramos · pase el cursor"],
+    "月频滚动窗口 · 正收益概率": ["Monthly rolling windows · probability of gain", "Fenêtres mensuelles glissantes · probabilité de gain", "Monatlich rollierend · Gewinnwahrscheinlichkeit", "Ventanas móviles mensuales · probabilidad de ganancia"],
+    "首段自数据起点截断": ["First segment truncated at data start", "Premier segment tronqué au début des données", "Erstes Segment am Datenbeginn gekappt", "Primer tramo truncado al inicio de datos"],
+    "距前高的百分比距离（周频）": ["Percent below prior peak (weekly)", "Écart au sommet précédent (hebdo)", "Abstand zum Hoch in % (wöchentlich)", "Distancia al máximo previo (semanal)"],
+    "几乎每一年都有回撤，多数年份仍收正": ["Nearly every year has a drawdown; most still close positive", "Presque chaque année connaît un repli ; la plupart finissent positives", "Fast jedes Jahr hat einen Drawdown; die meisten schließen positiv", "Casi todos los años hay caídas; la mayoría cierra en positivo"],
+    "全历史（1871→）· 近 50 年 · 2010 年以来，三条虚线即三个\"回归锚\"": ["All history (1871→), last 50 years, and 2010→ — three dashed anchors of mean reversion", "Tout l'historique (1871→), 50 ans, 2010→ — trois ancres de retour à la moyenne", "Gesamthistorie (1871→), 50 Jahre, 2010→ — drei Anker der Rückkehr zum Mittel", "Todo el histórico (1871→), 50 años y 2010→: tres anclas de reversión a la media"],
+    "VIX 衡量市场对未来 30 天的波动预期——冲破 30，意味着投资者已经在为下一轮风险付保费。叠加 20 日 / 60 日年化已实现波动率（周频）。": [
+      "VIX prices the next 30 days of expected volatility — above 30, investors are already paying premium for the next storm. Overlaid with 20d/60d realized vol (weekly).",
+      "Le VIX cote la volatilité attendue à 30 jours — au-dessus de 30, la prime de risque est déjà payée. Superposé aux vols réalisées 20 j/60 j.",
+      "Der VIX bepreist die erwartete Volatilität der nächsten 30 Tage — über 30 zahlen Anleger bereits Prämie für den nächsten Sturm. Mit realisierter 20T/60T-Vol.",
+      "El VIX cotiza la volatilidad esperada a 30 días: por encima de 30, ya se paga prima por la próxima tormenta. Superpuesto con vol realizada 20d/60d."],
+    "VXN 衡量市场对纳指未来 30 天的波动预期。叠加 20 日 / 60 日年化已实现波动率（周频）。": [
+      "VXN prices the Nasdaq's next 30 days of expected volatility. Overlaid with 20d/60d realized vol (weekly).",
+      "Le VXN cote la volatilité attendue du Nasdaq à 30 jours. Avec vols réalisées 20 j/60 j.",
+      "Der VXN bepreist die erwartete Nasdaq-Volatilität der nächsten 30 Tage. Mit realisierter 20T/60T-Vol.",
+      "El VXN cotiza la volatilidad esperada del Nasdaq a 30 días. Con vol realizada 20d/60d."],
+    "当前成分股（Wikipedia · 随每日更新刷新）": ["Current constituents (Wikipedia, refreshed daily)", "Composition actuelle (Wikipedia, quotidien)", "Aktuelle Mitglieder (Wikipedia, täglich)", "Componentes actuales (Wikipedia, diario)"],
+    "牛熊周期（跌 20% 确认熊 · 涨 25% 确认牛）": ["Bull/bear cycles (−20% confirms bear, +25% confirms bull)", "Cycles haussiers/baissiers (−20 % / +25 %)", "Bullen-/Bärenzyklen (−20 % / +25 %)", "Ciclos alcistas/bajistas (−20 % / +25 %)"],
+    "日收益分布（对数计数）": ["Daily return distribution (log count)", "Distribution des rendements quotidiens (log)", "Tagesrenditeverteilung (log)", "Distribución de rendimientos diarios (log)"],
+    "最差 / 最好单日": ["Worst / best single days", "Pires / meilleures séances", "Schlechteste / beste Tage", "Peores / mejores días"],
+    "十只核心成员自 2008-03（Visa 上市）同一起跑线；墨色粗线为等权组合。COIN/HOOD/CRCL 上市较晚，不入组合、只出个股页。": [
+      "Ten core members from a common start in Mar 2008 (Visa's IPO); the bold ink line is the equal-weight basket. COIN/HOOD/CRCL listed too recently and are excluded from the basket.",
+      "Dix membres depuis mars 2008 (IPO de Visa) ; la ligne épaisse est le panier équipondéré. COIN/HOOD/CRCL, trop récents, en sont exclus.",
+      "Zehn Kernmitglieder ab März 2008 (Visa-IPO); die dicke Linie ist der gleichgewichtete Korb. COIN/HOOD/CRCL sind zu jung und ausgeschlossen.",
+      "Diez miembros desde marzo de 2008 (salida de Visa); la línea gruesa es la cesta equiponderada. COIN/HOOD/CRCL cotizan hace poco y quedan fuera."],
+    "墨色粗线为六股等权组合": ["Bold ink line = equal-weight basket of six", "Ligne épaisse = panier équipondéré des six", "Dicke Linie = gleichgewichteter Korb der sechs", "Línea gruesa = cesta equiponderada de seis"],
+    "墨色粗线为三股等权组合；MC/RMS 为欧元、RACE 为美元，混币种仅供比较": ["Bold line = equal-weight basket of three; MC/RMS in EUR, RACE in USD — mixed currencies, for comparison only", "Ligne épaisse = panier des trois ; MC/RMS en EUR, RACE en USD — devises mixtes", "Dicke Linie = Korb der drei; MC/RMS in EUR, RACE in USD — Mischwährung", "Línea gruesa = cesta de tres; MC/RMS en EUR, RACE en USD — divisas mixtas"],
+    "年化收益按各自币种计；YTD 为年初至今涨跌 · 点击任意一行进入个股页": ["CAGRs in local currency; YTD = year-to-date · click any row for the stock page", "TCAC en devise locale ; cliquez une ligne pour la fiche valeur", "CAGR in Lokalwährung; Zeile anklicken für die Aktienseite", "TCAC en divisa local; haga clic en una fila para ver el valor"],
+    "点击任意一行进入个股页": ["Click any row for the stock page", "Cliquez une ligne pour la fiche valeur", "Zeile anklicken für die Aktienseite", "Haga clic en una fila para ver el valor"],
+    "上图：CNN（黄，左轴 0–100）· VIX（红，左轴）· 纳指 100（蓝，右轴，对数）｜下图：K 指数（红，左轴 1–10），K < 1 区间高亮": [
+      "Top: CNN (gold, left 0–100), VIX (red, left), NDX (blue, right, log). Bottom: K-Index (red, 1–10), K < 1 zones highlighted.",
+      "Haut : CNN (or), VIX (rouge), NDX (bleu, log). Bas : indice K (rouge, 1–10), zones K < 1 en surbrillance.",
+      "Oben: CNN (gold), VIX (rot), NDX (blau, log). Unten: K-Index (rot, 1–10), K < 1 hervorgehoben.",
+      "Arriba: CNN (oro), VIX (rojo), NDX (azul, log). Abajo: índice K (rojo, 1–10), zonas K < 1 resaltadas."],
+    "CNN 数据 2011 年起为每日存档；图表自 2019-06 起展示。数据源：CNN Fear & Greed（whit3rabbit 存档 + 官方接口）、Yahoo Finance。": [
+      "CNN data archived daily since 2011; chart shown from Jun 2019. Sources: CNN Fear & Greed (whit3rabbit archive + official endpoint), Yahoo Finance.",
+      "Données CNN archivées depuis 2011 ; graphique depuis juin 2019. Sources : CNN Fear & Greed, Yahoo Finance.",
+      "CNN-Daten seit 2011 täglich archiviert; Chart ab Juni 2019. Quellen: CNN Fear & Greed, Yahoo Finance.",
+      "Datos de CNN archivados desde 2011; gráfico desde junio de 2019. Fuentes: CNN Fear & Greed, Yahoo Finance."],
+    "金风（CNN）玉露（VIX）一（K < 1）相逢，便胜却人间无数。": [
+      "When golden fear (CNN) meets jade volatility (VIX) below one, the encounter outshines countless ordinary days.",
+      "Quand la peur (CNN) rencontre la volatilité (VIX) sous 1, la rencontre vaut mieux que mille jours ordinaires.",
+      "Wenn Angst (CNN) auf Volatilität (VIX) unter 1 trifft, ist diese Begegnung mehr wert als tausend gewöhnliche Tage.",
+      "Cuando el miedo (CNN) se encuentra con la volatilidad (VIX) bajo 1, ese encuentro vale más que mil días corrientes."],
+    "每段连续 K < 1 的交易日聚为一次信号（间隔超过 10 个交易日记为新信号）。收益为信号首日纳指 100 收盘价之后 20 / 40 / 60 个交易日的涨跌幅。": [
+      "Consecutive K < 1 days cluster into one signal (gaps > 10 trading days start a new one). Returns are NDX moves 20/40/60 trading days after the signal's first day.",
+      "Les jours consécutifs K < 1 forment un signal (écart > 10 jours = nouveau). Rendements NDX à 20/40/60 jours après le premier jour.",
+      "Aufeinanderfolgende K<1-Tage bilden ein Signal (Lücke > 10 Handelstage = neu). NDX-Renditen 20/40/60 Tage nach Signalbeginn.",
+      "Los días consecutivos con K < 1 forman una señal (hueco > 10 días = nueva). Rendimientos del NDX a 20/40/60 días."],
+    "黄色为 CNN 恐贪指数（左轴 0–100），蓝色为纳指 100（右轴 · 对数）；恐贪 < 25 的窗口期红色高亮，25 处虚线为开仓阈值": [
+      "Gold = CNN Fear & Greed (left, 0–100); blue = NDX (right, log). Windows below 25 highlighted; dashed line = entry threshold.",
+      "Or = CNN Fear & Greed ; bleu = NDX (log). Fenêtres < 25 en surbrillance ; pointillé = seuil.",
+      "Gold = CNN Fear & Greed; blau = NDX (log). Fenster < 25 hervorgehoben; gestrichelt = Schwelle.",
+      "Oro = CNN Fear & Greed; azul = NDX (log). Ventanas < 25 resaltadas; línea discontinua = umbral."],
+    "连续低于 25 的交易日聚为一个窗口（间隔 >10 个交易日记新窗口）；收益为窗口首日起 6/12/18 个月（126/252/378 交易日）标普 500 与纳指 100 涨跌幅": [
+      "Consecutive days below 25 cluster into one window (gaps > 10 days start a new one). Returns are S&P 500 and NDX moves 6/12/18 months (126/252/378 trading days) from the window's first day.",
+      "Jours consécutifs < 25 = une fenêtre. Rendements S&P 500 et NDX à 6/12/18 mois.",
+      "Folgetage < 25 = ein Fenster. S&P-500- und NDX-Renditen nach 6/12/18 Monaten.",
+      "Días consecutivos < 25 = una ventana. Rendimientos del S&P 500 y NDX a 6/12/18 meses."],
+    "低于 25，市场进入极端恐惧——别人恐惧时的保费，就是 LEAPS 买家的入场券。不买 3 个月以内的期权：短期权大概率归零，胜负手在时间价值站在你这边。": [
+      "Below 25 the market enters extreme fear — the premium others pay in panic is the LEAPS buyer's ticket. Never buy options under 3 months: short-dated contracts mostly expire worthless; the edge is having time value on your side.",
+      "Sous 25, peur extrême — la prime payée par les autres est le ticket d'entrée de l'acheteur de LEAPS. Jamais d'options < 3 mois : elles expirent le plus souvent sans valeur.",
+      "Unter 25 herrscht extreme Angst — die Prämie der anderen ist das Ticket des LEAPS-Käufers. Keine Optionen unter 3 Monaten: kurze Laufzeiten verfallen meist wertlos.",
+      "Bajo 25, miedo extremo: la prima que pagan otros es la entrada del comprador de LEAPS. Nunca opciones a menos de 3 meses: suelen expirar sin valor."],
+    "CNN 恐惧贪婪指数跌破 25 = 市场进入极端恐惧 = LEAPS call 开仓观察窗口。只做一年以上的远期期权——短期期权是彩票，LEAPS 才是用时间换空间。": [
+      "CNN Fear & Greed below 25 = extreme fear = LEAPS-call entry watch window. Only go a year or more out — short-dated options are lottery tickets; LEAPS trade time for room to be right.",
+      "CNN Fear & Greed sous 25 = peur extrême = fenêtre d'observation LEAPS. Un an minimum — le court terme est une loterie.",
+      "CNN Fear & Greed unter 25 = extreme Angst = LEAPS-Beobachtungsfenster. Mindestens ein Jahr Laufzeit — kurzes ist Lotterie.",
+      "CNN Fear & Greed bajo 25 = miedo extremo = ventana de observación LEAPS. Mínimo un año: el corto plazo es lotería."],
+    "K 指数 = CNN 恐惧贪婪指数 ÷ VIX。当恐惧（CNN 走低）与波动（VIX 走高）交叉，K 跌破 1 —— 2020 年以来的每一次，都对应纳指 100 的一次深度回调。下方逐次对账。": [
+      "K-Index = CNN Fear & Greed ÷ VIX. When fear (CNN falling) crosses volatility (VIX rising), K breaks below 1 — every time since 2020 has coincided with a deep NDX correction. Audited signal by signal below.",
+      "Indice K = CNN ÷ VIX. Quand K passe sous 1, chaque occurrence depuis 2020 a coïncidé avec une correction profonde du NDX. Audit ci-dessous.",
+      "K-Index = CNN ÷ VIX. Fällt K unter 1, fiel dies seit 2020 jedes Mal mit einer tiefen NDX-Korrektur zusammen. Prüfung unten.",
+      "Índice K = CNN ÷ VIX. Cada vez que K cae bajo 1 desde 2020 ha coincidido con una corrección profunda del NDX. Auditoría abajo."],
+    "过剩流动性的蓄水池，抽干即水位警报": ["The reservoir of excess liquidity — drained means low-water alarm", "Réservoir de liquidité excédentaire", "Reservoir überschüssiger Liquidität", "Reserva de liquidez excedente"],
+    "QE 放水 / QT 收水的总闸门": ["The master valve of QE and QT", "La vanne maîtresse du QE/QT", "Das Hauptventil von QE/QT", "La válvula maestra del QE/QT"],
+    "倒挂（< 0）历来是衰退的前奏": ["Inversion (< 0) has historically preceded recessions", "L'inversion précède historiquement les récessions", "Inversion ging Rezessionen historisch voraus", "La inversión ha precedido históricamente a las recesiones"],
+    "CDS 级的违约恐惧温度计（美银美林指数）": ["A CDS-grade default-fear thermometer (BofA ML indices)", "Thermomètre de peur du défaut (indices BofA ML)", "Ausfallangst-Thermometer (BofA-ML-Indizes)", "Termómetro del miedo al impago (índices BofA ML)"],
+    "全美企业税后利润（FRED CP）——指数 EPS 的宏观母体": ["US after-tax corporate profits (FRED CP) — the macro parent of index EPS", "Profits après impôts des entreprises US — matrice macro du BPA", "US-Unternehmensgewinne nach Steuern — Makro-Mutter des Index-EPS", "Beneficios empresariales después de impuestos — matriz macro del BPA"],
+    "钱贵不贵、多不多？隔夜利率是资金的体温计，逆回购与 Fed 资产负债表是流动性的蓄水池。": [
+      "Is money dear, is money plentiful? Overnight rates are its thermometer; RRP and the Fed's balance sheet are its reservoirs.",
+      "L'argent est-il cher, abondant ? Les taux au jour le jour en sont le thermomètre.",
+      "Ist Geld teuer, ist Geld reichlich? Tagesgeldsätze sind das Thermometer.",
+      "¿El dinero está caro o abunda? Los tipos a un día son su termómetro."],
+    "Fed 政策方向写在收益率曲线上，违约恐惧写在信用利差里。": [
+      "Fed policy is written on the yield curve; default fear is written in credit spreads.",
+      "La politique de la Fed s'écrit sur la courbe des taux ; la peur du défaut, dans les spreads.",
+      "Fed-Politik steht in der Zinskurve; Ausfallangst in den Kreditspreads.",
+      "La política de la Fed se escribe en la curva de tipos; el miedo al impago, en los spreads."],
+    "CPI、核心 PCE 与 PPI——Fed 盯的就是这三条线回不回 2%。": [
+      "CPI, core PCE and PPI — the three lines the Fed watches on their way back to 2%.",
+      "CPI, PCE core et PPI — les trois lignes que la Fed surveille vers 2 %.",
+      "CPI, Kern-PCE und PPI — die drei Linien auf dem Weg zurück zu 2 %.",
+      "CPI, PCE núcleo y PPI: las tres líneas que la Fed vigila hacia el 2 %."],
+    "GDP、非农、失业率与企业利润——基本面的四块基石。": [
+      "GDP, payrolls, unemployment and corporate profits — the four cornerstones of fundamentals.",
+      "PIB, emploi, chômage et profits — les quatre pierres angulaires.",
+      "BIP, Beschäftigung, Arbeitslosigkeit und Gewinne — die vier Grundpfeiler.",
+      "PIB, empleo, paro y beneficios: las cuatro piedras angulares."],
+    "对比模式：全部序列在共同起点归一化为 100（对数坐标），跑赢基准 = 长期真正的好公司。": [
+      "Comparison mode: all series normalized to 100 at the common start (log scale). Beating the benchmark = a genuinely great long-term business.",
+      "Mode comparaison : séries en base 100 au départ commun (log). Battre l'indice = une vraie grande entreprise.",
+      "Vergleichsmodus: alle Serien auf 100 normiert (log). Den Index schlagen = ein wirklich gutes Unternehmen.",
+      "Modo comparación: todas las series en base 100 (log). Batir al índice = una empresa realmente buena."],
+    "(1+回报) = (1+EPS变化) × (1+估值变化)，年末对年末": ["(1+return) = (1+EPS change) × (1+multiple change), year-end to year-end", "(1+rendement) = (1+ΔBPA) × (1+Δmultiple)", "(1+Rendite) = (1+ΔEPS) × (1+ΔMultiple)", "(1+retorno) = (1+ΔBPA) × (1+Δmúltiplo)"],
+
+    // ---- 残留清扫（自动扫描补充）----
+    "美股编年史": ["Market Chronicle", "Market Chronicle", "Market Chronicle", "Market Chronicle"],
+    "纳指综指 × 纳指 100（月线 · 对数坐标）": ["Composite × Nasdaq-100 (monthly, log)", "Composite × Nasdaq-100 (mensuel, log)", "Composite × Nasdaq-100 (monatlich, log)", "Composite × Nasdaq-100 (mensual, log)"],
+    "纳指 100 年度回报": ["Nasdaq-100 annual returns", "Rendements annuels du Nasdaq-100", "Nasdaq-100-Jahresrenditen", "Rendimientos anuales del Nasdaq-100"],
+    "纳指 100 历史回撤曲线": ["Nasdaq-100 drawdown curve", "Courbe des replis du Nasdaq-100", "Nasdaq-100-Drawdown-Kurve", "Curva de caídas del Nasdaq-100"],
+    "纳指 100 现在贵吗？": ["Is the Nasdaq-100 expensive today?", "Le Nasdaq-100 est-il cher ?", "Ist der Nasdaq-100 heute teuer?", "¿Está caro el Nasdaq-100?"],
+    "QQQ PE (TTM · ETF 口径)": ["QQQ P/E (TTM, ETF basis)", "PER QQQ (TTM, base ETF)", "QQQ-KGV (TTM, ETF-Basis)", "PER QQQ (TTM, base ETF)"],
+    "QQQ 远期 PE": ["QQQ forward P/E", "PER prospectif QQQ", "QQQ-Forward-KGV", "PER adelantado QQQ"],
+    "SPY PE 对照": ["SPY P/E for reference", "PER SPY en référence", "SPY-KGV als Referenz", "PER SPY de referencia"],
+    "指数级的纳指 PE 长历史与远期 PE 无免费公开数据源（原站为 Bloomberg 手动维护），此处仅展示 QQQ ETF 口径的当前值；个股级的 20 年 PE 历史请进入金融/消费/奢侈品板块的个股页查看。": [
+      "No free public source exists for index-level Nasdaq P/E history or forward P/E (the original site maintains Bloomberg files by hand); only current QQQ ETF-basis values are shown here. For 20-year P/E histories, open any stock page in the Financials / Consumer / Luxury tabs.",
+      "Pas de source publique gratuite pour l'historique du PER du Nasdaq ; seules les valeurs actuelles base ETF sont affichées. Voir les fiches valeurs pour 20 ans de PER.",
+      "Keine freie Quelle für die Nasdaq-KGV-Historie; hier nur aktuelle ETF-Werte. 20-Jahres-KGV auf den Aktienseiten.",
+      "No hay fuente gratuita para el histórico del PER del Nasdaq; aquí solo valores actuales base ETF. Vea 20 años de PER en las páginas de valores."],
+    "XLF 走势（月线 · 对数坐标）": ["XLF price (monthly, log)", "XLF (mensuel, log)", "XLF (monatlich, log)", "XLF (mensual, log)"],
+    "XLF 年度回报": ["XLF annual returns", "Rendements annuels XLF", "XLF-Jahresrenditen", "Rendimientos anuales XLF"],
+    "XLF 回撤曲线": ["XLF drawdown curve", "Courbe des replis XLF", "XLF-Drawdown-Kurve", "Curva de caídas XLF"],
+    "XLP（必需消费）× XLY（可选消费）走势（月线 · 对数坐标）": ["XLP (staples) × XLY (discretionary), monthly log", "XLP × XLY (mensuel, log)", "XLP × XLY (monatlich, log)", "XLP × XLY (mensual, log)"],
+    "XLP 年度回报": ["XLP annual returns", "Rendements annuels XLP", "XLP-Jahresrenditen", "Rendimientos anuales XLP"],
+    "XLY 年度回报": ["XLY annual returns", "Rendements annuels XLY", "XLY-Jahresrenditen", "Rendimientos anuales XLY"],
+    "滚动 5 年年化": ["Rolling 5-year CAGR", "TCAC glissant 5 ans", "Rollierende 5J-CAGR", "TCAC móvil 5 años"],
+    "已实现波动率（20 日年化）": ["Realized volatility (20d annualized)", "Volatilité réalisée (20 j annualisée)", "Realisierte Volatilität (20T ann.)", "Volatilidad realizada (20d anualizada)"],
+    "PB（银行类更看市净率）": ["P/B (the right lens for banks)", "P/B (la bonne optique pour les banques)", "KBV (der richtige Blick für Banken)", "P/VC (la lente correcta para bancos)"],
+    "CNN 恐贪 × VIX × 纳指 100，与 K 指数": ["CNN F&G × VIX × Nasdaq-100, and the K-Index", "CNN F&G × VIX × Nasdaq-100, et l'indice K", "CNN F&G × VIX × Nasdaq-100 und der K-Index", "CNN F&G × VIX × Nasdaq-100, y el índice K"],
+    "2020 年以来 K < 1 信号逐次对账": ["Every K < 1 signal since 2020, audited", "Chaque signal K < 1 depuis 2020, audité", "Jedes K<1-Signal seit 2020, geprüft", "Cada señal K < 1 desde 2020, auditada"],
+    "CNN 恐贪 × 纳指 100（2011 年至今）": ["CNN F&G × Nasdaq-100 (since 2011)", "CNN F&G × Nasdaq-100 (depuis 2011)", "CNN F&G × Nasdaq-100 (seit 2011)", "CNN F&G × Nasdaq-100 (desde 2011)"],
+    "2011 年以来每次极端恐惧，6 / 12 / 18 个月后指数在哪里？（LEAPS 的持有视界）": ["After every extreme-fear window since 2011 — where was the index 6/12/18 months later? (the LEAPS holding horizon)", "Après chaque fenêtre de peur extrême depuis 2011 — où était l'indice 6/12/18 mois plus tard ?", "Nach jedem Extremangst-Fenster seit 2011 — wo stand der Index 6/12/18 Monate später?", "Tras cada ventana de miedo extremo desde 2011, ¿dónde estaba el índice 6/12/18 meses después?"],
+    "恐贪 < 25 窗口逐次对账": ["Every window below 25, audited", "Chaque fenêtre sous 25, auditée", "Jedes Fenster unter 25, geprüft", "Cada ventana bajo 25, auditada"],
+    "NDX至今": ["NDX to date", "NDX à ce jour", "NDX bis heute", "NDX hasta hoy"],
   };
+
+  // 带动态数字的句式：正则 → 各语言模板（$1…为捕获组）
+  const P = [
+    [/^今日 K 指数（(.+)）$/, ["K-Index today ($1)", "Indice K aujourd'hui ($1)", "K-Index heute ($1)", "Índice K hoy ($1)"]],
+    [/^今日恐贪（(.+)）$/, ["Fear & Greed today ($1)", "Fear & Greed aujourd'hui ($1)", "Fear & Greed heute ($1)", "Fear & Greed hoy ($1)"]],
+    [/^至今 (.+)$/, ["$1 to date", "$1 à ce jour", "$1 bis heute", "$1 hasta hoy"]],
+    [/^NDX 至今 (.+)$/, ["NDX to date: $1", "NDX à ce jour : $1", "NDX bis heute: $1", "NDX hasta hoy: $1"]],
+    [/^(\d+) 次$/, ["$1", "$1", "$1", "$1"]],
+    [/^(\d+) 年$/, ["$1y", "$1 ans", "$1 J", "$1a"]],
+    [/^持有(\d+)年$/, ["Hold $1y", "Tenir $1 ans", "$1 J halten", "Mantener $1a"]],
+    [/^全历史第 (.+) 百分位$/, ["$1th percentile, all history", "$1e percentile (historique)", "$1. Perzentil (gesamt)", "Percentil $1 (histórico)"]],
+    [/^1871 年来第 (.+) 百分位$/, ["$1th percentile since 1871", "$1e percentile depuis 1871", "$1. Perzentil seit 1871", "Percentil $1 desde 1871"]],
+    [/^自身 (\d{4})→ 第 (.+) 百分位$/, ["$2th percentile since $1", "$2e percentile depuis $1", "$2. Perzentil seit $1", "Percentil $2 desde $1"]],
+    [/^约 (\d{4}) 年以来$/, ["since ~$1", "depuis ~$1", "seit ca. $1", "desde ~$1"]],
+    [/^历史均值 (.+)$/, ["Mean $1", "Moyenne $1", "Mittel $1", "Media $1"]],
+    [/^均值 (.+)$/, ["Mean $1", "Moyenne $1", "Mittel $1", "Media $1"]],
+    [/^中位 (.+)$/, ["Median $1", "Médiane $1", "Median $1", "Mediana $1"]],
+    [/^全历史中位 (.+)$/, ["All-history median $1", "Médiane historique $1", "Gesamtmedian $1", "Mediana histórica $1"]],
+    [/^近50年中位 (.+)$/, ["50y median $1", "Médiane 50 ans $1", "50J-Median $1", "Mediana 50a $1"]],
+    [/^2010→中位 (.+)$/, ["2010→ median $1", "Médiane 2010→ $1", "Median 2010→ $1", "Mediana 2010→ $1"]],
+    [/^(VIX|VXN) = 30 · 保费警戒线$/, ["$1 = 30 · premium alert", "$1 = 30 · alerte prime", "$1 = 30 · Prämienalarm", "$1 = 30 · alerta de prima"]],
+    [/^美股编年史 · 自用版 · 数据更新于 (.+)$/, ["Market Chronicle · personal edition · data updated $1", "Market Chronicle · données mises à jour le $1", "Market Chronicle · Daten aktualisiert am $1", "Market Chronicle · datos actualizados el $1"]],
+    [/^· 数据源：.+$/, ["· Data: Yahoo Finance / CNN Fear & Greed / multpl / FRED / macrotrends / Wikipedia · Personal research only — not investment advice",
+      "· Données : Yahoo Finance / CNN / multpl / FRED / macrotrends / Wikipedia · Recherche personnelle — pas un conseil en investissement",
+      "· Daten: Yahoo Finance / CNN / multpl / FRED / macrotrends / Wikipedia · Private Recherche — keine Anlageberatung",
+      "· Datos: Yahoo Finance / CNN / multpl / FRED / macrotrends / Wikipedia · Investigación personal; no es asesoramiento"]],
+    [/^实证结论：2020 年以来共 (\d+) 次信号。60 个交易日窗口胜率 (\d+)\/(\d+)（.+）。所有信号持有至今全部为正。历史规律不保证未来。$/,
+      ["Empirical result: $1 signals since 2020; 60-trading-day win rate $2/$3 (near-perfect in V-shaped corrections; the 2021–22 bear market fired repeated signals with negative short windows). All signals are positive held to date. Past patterns do not guarantee the future.",
+       "Résultat empirique : $1 signaux depuis 2020 ; taux de gain à 60 jours $2/$3. Tous les signaux sont positifs à ce jour. Le passé ne garantit pas l'avenir.",
+       "Empirisches Ergebnis: $1 Signale seit 2020; 60-Tage-Gewinnquote $2/$3. Alle Signale bis heute positiv. Vergangenheit garantiert keine Zukunft.",
+       "Resultado empírico: $1 señales desde 2020; tasa de acierto a 60 días $2/$3. Todas positivas hasta hoy. El pasado no garantiza el futuro."]],
+    [/^实证结论：(\d+) 次窗口中，12 个月视界 NDX 胜率 (\d+)\/(\d+)、SPX 胜率 (\d+)\/(\d+)。.+$/,
+      ["Empirical result: of $1 windows, 12-month NDX win rate $2/$3 and SPX $4/$5. Note the late-2021 windows: extreme fear during a topping market was not the bottom — still negative 12 months on. Fear gauges mark sentiment extremes, not valuation floors; cross-check with the K-Index. Past patterns do not guarantee the future.",
+       "Résultat : sur $1 fenêtres, taux de gain NDX à 12 mois $2/$3, SPX $4/$5. Les fenêtres fin 2021 n'étaient pas un plancher. À croiser avec l'indice K.",
+       "Ergebnis: von $1 Fenstern NDX-12-Monats-Quote $2/$3, SPX $4/$5. Die Fenster Ende 2021 waren kein Boden. Mit dem K-Index gegenprüfen.",
+       "Resultado: de $1 ventanas, acierto NDX a 12 meses $2/$3 y SPX $4/$5. Las ventanas de finales de 2021 no fueron suelo. Contrastar con el índice K."]],
+    [/^口径说明：PE\(TTM\) 与 CAPE 来自 multpl\/席勒月度数据（(\d+) 年起），.+数据截至 (.+)。$/,
+      ["Methodology: PE(TTM) and CAPE from multpl/Shiller monthly data (since $1); percentile = today's reading within all history. The three medians are three eras' gravity anchors — the farther from an anchor, the more stretched the elastic. Data as of $2.",
+       "Méthodologie : PER et CAPE via multpl/Shiller (depuis $1) ; percentile = position actuelle dans l'historique. Données au $2.",
+       "Methodik: KGV und CAPE via multpl/Shiller (seit $1); Perzentil = heutige Position in der Gesamthistorie. Stand: $2.",
+       "Metodología: PER y CAPE de multpl/Shiller (desde $1); percentil = posición actual en el histórico. Datos a $2."]],
+  ];
 
   const LANG_META = {
     zh: { label: "简", html: "zh-CN" },
@@ -323,13 +564,16 @@
     const t = src.trim();
     if (!t || !/[一-鿿]/.test(t)) return src; // 无中文不处理
     if (cur === "tw") return twConv ? twConv(src) : src;
-    const ch = t.match(/^第(.+)章$/); // "第N章" 动态编号
+    const ch = t.match(/^第(.+)章$/); // "第N章" 动态编号（中文数字或阿拉伯数字）
     if (ch) {
-      const n = CN_NUM.indexOf(ch[1]) + 1;
+      const n = /^\d+$/.test(ch[1]) ? parseInt(ch[1], 10) : CN_NUM.indexOf(ch[1]) + 1;
       if (n > 0) return src.replace(t, CHAPTER_WORD[cur] + " " + n);
     }
     const entry = D[t];
     if (entry && entry[COL[cur]]) return src.replace(t, entry[COL[cur]]);
+    for (const [re, out] of P) { // 带数字的动态句式
+      if (re.test(t) && out[COL[cur]]) return src.replace(t, t.replace(re, out[COL[cur]]));
+    }
     return src;
   }
 
@@ -361,6 +605,15 @@
   });
   mo.observe(document.body, { childList: true, subtree: true });
 
+  // 对外 API：app.js 用它翻译 ECharts 配置、并在语言切换时重建图表
+  const changeCbs = [];
+  window.MC_I18N = {
+    lang: () => cur,
+    translate,
+    onChange: (cb) => changeCbs.push(cb),
+    ready: cur === "tw" ? ensureOpenCC() : Promise.resolve(),
+  };
+
   const host = document.getElementById("lang-switch");
   function renderSwitch() {
     host.innerHTML = Object.entries(LANG_META).map(([k, m]) =>
@@ -376,11 +629,12 @@
     if (cur === "tw") await ensureOpenCC();
     renderSwitch();
     applyTo(document.body);
+    changeCbs.forEach((cb) => cb(cur)); // 图表等 canvas 内容重建
   });
 
   renderSwitch();
   if (cur !== "zh") {
-    (cur === "tw" ? ensureOpenCC() : Promise.resolve()).then(() => applyTo(document.body));
+    window.MC_I18N.ready.then(() => applyTo(document.body));
     document.documentElement.lang = LANG_META[cur].html;
   }
 })();
