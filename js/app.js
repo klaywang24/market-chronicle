@@ -596,7 +596,7 @@
     });
     // 标题单独包 span，文本节点独立才能命中 i18n 词典
     tocEl.innerHTML = heads.map((h, i) =>
-      `<a data-target="${chapters[i].id}">${ROMAN[i] || i + 1} · <span>${h.textContent.split("：")[0]}</span></a>`
+      `<a data-target="${chapters[i].id}" title="${h.textContent}">${ROMAN[i] || i + 1} · <span>${h.textContent.split("：")[0]}</span></a>`
     ).join("");
     renumberChapters(scope); // 插入/裁剪章节后重排"第N章"标签
     tocChapters = chapters;
@@ -1343,8 +1343,6 @@
             <div class="pulse-quotes">
               ${q.vix ? `<span class="pq">VIX 恐慌指数 <b>${q.vix.close}</b> ${chg(q.vix.chg)}</span>` : ""}
               ${d.fng != null ? `<span class="pq">恐惧贪婪指数 <b>${Math.round(d.fng)}</b></span>` : ""}
-            </div>
-            <div class="pulse-quotes">
               ${d.k != null ? `<span class="pq">K 指数 <b>${d.k.toFixed(2)}</b></span>` : ""}
               ${leaps ? `<span class="pq">LEAPS Call 窗口 <b class="${windowOpen ? "neg" : "pos"}">${windowOpen ? "开启" : "关闭"}</b></span>` : ""}
             </div>
@@ -1385,7 +1383,7 @@
         const c = await load("sp500_century");
         const vals = c.close, n = vals.length;
         const lo = Math.log(Math.min(...vals)), hi = Math.log(Math.max(...vals));
-        const xy = (i) => [i / (n - 1) * 100, 90 - (Math.log(vals[i]) - lo) / (hi - lo) * 76];
+        const xy = (i) => [i / (n - 1) * 100, 96 - (Math.log(vals[i]) - lo) / (hi - lo) * 92];
         const pts = vals.map((v, i) => xy(i).map((z) => z.toFixed(2)).join(",")).join(" ");
         band.insertAdjacentHTML("afterbegin",
           `<svg class="pulse-chartline" viewBox="0 0 100 100" preserveAspectRatio="none" style="opacity:${opacity}">
@@ -1416,7 +1414,7 @@
 
     // 聚光灯：纯 CSS mask 跟随光标；触屏设备自动巡游
     const hero = document.getElementById("pulse-hero");
-    const R = 230;
+    const R = 155;
     const setSpot = (x, y) => {
       const m = `radial-gradient(circle ${R}px at ${x}px ${y}px, #fff 0%, #fff 45%, rgba(255,255,255,.55) 68%, rgba(255,255,255,.15) 86%, transparent 100%)`;
       reveal.style.webkitMaskImage = m;
