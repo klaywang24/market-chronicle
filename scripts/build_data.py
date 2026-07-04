@@ -401,11 +401,12 @@ def build_valuation_extras():
 # ------------------------------------------------------- 个股篮子板块
 
 BASKETS = {
-    # 顺序即页面展示顺序：银行 → 卡组织 → 投行 → 资管 → 券商
+    # 顺序即页面展示顺序：银行 → 卡组织 → 投行 → 资管 → 券商 → 加密/稳定币
     "fin": [
         ("JPM", "摩根大通"), ("BAC", "美国银行"), ("V", "Visa"), ("MA", "万事达"),
         ("AXP", "美国运通"), ("GS", "高盛"), ("MS", "摩根士丹利"), ("BLK", "贝莱德"),
         ("SCHW", "嘉信理财"), ("IBKR", "盈透证券"),
+        ("COIN", "Coinbase"), ("HOOD", "Robinhood"), ("CRCL", "Circle"),
     ],
     "consumer": [
         ("KO", "可口可乐"), ("WMT", "沃尔玛"), ("COST", "好市多"),
@@ -419,6 +420,9 @@ BASKETS = {
 # 板块锚 ETF（个股钻取页之上的"总览"层；奢侈品无合适 ETF，用等权组合当锚）
 ETF_ANCHORS = ["XLF", "XLP", "XLY"]
 
+# 卫星成员：上市太晚，不进"共同起点"的成长曲线与等权组合，但有个股页和对照表
+BASKET_SATELLITES = {"fin": {"COIN", "HOOD", "CRCL"}}
+
 
 def safe_ticker(t: str) -> str:
     return t.lower().replace(".", "-")
@@ -426,13 +430,16 @@ def safe_ticker(t: str) -> str:
 
 def build_basket(prefix: str, members: list):
     """个股篮子：归一化成长曲线 + 等权组合面板 + 个股对照表。
-    组合与归一化都基于各自币种的百分比回报，跨币种混合仅供比较参考。"""
+    组合与归一化都基于各自币种的百分比回报，跨币种混合仅供比较参考。
+    卫星成员（上市太晚）不进共同起点分析，只出对照表行与个股页。"""
     print(f"== basket {prefix}")
+    satellites = BASKET_SATELLITES.get(prefix, set())
+    core = [(t, n) for t, n in members if t not in satellites]
     closes = {}
     for ticker, label in members:
         closes[ticker] = fetch_history(ticker)["Close"].dropna()
         time.sleep(1)
-    df = pd.DataFrame(closes).dropna()  # 共同起点 = 最晚上市者
+    df = pd.DataFrame({t: closes[t] for t, _ in core}).dropna()  # 共同起点 = 核心成员最晚上市者
     start = df.index[0]
 
     # 归一化成长曲线（周频，起点=100）+ 等权组合
@@ -445,7 +452,7 @@ def build_basket(prefix: str, members: list):
     write_json(f"{prefix}_growth.json", {
         "start": start.strftime("%Y-%m-%d"),
         "dates": dates(weekly.index),
-        "series": [{"ticker": t, "name": n, "values": rnd(weekly[t], 1)} for t, n in members],
+        "series": [{"ticker": t, "name": n, "values": rnd(weekly[t], 1)} for t, n in core],
         "ew": {"dates": dates(ew_w.index), "values": rnd(ew_w, 1)},
     })
 
@@ -465,9 +472,9 @@ def build_basket(prefix: str, members: list):
 
     # 个股对照表（共同起点口径）+ 各自全历史统计（个股页 hero 用）
     rows = []
-    last_year_end = df[df.index.year < df.index[-1].year].index[-1]
     for t, n in members:
-        s = df[t]
+        is_sat = t in satellites
+        s = closes[t] if is_sat else df[t]
         years_total = (s.index[-1] - s.index[0]).days / 365.25
         def cagr(y):
             past = s[s.index <= s.index[-1] - pd.Timedelta(days=int(y * 365.25))]
@@ -476,12 +483,14 @@ def build_basket(prefix: str, members: list):
             return round(((s.iloc[-1] / past.iloc[-1]) ** (1 / y) - 1) * 100, 1)
         max_dd = (s / s.cummax() - 1).min() * 100
         full = closes[t]
-        full_years = (full.index[-1] - full.index[0]).days / 365.25
+        full_years = max((full.index[-1] - full.index[0]).days / 365.25, 0.25)
+        prev_year = s[s.index.year < s.index[-1].year]
+        ytd = round((s.iloc[-1] / prev_year.iloc[-1] - 1) * 100, 1) if len(prev_year) else None
         rows.append({
             "ticker": t, "name": n, "safe": safe_ticker(t),
-            "ytd": round((s.iloc[-1] / s.loc[last_year_end] - 1) * 100, 1),
+            "ytd": ytd,
             "y1": cagr(1), "y3": cagr(3), "y5": cagr(5), "y10": cagr(10),
-            "since": round(((s.iloc[-1] / s.iloc[0]) ** (1 / years_total) - 1) * 100, 1),
+            "since": None if is_sat else round(((s.iloc[-1] / s.iloc[0]) ** (1 / years_total) - 1) * 100, 1),
             "max_dd": round(float(max_dd), 1),
             "start_full": full.index[0].strftime("%Y-%m-%d"),
             "since_full": round(float(((full.iloc[-1] / full.iloc[0]) ** (1 / full_years) - 1) * 100), 1),

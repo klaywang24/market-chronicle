@@ -276,16 +276,40 @@ tr:hover td { background: var(--bg-card-hover); }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding-left: 10px;
+  padding-left: 12px;
   border-left: 1px dashed var(--border);
 }
+.pill-group:first-child { border-left: none; padding-left: 0; }
 .pill-group-label {
-  font-size: 11px;
-  color: var(--ink-muted);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-deep);
   letter-spacing: 0.08em;
   white-space: nowrap;
 }
 .subnav .pill { font-size: 12.5px; padding: 3px 12px; }
+/* 两行分组布局：锚胶囊纵跨两行 + 右侧行容器 */
+.subnav .pill-anchor {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 20px;
+}
+.pill-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+}
 
 /* ---------- 个股专页 ---------- */
 .stock-hero { margin: 20px 0 8px; }

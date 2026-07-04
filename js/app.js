@@ -91,12 +91,15 @@
   const BASKET_CFG = {
     fin: {
       anchorLabel: "XLF 总览",
-      // groups 决定胶囊条的分组展示；members 顺序 = 上一只/下一只的翻页顺序
-      groups: [["银行", ["JPM", "BAC"]], ["卡组织", ["V", "MA", "AXP"]],
-               ["投行", ["GS", "MS"]], ["资管", ["BLK"]], ["券商", ["SCHW", "IBKR"]]],
+      // rows：两行分组布局（左侧锚胶囊纵跨两行）；members 顺序 = 上一只/下一只的翻页顺序
+      rows: [
+        [["银行", ["JPM", "BAC"]], ["卡组织", ["V", "MA", "AXP"]], ["投行", ["GS", "MS"]]],
+        [["资管", ["BLK"]], ["券商", ["SCHW", "IBKR"]], ["加密·稳定币", ["COIN", "HOOD", "CRCL"]]],
+      ],
       members: [["JPM", "摩根大通"], ["BAC", "美国银行"], ["V", "Visa"], ["MA", "万事达"],
                 ["AXP", "美国运通"], ["GS", "高盛"], ["MS", "摩根士丹利"], ["BLK", "贝莱德"],
-                ["SCHW", "嘉信理财"], ["IBKR", "盈透证券"]],
+                ["SCHW", "嘉信理财"], ["IBKR", "盈透证券"],
+                ["COIN", "Coinbase"], ["HOOD", "Robinhood"], ["CRCL", "Circle"]],
     },
     consumer: {
       anchorLabel: "XLP·XLY 总览",
@@ -121,13 +124,19 @@
       const s = safeTicker(t);
       return `<a class="pill ${cur === s ? "active" : ""}" href="#${basket}/${s}">${t.split(".")[0]} <span class="zh">${nameOf[t]}</span></a>`;
     };
-    const anchor = `<a class="pill ${cur ? "" : "active"}" href="#${basket}"><span class="zh">${cfg.anchorLabel}</span></a>`;
-    const body = cfg.groups
-      ? cfg.groups.map(([label, ticks]) =>
-          `<span class="pill-group"><span class="pill-group-label">${label}</span>${ticks.map(pill).join("")}</span>`
-        ).join("")
-      : cfg.members.map(([t]) => pill(t)).join("");
-    document.getElementById("subnav-" + basket).innerHTML = anchor + body;
+    const group = ([label, ticks]) =>
+      `<span class="pill-group"><span class="pill-group-label">${label}</span>${ticks.map(pill).join("")}</span>`;
+    let html;
+    if (cfg.rows) {
+      html = `<a class="pill pill-anchor ${cur ? "" : "active"}" href="#${basket}"><span class="zh">${cfg.anchorLabel}</span></a>` +
+        `<div class="pill-rows">` +
+        cfg.rows.map((row) => `<div class="pill-row">${row.map(group).join("")}</div>`).join("") +
+        `</div>`;
+    } else {
+      const anchor = `<a class="pill ${cur ? "" : "active"}" href="#${basket}"><span class="zh">${cfg.anchorLabel}</span></a>`;
+      html = anchor + (cfg.groups ? cfg.groups.map(group).join("") : cfg.members.map(([t]) => pill(t)).join(""));
+    }
+    document.getElementById("subnav-" + basket).innerHTML = html;
   }
 
   function showOverview(basket) {
