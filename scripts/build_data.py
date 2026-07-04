@@ -737,6 +737,27 @@ def safe_ticker(t: str) -> str:
     return t.lower().replace(".", "-")
 
 
+_FX_CACHE = {}
+
+def mcap_usd_b(ticker: str):
+    """市值（十亿美元）。先按原代码试（欧股 MC.PA），再试 . → - （美股 BRK.B）；非美元按汇率换算。"""
+    for sym in (ticker, ticker.replace(".", "-")):
+        try:
+            fi = yf.Ticker(sym).fast_info
+            v = fi["market_cap"]
+            if not v:
+                continue
+            cur = (fi.get("currency") or "USD").upper()
+            if cur != "USD":
+                if cur not in _FX_CACHE:
+                    _FX_CACHE[cur] = float(yf.Ticker(f"{cur}USD=X").fast_info["last_price"])
+                v *= _FX_CACHE[cur]
+            return round(v / 1e9, 1)
+        except Exception:
+            continue
+    return None
+
+
 def build_basket(prefix: str, members: list):
     """个股篮子：归一化成长曲线 + 等权组合面板 + 个股对照表。
     组合与归一化都基于各自币种的百分比回报，跨币种混合仅供比较参考。
@@ -795,11 +816,7 @@ def build_basket(prefix: str, members: list):
         full_years = max((full.index[-1] - full.index[0]).days / 365.25, 0.25)
         prev_year = s[s.index.year < s.index[-1].year]
         ytd = round((s.iloc[-1] / prev_year.iloc[-1] - 1) * 100, 1) if len(prev_year) else None
-        try:
-            mc = yf.Ticker(t.replace(".", "-")).fast_info["market_cap"]
-            mc = round(mc / 1e9, 1) if mc else None
-        except Exception:
-            mc = None
+        mc = mcap_usd_b(t)
         rows.append({
             "ticker": t, "name": n, "safe": safe_ticker(t), "mcap": mc,
             "ytd": ytd,

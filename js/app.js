@@ -1324,6 +1324,7 @@
 
     document.getElementById("pulse-base").innerHTML = `
       <div class="pulse-kicker">TODAY'S FRONT PAGE · ${d.date}</div>
+      <div class="pulse-chartband"></div>
       <div class="pulse-head">
         <div class="temp-ring" style="--pct:${d.temp};--temp-color:${tempColor}">
           <div class="val">${d.temp.toFixed(1)}<em>°</em></div>
@@ -1334,10 +1335,10 @@
           <p class="sub">温度 = （估值百分位 ${pct(d.val_pct)} + 情绪百分位 ${pct(d.sent_pct)}）÷ 2。估值取标普 500 PE(TTM) 在 1871 年以来全历史的位置；情绪取今日上涨家数占比在近一年中的位置。</p>
           <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
             <div class="pulse-quotes">
-              ${q.spx ? `<span class="pq">标普 500 <b>${q.spx.close.toLocaleString("en-US")}</b> ${chg(q.spx.chg)}</span>` : ""}
-              ${q.ndx ? `<span class="pq">纳指 100 <b>${q.ndx.close.toLocaleString("en-US")}</b> ${chg(q.ndx.chg)}</span>` : ""}
-              ${q.dji ? `<span class="pq">道琼斯 <b>${q.dji.close.toLocaleString("en-US")}</b> ${chg(q.dji.chg)}</span>` : ""}
-              ${q.rut ? `<span class="pq">罗素 2000 <b>${q.rut.close.toLocaleString("en-US")}</b> ${chg(q.rut.chg)}</span>` : ""}
+              ${q.spx ? `<span class="pq">标普 500 <b>${Math.round(q.spx.close).toLocaleString("en-US")}</b> ${chg(q.spx.chg)}</span>` : ""}
+              ${q.ndx ? `<span class="pq">纳指 100 <b>${Math.round(q.ndx.close).toLocaleString("en-US")}</b> ${chg(q.ndx.chg)}</span>` : ""}
+              ${q.dji ? `<span class="pq">道琼斯 <b>${Math.round(q.dji.close).toLocaleString("en-US")}</b> ${chg(q.dji.chg)}</span>` : ""}
+              ${q.rut ? `<span class="pq">罗素 2000 <b>${Math.round(q.rut.close).toLocaleString("en-US")}</b> ${chg(q.rut.chg)}</span>` : ""}
             </div>
             <div class="pulse-quotes">
               ${q.vix ? `<span class="pq">VIX 恐慌指数 <b>${q.vix.close}</b> ${chg(q.vix.chg)}</span>` : ""}
@@ -1373,29 +1374,45 @@
       </div>
       <div class="pulse-foot">滑动光标，掀开夜之一角。数据每交易日收盘后自动更新；温度是尺度不是信号——96 度的估值曾经烫了三年。</div>`;
 
-    // 自绘的百年走势线：日间层淡墨、夜间揭示层金色发光，加载时描线动画
-    const drawCentury = async (host, stroke, width, glow, opacity) => {
+    // 顶部世纪带：百年走势线 + 六个闪烁的危机红点
+    const CRISES = [
+      ["1929-09", "1929", "大萧条"], ["1974-10", "1974", "滞胀"],
+      ["1987-10", "1987", "黑色星期一"], ["2000-03", "2000", "互联网泡沫"],
+      ["2008-09", "2008", "金融危机"], ["2020-02", "2020", "疫情冲击"],
+    ];
+    const drawCentury = async (band, stroke, width, glow, opacity, withDots) => {
       try {
         const c = await load("sp500_century");
         const vals = c.close, n = vals.length;
         const lo = Math.log(Math.min(...vals)), hi = Math.log(Math.max(...vals));
-        const pts = vals.map((v, i) =>
-          `${(i / (n - 1) * 100).toFixed(2)},${(94 - (Math.log(v) - lo) / (hi - lo) * 82).toFixed(2)}`).join(" ");
-        host.insertAdjacentHTML("afterbegin",
+        const xy = (i) => [i / (n - 1) * 100, 90 - (Math.log(vals[i]) - lo) / (hi - lo) * 76];
+        const pts = vals.map((v, i) => xy(i).map((z) => z.toFixed(2)).join(",")).join(" ");
+        band.insertAdjacentHTML("afterbegin",
           `<svg class="pulse-chartline" viewBox="0 0 100 100" preserveAspectRatio="none" style="opacity:${opacity}">
              <polyline class="draw-line" points="${pts}" pathLength="1000" fill="none"
                style="stroke:${stroke};stroke-width:${width}${glow ? `;filter:drop-shadow(0 0 ${glow}px ${stroke})` : ""}"/></svg>`);
+        if (!withDots) return;
+        for (const [ym, year, name] of CRISES) {
+          let i = c.dates.findIndex((dt) => dt >= ym);
+          if (i < 0) continue;
+          const [x, y] = xy(i);
+          const cls = (y < 34 ? "below " : "") + (x > 90 ? "edge-r" : x < 6 ? "edge-l" : "");
+          band.insertAdjacentHTML("beforeend",
+            `<div class="crisis-dot ${cls}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%">
+               <i></i><span>${year} · <span>${name}</span></span></div>`);
+        }
       } catch (e) {}
     };
     const base = document.getElementById("pulse-base");
-    await drawCentury(base, "var(--accent)", 0.45, 0, 0.16);
+    await drawCentury(base.querySelector(".pulse-chartband"), "var(--accent)", 0.5, 0, 0.55, true);
 
-    // 揭示层 = 同一内容的夜间克隆 + 金色发光线
+    // 揭示层 = 同一内容的夜间克隆 + 金色发光线（红点随克隆保留）
     const reveal = document.getElementById("pulse-reveal");
     reveal.innerHTML = base.innerHTML;
-    const clonedSvg = reveal.querySelector("svg.pulse-chartline");
+    const rBand = reveal.querySelector(".pulse-chartband");
+    const clonedSvg = rBand && rBand.querySelector("svg.pulse-chartline");
     if (clonedSvg) clonedSvg.remove();
-    await drawCentury(reveal, "#E0B05A", 0.7, 2, 0.85);
+    if (rBand) await drawCentury(rBand, "#E0B05A", 0.8, 2, 0.9, false);
 
     // 聚光灯：纯 CSS mask 跟随光标；触屏设备自动巡游
     const hero = document.getElementById("pulse-hero");

@@ -306,6 +306,49 @@ tr:hover td { background: var(--bg-card-hover); }
   height: 100%;
   pointer-events: none;
 }
+/* 顶部世纪带：百年走势 + 危机红点 */
+.pulse-chartband {
+  position: relative;
+  height: 200px;
+  flex-shrink: 0;
+  margin: 2px 0 4px;
+}
+.crisis-dot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+.crisis-dot i {
+  display: block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #D62828;
+  border: 2px solid color-mix(in srgb, var(--bg) 80%, #fff);
+  animation: crisisPulse 1.8s ease-out infinite;
+}
+@keyframes crisisPulse {
+  0% { box-shadow: 0 0 0 0 rgba(214, 40, 40, 0.55); transform: scale(1); }
+  60% { box-shadow: 0 0 0 13px rgba(214, 40, 40, 0); transform: scale(1.22); }
+  100% { box-shadow: 0 0 0 0 rgba(214, 40, 40, 0); transform: scale(1); }
+}
+.crisis-dot > span {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -26px;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+  color: var(--accent-deep);
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  padding: 1px 7px;
+  border-radius: 5px;
+}
+.crisis-dot.below > span { top: auto; bottom: -28px; }
+.crisis-dot.edge-r > span { left: auto; right: -8px; transform: none; }
+.crisis-dot.edge-l > span { left: -8px; transform: none; }
 /* 描线动画：走势线从左至右自己画出来 */
 .draw-line {
   stroke-dasharray: 1000;
@@ -325,6 +368,7 @@ tr:hover td { background: var(--bg-card-hover); }
 .pulse-base > :nth-child(4) { animation-delay: 0.68s; }
 .pulse-base > :nth-child(5) { animation-delay: 0.85s; }
 .pulse-base > :nth-child(6) { animation-delay: 1s; }
+.pulse-base > :nth-child(7) { animation-delay: 1.12s; }
 /* 揭示层强制夜间调色（scoped 副本） */
 .force-dark {
   --bg: #1A1410; --bg-card: #241C16; --bg-card-hover: #2D241D; --bg-deep: #20180F;
@@ -365,10 +409,13 @@ tr:hover td { background: var(--bg-card-hover); }
   border: 1px solid var(--border);
   background: var(--bg-card);
   border-radius: 8px;
-  padding: 7px 14px;
-  font-size: 13px;
+  padding: 5px 11px;
+  font-size: 12.5px;
+  white-space: nowrap;
 }
-.pq b { font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-left: 6px; }
+.pq b { font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-left: 5px; }
+/* 宽屏下四大指数强制一行 */
+@media (min-width: 1000px) { .pulse-quotes { flex-wrap: nowrap; } }
 /* 涨跌带 */
 .breadth-bar { display: flex; height: 30px; border-radius: 8px; overflow: hidden; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 .breadth-bar div { display: flex; align-items: center; justify-content: center; color: #fff; min-width: 34px; }
