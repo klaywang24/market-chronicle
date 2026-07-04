@@ -251,6 +251,78 @@ def build_index_panels(prefix: str, close: pd.Series, vol_index: pd.Series | Non
     write_json(f"{prefix}_seasonality.json", {"rows": season, "years": f"{monthly.index[0].year}–{monthly.index[-1].year}"})
 
 
+# ---------------------------------------------------------------- 今日头版
+
+SECTOR_ETFS = [
+    ("XLK", "科技"), ("XLF", "金融"), ("XLV", "医疗保健"), ("XLY", "可选消费"),
+    ("XLP", "必需消费"), ("XLE", "能源"), ("XLI", "工业"), ("XLB", "原材料"),
+    ("XLU", "公用事业"), ("XLRE", "房地产"), ("XLC", "通信服务"),
+]
+
+
+def build_pulse():
+    """今日头版：市场温度（估值百分位+情绪百分位）/2、涨跌家数分布、板块当日涨跌。
+    情绪 = 上涨家数占比 (涨 + 平/2)/总数 在近一年中的百分位；
+    估值 = 标普 500 PE(TTM) 在 1871 年以来全历史中的百分位。"""
+    print("== 今日头版")
+    ticks = [r["ticker"].replace(".", "-")
+             for r in json.loads((DATA / "sp500_constituents.json").read_text())["rows"]]
+    frames = []
+    for i in range(0, len(ticks), 110):
+        chunk = ticks[i:i + 110]
+        df = yf.download(" ".join(chunk), period="1y", interval="1d",
+                         progress=False, auto_adjust=True)["Close"]
+        frames.append(df)
+        time.sleep(2)
+    px = pd.concat(frames, axis=1).dropna(how="all")
+    ret = px.pct_change().iloc[1:]
+    FLAT = 0.0001  # |涨跌| < 0.01% 记为持平
+    up = (ret > FLAT).sum(axis=1)
+    flat = (ret.abs() <= FLAT).sum(axis=1)
+    total = ret.notna().sum(axis=1)
+    ratio = (up + flat / 2) / total
+    today = ratio.index[-1]
+    adv, fl, tot = int(up.iloc[-1]), int(flat.iloc[-1]), int(total.iloc[-1])
+    dec = tot - adv - fl
+    sent_pct = round(float((ratio <= ratio.iloc[-1]).mean() * 100), 1)
+
+    pe = json.loads((DATA / "sp500_pe_ttm.json").read_text())
+    val_pct = round(sum(1 for v in pe["values"] if v <= pe["values"][-1]) / len(pe["values"]) * 100, 1)
+    temp = round((val_pct + sent_pct) / 2, 1)
+
+    # 板块当日涨跌（11 只 SPDR 行业 ETF）
+    etf_px = yf.download(" ".join(e for e, _ in SECTOR_ETFS), period="5d",
+                         interval="1d", progress=False, auto_adjust=True)["Close"]
+    etf_chg = (etf_px.iloc[-1] / etf_px.iloc[-2] - 1) * 100
+    sectors = [{"etf": e, "name": n, "chg": round(float(etf_chg[e]), 2)}
+               for e, n in SECTOR_ETFS if e in etf_chg and pd.notna(etf_chg[e])]
+    sectors.sort(key=lambda x: -x["chg"])
+
+    # 指数当日行情 + 现有信号
+    idx_px = yf.download("^GSPC ^NDX ^VIX", period="5d", interval="1d",
+                         progress=False, auto_adjust=True)["Close"]
+    quotes = {}
+    for sym, key in (("^GSPC", "spx"), ("^NDX", "ndx"), ("^VIX", "vix")):
+        s = idx_px[sym].dropna()
+        quotes[key] = {"close": round(float(s.iloc[-1]), 2),
+                       "chg": round(float(s.iloc[-1] / s.iloc[-2] - 1) * 100, 2)}
+    fng = k = None
+    try:
+        kd = json.loads((DATA / "kindex.json").read_text())["current"]
+        fng, k = kd["cnn"], kd["k"]
+    except Exception:
+        pass
+
+    write_json("pulse.json", {
+        "date": today.strftime("%Y-%m-%d"),
+        "temp": temp, "val_pct": val_pct, "sent_pct": sent_pct,
+        "adv": adv, "flat": fl, "dec": dec, "total": tot,
+        "adv_ratio": round(float(ratio.iloc[-1]) * 100, 1),
+        "sectors": sectors, "quotes": quotes, "fng": fng, "k": k,
+        "sent_window": f"{ratio.index[0].strftime('%Y-%m')}→",
+    })
+
+
 # ---------------------------------------------------------------- 宏观（FRED）
 
 def _fred(series_id: str, start: str = "2000-01-01") -> pd.Series:
@@ -780,6 +852,7 @@ def main():
     build_constituents()
     build_top_holdings()
     build_valuation_extras()
+    build_pulse()  # 依赖 constituents 与 pe_ttm，放在其后
     for prefix, members in BASKETS.items():
         build_basket(prefix, members)
     for etf in ETF_ANCHORS:

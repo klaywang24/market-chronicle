@@ -46,7 +46,7 @@
 
   // ---------------- 图表注册表 ----------------
   // panel -> [{el, build}]；懒加载：首次进入 tab 才渲染
-  const registry = { kindex: [], spy: [], qqq: [], fin: [], consumer: [], luxury: [], macro: [], leaps: [] };
+  const registry = { pulse: [], kindex: [], spy: [], qqq: [], fin: [], consumer: [], luxury: [], macro: [], leaps: [] };
   const built = new Map(); // el id -> echarts instance
 
   function chart(panel, elId, build) {
@@ -541,9 +541,9 @@
 
   // ---------------- hash 路由 ----------------
   function route() {
-    const h = location.hash.slice(1) || "spy";
+    const h = location.hash.slice(1) || "pulse";
     const [panel, stock] = h.split("/");
-    const target = registry[panel] ? panel : "spy";
+    const target = registry[panel] ? panel : "pulse";
     activatePanel(target).then(() => {
       if (BASKET_CFG[target]) {
         if (stock) showStock(target, stock);
@@ -1302,6 +1302,105 @@
   });
   chart("macro", "ch-macro-profits", macroBars("cp_yoy", "企业利润同比"));
 
+  // ---------------- 今日 · 头版（聚光灯封面） ----------------
+  async function renderPulse() {
+    let d, leaps = null;
+    try { d = await load("pulse"); } catch (e) {
+      document.getElementById("pulse-base").innerHTML =
+        '<p style="color:var(--ink-muted)">数据更新中，稍后自动出现 · data updating</p>';
+      return;
+    }
+    try { leaps = await load("leaps"); } catch (e) {}
+
+    const chg = (v) => `<span class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(2)}%</span>`;
+    const tempColor = d.temp >= 75 ? "#B8421E" : d.temp >= 50 ? "#C9882E" : d.temp >= 25 ? "#14A63E" : "#2B5F8F";
+    const tempWord = d.temp >= 75 ? "炙热" : d.temp >= 50 ? "偏暖" : d.temp >= 25 ? "温和" : "冰点";
+    const pct = (v) => v.toFixed(1);
+    const q = d.quotes || {};
+    const windowOpen = leaps && leaps.current && leaps.current.window_open;
+
+    document.getElementById("pulse-base").innerHTML = `
+      <div class="pulse-kicker">TODAY'S FRONT PAGE · ${d.date}</div>
+      <div class="pulse-head">
+        <div class="temp-ring" style="--pct:${d.temp};--temp-color:${tempColor}">
+          <div class="val">${d.temp.toFixed(1)}<em>°</em></div>
+          <div class="lbl"><span>市场温度</span> · <span>${tempWord}</span></div>
+        </div>
+        <div class="pulse-title">
+          <h1>今日，市场的体温</h1>
+          <p class="sub">温度 = （估值百分位 ${pct(d.val_pct)} + 情绪百分位 ${pct(d.sent_pct)}）÷ 2。估值取标普 500 PE(TTM) 在 1871 年以来全历史的位置；情绪取今日上涨家数占比在近一年中的位置。</p>
+          <div class="pulse-quotes" style="margin-top:14px">
+            ${q.spx ? `<span class="pq">标普 500 <b>${q.spx.close.toLocaleString("en-US")}</b> ${chg(q.spx.chg)}</span>` : ""}
+            ${q.ndx ? `<span class="pq">纳指 100 <b>${q.ndx.close.toLocaleString("en-US")}</b> ${chg(q.ndx.chg)}</span>` : ""}
+            ${q.vix ? `<span class="pq">VIX <b>${q.vix.close}</b> ${chg(q.vix.chg)}</span>` : ""}
+            ${d.fng != null ? `<span class="pq">恐贪 <b>${Math.round(d.fng)}</b></span>` : ""}
+            ${d.k != null ? `<span class="pq">K 指数 <b>${d.k.toFixed(2)}</b></span>` : ""}
+            ${leaps ? `<span class="pq">LEAPS 窗口 <b class="${windowOpen ? "neg" : "pos"}">${windowOpen ? "开启" : "关闭"}</b></span>` : ""}
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="pulse-section-label">涨跌分布 · 标普 500 成分股</div>
+        <div class="breadth-bar">
+          <div style="flex:${d.adv};background:var(--moss)">${d.adv} 涨</div>
+          <div style="flex:${Math.max(d.flat, 6)};background:var(--ink-muted)">${d.flat} 平</div>
+          <div style="flex:${d.dec};background:var(--danger)">${d.dec} 跌</div>
+        </div>
+        <div class="breadth-note">上涨家数占比 ${d.adv_ratio}%（(涨 + 平÷2) ÷ ${d.total}），处于近一年第 ${pct(d.sent_pct)} 百分位</div>
+      </div>
+      <div>
+        <div class="pulse-section-label">板块温度 · 11 只 SPDR 行业 ETF 当日涨跌</div>
+        <div class="heat-grid">
+          ${d.sectors.map((s) => {
+            const a = Math.min(Math.abs(s.chg) / 2.5, 1) * 0.75 + 0.1;
+            const base = s.chg >= 0 ? "20,166,62" : "184,66,30";
+            return `<div class="heat-tile" style="background:rgba(${base},${a.toFixed(2)})">
+              <div class="n">${s.name} <span style="opacity:.6">${s.etf}</span></div>
+              <div class="c">${(s.chg > 0 ? "+" : "") + s.chg.toFixed(2)}%</div></div>`;
+          }).join("")}
+        </div>
+      </div>
+      <div class="pulse-foot">滑动光标，掀开夜之一角。数据每交易日收盘后自动更新；温度是尺度不是信号——96 度的估值曾经烫了三年。</div>`;
+
+    // 揭示层 = 同一内容的夜间克隆 + 发光的百年走势线
+    const reveal = document.getElementById("pulse-reveal");
+    reveal.innerHTML = document.getElementById("pulse-base").innerHTML;
+    try {
+      const c = await load("sp500_century");
+      const vals = c.close, n = vals.length;
+      const lo = Math.log(Math.min(...vals)), hi = Math.log(Math.max(...vals));
+      const pts = vals.map((v, i) =>
+        `${(i / (n - 1) * 100).toFixed(2)},${(92 - (Math.log(v) - lo) / (hi - lo) * 80).toFixed(2)}`).join(" ");
+      reveal.insertAdjacentHTML("afterbegin",
+        `<svg class="pulse-chartline" viewBox="0 0 100 100" preserveAspectRatio="none">
+           <polyline points="${pts}" fill="none" stroke="#E0B05A" stroke-width="0.35"
+             style="filter:drop-shadow(0 0 1.2px #E0B05A)"/></svg>`);
+    } catch (e) {}
+
+    // 聚光灯：纯 CSS mask 跟随光标；触屏设备自动巡游
+    const hero = document.getElementById("pulse-hero");
+    const R = 230;
+    const setSpot = (x, y) => {
+      const m = `radial-gradient(circle ${R}px at ${x}px ${y}px, #fff 0%, #fff 45%, rgba(255,255,255,.55) 68%, rgba(255,255,255,.15) 86%, transparent 100%)`;
+      reveal.style.webkitMaskImage = m;
+      reveal.style.maskImage = m;
+    };
+    hero.addEventListener("mousemove", (e) => {
+      const r = hero.getBoundingClientRect();
+      setSpot(e.clientX - r.left, e.clientY - r.top);
+    });
+    hero.addEventListener("mouseleave", () => setSpot(-999, -999));
+    if (window.matchMedia("(hover: none)").matches) {
+      let t = 0;
+      setInterval(() => {
+        t += 0.016;
+        const r = hero.getBoundingClientRect();
+        setSpot((0.5 + 0.38 * Math.sin(t * 0.7)) * r.width,
+                (0.45 + 0.3 * Math.sin(t * 1.1 + 1.3)) * r.height);
+      }, 40);
+    }
+  }
+
   // ---------------- LEAPS 窗口 ----------------
   chart("leaps", "ch-leaps", async (p) => {
     const d = await load("leaps");
@@ -1417,6 +1516,7 @@
   renderKStatus();
   renderValCards();
   renderLeaps();
+  renderPulse();
   renderDDTable("sp500_drawdowns", "spy-dd-table");
   renderDDTable("ndx_drawdowns", "qqq-dd-table");
   renderHoldingTable("sp500_holding", "spy-holding-table");

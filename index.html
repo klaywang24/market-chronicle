@@ -23,7 +23,8 @@
   <div class="topbar-inner">
     <div class="brand">美股编年史<em>Market Chronicle</em></div>
     <nav class="tabs" id="tabs">
-      <button class="tab active" data-panel="spy">标普 500</button>
+      <button class="tab active" data-panel="pulse">今日</button>
+      <button class="tab" data-panel="spy">标普 500</button>
       <button class="tab" data-panel="qqq">纳斯达克</button>
       <button class="tab" data-panel="fin">金融</button>
       <button class="tab" data-panel="consumer">消费</button>
@@ -77,8 +78,16 @@
   </div>
 </section>
 
+<!-- ================= 今日 · 头版 ================= -->
+<section class="panel active" id="panel-pulse">
+  <div class="pulse-hero" id="pulse-hero">
+    <div class="pulse-layer pulse-base" id="pulse-base"></div>
+    <div class="pulse-layer pulse-reveal force-dark" id="pulse-reveal" aria-hidden="true"></div>
+  </div>
+</section>
+
 <!-- ================= 标普 500 ================= -->
-<section class="panel active" id="panel-spy">
+<section class="panel" id="panel-spy">
   <div class="hero">
     <div class="kicker">S&amp;P 500 · SINCE 1927</div>
     <h1>标普 500：一个世纪的形状</h1>

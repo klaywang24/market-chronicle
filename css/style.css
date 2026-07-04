@@ -270,6 +270,110 @@ tr:hover td { background: var(--bg-card-hover); }
 
 .footnote { color: var(--ink-muted); font-size: 12.5px; margin-top: 10px; }
 
+/* ---------- 今日 · 头版（聚光灯封面） ---------- */
+.pulse-hero {
+  position: relative;
+  min-height: calc(100vh - 140px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-top: 18px;
+  cursor: crosshair;
+}
+.pulse-layer {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  color: var(--ink);
+  padding: 48px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+@media (max-width: 900px) { .pulse-layer { padding: 26px 20px; } }
+/* 揭示层：仅在光标柔光圆内可见（JS 更新 mask 圆心） */
+.pulse-reveal {
+  z-index: 3;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle 0px at -999px -999px, #fff 0%, transparent 100%);
+  mask-image: radial-gradient(circle 0px at -999px -999px, #fff 0%, transparent 100%);
+}
+.pulse-reveal .pulse-chartline {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  pointer-events: none;
+}
+/* 揭示层强制夜间调色（scoped 副本） */
+.force-dark {
+  --bg: #1A1410; --bg-card: #241C16; --bg-card-hover: #2D241D; --bg-deep: #20180F;
+  --ink: #F1ECDF; --ink-soft: #D8D0BA; --ink-muted: #9B8E7C;
+  --accent: #D45D4F; --accent-deep: #B8421E; --accent-soft: rgba(212, 93, 79, 0.14);
+  --gold: #E0B05A; --gold-soft: rgba(224, 176, 90, 0.14);
+  --moss: #34D96C; --blue: #6FA0CC; --teal: #6A8C88; --purple: #A88FD8;
+  --danger: #E06F4A; --grid: rgba(241, 236, 223, 0.10); --grid-strong: rgba(241, 236, 223, 0.18);
+  --border: #3D352D;
+  --cmp-red: #FF5C5C; --cmp-blue: #4BA8FF; --cmp-purple: #B78FFF; --cmp-green: #3BE577;
+}
+.pulse-kicker {
+  color: var(--accent);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+.pulse-head { display: flex; align-items: center; gap: 44px; flex-wrap: wrap; }
+.pulse-title { flex: 1; min-width: 260px; }
+.pulse-title h1 { font-family: 'Noto Serif SC', serif; font-size: 44px; font-weight: 700; line-height: 1.2; }
+.pulse-title .sub { color: var(--ink-muted); margin-top: 8px; font-size: 14.5px; max-width: 560px; }
+/* 温度环：conic-gradient 圆环 + 中心大数字（纯 CSS，可克隆） */
+.temp-ring {
+  --pct: 0;
+  width: 190px; height: 190px;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, var(--bg) 76%, transparent 77% 100%),
+    conic-gradient(var(--temp-color, #B8421E) calc(var(--pct) * 1%), var(--bg-deep) 0);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.temp-ring .val { font-family: 'JetBrains Mono', monospace; font-size: 44px; font-weight: 700; }
+.temp-ring .val em { font-style: normal; font-size: 20px; color: var(--ink-muted); }
+.temp-ring .lbl { font-size: 12px; color: var(--ink-muted); letter-spacing: 0.1em; }
+.pulse-quotes { display: flex; gap: 10px; flex-wrap: wrap; }
+.pq {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+}
+.pq b { font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-left: 6px; }
+/* 涨跌带 */
+.breadth-bar { display: flex; height: 30px; border-radius: 8px; overflow: hidden; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.breadth-bar div { display: flex; align-items: center; justify-content: center; color: #fff; min-width: 34px; }
+.breadth-note { color: var(--ink-muted); font-size: 12.5px; margin-top: 6px; }
+/* 板块热力图 */
+.heat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 10px;
+}
+.heat-tile {
+  border-radius: 8px;
+  padding: 12px 12px 10px;
+  border: 1px solid var(--border);
+}
+.heat-tile .n { font-size: 13px; }
+.heat-tile .c { font-family: 'JetBrains Mono', monospace; font-size: 17px; font-weight: 700; margin-top: 2px; }
+.pulse-section-label {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.pulse-foot { color: var(--ink-muted); font-size: 12px; margin-top: auto; line-height: 1.8; }
+
 /* ---------- 二级胶囊导航（板块总览 ↔ 个股） ---------- */
 .subnav {
   position: sticky;
