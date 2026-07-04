@@ -327,9 +327,18 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
   padding: 4px;
 }
 .toc.open { display: block; }
-@media (min-width: 1560px) { .toc { display: block; } }
-/* 窄屏展开时垫一层底，避免叠在正文上看不清 */
-@media (max-width: 1559px) {
+/* ≥1280px：目录常驻左栏，正文右移让位，互不遮挡 */
+@media (min-width: 1280px) {
+  .toc { display: block; }
+  .toc-toggle { display: none; }
+  .container,
+  .topbar-inner {
+    margin-left: max(214px, calc((100vw - 1180px) / 2));
+    margin-right: max(24px, calc((100vw - 1180px) / 2));
+  }
+}
+/* 窄屏：☰ 按钮展开为浮层，垫底避免看不清 */
+@media (max-width: 1279px) {
   .toc.open {
     background: color-mix(in srgb, var(--bg) 96%, transparent);
     backdrop-filter: blur(10px);
@@ -373,7 +382,6 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
   cursor: pointer;
 }
 .toc-toggle:hover { background: var(--bg-card-hover); }
-@media (min-width: 1560px) { .toc-toggle { display: none; } }
 
 /* ---------- 长表格 / 个股 logo / 数据条 ---------- */
 .table-scroll { max-height: 440px; overflow-y: auto; }
