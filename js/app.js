@@ -44,7 +44,7 @@
 
   // ---------------- 图表注册表 ----------------
   // panel -> [{el, build}]；懒加载：首次进入 tab 才渲染
-  const registry = { kindex: [], spy: [], qqq: [], fin: [], consumer: [], luxury: [] };
+  const registry = { kindex: [], spy: [], qqq: [], fin: [], consumer: [], luxury: [], leaps: [] };
   const built = new Map(); // el id -> echarts instance
 
   function chart(panel, elId, build) {
@@ -216,6 +216,7 @@
       <div class="chapter" id="${basket}-fd-valuation">
         <div class="chapter-head"><span class="chapter-no"></span><h2>估值的锚</h2></div>
         <p class="chapter-q">现在的价格，在自己的历史里算贵吗？</p>
+        <div class="k-status" id="${basket}-fd-valstats"></div>
         <div class="grid-2">
           <div class="card"><h3>PE（TTM · 含历史中位数）</h3><div class="chart short" id="${basket}-fd-pe"></div></div>
           <div class="card"><h3 id="${basket}-fd-ps-title">PS（TTM）</h3><div class="chart short" id="${basket}-fd-ps"></div></div>
@@ -368,7 +369,23 @@
       if (fund.fcf) await buildOne(basket + "-fd-fcf",
         bars(fund.fcf.dates, fund.fcf.values.map((v) => v == null ? null : Math.round(v / 100) / 10), "gold", true));
       else { const c = document.getElementById(basket + "-fd-fcf"); if (c) c.closest(".card").remove(); }
-      if (fund.pe) await buildOne(basket + "-fd-pe", line(fund.pe, "PE", "accent", { median: true }));
+      if (fund.pe) {
+        await buildOne(basket + "-fd-pe", line(fund.pe, "PE", "accent", { median: true }));
+        const vs = document.getElementById(basket + "-fd-valstats");
+        if (vs) {
+          const cur = fund.pe.values[fund.pe.values.length - 1];
+          const med = median(fund.pe.values);
+          const pct = percentile(fund.pe.values, cur);
+          const snapFwd = fund.snapshot && fund.snapshot.fwd_pe;
+          vs.innerHTML = [
+            ["当前 PE (TTM)", cur.toFixed(1), `自身 ${fund.pe.dates[0].slice(0, 4)}→ 第 ${pct} 百分位`, pct > 90],
+            ["历史中位数", med.toFixed(1), "约 " + fund.pe.dates[0].slice(0, 4) + " 年以来", false],
+            ["远期 PE", snapFwd ? snapFwd.toFixed(1) : "--", "yfinance 快照", false],
+            ["相对中位溢价", ((cur / med - 1) * 100).toFixed(0) + "%", cur > med ? "贵于历史中枢" : "低于历史中枢", false],
+          ].map(([l, v, n, hot]) =>
+            `<div class="stat ${hot ? "signal-on" : ""}"><div class="label">${l}</div><div class="value" style="font-size:19px">${v}</div><div class="note">${n}</div></div>`).join("");
+        }
+      }
       const psData = fund.ps || fund.pb_hist;
       if (psData) {
         const t = document.getElementById(basket + "-fd-ps-title");
@@ -471,6 +488,7 @@
     tocEl.innerHTML = heads.map((h, i) =>
       `<a data-target="${chapters[i].id}">${ROMAN[i] || i + 1} · ${h.textContent.split("：")[0]}</a>`
     ).join("");
+    renumberChapters(scope); // 插入/裁剪章节后重排"第N章"标签
     tocChapters = chapters;
     highlightToc();
   }
@@ -693,9 +711,17 @@
         name: "已实现波动率(20d)", type: "line", showSymbol: false,
         data: zip(d.dates, d.vol20), lineStyle: { color: p.teal, width: 1 }, itemStyle: { color: p.teal },
       }];
+      if (d.vol60) series.push({
+        name: "已实现波动率(60d)", type: "line", showSymbol: false,
+        data: zip(d.dates, d.vol60), lineStyle: { color: p.moss, width: 1.1 }, itemStyle: { color: p.moss },
+      });
       if (d.vol_index) series.push({
         name: d.vol_index_name, type: "line", showSymbol: false,
         data: zip(d.dates, d.vol_index), lineStyle: { color: p.accent, width: 1 }, itemStyle: { color: p.accent },
+        markLine: { silent: true, symbol: "none",
+          lineStyle: { color: p.danger, type: "dashed", width: 1.2 },
+          label: { color: p.danger, formatter: d.vol_index_name + " = 30 · 保费警戒线", fontFamily: "JetBrains Mono", fontSize: 10 },
+          data: [{ yAxis: 30 }] },
       });
       return {
         tooltip: tip(p),
@@ -989,6 +1015,145 @@
         (hasAdded ? `<td>${r.added || "--"}</td>` : "") + "</tr>").join("");
   }
 
+  // ---------------- 估值的弹性（SPY） ----------------
+  const median = (xs) => {
+    const s = xs.filter((v) => v != null).slice().sort((a, b) => a - b);
+    return s[Math.floor(s.length / 2)];
+  };
+  const percentile = (xs, cur) => {
+    const s = xs.filter((v) => v != null);
+    return Math.round(s.filter((v) => v <= cur).length / s.length * 1000) / 10;
+  };
+
+  async function spyValStats() {
+    const pe = await load("sp500_pe_ttm");
+    const now = pe.dates[pe.dates.length - 1];
+    const y50 = (parseInt(now.slice(0, 4)) - 50) + now.slice(4);
+    const sel = (from) => pe.values.filter((v, i) => pe.dates[i] >= from);
+    return {
+      cur: pe.values[pe.values.length - 1],
+      medAll: median(pe.values), med50: median(sel(y50)), med2010: median(sel("2010")),
+      pct: percentile(pe.values, pe.values[pe.values.length - 1]),
+      since: pe.dates[0].slice(0, 4), asof: now,
+    };
+  }
+
+  chart("spy", "ch-spy-val", async (p) => {
+    const [pe, st] = await Promise.all([load("sp500_pe_ttm"), spyValStats()]);
+    const ml = (v, label, color) => ({
+      yAxis: v, lineStyle: { color, type: "dashed", width: 1.2 },
+      label: { color, formatter: label + " " + v.toFixed(1), fontFamily: "JetBrains Mono", fontSize: 10 },
+    });
+    return {
+      tooltip: tip(p),
+      grid: { left: 54, right: 96, top: 20, bottom: 28 },
+      xAxis: timeX(p),
+      yAxis: Object.assign({ type: "value" }, baseAxis(p)),
+      series: [{
+        name: "PE(TTM)", type: "line", showSymbol: false, data: zip(pe.dates, pe.values),
+        lineStyle: { color: p.accent, width: 1.2 }, itemStyle: { color: p.accent },
+        markLine: { silent: true, symbol: "none", data: [
+          ml(st.medAll, "全历史中位", p.ink),
+          ml(st.med50, "近50年中位", p.gold),
+          ml(st.med2010, "2010→中位", p.moss),
+        ] },
+      }],
+    };
+  });
+
+  async function renderValCards() {
+    try {
+      const [st, cape, iv] = await Promise.all([spyValStats(), load("sp500_cape"), load("index_val")]);
+      const curCape = cape.cape[cape.cape.length - 1];
+      const capePct = percentile(cape.cape, curCape);
+      const fwd = iv.SPY && iv.SPY.forward_pe;
+      document.getElementById("spy-val-cards").innerHTML = [
+        ["当前 PE (TTM)", st.cur.toFixed(1), `全历史第 ${st.pct} 百分位`, st.pct > 90],
+        ["席勒 CAPE", curCape.toFixed(1), `1871 年来第 ${capePct} 百分位`, capePct > 90],
+        ["远期 PE (SPY 口径)", fwd ? fwd.toFixed(1) : "--", fwd ? "" : "免费源暂缺，参考 TTM", false],
+        ["三条中位数锚", `${st.medAll.toFixed(0)} / ${st.med50.toFixed(0)} / ${st.med2010.toFixed(1)}`, "全历史 / 近50年 / 2010→", false],
+      ].map(([l, v, n, hot]) =>
+        `<div class="stat ${hot ? "signal-on" : ""}"><div class="label">${l}</div><div class="value">${v}</div><div class="note">${n}</div></div>`).join("");
+      document.getElementById("spy-val-note").textContent =
+        `口径说明：PE(TTM) 与 CAPE 来自 multpl/席勒月度数据（${st.since} 年起），百分位为当前值在全部历史读数中的位置；` +
+        `三条中位数是三个不同时代的"估值重力"——离哪条锚越远，弹性拉得越满。数据截至 ${st.asof}。`;
+      const qv = iv.QQQ || {};
+      document.getElementById("qqq-val-cards").innerHTML = [
+        ["QQQ PE (TTM · ETF 口径)", qv.trailing_pe ? qv.trailing_pe.toFixed(1) : "--", "持仓加权"],
+        ["QQQ 远期 PE", qv.forward_pe ? qv.forward_pe.toFixed(1) : "--", qv.forward_pe ? "" : "免费源暂缺"],
+        ["SPY PE 对照", iv.SPY && iv.SPY.trailing_pe ? iv.SPY.trailing_pe.toFixed(1) : "--", "同为 ETF 口径"],
+      ].map(([l, v, n]) =>
+        `<div class="stat"><div class="label">${l}</div><div class="value">${v}</div><div class="note">${n}</div></div>`).join("");
+    } catch (e) { /* 数据缺失时留空 */ }
+  }
+
+  // ---------------- LEAPS 窗口 ----------------
+  chart("leaps", "ch-leaps", async (p) => {
+    const d = await load("leaps");
+    const areas = d.episodes.map((e) => [
+      { xAxis: e.start, itemStyle: { color: p.accent, opacity: 0.12 } },
+      { xAxis: e.end },
+    ]);
+    return {
+      tooltip: tip(p),
+      grid: { left: 58, right: 64, top: 28, bottom: 64 },
+      xAxis: timeX(p),
+      yAxis: [
+        Object.assign({ type: "value", name: "CNN 恐贪", min: 0, max: 100 }, baseAxis(p)),
+        Object.assign({ type: "log", name: "NDX", position: "right", splitLine: { show: false } }, baseAxis(p)),
+      ],
+      dataZoom: [{ type: "inside" }, { type: "slider", bottom: 6, height: 18,
+        borderColor: p.border, fillerColor: "rgba(160,57,47,0.08)",
+        handleStyle: { color: p.accent }, textStyle: { color: p.muted, fontSize: 10 } }],
+      series: [
+        { name: "CNN 恐贪", type: "line", yAxisIndex: 0, showSymbol: false,
+          data: zip(d.dates, d.fng), lineStyle: { color: p.gold, width: 1.1 }, itemStyle: { color: p.gold },
+          markLine: { silent: true, symbol: "none",
+            lineStyle: { color: p.danger, type: "dashed", width: 1.2 },
+            label: { color: p.danger, formatter: "开仓阈值 25", fontFamily: "JetBrains Mono", fontSize: 10 },
+            data: [{ yAxis: d.threshold }] },
+          markArea: { silent: true, data: areas } },
+        { name: "纳指 100", type: "line", yAxisIndex: 1, showSymbol: false,
+          data: zip(d.dates, d.ndx), lineStyle: { color: p.blue, width: 1.4 }, itemStyle: { color: p.blue } },
+      ],
+    };
+  });
+
+  async function renderLeaps() {
+    const d = await load("leaps");
+    const cur = d.current;
+    const last = d.episodes[d.episodes.length - 1];
+    document.getElementById("leaps-status").innerHTML = `
+      <div class="stat ${cur.window_open ? "signal-on" : ""}">
+        <div class="label">今日恐贪（${cur.date}）</div>
+        <div class="value">${cur.fng.toFixed(0)}</div>
+        <div class="note">${cur.window_open ? "★ 窗口开启 — 极端恐惧" : "窗口关闭（≥ 25）"}</div>
+      </div>
+      <div class="stat"><div class="label">开仓阈值</div><div class="value">&lt; ${d.threshold}</div><div class="note">${cur.rating || ""}</div></div>
+      <div class="stat"><div class="label">2011 年以来窗口</div><div class="value">${d.episodes.length} 次</div><div class="note">连续交易日聚为一次</div></div>
+      <div class="stat"><div class="label">最近一次窗口</div><div class="value" style="font-size:18px">${last.start}</div><div class="note">NDX 至今 ${last.ndx_to_date > 0 ? "+" : ""}${last.ndx_to_date}%</div></div>`;
+
+    const cell = (v) => v == null ? "<td>--</td>" :
+      `<td class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(1)}%</td>`;
+    document.getElementById("leaps-table").innerHTML =
+      "<tr><th>#</th><th>窗口首日</th><th>持续(日)</th><th>最低恐贪</th>" +
+      "<th>SPX+6m</th><th>SPX+12m</th><th>SPX+18m</th><th>NDX+6m</th><th>NDX+12m</th><th>NDX+18m</th><th>NDX至今</th></tr>" +
+      d.episodes.slice().reverse().map((e, i) =>
+        `<tr><td>${d.episodes.length - i}</td><td>${e.start}</td><td>${e.days_below}</td>` +
+        `<td class="k-min">${e.min_fng}</td>` +
+        cell(e.spx_m6) + cell(e.spx_m12) + cell(e.spx_m18) +
+        cell(e.ndx_m6) + cell(e.ndx_m12) + cell(e.ndx_m18) + cell(e.ndx_to_date) + "</tr>").join("");
+
+    const done = d.episodes.filter((e) => e.ndx_m12 != null);
+    const win = done.filter((e) => e.ndx_m12 > 0).length;
+    const spxDone = d.episodes.filter((e) => e.spx_m12 != null);
+    const spxWin = spxDone.filter((e) => e.spx_m12 > 0).length;
+    document.getElementById("leaps-verdict").textContent =
+      `实证结论：${d.episodes.length} 次窗口中，12 个月视界 NDX 胜率 ${win}/${done.length}、SPX 胜率 ${spxWin}/${spxDone.length}。` +
+      `注意 2021 年下半年的几个窗口：高位回落途中的"极端恐惧"并非底部，12 个月后仍为负——恐惧指标标记的是情绪极值，不是估值底。` +
+      `与 K 指数（CNN÷VIX）互为印证：两个信号同时触发时，窗口质量历史上更高。历史规律不保证未来。`;
+  }
+
   // ---------------- 注册 SPY / QQQ ----------------
   chart("spy", "ch-spy-century", centuryChart("sp500_century", [{ ds: "sp500_century", name: "标普 500" }]));
   chart("spy", "ch-spy-annual", annualChart("sp500_annual"));
@@ -1035,6 +1200,8 @@
 
   // ---------------- 启动 ----------------
   renderKStatus();
+  renderValCards();
+  renderLeaps();
   renderDDTable("sp500_drawdowns", "spy-dd-table");
   renderDDTable("ndx_drawdowns", "qqq-dd-table");
   renderHoldingTable("sp500_holding", "spy-holding-table");

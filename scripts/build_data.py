@@ -59,13 +59,12 @@ def rnd(s, n=2) -> list:
 
 # ---------------------------------------------------------------- K 指数
 
-def build_kindex(ndx_close: pd.Series, vix_close: pd.Series):
-    print("== K 指数")
+def fetch_fng():
+    """CNN 恐贪：whit3rabbit 存档（2011→）+ 官方接口当天值。返回 (Series, rating)。"""
     csv = requests.get(FNG_ARCHIVE, headers=UA, timeout=30)
     csv.raise_for_status()
     from io import StringIO
     fng = pd.read_csv(StringIO(csv.text), parse_dates=["Date"]).set_index("Date")["Fear Greed"]
-
     live_note = ""
     try:
         live = requests.get(FNG_LIVE, headers=UA, timeout=30).json()["fear_and_greed"]
@@ -74,8 +73,12 @@ def build_kindex(ndx_close: pd.Series, vix_close: pd.Series):
         live_note = live["rating"]
     except Exception as e:
         print(f"  CNN live endpoint unavailable, archive only: {e}")
+    return fng[~fng.index.duplicated(keep="last")].sort_index(), live_note
 
-    fng = fng[~fng.index.duplicated(keep="last")].sort_index()
+
+def build_kindex(ndx_close: pd.Series, vix_close: pd.Series):
+    print("== K 指数")
+    fng, live_note = fetch_fng()
     df = pd.DataFrame({"cnn": fng, "vix": vix_close, "ndx": ndx_close}).dropna()
     df = df[df.index >= "2019-06-01"]  # 多留半年做图表前置缓冲
     df["k"] = df["cnn"] / df["vix"]
@@ -222,11 +225,14 @@ def build_index_panels(prefix: str, close: pd.Series, vol_index: pd.Series | Non
     roll5 = (roll5.dropna()) * 100
     write_json(f"{prefix}_rolling5y.json", {"dates": dates(roll5.index), "cagr": rnd(roll5, 2)})
 
-    # 波动率（20 日年化）+ 恐慌指数
+    # 波动率（20 日 / 60 日年化）+ 恐慌指数
     ret_d = close.pct_change()
     vol20 = ret_d.rolling(20).std() * (252 ** 0.5) * 100
+    vol60 = ret_d.rolling(60).std() * (252 ** 0.5) * 100
     vol_m = vol20.resample("W").last().dropna()
-    out = {"dates": dates(vol_m.index), "vol20": rnd(vol_m, 2), "vol_index_name": vol_name}
+    out = {"dates": dates(vol_m.index), "vol20": rnd(vol_m, 2),
+           "vol60": rnd(vol60.resample("W").last().reindex(vol_m.index), 2),
+           "vol_index_name": vol_name}
     if vol_index is not None:
         vi = vol_index.resample("W").last().reindex(vol_m.index)
         out["vol_index"] = rnd(vi, 2)
@@ -243,6 +249,77 @@ def build_index_panels(prefix: str, close: pd.Series, vol_index: pd.Series | Non
             "win": round(float((sub > 0).mean() * 100), 1),
         })
     write_json(f"{prefix}_seasonality.json", {"rows": season, "years": f"{monthly.index[0].year}–{monthly.index[-1].year}"})
+
+
+# ---------------------------------------------------------------- LEAPS 窗口
+
+def build_leaps(spx_close: pd.Series, ndx_close: pd.Series, threshold: float = 25.0):
+    """CNN 恐贪 < 25 = 极端恐惧 = LEAPS call 开仓观察窗口。
+    对 2011 年以来每个窗口计算 SPX/NDX 之后 6/12/18 个月（126/252/378 交易日）收益。"""
+    print("== LEAPS 窗口")
+    fng, live_note = fetch_fng()
+    df = pd.DataFrame({"fng": fng, "spx": spx_close, "ndx": ndx_close}).dropna()
+
+    below = df["fng"] < threshold
+    episodes = []
+    cur = None
+    last_pos = None
+    for pos, (dt, b) in enumerate(zip(df.index, below)):
+        if b:
+            if cur is None or pos - last_pos > 10:
+                if cur:
+                    episodes.append(cur)
+                cur = {"start": dt, "start_pos": pos, "end": dt, "min": df["fng"].iloc[pos]}
+            cur["end"] = dt
+            cur["min"] = min(cur["min"], float(df["fng"].iloc[pos]))
+            last_pos = pos
+    if cur:
+        episodes.append(cur)
+
+    rows = []
+    for ep in episodes:
+        p0 = ep["start_pos"]
+        row = {
+            "start": ep["start"].strftime("%Y-%m-%d"),
+            "end": ep["end"].strftime("%Y-%m-%d"),
+            "days_below": int(((df.index >= ep["start"]) & (df.index <= ep["end"]) & below).sum()),
+            "min_fng": round(ep["min"], 1),
+        }
+        for label, horizon in (("m6", 126), ("m12", 252), ("m18", 378)):
+            p = p0 + horizon
+            for idx in ("spx", "ndx"):
+                entry = df[idx].iloc[p0]
+                row[f"{idx}_{label}"] = round(float(df[idx].iloc[p] / entry - 1) * 100, 1) if p < len(df) else None
+        row["spx_to_date"] = round(float(df["spx"].iloc[-1] / df["spx"].iloc[p0] - 1) * 100, 1)
+        row["ndx_to_date"] = round(float(df["ndx"].iloc[-1] / df["ndx"].iloc[p0] - 1) * 100, 1)
+        rows.append(row)
+
+    write_json("leaps.json", {
+        "threshold": threshold,
+        "dates": dates(df.index),
+        "fng": rnd(df["fng"], 1),
+        "ndx": rnd(df["ndx"], 2),
+        "current": {
+            "date": df.index[-1].strftime("%Y-%m-%d"),
+            "fng": round(float(df["fng"].iloc[-1]), 1),
+            "rating": live_note,
+            "window_open": bool(df["fng"].iloc[-1] < threshold),
+        },
+        "episodes": rows,
+    })
+
+
+def build_index_val():
+    """SPY/QQQ ETF 口径的估值快照（yfinance；指数级 Forward PE 无免费长史，只取当前值）。"""
+    print("== 指数估值快照")
+    out = {}
+    for etf in ("SPY", "QQQ"):
+        try:
+            info = yf.Ticker(etf).info
+            out[etf] = {"trailing_pe": info.get("trailingPE"), "forward_pe": info.get("forwardPE")}
+        except Exception as e:
+            print(f"  {etf} info: {e}")
+    write_json("index_val.json", out)
 
 
 # ------------------------------------------------- 指数扩容章节（SPY/QQQ 专用）
@@ -533,6 +610,8 @@ def main():
         vxn = None
 
     build_kindex(ndx, vix)
+    build_leaps(gspc, ndx)
+    build_index_val()
     build_index_panels("sp500", gspc, vix, "VIX")
     build_index_panels("ixic", ixic)
     build_index_panels("ndx", ndx, vxn, "VXN")

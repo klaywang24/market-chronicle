@@ -29,6 +29,7 @@
       <button class="tab" data-panel="consumer">消费</button>
       <button class="tab" data-panel="luxury">奢侈品</button>
       <button class="tab" data-panel="kindex">K 指数</button>
+      <button class="tab" data-panel="leaps">LEAPS 窗口</button>
     </nav>
     <div class="top-controls">
       <div class="lang-switch" title="多语言版本制作中"><span class="active">简</span> · 繁 · EN · FR · ES</div>
@@ -146,6 +147,14 @@
   </div>
 
   <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no"></span><h2>估值的弹性</h2></div>
+    <p class="chapter-q">当前估值站在 150 年历史的什么位置？</p>
+    <div class="k-status" id="spy-val-cards"></div>
+    <div class="card"><h3>PE（TTM）与三条历史中位数</h3><div class="sub">全历史（1871→）· 近 50 年 · 2010 年以来，三条虚线即三个"回归锚"</div><div class="chart short" id="ch-spy-val"></div></div>
+    <p class="footnote" id="spy-val-note"></p>
+  </div>
+
+  <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第九章</span><h2>利润基本面</h2></div>
     <p class="chapter-q">指数背后，每股盈利涨了多少？</p>
     <div class="card"><h3>标普 500 EPS（TTM · 对数坐标）</h3><div class="chart short" id="ch-spy-eps"></div></div>
@@ -154,7 +163,7 @@
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第十章</span><h2>恐惧的标价</h2></div>
     <p class="chapter-q">市场什么时候在发抖？</p>
-    <div class="card"><h3>已实现波动率 × VIX</h3><div class="sub">20 日年化已实现波动率（周频）与 VIX</div><div class="chart short" id="ch-spy-vol"></div></div>
+    <div class="card"><h3>VIX · 保险费的账本</h3><div class="sub">VIX 衡量市场对未来 30 天的波动预期——冲破 30，意味着投资者已经在为下一轮风险付保费。叠加 20 日 / 60 日年化已实现波动率（周频）。</div><div class="chart short" id="ch-spy-vol"></div></div>
   </div>
 
   <div class="chapter">
@@ -238,9 +247,16 @@
   </div>
 
   <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no"></span><h2>估值的弹性</h2></div>
+    <p class="chapter-q">纳指 100 现在贵吗？</p>
+    <div class="k-status" id="qqq-val-cards"></div>
+    <p class="footnote">指数级的纳指 PE 长历史与远期 PE 无免费公开数据源（原站为 Bloomberg 手动维护），此处仅展示 QQQ ETF 口径的当前值；个股级的 20 年 PE 历史请进入金融/消费/奢侈品板块的个股页查看。</p>
+  </div>
+
+  <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第八章</span><h2>纳指恐慌</h2></div>
     <p class="chapter-q">成长股的心跳有多快？</p>
-    <div class="card"><h3>已实现波动率 × VXN</h3><div class="chart short" id="ch-qqq-vol"></div></div>
+    <div class="card"><h3>VXN · 纳指的保险费</h3><div class="sub">VXN 衡量市场对纳指未来 30 天的波动预期。叠加 20 日 / 60 日年化已实现波动率（周频）。</div><div class="chart short" id="ch-qqq-vol"></div></div>
   </div>
 
   <div class="chapter">
@@ -359,6 +375,38 @@
   </div>
   </div>
   <div class="basket-stock" id="luxury-stock" style="display:none"></div>
+</section>
+
+<!-- ================= LEAPS 窗口 ================= -->
+<section class="panel" id="panel-leaps">
+  <div class="hero">
+    <div class="kicker">LEAPS CALL · TIMING</div>
+    <h1>LEAPS 窗口：恐惧的定价</h1>
+    <p class="dek">CNN 恐惧贪婪指数跌破 25 = 市场进入极端恐惧 = LEAPS call 开仓观察窗口。只做一年以上的远期期权——短期期权是彩票，LEAPS 才是用时间换空间。</p>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>窗口面板</h2></div>
+    <p class="chapter-q">今天的窗口开着吗？</p>
+    <div class="k-status" id="leaps-status"></div>
+    <div class="card">
+      <h3>CNN 恐贪 × 纳指 100（2011 年至今）</h3>
+      <div class="sub">黄色为 CNN 恐贪指数（左轴 0–100），蓝色为纳指 100（右轴 · 对数）；恐贪 &lt; 25 的窗口期红色高亮，25 处虚线为开仓阈值</div>
+      <div class="chart tall" id="ch-leaps"></div>
+    </div>
+    <div class="poem">低于 25，市场进入极端恐惧——别人恐惧时的保费，就是 LEAPS 买家的入场券。不买 3 个月以内的期权：短期权大概率归零，胜负手在时间价值站在你这边。</div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>窗口对账</h2></div>
+    <p class="chapter-q">2011 年以来每次极端恐惧，6 / 12 / 18 个月后指数在哪里？（LEAPS 的持有视界）</p>
+    <div class="card">
+      <h3>恐贪 &lt; 25 窗口逐次对账</h3>
+      <div class="sub">连续低于 25 的交易日聚为一个窗口（间隔 &gt;10 个交易日记新窗口）；收益为窗口首日起 6/12/18 个月（126/252/378 交易日）标普 500 与纳指 100 涨跌幅</div>
+      <div class="table-wrap table-scroll"><table id="leaps-table"></table></div>
+      <p class="footnote" id="leaps-verdict"></p>
+    </div>
+  </div>
 </section>
 
 </main>
