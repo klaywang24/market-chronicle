@@ -1,0 +1,290 @@
+#!/usr/bin/env python3
+"""美股编年史 · 数据管线
+拉取公开数据 → 计算指标 → 写出 data/*.json（前端只读这些静态文件）。
+
+数据源：
+- 价格/指数：yfinance（^GSPC ^IXIC ^NDX ^VIX ^VXN）
+- CNN 恐贪指数：whit3rabbit/fear-greed-data 每日存档（2011→）+ CNN 官方接口（当天值）
+- 席勒 CAPE：multpl.com 月度表
+"""
+import json
+import re
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+import pandas as pd
+import requests
+import yfinance as yf
+
+ROOT = Path(__file__).resolve().parent.parent
+DATA = ROOT / "data"
+DATA.mkdir(exist_ok=True)
+
+UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"}
+
+FNG_ARCHIVE = "https://raw.githubusercontent.com/whit3rabbit/fear-greed-data/main/fear-greed.csv"
+FNG_LIVE = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
+MULTPL_CAPE = "https://www.multpl.com/shiller-pe/table/by-month"
+
+
+def write_json(name: str, obj):
+    path = DATA / name
+    # 拉失败时上游函数会抛异常走到不了这里，留旧文件不覆盖
+    path.write_text(json.dumps(obj, ensure_ascii=False, separators=(",", ":")))
+    print(f"  wrote {name} ({path.stat().st_size/1024:.0f} KB)")
+
+
+def fetch_history(ticker: str, retries: int = 3) -> pd.DataFrame:
+    for i in range(retries):
+        try:
+            df = yf.Ticker(ticker).history(period="max", auto_adjust=True)
+            if len(df) > 100:
+                df.index = df.index.tz_localize(None)
+                return df
+        except Exception as e:
+            print(f"  {ticker} attempt {i+1} failed: {e}")
+        time.sleep(3 * (i + 1))
+    raise RuntimeError(f"failed to fetch {ticker}")
+
+
+def dates(idx) -> list:
+    return [d.strftime("%Y-%m-%d") for d in idx]
+
+
+def rnd(s, n=2) -> list:
+    return [None if pd.isna(v) else round(float(v), n) for v in s]
+
+
+# ---------------------------------------------------------------- K 指数
+
+def build_kindex(ndx_close: pd.Series, vix_close: pd.Series):
+    print("== K 指数")
+    csv = requests.get(FNG_ARCHIVE, headers=UA, timeout=30)
+    csv.raise_for_status()
+    from io import StringIO
+    fng = pd.read_csv(StringIO(csv.text), parse_dates=["Date"]).set_index("Date")["Fear Greed"]
+
+    live_note = ""
+    try:
+        live = requests.get(FNG_LIVE, headers=UA, timeout=30).json()["fear_and_greed"]
+        ts = pd.Timestamp(live["timestamp"][:10])
+        fng.loc[ts] = float(live["score"])
+        live_note = live["rating"]
+    except Exception as e:
+        print(f"  CNN live endpoint unavailable, archive only: {e}")
+
+    fng = fng[~fng.index.duplicated(keep="last")].sort_index()
+    df = pd.DataFrame({"cnn": fng, "vix": vix_close, "ndx": ndx_close}).dropna()
+    df = df[df.index >= "2019-06-01"]  # 多留半年做图表前置缓冲
+    df["k"] = df["cnn"] / df["vix"]
+
+    # K<1 信号分段：连续 K<1 的交易日聚成一个 episode，间隔 >10 个交易日算新信号
+    below = df["k"] < 1
+    episodes = []
+    cur = None
+    last_below_pos = None
+    for pos, (dt, b) in enumerate(zip(df.index, below)):
+        if b:
+            if cur is None or (last_below_pos is not None and pos - last_below_pos > 10):
+                if cur:
+                    episodes.append(cur)
+                cur = {"start": dt, "end": dt, "start_pos": pos, "min_k": df["k"].iloc[pos]}
+            cur["end"] = dt
+            cur["min_k"] = min(cur["min_k"], df["k"].iloc[pos])
+            last_below_pos = pos
+    if cur:
+        episodes.append(cur)
+
+    closes = df["ndx"]
+    sig_rows = []
+    for ep in episodes:
+        if ep["start"] < pd.Timestamp("2020-01-01"):
+            continue
+        p0 = ep["start_pos"]
+        entry = closes.iloc[p0]
+        row = {
+            "start": ep["start"].strftime("%Y-%m-%d"),
+            "end": ep["end"].strftime("%Y-%m-%d"),
+            "days_below": int(((df.index >= ep["start"]) & (df.index <= ep["end"]) & below).sum()),
+            "min_k": round(float(ep["min_k"]), 3),
+            "ndx_entry": round(float(entry), 2),
+        }
+        for horizon in (20, 40, 60):
+            p = p0 + horizon
+            row[f"fwd{horizon}"] = round(float(closes.iloc[p] / entry - 1) * 100, 2) if p < len(closes) else None
+        # 至今收益（最后一个信号用）
+        row["fwd_to_date"] = round(float(closes.iloc[-1] / entry - 1) * 100, 2)
+        sig_rows.append(row)
+
+    write_json("kindex.json", {
+        "dates": dates(df.index),
+        "cnn": rnd(df["cnn"], 1),
+        "vix": rnd(df["vix"], 2),
+        "ndx": rnd(df["ndx"], 2),
+        "k": rnd(df["k"], 3),
+        "current": {
+            "date": df.index[-1].strftime("%Y-%m-%d"),
+            "cnn": round(float(df["cnn"].iloc[-1]), 1),
+            "vix": round(float(df["vix"].iloc[-1]), 2),
+            "k": round(float(df["k"].iloc[-1]), 3),
+            "rating": live_note,
+        },
+    })
+    write_json("kindex_signals.json", {"signals": sig_rows, "since": "2020-01-01"})
+    return sig_rows
+
+
+# ------------------------------------------------------- 指数通用面板
+
+def drawdown_episodes(close: pd.Series, threshold=-0.10):
+    """从日线收盘价提取回撤 episode（峰值→谷底→修复）。"""
+    cummax = close.cummax()
+    dd = close / cummax - 1
+    episodes = []
+    in_dd = False
+    peak_date = trough_date = None
+    trough = 0.0
+    for dt, v in dd.items():
+        if not in_dd and v < 0:
+            in_dd = True
+            peak_date = close.loc[:dt].idxmax() if False else None  # set below
+            # 峰值 = 此刻 cummax 对应的最近日期
+            peak_date = close[close == cummax.loc[dt]].index[-1]
+            trough, trough_date = v, dt
+        elif in_dd:
+            if v < trough:
+                trough, trough_date = v, dt
+            if v == 0:
+                if trough <= threshold:
+                    episodes.append({
+                        "peak": peak_date.strftime("%Y-%m-%d"),
+                        "trough": trough_date.strftime("%Y-%m-%d"),
+                        "recovery": dt.strftime("%Y-%m-%d"),
+                        "depth": round(trough * 100, 1),
+                        "days_down": int((trough_date - peak_date).days),
+                        "days_recover": int((dt - trough_date).days),
+                    })
+                in_dd = False
+    if in_dd and trough <= threshold:
+        episodes.append({
+            "peak": peak_date.strftime("%Y-%m-%d"),
+            "trough": trough_date.strftime("%Y-%m-%d"),
+            "recovery": None,
+            "depth": round(trough * 100, 1),
+            "days_down": int((trough_date - peak_date).days),
+            "days_recover": None,
+        })
+    return dd, episodes
+
+
+def build_index_panels(prefix: str, close: pd.Series, vol_index: pd.Series | None = None,
+                       vol_name: str = ""):
+    """一个指数板块的全部面板数据。close 为日线收盘。"""
+    print(f"== {prefix}")
+    close = close.dropna()
+
+    # 月线（世纪图）
+    monthly = close.resample("ME").last()
+    write_json(f"{prefix}_century.json", {"dates": dates(monthly.index), "close": rnd(monthly, 2)})
+
+    # 年度回报 + 分桶
+    annual = close.resample("YE").last().pct_change().dropna() * 100
+    # 首年用年内首尾补（yfinance 首年不完整就跳过）
+    write_json(f"{prefix}_annual.json", {
+        "years": [d.year for d in annual.index],
+        "returns": rnd(annual, 2),
+    })
+
+    # 回撤
+    dd, episodes = drawdown_episodes(close)
+    weekly_dd = dd.resample("W").min()
+    write_json(f"{prefix}_drawdowns.json", {
+        "dates": dates(weekly_dd.index),
+        "dd": rnd(weekly_dd * 100, 2),
+        "episodes": sorted(episodes, key=lambda e: e["depth"])[:25],
+    })
+
+    # 年内最大回撤 vs 年度收益
+    rows = []
+    for year, grp in close.groupby(close.index.year):
+        if len(grp) < 60:
+            continue
+        intra = (grp / grp.cummax() - 1).min() * 100
+        ret = (grp.iloc[-1] / grp.iloc[0] - 1) * 100
+        rows.append({"year": int(year), "intra_dd": round(float(intra), 1), "ret": round(float(ret), 1)})
+    write_json(f"{prefix}_intrayear.json", {"rows": rows})
+
+    # 滚动 5 年年化（月频）
+    m = monthly.dropna()
+    roll5 = (m / m.shift(60)) ** (1 / 5) - 1
+    roll5 = (roll5.dropna()) * 100
+    write_json(f"{prefix}_rolling5y.json", {"dates": dates(roll5.index), "cagr": rnd(roll5, 2)})
+
+    # 波动率（20 日年化）+ 恐慌指数
+    ret_d = close.pct_change()
+    vol20 = ret_d.rolling(20).std() * (252 ** 0.5) * 100
+    vol_m = vol20.resample("W").last().dropna()
+    out = {"dates": dates(vol_m.index), "vol20": rnd(vol_m, 2), "vol_index_name": vol_name}
+    if vol_index is not None:
+        vi = vol_index.resample("W").last().reindex(vol_m.index)
+        out["vol_index"] = rnd(vi, 2)
+    write_json(f"{prefix}_volatility.json", out)
+
+    # 月度季节性
+    mret = monthly.pct_change().dropna() * 100
+    season = []
+    for month in range(1, 13):
+        sub = mret[mret.index.month == month]
+        season.append({
+            "month": month,
+            "avg": round(float(sub.mean()), 2),
+            "win": round(float((sub > 0).mean() * 100), 1),
+        })
+    write_json(f"{prefix}_seasonality.json", {"rows": season, "years": f"{monthly.index[0].year}–{monthly.index[-1].year}"})
+
+
+def build_cape():
+    print("== 席勒 CAPE")
+    try:
+        html = requests.get(MULTPL_CAPE, headers=UA, timeout=30).text
+        rows = re.findall(r'<td>([A-Z][a-z]{2} \d{1,2}, \d{4})</td>\s*<td>\s*(?:&#x2002;)?\s*([\d.]+)', html)
+        if not rows:
+            raise RuntimeError("multpl table parse failed")
+        recs = [(datetime.strptime(d, "%b %d, %Y"), float(v)) for d, v in rows]
+        recs.sort()
+        write_json("sp500_cape.json", {
+            "dates": [d.strftime("%Y-%m-%d") for d, _ in recs],
+            "cape": [v for _, v in recs],
+        })
+    except Exception as e:
+        print(f"  CAPE unavailable this run (kept old file if any): {e}")
+
+
+def main():
+    print("fetching prices …")
+    gspc = fetch_history("^GSPC")["Close"]
+    ixic = fetch_history("^IXIC")["Close"]
+    ndx = fetch_history("^NDX")["Close"]
+    vix = fetch_history("^VIX")["Close"]
+    try:
+        vxn = fetch_history("^VXN")["Close"]
+    except RuntimeError:
+        vxn = None
+
+    build_kindex(ndx, vix)
+    build_index_panels("sp500", gspc, vix, "VIX")
+    build_index_panels("ixic", ixic)
+    build_index_panels("ndx", ndx, vxn, "VXN")
+    build_cape()
+
+    write_json("meta.json", {
+        "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "sources": "Yahoo Finance · CNN Fear & Greed (whit3rabbit archive) · multpl.com",
+    })
+    print("done.")
+
+
+if __name__ == "__main__":
+    sys.exit(main())

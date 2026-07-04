@@ -1,0 +1,248 @@
+/* 美股编年史 — 设计系统沿用 field guide 系列（羊皮纸 + 铁锈红/金/橄榄） */
+:root {
+  --bg: #F1ECDF;
+  --bg-card: #EBE5D6;
+  --bg-card-hover: #E5DECC;
+  --bg-deep: #E0D8C2;
+  --ink: #1A1410;
+  --ink-soft: #3D352D;
+  --ink-muted: #6B5D4F;
+  --accent: #A0392F;
+  --accent-deep: #7E2A22;
+  --accent-soft: rgba(160, 57, 47, 0.08);
+  --gold: #B8893E;
+  --gold-soft: rgba(184, 137, 62, 0.10);
+  --moss: #4A5D3A;
+  --blue: #2B5F8F;
+  --teal: #2D4A48;
+  --danger: #B8421E;
+  --grid: rgba(26, 20, 16, 0.10);
+  --grid-strong: rgba(26, 20, 16, 0.18);
+  --border: #D8D0BA;
+}
+.dark-mode {
+  --bg: #1A1410;
+  --bg-card: #241C16;
+  --bg-card-hover: #2D241D;
+  --bg-deep: #20180F;
+  --ink: #F1ECDF;
+  --ink-soft: #D8D0BA;
+  --ink-muted: #9B8E7C;
+  --accent: #D45D4F;
+  --accent-deep: #B8421E;
+  --accent-soft: rgba(212, 93, 79, 0.14);
+  --gold: #E0B05A;
+  --gold-soft: rgba(224, 176, 90, 0.14);
+  --moss: #8AA176;
+  --blue: #6FA0CC;
+  --teal: #6A8C88;
+  --danger: #E06F4A;
+  --grid: rgba(241, 236, 223, 0.10);
+  --grid-strong: rgba(241, 236, 223, 0.18);
+  --border: #3D352D;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Noto Sans SC', 'IBM Plex Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  transition: background 0.3s, color 0.3s;
+}
+.dark-mode body { background: var(--bg); }
+
+/* ---------- 顶栏 ---------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 58px;
+}
+.brand {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 19px;
+  white-space: nowrap;
+}
+.brand em {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink-muted);
+  font-size: 13px;
+  margin-left: 8px;
+}
+.tabs { display: flex; gap: 2px; flex: 1; }
+.tab {
+  padding: 6px 16px;
+  border: none;
+  background: none;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 14.5px;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  border-bottom: 2px solid transparent;
+}
+.tab:hover { color: var(--ink); background: var(--bg-card-hover); }
+.tab.active {
+  color: var(--accent-deep);
+  font-weight: 600;
+  border-bottom-color: var(--accent);
+}
+.top-controls { display: flex; align-items: center; gap: 10px; }
+.lang-switch {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 10px;
+  background: var(--bg-card);
+  cursor: default;
+}
+.lang-switch span.active { color: var(--accent-deep); font-weight: 600; }
+.theme-toggle {
+  width: 34px; height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-card);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--ink);
+}
+.theme-toggle:hover { background: var(--bg-card-hover); }
+
+/* ---------- 版面 ---------- */
+.container { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+.hero { margin: 12px 0 36px; }
+.hero h1 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.hero .kicker {
+  color: var(--accent);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.hero .dek { color: var(--ink-muted); max-width: 720px; margin-top: 10px; font-size: 15.5px; }
+
+.chapter { margin: 48px 0; }
+.chapter-head { display: flex; align-items: baseline; gap: 14px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-bottom: 6px; }
+.chapter-no {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  color: var(--accent);
+  font-size: 15px;
+  white-space: nowrap;
+}
+.chapter-head h2 { font-family: 'Noto Serif SC', serif; font-size: 22px; font-weight: 700; }
+.chapter-q { color: var(--ink-muted); font-size: 14px; margin-bottom: 18px; }
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 18px 10px;
+  margin-bottom: 22px;
+}
+.card h3 { font-size: 15.5px; font-weight: 600; margin-bottom: 2px; }
+.card .sub { color: var(--ink-muted); font-size: 12.5px; margin-bottom: 6px; }
+.chart { width: 100%; height: 420px; }
+.chart.tall { height: 560px; }
+.chart.short { height: 320px; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+/* ---------- K 指数状态卡 ---------- */
+.k-status {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 26px;
+}
+@media (max-width: 900px) { .k-status { grid-template-columns: repeat(2, 1fr); } }
+.stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+.stat .label { font-size: 12px; color: var(--ink-muted); letter-spacing: 0.06em; }
+.stat .value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 26px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.stat .note { font-size: 12px; color: var(--ink-muted); }
+.stat.signal-on { border-color: var(--accent); background: var(--accent-soft); }
+.stat.signal-on .value { color: var(--accent-deep); }
+
+.poem {
+  font-family: 'Noto Serif SC', serif;
+  color: var(--ink-soft);
+  background: var(--gold-soft);
+  border-left: 3px solid var(--gold);
+  padding: 10px 16px;
+  border-radius: 0 8px 8px 0;
+  margin: 18px 0;
+  font-size: 14.5px;
+}
+
+/* ---------- 表格 ---------- */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th {
+  text-align: right;
+  font-weight: 600;
+  color: var(--ink-muted);
+  border-bottom: 2px solid var(--ink);
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+th:first-child, td:first-child { text-align: left; }
+td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+td:first-child { font-family: 'Noto Sans SC', sans-serif; }
+tr:hover td { background: var(--bg-card-hover); }
+.pos { color: var(--moss); }
+.neg { color: var(--danger); }
+.k-min { color: var(--accent-deep); font-weight: 700; }
+
+.footnote { color: var(--ink-muted); font-size: 12.5px; margin-top: 10px; }
+footer {
+  border-top: 1px solid var(--border);
+  color: var(--ink-muted);
+  font-size: 12.5px;
+  padding: 20px 24px;
+  text-align: center;
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>美股编年史 · Market Chronicle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+// 主题先于渲染应用，避免闪白
+(function () {
+  var saved = localStorage.getItem("mc-theme");
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  if (dark) document.documentElement.classList.add("dark-mode");
+})();
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">美股编年史<em>Market Chronicle</em></div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-panel="kindex">K 指数</button>
+      <button class="tab" data-panel="spy">标普 500</button>
+      <button class="tab" data-panel="qqq">纳斯达克</button>
+    </nav>
+    <div class="top-controls">
+      <div class="lang-switch" title="多语言版本制作中"><span class="active">简</span> · 繁 · EN · FR · ES</div>
+      <button class="theme-toggle" id="theme-toggle" title="日夜切换">☀</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+<!-- ================= K 指数 ================= -->
+<section class="panel active" id="panel-kindex">
+  <div class="hero">
+    <div class="kicker">K-INDEX · CNN ÷ VIX</div>
+    <h1>金风玉露一相逢</h1>
+    <p class="dek">K 指数 = CNN 恐惧贪婪指数 ÷ VIX。当恐惧（CNN 走低）与波动（VIX 走高）交叉，K 跌破 1 —— 2020 年以来的每一次，都对应纳指 100 的一次深度回调。下方逐次对账。</p>
+  </div>
+
+  <div class="k-status" id="k-status"></div>
+
+  <div class="card">
+    <h3>CNN 恐贪 × VIX × 纳指 100，与 K 指数</h3>
+    <div class="sub">上图：CNN（黄，左轴 0–100）· VIX（红，左轴）· 纳指 100（蓝，右轴，对数）｜下图：K 指数（红，左轴 1–10），K &lt; 1 区间高亮</div>
+    <div class="chart tall" id="ch-kindex"></div>
+    <p class="footnote">CNN 数据 2011 年起为每日存档；图表自 2019-06 起展示。数据源：CNN Fear &amp; Greed（whit3rabbit 存档 + 官方接口）、Yahoo Finance。</p>
+  </div>
+
+  <div class="poem" id="k-poem">金风（CNN）玉露（VIX）一（K &lt; 1）相逢，便胜却人间无数。</div>
+
+  <div class="card">
+    <h3>2020 年以来 K &lt; 1 信号逐次对账</h3>
+    <div class="sub">每段连续 K &lt; 1 的交易日聚为一次信号（间隔超过 10 个交易日记为新信号）。收益为信号首日纳指 100 收盘价之后 20 / 40 / 60 个交易日的涨跌幅。</div>
+    <div class="table-wrap"><table id="k-table"></table></div>
+    <p class="footnote" id="k-verdict"></p>
+  </div>
+</section>
+
+<!-- ================= 标普 500 ================= -->
+<section class="panel" id="panel-spy">
+  <div class="hero">
+    <div class="kicker">S&amp;P 500 · SINCE 1927</div>
+    <h1>标普 500：一个世纪的形状</h1>
+    <p class="dek">价格、回报、回撤、估值与波动——把近百年的标普 500 放进五个章节。</p>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>回报的形状</h2></div>
+    <p class="chapter-q">拉长到一个世纪，回报长什么样？</p>
+    <div class="card"><h3>百年走势（月线 · 对数坐标）</h3><div class="chart" id="ch-spy-century"></div></div>
+    <div class="card"><h3>年度回报</h3><div class="sub">每年收盘对收盘的价格回报</div><div class="chart short" id="ch-spy-annual"></div></div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>危机的节奏</h2></div>
+    <p class="chapter-q">跌下去要多深，爬回来要多久？</p>
+    <div class="card"><h3>历史回撤曲线</h3><div class="sub">距前高的百分比距离（周频）</div><div class="chart short" id="ch-spy-dd"></div></div>
+    <div class="grid-2">
+      <div class="card"><h3>深度回撤一览（≥10%）</h3><div class="table-wrap"><table id="spy-dd-table"></table></div></div>
+      <div class="card"><h3>年内最大回撤 vs 全年收益</h3><div class="sub">几乎每一年都有回撤，多数年份仍收正</div><div class="chart short" id="ch-spy-intra"></div></div>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>估值的锚</h2></div>
+    <p class="chapter-q">现在贵不贵？和 1929、2000 比呢？</p>
+    <div class="card"><h3>席勒 CAPE（1871 年至今）</h3><div class="chart short" id="ch-spy-cape"></div></div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第四章</span><h2>波动的纹理</h2></div>
+    <p class="chapter-q">市场什么时候在发抖？</p>
+    <div class="card"><h3>已实现波动率 × VIX</h3><div class="sub">20 日年化已实现波动率（周频）与 VIX</div><div class="chart short" id="ch-spy-vol"></div></div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第五章</span><h2>时间的复利</h2></div>
+    <p class="chapter-q">拿满五年，最差什么样？哪个月份最顺？</p>
+    <div class="grid-2">
+      <div class="card"><h3>滚动 5 年年化回报</h3><div class="chart short" id="ch-spy-roll"></div></div>
+      <div class="card"><h3>月度季节性</h3><div class="sub">各月平均涨跌与上涨概率</div><div class="chart short" id="ch-spy-season"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 纳斯达克 ================= -->
+<section class="panel" id="panel-qqq">
+  <div class="hero">
+    <div class="kicker">NASDAQ · COMPOSITE 1971 / NDX 1985</div>
+    <h1>纳斯达克：成长与代价</h1>
+    <p class="dek">纳指综指（1971→）与纳指 100（1985→）：更陡的复利，更深的回撤。</p>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>回报的形状</h2></div>
+    <p class="chapter-q">半个世纪的成长股复利曲线。</p>
+    <div class="card"><h3>纳指综指 × 纳指 100（月线 · 对数坐标）</h3><div class="chart" id="ch-qqq-century"></div></div>
+    <div class="card"><h3>纳指 100 年度回报</h3><div class="chart short" id="ch-qqq-annual"></div></div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>危机的节奏</h2></div>
+    <p class="chapter-q">dotcom 崩了 −83%，这次呢？</p>
+    <div class="card"><h3>纳指 100 历史回撤曲线</h3><div class="chart short" id="ch-qqq-dd"></div></div>
+    <div class="grid-2">
+      <div class="card"><h3>深度回撤一览（≥10%）</h3><div class="table-wrap"><table id="qqq-dd-table"></table></div></div>
+      <div class="card"><h3>年内最大回撤 vs 全年收益</h3><div class="chart short" id="ch-qqq-intra"></div></div>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>波动的纹理</h2></div>
+    <p class="chapter-q">成长股的心跳有多快？</p>
+    <div class="card"><h3>已实现波动率 × VXN</h3><div class="chart short" id="ch-qqq-vol"></div></div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第四章</span><h2>时间的复利</h2></div>
+    <p class="chapter-q">五年为期，纳指 100 会亏钱吗？</p>
+    <div class="grid-2">
+      <div class="card"><h3>滚动 5 年年化回报</h3><div class="chart short" id="ch-qqq-roll"></div></div>
+      <div class="card"><h3>月度季节性</h3><div class="chart short" id="ch-qqq-season"></div></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span id="meta-line">美股编年史 · 自用版</span> · 数据源：Yahoo Finance / CNN Fear &amp; Greed / multpl.com · 仅供个人研究，不构成投资建议
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
