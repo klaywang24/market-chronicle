@@ -57,9 +57,16 @@
     const el = document.getElementById(elId);
     if (!el) return;
     if (built.has(elId)) { built.get(elId).dispose(); }
-    const inst = echarts.init(el, null, { renderer: "canvas" });
-    built.set(elId, inst);
-    inst.setOption(await build(pal()));
+    try {
+      const option = await build(pal());
+      const inst = echarts.init(el, null, { renderer: "canvas" });
+      built.set(elId, inst);
+      inst.setOption(option);
+    } catch (e) {
+      // 数据尚未生成/拉取失败：给出可见占位，而不是无声空白
+      built.delete(elId);
+      el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-muted);font-size:13px">数据更新中，稍后自动出现 · data updating</div>';
+    }
   }
 
   const panelDone = new Set();
@@ -436,6 +443,10 @@
       if (fund.income4 && fund.income4.revenue) {
         await buildOne(basket + "-fd-rev", bars(fund.income4.years, fund.income4.revenue, "blue"));
         await buildOne(basket + "-fd-ni", bars(fund.income4.years, fund.income4.net_income, "moss", true));
+      }
+      if (!fund.roe && !fund.roic) {
+        const c = document.getElementById(basket + "-fd-roe");
+        if (c) c.closest(".card").remove();
       }
       if (fund.roe || fund.roic) {
         await buildOne(basket + "-fd-roe", async (p) => ({

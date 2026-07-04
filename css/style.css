@@ -107,12 +107,12 @@ body {
 }
 .tabs::-webkit-scrollbar { display: none; }
 .tab {
-  padding: 6px 14px;
+  padding: 6px 11px;
   border: none;
   background: none;
   color: var(--ink-muted);
   font: inherit;
-  font-size: 14.5px;
+  font-size: 14px;
   cursor: pointer;
   border-radius: 6px 6px 0 0;
   border-bottom: 2px solid transparent;
@@ -125,7 +125,9 @@ body {
   font-weight: 600;
   border-bottom-color: var(--accent);
 }
-.top-controls { display: flex; align-items: center; gap: 10px; }
+.top-controls { display: flex; align-items: center; gap: 10px; margin-left: 18px; }
+/* 窄屏收起品牌副题，给 tab 让位 */
+@media (max-width: 1560px) { .brand em { display: none; } }
 .lang-switch {
   white-space: nowrap;
   flex-shrink: 0;
@@ -386,10 +388,15 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
 @media (min-width: 1280px) {
   .toc { display: block; }
   .toc-toggle { display: none; }
-  .container,
-  .topbar-inner {
+  .container {
     margin-left: max(214px, calc((100vw - 1180px) / 2));
     margin-right: max(24px, calc((100vw - 1180px) / 2));
+  }
+  /* 顶栏用尽全宽：语言/主题切换贴右缘，tab 栏空间最大化 */
+  .topbar-inner {
+    max-width: none;
+    margin-left: max(214px, calc((100vw - 1180px) / 2));
+    margin-right: 24px;
   }
 }
 /* 窄屏：☰ 按钮展开为浮层，垫底避免看不清 */

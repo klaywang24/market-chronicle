@@ -17,8 +17,9 @@ jobs:
       - run: python scripts/build_fundamentals.py
       - name: commit data
         run: |
-          git config user.name "chronicle-bot"
-          git config user.email "bot@users.noreply.github.com"
+          git config user.name "klaywang24"
+          git config user.email "klaywang24@users.noreply.github.com"
           git add data
           git commit -m "data: weekly fundamentals $(date -u +%F)" || echo "no changes"
+          git pull --rebase origin main
           git push
