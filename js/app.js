@@ -24,7 +24,7 @@
       ink: v("--ink"), inkSoft: v("--ink-soft"), muted: v("--ink-muted"),
       accent: v("--accent"), accentDeep: v("--accent-deep"),
       gold: v("--gold"), moss: v("--moss"), blue: v("--blue"),
-      teal: v("--teal"), danger: v("--danger"),
+      teal: v("--teal"), purple: v("--purple"), danger: v("--danger"),
       grid: v("--grid"), gridStrong: v("--grid-strong"),
       card: v("--bg-card"), border: v("--border"),
     };
@@ -285,11 +285,12 @@
 
   // ---------------- 个股回报对比（vs 标普/纳指/行业ETF） ----------------
   const XLP_MEMBERS = new Set(["KO", "WMT", "COST"]);
+  // 对比四色：个股红(accent) / 标普蓝 / 纳指紫 / 行业ETF绿 —— 最大区分度
   function cmpDefs(basket, ticker) {
-    const defs = [["sp500_century", "标普 500", "blue"], ["ndx_century", "纳指 100", "gold"]];
-    if (basket === "fin") defs.push(["s_xlf_century", "XLF 金融", "teal"]);
+    const defs = [["sp500_century", "标普 500", "blue"], ["ndx_century", "纳指 100", "purple"]];
+    if (basket === "fin") defs.push(["s_xlf_century", "XLF 金融", "moss"]);
     else if (basket === "consumer") defs.push(XLP_MEMBERS.has(ticker)
-      ? ["s_xlp_century", "XLP 必需消费", "teal"] : ["s_xly_century", "XLY 可选消费", "teal"]);
+      ? ["s_xlp_century", "XLP 必需消费", "moss"] : ["s_xly_century", "XLY 可选消费", "moss"]);
     return defs;
   }
 
@@ -565,8 +566,9 @@
       if (!ch.id) ch.id = panel.id + "-ch" + i; // 已有 id（如 fd-* 章节）保留，供数据裁剪定位
       return ch;
     });
+    // 标题单独包 span，文本节点独立才能命中 i18n 词典
     tocEl.innerHTML = heads.map((h, i) =>
-      `<a data-target="${chapters[i].id}">${ROMAN[i] || i + 1} · ${h.textContent.split("：")[0]}</a>`
+      `<a data-target="${chapters[i].id}">${ROMAN[i] || i + 1} · <span>${h.textContent.split("：")[0]}</span></a>`
     ).join("");
     renumberChapters(scope); // 插入/裁剪章节后重排"第N章"标签
     tocChapters = chapters;

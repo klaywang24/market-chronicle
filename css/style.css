@@ -15,6 +15,7 @@
   --moss: #4A5D3A;
   --blue: #2B5F8F;
   --teal: #2D4A48;
+  --purple: #6A4E9E;
   --danger: #B8421E;
   --grid: rgba(26, 20, 16, 0.10);
   --grid-strong: rgba(26, 20, 16, 0.18);
@@ -36,6 +37,7 @@
   --moss: #8AA176;
   --blue: #6FA0CC;
   --teal: #6A8C88;
+  --purple: #A88FD8;
   --danger: #E06F4A;
   --grid: rgba(241, 236, 223, 0.10);
   --grid-strong: rgba(241, 236, 223, 0.18);
@@ -114,7 +116,11 @@ body {
   background: var(--bg-card);
   cursor: default;
 }
+.lang-switch { cursor: default; }
+.lang-switch span[data-lang] { cursor: pointer; padding: 0 2px; }
+.lang-switch span[data-lang]:hover { color: var(--ink); }
 .lang-switch span.active { color: var(--accent-deep); font-weight: 600; }
+.lang-switch .sep { color: var(--border); margin: 0 1px; }
 .theme-toggle {
   width: 34px; height: 34px;
   border: 1px solid var(--border);
@@ -349,9 +355,11 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
   width: 176px;
   max-height: calc(100vh - 160px);
   overflow-y: auto;
+  scrollbar-width: none;
   z-index: 95;
   padding: 4px;
 }
+.toc::-webkit-scrollbar { display: none; }
 .toc.open { display: block; }
 /* ≥1280px：目录常驻左栏，正文右移让位，互不遮挡 */
 @media (min-width: 1280px) {
