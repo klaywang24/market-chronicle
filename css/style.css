@@ -448,6 +448,16 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
 
 /* ---------- 长表格 / 个股 logo / 数据条 ---------- */
 .table-scroll { max-height: 440px; overflow-y: auto; }
+th.left { text-align: left; }
+.tbl-logo {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: #fff;
+  object-fit: contain;
+  vertical-align: -4px;
+  margin-right: 8px;
+}
 .table-scroll th { position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
 .stock-logo {
   width: 46px;

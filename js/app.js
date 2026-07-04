@@ -1119,16 +1119,19 @@
     };
   }
 
+  const tblLogo = (ticker) =>
+    `<img class="tbl-logo" loading="lazy" src="https://assets.parqet.com/logos/symbol/${ticker}?format=png" onerror="this.style.display='none'" alt="">`;
+
   async function renderTopTable(dsName, tableId) {
     const d = await load(dsName);
     const tbl = document.getElementById(tableId);
     tbl.innerHTML =
-      "<tr><th>#</th><th>代码</th><th>公司</th><th>行业</th><th>市值 ($B)</th><th>权重</th></tr>" +
+      '<tr><th>#</th><th>代码</th><th class="left">公司</th><th class="left">行业</th><th>市值 ($B)</th><th>权重</th></tr>' +
       d.rows.map((r, i) =>
         `<tr><td>${i + 1}</td><td>${r.ticker}</td>` +
-        `<td style="text-align:left">${r.name}</td>` +
+        `<td style="text-align:left">${tblLogo(r.ticker)}${r.name}</td>` +
         `<td style="text-align:left;font-family:'Noto Sans SC',sans-serif">${r.sector || "--"}</td>` +
-        `<td>${r.mcap ? r.mcap.toLocaleString("en-US") : "--"}</td>` +
+        `<td>${r.mcap ? Math.round(r.mcap).toLocaleString("en-US") : "--"}</td>` +
         `<td class="k-min">${r.weight.toFixed(2)}%</td></tr>`).join("") +
       (d.asof ? `<tr><td colspan="6" style="text-align:left;color:var(--ink-muted)">数据截至 ${d.asof} · ${d.source}</td></tr>` : "");
   }
@@ -1137,9 +1140,9 @@
     const d = await load(dsName);
     const hasAdded = d.rows[0] && d.rows[0].added !== undefined;
     document.getElementById(tableId).innerHTML =
-      `<tr><th>#</th><th>代码</th><th>公司</th><th>GICS 行业</th>${hasAdded ? "<th>纳入日期</th>" : ""}</tr>` +
+      `<tr><th>#</th><th>代码</th><th class="left">公司</th><th class="left">${hasAdded ? "GICS 行业" : "行业"}</th>${hasAdded ? "<th>纳入日期</th>" : ""}</tr>` +
       d.rows.map((r, i) =>
-        `<tr><td>${i + 1}</td><td>${r.ticker}</td><td style="text-align:left">${r.name}</td>` +
+        `<tr><td>${i + 1}</td><td>${r.ticker}</td><td style="text-align:left">${tblLogo(r.ticker)}${r.name}</td>` +
         `<td style="text-align:left;font-family:'Noto Sans SC',sans-serif">${r.sector}</td>` +
         (hasAdded ? `<td>${r.added || "--"}</td>` : "") + "</tr>").join("");
   }
