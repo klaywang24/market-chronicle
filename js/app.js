@@ -169,7 +169,12 @@
       </div>
       <div class="chapter">
         <div class="chapter-head"><span class="chapter-no">第一章</span><h2>上市以来</h2></div>
-        <div class="card"><h3>走势（月线 · 对数坐标 · 复权价）</h3><div class="chart" id="${basket}-sd-century"></div></div>
+        <div class="card">
+          <h3>走势（月线 · 对数坐标 · 复权价）</h3>
+          <div class="sub">和谁比一比？—— <span class="cmp-chips" id="${basket}-cmp"></span></div>
+          <div class="chart" id="${basket}-sd-century"></div>
+          <p class="footnote" id="${basket}-cmp-note" style="display:none">对比模式：全部序列在共同起点归一化为 100（对数坐标），跑赢基准 = 长期真正的好公司。</p>
+        </div>
       </div>
       <div class="chapter">
         <div class="chapter-head"><span class="chapter-no">第二章</span><h2>回报的形状</h2></div>
@@ -265,7 +270,8 @@
       ).join("");
     });
 
-    await buildOne(basket + "-sd-century", centuryChart(null, [{ ds: p + "_century", name: name }]));
+    setupCmp(basket, safe, ticker, name);
+    await buildStockCentury(basket, safe, name);
     await buildOne(basket + "-sd-annual", annualChart(p + "_annual"));
     await buildOne(basket + "-sd-intra", intraChart(p + "_intrayear"));
     await buildOne(basket + "-sd-dd", ddChart(p + "_drawdowns"));
@@ -275,6 +281,80 @@
     renderDDTable(p + "_drawdowns", basket + "-sd-ddtable");
     await renderFund(basket, safe, ticker);
     window.scrollTo(0, 0);
+  }
+
+  // ---------------- 个股回报对比（vs 标普/纳指/行业ETF） ----------------
+  const XLP_MEMBERS = new Set(["KO", "WMT", "COST"]);
+  function cmpDefs(basket, ticker) {
+    const defs = [["sp500_century", "标普 500", "blue"], ["ndx_century", "纳指 100", "gold"]];
+    if (basket === "fin") defs.push(["s_xlf_century", "XLF 金融", "teal"]);
+    else if (basket === "consumer") defs.push(XLP_MEMBERS.has(ticker)
+      ? ["s_xlp_century", "XLP 必需消费", "teal"] : ["s_xly_century", "XLY 可选消费", "teal"]);
+    return defs;
+  }
+
+  let cmpSel = new Set();
+  let cmpStockKey = null; // 换股时重置选择
+
+  function setupCmp(basket, safe, ticker, name) {
+    const key = basket + "/" + safe;
+    if (key !== cmpStockKey) { cmpSel = new Set(); cmpStockKey = key; }
+    const host = document.getElementById(basket + "-cmp");
+    const defs = cmpDefs(basket, ticker);
+    host.innerHTML = defs.map(([ds, label]) =>
+      `<button class="pill cmp-chip ${cmpSel.has(ds) ? "active" : ""}" data-ds="${ds}">${label}</button>`).join("");
+    host.onclick = async (e) => {
+      const chip = e.target.closest(".cmp-chip");
+      if (!chip) return;
+      cmpSel.has(chip.dataset.ds) ? cmpSel.delete(chip.dataset.ds) : cmpSel.add(chip.dataset.ds);
+      chip.classList.toggle("active");
+      await buildStockCentury(basket, safe, name);
+    };
+  }
+
+  async function buildStockCentury(basket, safe, name) {
+    const elId = basket + "-sd-century";
+    const note = document.getElementById(basket + "-cmp-note");
+    if (cmpSel.size === 0) {
+      if (note) note.style.display = "none";
+      return buildOne(elId, centuryChart(null, [{ ds: "s_" + safe + "_century", name }]));
+    }
+    if (note) note.style.display = "";
+    const defs = cmpDefs(basket, BASKET_CFG[basket].members.find(([t]) => safeTicker(t) === safe)[0]);
+    await buildOne(elId, async (p) => {
+      const stock = await load("s_" + safe + "_century");
+      const selected = defs.filter(([ds]) => cmpSel.has(ds));
+      const comps = await Promise.all(selected.map(([ds]) => load(ds)));
+      const all = [
+        { name, dates: stock.dates, values: stock.close, color: p.accent, width: 2 },
+        ...comps.map((c, i) => ({
+          name: selected[i][1], dates: c.dates, values: c.close,
+          color: p[selected[i][2]], width: 1.2,
+        })),
+      ];
+      // 共同起点 = 最晚起始的序列；全部归一化为 100
+      const start = all.map((s) => s.dates[0]).sort().slice(-1)[0];
+      const series = all.map((s) => {
+        const i0 = s.dates.findIndex((d) => d >= start);
+        const base = s.values[i0];
+        return {
+          name: s.name, type: "line", showSymbol: false,
+          data: s.dates.slice(i0).map((d, j) => [d, Math.round(s.values[i0 + j] / base * 1000) / 10]),
+          lineStyle: { color: s.color, width: s.width }, itemStyle: { color: s.color },
+        };
+      });
+      return {
+        tooltip: tip(p),
+        legend: { textStyle: { color: p.muted, fontSize: 11 }, top: 0 },
+        grid: { left: 64, right: 24, top: 32, bottom: 60 },
+        xAxis: timeX(p),
+        yAxis: Object.assign({ type: "log", name: "起点=100" }, baseAxis(p)),
+        dataZoom: [{ type: "inside" }, { type: "slider", bottom: 6, height: 18,
+          borderColor: p.border, fillerColor: "rgba(160,57,47,0.08)",
+          handleStyle: { color: p.accent }, textStyle: { color: p.muted, fontSize: 10 } }],
+        series,
+      };
+    });
   }
 
   // ---------------- 个股基本面章节（数据可用才显示对应章） ----------------
