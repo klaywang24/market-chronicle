@@ -25,6 +25,8 @@
       accent: v("--accent"), accentDeep: v("--accent-deep"),
       gold: v("--gold"), moss: v("--moss"), blue: v("--blue"),
       teal: v("--teal"), purple: v("--purple"), danger: v("--danger"),
+      cmpRed: v("--cmp-red"), cmpBlue: v("--cmp-blue"),
+      cmpPurple: v("--cmp-purple"), cmpGreen: v("--cmp-green"),
       grid: v("--grid"), gridStrong: v("--grid-strong"),
       card: v("--bg-card"), border: v("--border"),
     };
@@ -44,7 +46,7 @@
 
   // ---------------- 图表注册表 ----------------
   // panel -> [{el, build}]；懒加载：首次进入 tab 才渲染
-  const registry = { kindex: [], spy: [], qqq: [], fin: [], consumer: [], luxury: [], leaps: [] };
+  const registry = { kindex: [], spy: [], qqq: [], fin: [], consumer: [], luxury: [], macro: [], leaps: [] };
   const built = new Map(); // el id -> echarts instance
 
   function chart(panel, elId, build) {
@@ -285,12 +287,12 @@
 
   // ---------------- 个股回报对比（vs 标普/纳指/行业ETF） ----------------
   const XLP_MEMBERS = new Set(["KO", "WMT", "COST"]);
-  // 对比四色：个股红(accent) / 标普蓝 / 纳指紫 / 行业ETF绿 —— 最大区分度
+  // 对比四色：个股深红 / 标普 Chase 蓝 / 纳指深紫 / 行业ETF 凯尔特人绿
   function cmpDefs(basket, ticker) {
-    const defs = [["sp500_century", "标普 500", "blue"], ["ndx_century", "纳指 100", "purple"]];
-    if (basket === "fin") defs.push(["s_xlf_century", "XLF 金融", "moss"]);
+    const defs = [["sp500_century", "标普 500", "cmpBlue"], ["ndx_century", "纳指 100", "cmpPurple"]];
+    if (basket === "fin") defs.push(["s_xlf_century", "XLF 金融", "cmpGreen"]);
     else if (basket === "consumer") defs.push(XLP_MEMBERS.has(ticker)
-      ? ["s_xlp_century", "XLP 必需消费", "moss"] : ["s_xly_century", "XLY 可选消费", "moss"]);
+      ? ["s_xlp_century", "XLP 必需消费", "cmpGreen"] : ["s_xly_century", "XLY 可选消费", "cmpGreen"]);
     return defs;
   }
 
@@ -327,7 +329,7 @@
       const selected = defs.filter(([ds]) => cmpSel.has(ds));
       const comps = await Promise.all(selected.map(([ds]) => load(ds)));
       const all = [
-        { name, dates: stock.dates, values: stock.close, color: p.accent, width: 2 },
+        { name, dates: stock.dates, values: stock.close, color: p.cmpRed, width: 2.2 },
         ...comps.map((c, i) => ({
           name: selected[i][1], dates: c.dates, values: c.close,
           color: p[selected[i][2]], width: 1.2,
@@ -1168,6 +1170,89 @@
         `<div class="stat"><div class="label">${l}</div><div class="value">${v}</div><div class="note">${n}</div></div>`).join("");
     } catch (e) { /* 数据缺失时留空 */ }
   }
+
+  // ---------------- 宏观（FRED） ----------------
+  function macroLines(keys, opts) {
+    opts = opts || {};
+    return async (p) => {
+      const d = await load("macro");
+      const colors = [p.cmpBlue, p.cmpRed, p.cmpGreen, p.cmpPurple];
+      const series = keys.filter(([k]) => d[k]).map(([k, label], i) => ({
+        name: label, type: opts.bar ? "bar" : "line", showSymbol: false,
+        data: zip(d[k].dates, d[k].values),
+        lineStyle: { color: colors[i % 4], width: 1.3 }, itemStyle: { color: colors[i % 4] },
+        yAxisIndex: opts.dualAxis && i === keys.length - 1 ? 1 : 0,
+      }));
+      if (opts.zeroLine || opts.markValue != null) {
+        series[0].markLine = { silent: true, symbol: "none",
+          lineStyle: { color: p.danger, type: "dashed", width: 1.2 },
+          label: { color: p.danger, formatter: opts.markLabel || "", fontFamily: "JetBrains Mono", fontSize: 10 },
+          data: [{ yAxis: opts.markValue != null ? opts.markValue : 0 }] };
+      }
+      const yAxes = [Object.assign({ type: "value", name: opts.yName || "" }, baseAxis(p))];
+      if (opts.dualAxis) yAxes.push(Object.assign({ type: "value", name: opts.y2Name || "", position: "right", splitLine: { show: false } }, baseAxis(p)));
+      return {
+        tooltip: tip(p),
+        legend: keys.length > 1 ? { textStyle: { color: p.muted, fontSize: 11 }, top: 0 } : undefined,
+        grid: { left: 56, right: opts.dualAxis ? 56 : 20, top: keys.length > 1 ? 30 : 20, bottom: 28 },
+        xAxis: timeX(p),
+        yAxis: yAxes,
+        series,
+      };
+    };
+  }
+
+  function macroBars(key, label) {
+    return async (p) => {
+      const d = await load("macro");
+      return {
+        tooltip: tip(p, { axisPointer: { type: "shadow" } }),
+        grid: { left: 56, right: 20, top: 20, bottom: 28 },
+        xAxis: timeX(p),
+        yAxis: Object.assign({ type: "value" }, baseAxis(p)),
+        series: [{
+          name: label, type: "bar", barWidth: "60%",
+          data: d[key].dates.map((dt, i) => ({
+            value: [dt, d[key].values[i]],
+            itemStyle: { color: d[key].values[i] >= 0 ? p.moss : p.danger },
+          })),
+        }],
+      };
+    };
+  }
+
+  chart("macro", "ch-macro-rates", macroLines([["sofr", "SOFR"], ["effr", "EFFR"], ["target", "目标上限"]], { yName: "%" }));
+  chart("macro", "ch-macro-rrp", macroLines([["rrp", "ON RRP"]], { yName: "$B" }));
+  chart("macro", "ch-macro-walcl", macroLines([["walcl", "Fed 资产负债表"]], { yName: "$T" }));
+  chart("macro", "ch-macro-yields", macroLines([["dgs2", "2Y"], ["dgs10", "10Y"], ["dgs20", "20Y"], ["dgs30", "30Y"]], { yName: "%" }));
+  chart("macro", "ch-macro-curve", macroLines([["t10y2y", "10Y−2Y"]], { markValue: 0, markLabel: "倒挂线", yName: "%" }));
+  chart("macro", "ch-macro-credit", macroLines([["hy_oas", "高收益 OAS"], ["ig_oas", "投资级 OAS"]], { yName: "%" }));
+  chart("macro", "ch-macro-inflation", macroLines([["cpi_yoy", "CPI 同比"], ["core_pce_yoy", "核心 PCE 同比"], ["ppi_yoy", "PPI 同比"]], { markValue: 2, markLabel: "2% 目标", yName: "%" }));
+  chart("macro", "ch-macro-gdp", macroBars("gdp_qoq", "GDP 环比年化"));
+  chart("macro", "ch-macro-jobs", async (p) => {
+    const d = await load("macro");
+    return {
+      tooltip: tip(p),
+      legend: { textStyle: { color: p.muted, fontSize: 11 }, top: 0 },
+      grid: { left: 56, right: 56, top: 30, bottom: 28 },
+      xAxis: timeX(p),
+      yAxis: [
+        Object.assign({ type: "value", name: "千人" }, baseAxis(p)),
+        Object.assign({ type: "value", name: "失业率%", position: "right", splitLine: { show: false } }, baseAxis(p)),
+      ],
+      series: [
+        { name: "非农新增", type: "bar", barWidth: "60%",
+          data: d.nfp.dates.map((dt, i) => ({
+            value: [dt, d.nfp.values[i]],
+            itemStyle: { color: d.nfp.values[i] >= 0 ? p.moss : p.danger },
+          })) },
+        { name: "失业率", type: "line", yAxisIndex: 1, showSymbol: false,
+          data: zip(d.unrate.dates, d.unrate.values),
+          lineStyle: { color: p.cmpRed, width: 1.4 }, itemStyle: { color: p.cmpRed } },
+      ],
+    };
+  });
+  chart("macro", "ch-macro-profits", macroBars("cp_yoy", "企业利润同比"));
 
   // ---------------- LEAPS 窗口 ----------------
   chart("leaps", "ch-leaps", async (p) => {

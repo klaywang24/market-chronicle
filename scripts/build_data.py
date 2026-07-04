@@ -251,6 +251,81 @@ def build_index_panels(prefix: str, close: pd.Series, vol_index: pd.Series | Non
     write_json(f"{prefix}_seasonality.json", {"rows": season, "years": f"{monthly.index[0].year}–{monthly.index[-1].year}"})
 
 
+# ---------------------------------------------------------------- 宏观（FRED）
+
+def _fred(series_id: str, start: str = "2000-01-01") -> pd.Series:
+    """FRED fredgraph.csv 免费接口，无需 API key。
+    注意：部分地区/代理网络无法直连 FRED，本函数在 GitHub Actions（美国机房）稳定可用。"""
+    from io import StringIO
+    url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
+    r = None
+    for attempt in range(3):
+        try:
+            r = requests.get(url, headers=UA, timeout=60)
+            r.raise_for_status()
+            break
+        except Exception:
+            if attempt == 2:
+                raise
+            time.sleep(5 * (attempt + 1))
+    df = pd.read_csv(StringIO(r.text))
+    df.columns = ["d", "v"]
+    df["v"] = pd.to_numeric(df["v"], errors="coerce")
+    df = df.dropna()
+    df = df[df["d"] >= start]
+    s = pd.Series(df["v"].values, index=pd.to_datetime(df["d"]))
+    return s
+
+
+def _weekly(s: pd.Series, nd: int = 2):
+    w = s.resample("W").last().dropna()
+    return {"dates": dates(w.index), "values": rnd(w, nd)}
+
+
+def _yoy(s: pd.Series, nd: int = 2):
+    y = (s.pct_change(12).dropna()) * 100
+    return {"dates": dates(y.index), "values": rnd(y, nd)}
+
+
+def build_macro():
+    """资金面 / 信用 / 物价 / 增长与就业。全部 FRED 公开序列，2000 年起。"""
+    print("== 宏观（FRED）")
+    out = {}
+    fetch_plan = {
+        # 资金面
+        "sofr": ("SOFR", lambda s: _weekly(s)),
+        "effr": ("EFFR", lambda s: _weekly(s)),
+        "target": ("DFEDTARU", lambda s: _weekly(s)),
+        "rrp": ("RRPONTSYD", lambda s: _weekly(s, 1)),          # 十亿美元
+        "walcl": ("WALCL", lambda s: _weekly(s / 1e6, 3)),      # 百万→万亿美元
+        # 信用 / 利率
+        "dgs2": ("DGS2", lambda s: _weekly(s)),
+        "dgs10": ("DGS10", lambda s: _weekly(s)),
+        "dgs20": ("DGS20", lambda s: _weekly(s)),
+        "dgs30": ("DGS30", lambda s: _weekly(s)),
+        "t10y2y": ("T10Y2Y", lambda s: _weekly(s)),
+        "hy_oas": ("BAMLH0A0HYM2", lambda s: _weekly(s)),
+        "ig_oas": ("BAMLC0A0CM", lambda s: _weekly(s)),
+        # 物价（同比）
+        "cpi_yoy": ("CPIAUCSL", _yoy),
+        "core_pce_yoy": ("PCEPILFE", _yoy),
+        "ppi_yoy": ("PPIACO", _yoy),
+        # 增长与就业
+        "unrate": ("UNRATE", lambda s: {"dates": dates(s.index), "values": rnd(s, 1)}),
+        "nfp": ("PAYEMS", lambda s: (lambda d: {"dates": dates(d.index), "values": rnd(d, 0)})(s.diff().dropna())),  # 千人/月
+        "gdp_qoq": ("GDPC1", lambda s: (lambda g: {"dates": dates(g.index), "values": rnd(g, 1)})(((s / s.shift(1)) ** 4 - 1).dropna() * 100)),
+        "cp_yoy": ("CP", lambda s: (lambda y: {"dates": dates(y.index), "values": rnd(y, 1)})((s.pct_change(4).dropna()) * 100)),  # 季频
+    }
+    for key, (sid, f) in fetch_plan.items():
+        try:
+            out[key] = f(_fred(sid))
+        except Exception as e:
+            print(f"  {sid} failed (kept old if any): {e}")
+        time.sleep(0.6)
+    if out:
+        write_json("macro.json", out)
+
+
 # ---------------------------------------------------------------- LEAPS 窗口
 
 def build_leaps(spx_close: pd.Series, ndx_close: pd.Series, threshold: float = 25.0):
@@ -612,6 +687,7 @@ def main():
     build_kindex(ndx, vix)
     build_leaps(gspc, ndx)
     build_index_val()
+    build_macro()
     build_index_panels("sp500", gspc, vix, "VIX")
     build_index_panels("ixic", ixic)
     build_index_panels("ndx", ndx, vxn, "VXN")

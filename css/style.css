@@ -17,6 +17,11 @@
   --teal: #2D4A48;
   --purple: #6A4E9E;
   --danger: #B8421E;
+  /* 对比图专用四色：深红 / Chase 蓝 / 深紫 / 凯尔特人绿 —— 高饱和高区分 */
+  --cmp-red: #B01212;
+  --cmp-blue: #117ACA;
+  --cmp-purple: #6A3FB5;
+  --cmp-green: #007A33;
   --grid: rgba(26, 20, 16, 0.10);
   --grid-strong: rgba(26, 20, 16, 0.18);
   --border: #D8D0BA;
@@ -39,6 +44,10 @@
   --teal: #6A8C88;
   --purple: #A88FD8;
   --danger: #E06F4A;
+  --cmp-red: #FF5C5C;
+  --cmp-blue: #4BA8FF;
+  --cmp-purple: #B78FFF;
+  --cmp-green: #2FC97A;
   --grid: rgba(241, 236, 223, 0.10);
   --grid-strong: rgba(241, 236, 223, 0.18);
   --border: #3D352D;
@@ -88,9 +97,17 @@ body {
   font-size: 13px;
   margin-left: 8px;
 }
-.tabs { display: flex; gap: 2px; flex: 1; }
+.tabs {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
 .tab {
-  padding: 6px 16px;
+  padding: 6px 14px;
   border: none;
   background: none;
   color: var(--ink-muted);
@@ -99,6 +116,8 @@ body {
   cursor: pointer;
   border-radius: 6px 6px 0 0;
   border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .tab:hover { color: var(--ink); background: var(--bg-card-hover); }
 .tab.active {
@@ -108,6 +127,8 @@ body {
 }
 .top-controls { display: flex; align-items: center; gap: 10px; }
 .lang-switch {
+  white-space: nowrap;
+  flex-shrink: 0;
   font-size: 12.5px;
   color: var(--ink-muted);
   border: 1px solid var(--border);
