@@ -15,6 +15,8 @@ jobs:
           python-version: '3.12'
       - run: pip install yfinance pandas requests lxml
       - run: python scripts/build_data.py
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
       - name: commit data
         run: |
           git config user.name "klaywang24"

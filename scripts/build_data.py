@@ -254,27 +254,34 @@ def build_index_panels(prefix: str, close: pd.Series, vol_index: pd.Series | Non
 # ---------------------------------------------------------------- 宏观（FRED）
 
 def _fred(series_id: str, start: str = "2000-01-01") -> pd.Series:
-    """FRED fredgraph.csv 免费接口，无需 API key。
-    注意：部分地区/代理网络无法直连 FRED，本函数在 GitHub Actions（美国机房）稳定可用。"""
+    """FRED 数据。首选官方 API（需免费 key，环境变量 FRED_API_KEY，Actions 里从 Secrets 注入）；
+    无 key 时回退 fredgraph.csv（注意：该端点对数据中心/代理 IP 常不可达）。"""
+    import os
     from io import StringIO
+    key = os.environ.get("FRED_API_KEY")
+    if key:
+        url = ("https://api.stlouisfed.org/fred/series/observations"
+               f"?series_id={series_id}&api_key={key}&file_type=json&observation_start={start}")
+        for attempt in range(3):
+            try:
+                r = requests.get(url, headers=UA, timeout=60)
+                r.raise_for_status()
+                obs = r.json()["observations"]
+                pairs = [(o["date"], float(o["value"])) for o in obs if o["value"] not in (".", "")]
+                return pd.Series([v for _, v in pairs], index=pd.to_datetime([d for d, _ in pairs]))
+            except Exception:
+                if attempt == 2:
+                    raise
+                time.sleep(5 * (attempt + 1))
     url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
-    r = None
-    for attempt in range(3):
-        try:
-            r = requests.get(url, headers=UA, timeout=60)
-            r.raise_for_status()
-            break
-        except Exception:
-            if attempt == 2:
-                raise
-            time.sleep(5 * (attempt + 1))
+    r = requests.get(url, headers=UA, timeout=60)
+    r.raise_for_status()
     df = pd.read_csv(StringIO(r.text))
     df.columns = ["d", "v"]
     df["v"] = pd.to_numeric(df["v"], errors="coerce")
     df = df.dropna()
     df = df[df["d"] >= start]
-    s = pd.Series(df["v"].values, index=pd.to_datetime(df["d"]))
-    return s
+    return pd.Series(df["v"].values, index=pd.to_datetime(df["d"]))
 
 
 def _weekly(s: pd.Series, nd: int = 2):
