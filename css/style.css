@@ -146,7 +146,7 @@ body {
   font-weight: 600;
   margin-bottom: 6px;
 }
-.hero .dek { color: var(--ink-muted); max-width: 720px; margin-top: 10px; font-size: 15.5px; }
+.hero .dek { color: var(--ink-muted); max-width: 1020px; margin-top: 10px; font-size: 15.5px; }
 
 .chapter { margin: 48px 0; }
 .chapter-head { display: flex; align-items: baseline; gap: 14px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-bottom: 6px; }
@@ -422,6 +422,10 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
   margin-right: 14px;
 }
 .stat-strip { grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); }
+/* 个股 hero 的 7 张卡固定一行排满，避免最大回撤孤零零掉到第二行 */
+.stock-hero .stat-strip { grid-template-columns: repeat(7, 1fr); }
+@media (max-width: 1000px) { .stock-hero .stat-strip { grid-template-columns: repeat(4, 1fr); } }
+.stock-hero .stat .value { font-size: 18px; }
 footer {
   border-top: 1px solid var(--border);
   color: var(--ink-muted);
