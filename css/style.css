@@ -312,10 +312,11 @@ tr:hover td { background: var(--bg-card-hover); }
 /* 顶部世纪带：百年走势 + 危机红点 */
 .pulse-chartband {
   position: relative;
-  height: 260px;
+  height: 340px;
   flex-shrink: 0;
   margin: 2px 0 4px;
 }
+@media (max-width: 900px) { .pulse-chartband { height: 200px; } }
 .crisis-dot {
   position: absolute;
   transform: translate(-50%, -50%);

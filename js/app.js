@@ -1414,7 +1414,7 @@
 
     // 聚光灯：纯 CSS mask 跟随光标；触屏设备自动巡游
     const hero = document.getElementById("pulse-hero");
-    const R = 155;
+    const R = 80;
     const setSpot = (x, y) => {
       const m = `radial-gradient(circle ${R}px at ${x}px ${y}px, #fff 0%, #fff 45%, rgba(255,255,255,.55) 68%, rgba(255,255,255,.15) 86%, transparent 100%)`;
       reveal.style.webkitMaskImage = m;
