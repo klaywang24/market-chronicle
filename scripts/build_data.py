@@ -245,6 +245,159 @@ def build_index_panels(prefix: str, close: pd.Series, vol_index: pd.Series | Non
     write_json(f"{prefix}_seasonality.json", {"rows": season, "years": f"{monthly.index[0].year}–{monthly.index[-1].year}"})
 
 
+# ------------------------------------------------- 指数扩容章节（SPY/QQQ 专用）
+
+def build_index_extras(prefix: str, close: pd.Series):
+    """收益分布 / 持有期胜率 / 滚动年化矩阵 / 牛熊周期 / 左尾放大镜。"""
+    print(f"== extras {prefix}")
+    close = close.dropna()
+
+    # 收益分布：年度回报分桶（每桶列出年份，前端 tooltip 展示）
+    annual = close.resample("YE").last().pct_change().dropna() * 100
+    buckets = [(-100, -30), (-30, -20), (-20, -10), (-10, 0),
+               (0, 10), (10, 20), (20, 30), (30, 200)]
+    dist = []
+    for lo, hi in buckets:
+        yrs = sorted(int(d.year) for d, v in annual.items() if lo <= v < hi)
+        label = (f"<{-30}%" if lo == -100 else f">{30}%" if hi == 200 else f"{lo}~{hi}%")
+        dist.append({"label": label, "count": len(yrs), "years": yrs})
+    write_json(f"{prefix}_distribution.json", {"buckets": dist, "years_total": len(annual)})
+
+    # 入场与离场：持有 1/3/5/10/20 年（月频滚动）的胜率与年化分位
+    m = close.resample("ME").last().dropna()
+    hp = []
+    for y in (1, 3, 5, 10, 20):
+        r = ((m / m.shift(12 * y)) ** (1 / y) - 1).dropna() * 100
+        if len(r) < 24:
+            continue
+        hp.append({
+            "years": y,
+            "win": round(float((r > 0).mean() * 100), 1),
+            "median": round(float(r.median()), 1),
+            "worst": round(float(r.min()), 1),
+            "best": round(float(r.max()), 1),
+            "samples": int(len(r)),
+        })
+    write_json(f"{prefix}_holding.json", {"rows": hp})
+
+    # 滚动年化矩阵：5 / 10 / 20 年（月频）
+    out = {"dates": dates(m.index)}
+    for y in (5, 10, 20):
+        r = ((m / m.shift(12 * y)) ** (1 / y) - 1) * 100
+        out[f"cagr{y}"] = rnd(r, 2)
+    write_json(f"{prefix}_rollmatrix.json", out)
+
+    # 牛熊周期：标准 zigzag，跌 20% 确认熊、涨 25% 确认牛（对称：跌20%需涨25%回本）
+    pivots = []  # 相邻牛熊阶段之间的极值点 (日期, 价格)
+    hi, hi_d = float(close.iloc[0]), close.index[0]
+    lo, lo_d = float(close.iloc[0]), close.index[0]
+    direction = 0  # 1 牛 / -1 熊 / 0 未定
+    for dt, v in close.items():
+        v = float(v)
+        if direction >= 0 and v > hi:
+            hi, hi_d = v, dt
+        if direction <= 0 and v < lo:
+            lo, lo_d = v, dt
+        if direction >= 0 and v < hi * 0.8:
+            pivots.append((hi_d, hi))
+            direction, lo, lo_d = -1, v, dt
+        elif direction <= 0 and v > lo * 1.25:
+            pivots.append((lo_d, lo))
+            direction, hi, hi_d = 1, v, dt
+    cycles = []
+    prev_d, prev_p = close.index[0], float(close.iloc[0])
+    for d, px in pivots:
+        if d <= prev_d:
+            continue
+        ret = (px / prev_p - 1) * 100
+        cycles.append({"kind": "bull" if ret > 0 else "bear",
+                       "start": prev_d.strftime("%Y-%m-%d"), "end": d.strftime("%Y-%m-%d"),
+                       "ret": round(ret, 1), "days": int((d - prev_d).days)})
+        prev_d, prev_p = d, px
+    ret = (float(close.iloc[-1]) / prev_p - 1) * 100
+    cycles.append({"kind": "bull" if ret > 0 else "bear",
+                   "start": prev_d.strftime("%Y-%m-%d"), "end": None,
+                   "ret": round(ret, 1), "days": int((close.index[-1] - prev_d).days)})
+    write_json(f"{prefix}_bullbear.json", {"cycles": cycles})
+
+    # 左尾放大镜：最差/最好单日 + 日收益分布
+    d = close.pct_change().dropna() * 100
+    def top(series, n=12):
+        return [{"date": dt.strftime("%Y-%m-%d"), "ret": round(float(v), 2)}
+                for dt, v in series.items()]
+    hist_edges = [(-100, -5), (-5, -3), (-3, -2), (-2, -1), (-1, 0),
+                  (0, 1), (1, 2), (2, 3), (3, 5), (5, 100)]
+    hist = [{"label": (f"<-5%" if lo == -100 else f">5%" if hi == 100 else f"{lo}~{hi}%"),
+             "count": int(((d >= lo) & (d < hi)).sum())} for lo, hi in hist_edges]
+    write_json(f"{prefix}_extremes.json", {
+        "worst": top(d.nsmallest(12)), "best": top(d.nlargest(12)),
+        "hist": hist, "days_total": int(len(d)),
+    })
+
+
+def build_constituents():
+    """成分股（Wikipedia）：标普 500 与纳指 100，含 GICS 行业分布。"""
+    print("== constituents")
+    from io import StringIO
+    try:
+        html = requests.get("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies",
+                            headers=UA, timeout=30).text
+        t = pd.read_html(StringIO(html))[0]
+        rows = [{"ticker": r["Symbol"], "name": r["Security"], "sector": r["GICS Sector"],
+                 "sub": r["GICS Sub-Industry"], "added": str(r.get("Date added", ""))[:10]}
+                for _, r in t.iterrows()]
+        sectors = pd.Series([r["sector"] for r in rows]).value_counts()
+        write_json("sp500_constituents.json", {
+            "rows": rows,
+            "sectors": [{"sector": s, "count": int(c)} for s, c in sectors.items()],
+        })
+    except Exception as e:
+        print(f"  sp500 constituents failed (kept old): {e}")
+    try:
+        html = requests.get("https://en.wikipedia.org/wiki/Nasdaq-100", headers=UA, timeout=30).text
+        found = None
+        for t in pd.read_html(StringIO(html)):
+            cols = [str(c) for c in t.columns]
+            if any("Ticker" in c or "Symbol" in c for c in cols) and len(t) > 80:
+                found = t
+                break
+        if found is None:
+            raise RuntimeError("ndx table not found")
+        tick_col = next(c for c in found.columns if "Ticker" in str(c) or "Symbol" in str(c))
+        name_col = next(c for c in found.columns if "Company" in str(c))
+        sec_col = next((c for c in found.columns if "GICS Sector" in str(c)), None)
+        rows = [{"ticker": r[tick_col], "name": r[name_col],
+                 "sector": r[sec_col] if sec_col is not None else ""}
+                for _, r in found.iterrows()]
+        sectors = pd.Series([r["sector"] for r in rows if r["sector"]]).value_counts()
+        write_json("ndx_constituents.json", {
+            "rows": rows,
+            "sectors": [{"sector": s, "count": int(c)} for s, c in sectors.items()],
+        })
+    except Exception as e:
+        print(f"  ndx constituents failed (kept old): {e}")
+
+
+def _multpl_series(slug: str):
+    html = requests.get(f"https://www.multpl.com/{slug}/table/by-month", headers=UA, timeout=30).text
+    rows = re.findall(r'<td>([A-Z][a-z]{2} \d{1,2}, \d{4})</td>\s*<td>\s*(?:&#x2002;)?\s*\$?([\d.,]+)', html)
+    recs = sorted((datetime.strptime(d, "%b %d, %Y"), float(v.replace(",", ""))) for d, v in rows)
+    return recs
+
+
+def build_valuation_extras():
+    """标普 PE(TTM) 与 EPS（multpl，格式脆弱，失败保留旧文件）。"""
+    print("== 估值/盈利（multpl）")
+    for slug, out in (("s-p-500-pe-ratio", "sp500_pe_ttm.json"),
+                      ("s-p-500-earnings", "sp500_eps_hist.json")):
+        try:
+            recs = _multpl_series(slug)
+            write_json(out, {"dates": [d.strftime("%Y-%m-%d") for d, _ in recs],
+                             "values": [v for _, v in recs]})
+        except Exception as e:
+            print(f"  {slug} failed (kept old): {e}")
+
+
 # ------------------------------------------------------- 个股篮子板块
 
 BASKETS = {
@@ -332,6 +485,7 @@ def build_basket(prefix: str, members: list):
             "max_dd": round(float(max_dd), 1),
             "start_full": full.index[0].strftime("%Y-%m-%d"),
             "since_full": round(float(((full.iloc[-1] / full.iloc[0]) ** (1 / full_years) - 1) * 100), 1),
+            "total_mult": round(float(full.iloc[-1] / full.iloc[0]), 1),
             "max_dd_full": round(float((full / full.cummax() - 1).min() * 100), 1),
         })
     write_json(f"{prefix}_table.json", {"rows": rows, "start": start.strftime("%Y-%m-%d")})
@@ -373,6 +527,10 @@ def main():
     build_index_panels("sp500", gspc, vix, "VIX")
     build_index_panels("ixic", ixic)
     build_index_panels("ndx", ndx, vxn, "VXN")
+    build_index_extras("sp500", gspc)
+    build_index_extras("ndx", ndx)
+    build_constituents()
+    build_valuation_extras()
     for prefix, members in BASKETS.items():
         build_basket(prefix, members)
     for etf in ETF_ANCHORS:

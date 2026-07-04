@@ -144,7 +144,8 @@
     host.innerHTML = `
       <div class="stock-hero">
         <div class="kicker">${basket.toUpperCase()} · ${ticker}</div>
-        <h1>${name}<span class="ticker">${ticker}</span></h1>
+        <h1><img class="stock-logo" src="https://assets.parqet.com/logos/symbol/${ticker}?format=png"
+             onerror="this.style.display='none'" alt="">${name}<span class="ticker">${ticker}</span></h1>
         <div class="stat-strip" id="${basket}-sd-stats"></div>
       </div>
       <div class="chapter">
@@ -183,15 +184,19 @@
       if (!r) return;
       const f = (v) => v == null ? "--" : (v > 0 ? "+" : "") + v.toFixed(1) + "%";
       const cls = (v) => v == null ? "" : v >= 0 ? "pos" : "neg";
+      const totalPct = r.total_mult ? ((r.total_mult - 1) * 100).toLocaleString("en-US", { maximumFractionDigits: 0 }) : null;
       document.getElementById(basket + "-sd-stats").innerHTML = [
         ["上市数据起点", r.start_full.slice(0, 7), ""],
+        ["上市以来总回报", r.total_mult ? "×" + r.total_mult.toLocaleString("en-US", { maximumFractionDigits: 1 }) : "--",
+         "pos", totalPct ? "+" + totalPct + "%" : ""],
         ["YTD", f(r.ytd), cls(r.ytd)],
         ["5 年年化", f(r.y5), cls(r.y5)],
         ["10 年年化", f(r.y10), cls(r.y10)],
         ["上市以来年化", f(r.since_full), cls(r.since_full)],
         ["历史最大回撤", r.max_dd_full + "%", "neg"],
-      ].map(([l, v, c]) =>
-        `<div class="stat"><div class="label">${l}</div><div class="value ${c}">${v}</div></div>`
+      ].map(([l, v, c, note]) =>
+        `<div class="stat"><div class="label">${l}</div><div class="value ${c}">${v}</div>` +
+        (note ? `<div class="note">${note}</div>` : "") + "</div>"
       ).join("");
     });
 
@@ -221,12 +226,32 @@
   }
   window.addEventListener("hashchange", route);
 
-  // ---------------- 右侧悬浮章节目录 ----------------
-  const ROMAN = ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ"];
+  // ---------------- 左侧悬浮章节目录 ----------------
+  const ROMAN = ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ", "Ⅹ", "Ⅺ", "Ⅻ", "ⅩⅢ", "ⅩⅣ", "ⅩⅤ"];
+  const tocEl = document.getElementById("toc");
+  let tocChapters = [];
+
+  function highlightToc() {
+    if (!tocChapters.length) return;
+    let current = tocChapters[0];
+    for (const c of tocChapters) {
+      if (c.getBoundingClientRect().top <= 150) current = c;
+    }
+    tocEl.querySelectorAll("a").forEach((a) =>
+      a.classList.toggle("active", a.dataset.target === current.id));
+  }
+  let tocTick = false;
+  window.addEventListener("scroll", () => {
+    if (tocTick) return;
+    tocTick = true;
+    setTimeout(() => { highlightToc(); tocTick = false; }, 80);
+  }, { passive: true });
+  setInterval(highlightToc, 500); // scroll 事件之外的兜底，保证高亮永远跟手
+
   function buildToc() {
-    const toc = document.getElementById("toc");
     const panel = document.querySelector(".panel.active");
-    if (!panel) { toc.innerHTML = ""; return; }
+    tocChapters = [];
+    if (!panel) { tocEl.innerHTML = ""; return; }
     let scope = panel;
     const stockView = panel.querySelector(".basket-stock");
     if (stockView && stockView.style.display !== "none") scope = stockView;
@@ -235,16 +260,29 @@
       if (ov) scope = ov;
     }
     const heads = [...scope.querySelectorAll(".chapter-head h2")];
-    toc.innerHTML = heads.map((h, i) => {
-      const id = panel.id + "-ch" + i;
-      h.closest(".chapter").id = id;
-      return `<a data-target="${id}">${ROMAN[i] || i + 1} · ${h.textContent.split("：")[0]}</a>`;
-    }).join("");
+    const chapters = heads.map((h, i) => {
+      const ch = h.closest(".chapter");
+      ch.id = panel.id + "-ch" + i;
+      return ch;
+    });
+    tocEl.innerHTML = heads.map((h, i) =>
+      `<a data-target="${panel.id}-ch${i}">${ROMAN[i] || i + 1} · ${h.textContent.split("：")[0]}</a>`
+    ).join("");
+    tocChapters = chapters;
+    highlightToc();
   }
-  document.getElementById("toc").addEventListener("click", (e) => {
+  tocEl.addEventListener("click", (e) => {
     const a = e.target.closest("a");
-    if (a) document.getElementById(a.dataset.target).scrollIntoView({ behavior: "smooth" });
+    if (!a) return;
+    const target = document.getElementById(a.dataset.target);
+    if (target) {
+      const y = target.getBoundingClientRect().top + window.scrollY - 120;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+    if (window.innerWidth < 1560) tocEl.classList.remove("open");
   });
+  document.getElementById("toc-toggle").addEventListener("click", () =>
+    tocEl.classList.toggle("open"));
 
   // ---------------- 通用 option 片段 ----------------
   function baseAxis(p) {
@@ -584,25 +622,199 @@
     });
   }
 
+  // ---------------- 扩容章节构建器 ----------------
+  function distChart(dsName) {
+    return async (p) => {
+      const d = await load(dsName);
+      return {
+        tooltip: tip(p, {
+          axisPointer: { type: "shadow" },
+          formatter: (params) => {
+            const b = d.buckets[params[0].dataIndex];
+            const yrs = [];
+            for (let i = 0; i < b.years.length; i += 6) yrs.push(b.years.slice(i, i + 6).join(" "));
+            return `<b>${b.label}</b> · ${b.count} 年<br/>${yrs.join("<br/>") || "--"}`;
+          },
+        }),
+        grid: { left: 54, right: 20, top: 24, bottom: 28 },
+        xAxis: Object.assign({ type: "category", data: d.buckets.map((b) => b.label), splitLine: { show: false } }, baseAxis(p)),
+        yAxis: Object.assign({ type: "value", name: "年数" }, baseAxis(p)),
+        series: [{
+          type: "bar", barCategoryGap: "20%",
+          data: d.buckets.map((b, i) => ({ value: b.count, itemStyle: { color: i < 4 ? p.danger : p.moss } })),
+        }],
+      };
+    };
+  }
+
+  function holdingChart(dsName) {
+    return async (p) => {
+      const d = await load(dsName);
+      return {
+        tooltip: tip(p, {
+          axisPointer: { type: "shadow" },
+          formatter: (params) => {
+            const r = d.rows[params[0].dataIndex];
+            return `持有 ${r.years} 年<br/>胜率 ${r.win}%<br/>年化中位 ${r.median}% · 最差 ${r.worst}% · 最好 ${r.best}%`;
+          },
+        }),
+        grid: { left: 54, right: 20, top: 24, bottom: 28 },
+        xAxis: Object.assign({ type: "category", data: d.rows.map((r) => "持有" + r.years + "年"), splitLine: { show: false } }, baseAxis(p)),
+        yAxis: Object.assign({ type: "value", max: 100, axisLabel: { formatter: "{value}%", color: p.muted, fontFamily: "JetBrains Mono", fontSize: 11 } }, baseAxis(p)),
+        series: [{ type: "bar", barCategoryGap: "30%",
+          data: d.rows.map((r) => ({ value: r.win, itemStyle: { color: p.moss } })),
+          label: { show: true, position: "top", color: p.inkSoft, fontFamily: "JetBrains Mono", fontSize: 11, formatter: "{c}%" } }],
+      };
+    };
+  }
+
+  async function renderHoldingTable(dsName, tableId) {
+    const d = await load(dsName);
+    const f = (v) => `<td class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(1)}%</td>`;
+    document.getElementById(tableId).innerHTML =
+      "<tr><th>持有期</th><th>胜率</th><th>年化中位</th><th>最差年化</th><th>最好年化</th><th>样本</th></tr>" +
+      d.rows.map((r) =>
+        `<tr><td>${r.years} 年</td><td>${r.win}%</td>` + f(r.median) + f(r.worst) + f(r.best) +
+        `<td>${r.samples}</td></tr>`).join("");
+  }
+
+  function rollMatrixChart(dsName) {
+    return async (p) => {
+      const d = await load(dsName);
+      const defs = [["cagr5", "5 年", p.blue], ["cagr10", "10 年", p.gold], ["cagr20", "20 年", p.accent]];
+      return {
+        tooltip: tip(p),
+        legend: { textStyle: { color: p.muted, fontSize: 11 }, top: 0 },
+        grid: { left: 54, right: 20, top: 30, bottom: 28 },
+        xAxis: timeX(p),
+        yAxis: Object.assign({ type: "value", axisLabel: { formatter: "{value}%", color: p.muted, fontFamily: "JetBrains Mono", fontSize: 11 } }, baseAxis(p)),
+        series: defs.filter(([k]) => d[k]).map(([k, n, c]) => ({
+          name: n + "年化", type: "line", showSymbol: false, data: zip(d.dates, d[k]),
+          lineStyle: { color: c, width: 1.3 }, itemStyle: { color: c },
+        })).concat([{
+          name: "零线", type: "line", showSymbol: false, data: [],
+          markLine: { silent: true, symbol: "none", lineStyle: { color: p.ink, type: "dashed" },
+            label: { show: false }, data: [{ yAxis: 0 }] },
+        }]),
+      };
+    };
+  }
+
+  async function renderBullBearTable(dsName, tableId) {
+    const d = await load(dsName);
+    document.getElementById(tableId).innerHTML =
+      "<tr><th>阶段</th><th>起点</th><th>终点</th><th>涨跌</th><th>历时(天)</th></tr>" +
+      d.cycles.slice().reverse().map((c) =>
+        `<tr><td>${c.kind === "bull" ? "🐂 牛" : "🐻 熊"}</td><td>${c.start}</td><td>${c.end || "进行中"}</td>` +
+        `<td class="${c.ret >= 0 ? "pos" : "neg"}">${(c.ret > 0 ? "+" : "") + c.ret}%</td><td>${c.days}</td></tr>`).join("");
+  }
+
+  function dailyHistChart(dsName) {
+    return async (p) => {
+      const d = await load(dsName);
+      return {
+        tooltip: tip(p, { axisPointer: { type: "shadow" } }),
+        grid: { left: 60, right: 20, top: 24, bottom: 28 },
+        xAxis: Object.assign({ type: "category", data: d.hist.map((h) => h.label), splitLine: { show: false } }, baseAxis(p)),
+        yAxis: Object.assign({ type: "log", name: "天数(log)" }, baseAxis(p)),
+        series: [{ type: "bar", barCategoryGap: "20%",
+          data: d.hist.map((h, i) => ({ value: h.count || null, itemStyle: { color: i < 5 ? p.danger : p.moss } })) }],
+      };
+    };
+  }
+
+  async function renderExtremesTable(dsName, tableId) {
+    const d = await load(dsName);
+    document.getElementById(tableId).innerHTML =
+      "<tr><th>#</th><th>最差单日</th><th>跌幅</th><th>最好单日</th><th>涨幅</th></tr>" +
+      d.worst.map((w, i) => {
+        const b = d.best[i];
+        return `<tr><td>${i + 1}</td><td>${w.date}</td><td class="neg">${w.ret}%</td>` +
+               `<td>${b.date}</td><td class="pos">+${b.ret}%</td></tr>`;
+      }).join("");
+  }
+
+  function simpleLine(dsName, name, colorKey, opts) {
+    opts = opts || {};
+    return async (p) => {
+      const d = await load(dsName);
+      const series = {
+        name, type: "line", showSymbol: false, data: zip(d.dates, d.values),
+        lineStyle: { color: p[colorKey], width: 1.3 }, itemStyle: { color: p[colorKey] },
+      };
+      if (opts.avgLine) {
+        const avg = d.values.reduce((a, b) => a + b, 0) / d.values.length;
+        series.markLine = { silent: true, symbol: "none", lineStyle: { color: p.ink, type: "dashed" },
+          label: { color: p.muted, formatter: "均值 " + avg.toFixed(1), fontFamily: "JetBrains Mono" },
+          data: [{ yAxis: avg }] };
+      }
+      return {
+        tooltip: tip(p),
+        grid: { left: 58, right: 20, top: 20, bottom: 28 },
+        xAxis: timeX(p),
+        yAxis: Object.assign({ type: opts.log ? "log" : "value" }, baseAxis(p)),
+        series: [series],
+      };
+    };
+  }
+
+  function sectorChart(dsName) {
+    return async (p) => {
+      const d = await load(dsName);
+      const s = d.sectors.slice().reverse();
+      return {
+        tooltip: tip(p, { axisPointer: { type: "shadow" } }),
+        grid: { left: 150, right: 40, top: 10, bottom: 28 },
+        xAxis: Object.assign({ type: "value", name: "家数" }, baseAxis(p)),
+        yAxis: Object.assign({ type: "category", data: s.map((x) => x.sector), splitLine: { show: false },
+          axisLabel: { color: p.inkSoft, fontSize: 11 } }, baseAxis(p)),
+        series: [{ type: "bar", barCategoryGap: "30%",
+          data: s.map((x) => ({ value: x.count, itemStyle: { color: p.teal } })),
+          label: { show: true, position: "right", color: p.muted, fontFamily: "JetBrains Mono", fontSize: 11 } }],
+      };
+    };
+  }
+
+  async function renderConstituents(dsName, tableId) {
+    const d = await load(dsName);
+    const hasAdded = d.rows[0] && d.rows[0].added !== undefined;
+    document.getElementById(tableId).innerHTML =
+      `<tr><th>#</th><th>代码</th><th>公司</th><th>GICS 行业</th>${hasAdded ? "<th>纳入日期</th>" : ""}</tr>` +
+      d.rows.map((r, i) =>
+        `<tr><td>${i + 1}</td><td>${r.ticker}</td><td style="text-align:left">${r.name}</td>` +
+        `<td style="text-align:left;font-family:'Noto Sans SC',sans-serif">${r.sector}</td>` +
+        (hasAdded ? `<td>${r.added || "--"}</td>` : "") + "</tr>").join("");
+  }
+
   // ---------------- 注册 SPY / QQQ ----------------
   chart("spy", "ch-spy-century", centuryChart("sp500_century", [{ ds: "sp500_century", name: "标普 500" }]));
   chart("spy", "ch-spy-annual", annualChart("sp500_annual"));
+  chart("spy", "ch-spy-dist", distChart("sp500_distribution"));
+  chart("spy", "ch-spy-holding", holdingChart("sp500_holding"));
+  chart("spy", "ch-spy-rollmatrix", rollMatrixChart("sp500_rollmatrix"));
+  chart("spy", "ch-spy-dailyhist", dailyHistChart("sp500_extremes"));
   chart("spy", "ch-spy-dd", ddChart("sp500_drawdowns"));
   chart("spy", "ch-spy-intra", intraChart("sp500_intrayear"));
   chart("spy", "ch-spy-cape", capeChart());
+  chart("spy", "ch-spy-pettm", simpleLine("sp500_pe_ttm", "PE(TTM)", "accent", { avgLine: true }));
+  chart("spy", "ch-spy-eps", simpleLine("sp500_eps_hist", "EPS(TTM)", "moss", { log: true }));
   chart("spy", "ch-spy-vol", volChart("sp500_volatility"));
-  chart("spy", "ch-spy-roll", rollChart("sp500_rolling5y"));
   chart("spy", "ch-spy-season", seasonChart("sp500_seasonality"));
+  chart("spy", "ch-spy-sectors", sectorChart("sp500_constituents"));
 
   chart("qqq", "ch-qqq-century", centuryChart(null, [
     { ds: "ixic_century", name: "纳指综指" }, { ds: "ndx_century", name: "纳指 100" },
   ]));
   chart("qqq", "ch-qqq-annual", annualChart("ndx_annual"));
+  chart("qqq", "ch-qqq-dist", distChart("ndx_distribution"));
+  chart("qqq", "ch-qqq-holding", holdingChart("ndx_holding"));
+  chart("qqq", "ch-qqq-rollmatrix", rollMatrixChart("ndx_rollmatrix"));
+  chart("qqq", "ch-qqq-dailyhist", dailyHistChart("ndx_extremes"));
   chart("qqq", "ch-qqq-dd", ddChart("ndx_drawdowns"));
   chart("qqq", "ch-qqq-intra", intraChart("ndx_intrayear"));
   chart("qqq", "ch-qqq-vol", volChart("ndx_volatility"));
-  chart("qqq", "ch-qqq-roll", rollChart("ndx_rolling5y"));
   chart("qqq", "ch-qqq-season", seasonChart("ndx_seasonality"));
+  chart("qqq", "ch-qqq-sectors", sectorChart("ndx_constituents"));
 
   ["fin", "consumer", "luxury"].forEach((b) => {
     chart(b, "ch-" + b + "-growth", basketGrowthChart(b));
@@ -622,6 +834,14 @@
   renderKStatus();
   renderDDTable("sp500_drawdowns", "spy-dd-table");
   renderDDTable("ndx_drawdowns", "qqq-dd-table");
+  renderHoldingTable("sp500_holding", "spy-holding-table");
+  renderHoldingTable("ndx_holding", "qqq-holding-table");
+  renderBullBearTable("sp500_bullbear", "spy-bullbear-table");
+  renderBullBearTable("ndx_bullbear", "qqq-bullbear-table");
+  renderExtremesTable("sp500_extremes", "spy-extremes-table");
+  renderExtremesTable("ndx_extremes", "qqq-extremes-table");
+  renderConstituents("sp500_constituents", "spy-constituents");
+  renderConstituents("ndx_constituents", "qqq-constituents");
   renderBasketTable("fin", "fin-table");
   renderBasketTable("consumer", "consumer-table");
   renderBasketTable("luxury", "luxury-table");

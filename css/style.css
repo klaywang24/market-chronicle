@@ -300,16 +300,30 @@ tr:hover td { background: var(--bg-card-hover); }
 tr.clickable { cursor: pointer; }
 tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
 
-/* ---------- 右侧悬浮章节目录 ---------- */
+/* ---------- 左侧悬浮章节目录 ---------- */
 .toc {
   display: none;
   position: fixed;
-  top: 120px;
-  right: 24px;
-  width: 168px;
-  z-index: 80;
+  top: 116px;
+  left: 18px;
+  width: 176px;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  z-index: 95;
+  padding: 4px;
 }
+.toc.open { display: block; }
 @media (min-width: 1560px) { .toc { display: block; } }
+/* 窄屏展开时垫一层底，避免叠在正文上看不清 */
+@media (max-width: 1559px) {
+  .toc.open {
+    background: color-mix(in srgb, var(--bg) 96%, transparent);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+  }
+}
 .toc a {
   display: block;
   font-size: 12.5px;
@@ -321,9 +335,47 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
   padding: 4px 10px;
   margin-bottom: 6px;
   font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+  cursor: pointer;
 }
 .toc a:hover { color: var(--ink); background: var(--bg-card-hover); }
-.toc a.active { border-color: var(--accent); color: var(--accent-deep); font-weight: 600; }
+.toc a.active {
+  border-color: var(--accent);
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+.toc-toggle {
+  position: fixed;
+  top: 72px;
+  left: 18px;
+  z-index: 96;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--ink);
+  font-size: 15px;
+  cursor: pointer;
+}
+.toc-toggle:hover { background: var(--bg-card-hover); }
+@media (min-width: 1560px) { .toc-toggle { display: none; } }
+
+/* ---------- 长表格 / 个股 logo / 数据条 ---------- */
+.table-scroll { max-height: 440px; overflow-y: auto; }
+.table-scroll th { position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
+.stock-logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: #fff;
+  object-fit: contain;
+  padding: 4px;
+  border: 1px solid var(--border);
+  vertical-align: middle;
+  margin-right: 14px;
+}
+.stat-strip { grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); }
 footer {
   border-top: 1px solid var(--border);
   color: var(--ink-muted);
