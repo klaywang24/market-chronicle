@@ -245,6 +245,85 @@ def build_index_panels(prefix: str, close: pd.Series, vol_index: pd.Series | Non
     write_json(f"{prefix}_seasonality.json", {"rows": season, "years": f"{monthly.index[0].year}–{monthly.index[-1].year}"})
 
 
+# ------------------------------------------------------- 个股篮子板块
+
+BASKETS = {
+    "fin": [
+        ("JPM", "摩根大通"), ("BAC", "美国银行"), ("V", "Visa"), ("MA", "万事达"),
+        ("AXP", "美国运通"), ("GS", "高盛"), ("MS", "摩根士丹利"), ("BLK", "贝莱德"),
+        ("IBKR", "盈透证券"), ("SCHW", "嘉信理财"),
+    ],
+    "consumer": [
+        ("KO", "可口可乐"), ("WMT", "沃尔玛"), ("COST", "好市多"),
+        ("HD", "家得宝"), ("TJX", "TJX"), ("MCD", "麦当劳"),
+    ],
+    "luxury": [
+        ("MC.PA", "LVMH"), ("RMS.PA", "爱马仕"), ("RACE", "法拉利"),
+    ],
+}
+
+
+def build_basket(prefix: str, members: list):
+    """个股篮子：归一化成长曲线 + 等权组合面板 + 个股对照表。
+    组合与归一化都基于各自币种的百分比回报，跨币种混合仅供比较参考。"""
+    print(f"== basket {prefix}")
+    closes = {}
+    for ticker, label in members:
+        closes[ticker] = fetch_history(ticker)["Close"].dropna()
+        time.sleep(1)
+    df = pd.DataFrame(closes).dropna()  # 共同起点 = 最晚上市者
+    start = df.index[0]
+
+    # 归一化成长曲线（周频，起点=100）+ 等权组合
+    norm = df / df.iloc[0] * 100
+    daily_ret = df.pct_change().dropna()
+    ew = (1 + daily_ret.mean(axis=1)).cumprod() * 100
+    ew = pd.concat([pd.Series([100.0], index=[df.index[0]]), ew])
+    weekly = norm.resample("W").last().dropna(how="all")
+    ew_w = ew.resample("W").last().dropna()
+    write_json(f"{prefix}_growth.json", {
+        "start": start.strftime("%Y-%m-%d"),
+        "dates": dates(weekly.index),
+        "series": [{"ticker": t, "name": n, "values": rnd(weekly[t], 1)} for t, n in members],
+        "ew": {"dates": dates(ew_w.index), "values": rnd(ew_w, 1)},
+    })
+
+    # 等权组合：年度回报 + 回撤
+    annual = ew.resample("YE").last().pct_change().dropna() * 100
+    write_json(f"{prefix}_annual.json", {
+        "years": [d.year for d in annual.index],
+        "returns": rnd(annual, 2),
+    })
+    dd, episodes = drawdown_episodes(ew)
+    weekly_dd = dd.resample("W").min()
+    write_json(f"{prefix}_drawdowns.json", {
+        "dates": dates(weekly_dd.index),
+        "dd": rnd(weekly_dd * 100, 2),
+        "episodes": sorted(episodes, key=lambda e: e["depth"])[:15],
+    })
+
+    # 个股对照表
+    rows = []
+    last_year_end = df[df.index.year < df.index[-1].year].index[-1]
+    for t, n in members:
+        s = df[t]
+        years_total = (s.index[-1] - s.index[0]).days / 365.25
+        def cagr(y):
+            past = s[s.index <= s.index[-1] - pd.Timedelta(days=int(y * 365.25))]
+            if past.empty:
+                return None
+            return round(((s.iloc[-1] / past.iloc[-1]) ** (1 / y) - 1) * 100, 1)
+        max_dd = (s / s.cummax() - 1).min() * 100
+        rows.append({
+            "ticker": t, "name": n,
+            "ytd": round((s.iloc[-1] / s.loc[last_year_end] - 1) * 100, 1),
+            "y1": cagr(1), "y3": cagr(3), "y5": cagr(5), "y10": cagr(10),
+            "since": round(((s.iloc[-1] / s.iloc[0]) ** (1 / years_total) - 1) * 100, 1),
+            "max_dd": round(float(max_dd), 1),
+        })
+    write_json(f"{prefix}_table.json", {"rows": rows, "start": start.strftime("%Y-%m-%d")})
+
+
 def build_cape():
     print("== 席勒 CAPE")
     try:
@@ -277,6 +356,8 @@ def main():
     build_index_panels("sp500", gspc, vix, "VIX")
     build_index_panels("ixic", ixic)
     build_index_panels("ndx", ndx, vxn, "VXN")
+    for prefix, members in BASKETS.items():
+        build_basket(prefix, members)
     build_cape()
 
     write_json("meta.json", {

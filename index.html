@@ -23,9 +23,12 @@
   <div class="topbar-inner">
     <div class="brand">美股编年史<em>Market Chronicle</em></div>
     <nav class="tabs" id="tabs">
-      <button class="tab active" data-panel="kindex">K 指数</button>
-      <button class="tab" data-panel="spy">标普 500</button>
+      <button class="tab active" data-panel="spy">标普 500</button>
       <button class="tab" data-panel="qqq">纳斯达克</button>
+      <button class="tab" data-panel="fin">金融</button>
+      <button class="tab" data-panel="consumer">消费</button>
+      <button class="tab" data-panel="luxury">奢侈品</button>
+      <button class="tab" data-panel="kindex">K 指数</button>
     </nav>
     <div class="top-controls">
       <div class="lang-switch" title="多语言版本制作中"><span class="active">简</span> · 繁 · EN · FR · ES</div>
@@ -37,7 +40,7 @@
 <main class="container">
 
 <!-- ================= K 指数 ================= -->
-<section class="panel active" id="panel-kindex">
+<section class="panel" id="panel-kindex">
   <div class="hero">
     <div class="kicker">K-INDEX · CNN ÷ VIX</div>
     <h1>金风玉露一相逢</h1>
@@ -64,7 +67,7 @@
 </section>
 
 <!-- ================= 标普 500 ================= -->
-<section class="panel" id="panel-spy">
+<section class="panel active" id="panel-spy">
   <div class="hero">
     <div class="kicker">S&amp;P 500 · SINCE 1927</div>
     <h1>标普 500：一个世纪的形状</h1>
@@ -147,6 +150,75 @@
     <div class="grid-2">
       <div class="card"><h3>滚动 5 年年化回报</h3><div class="chart short" id="ch-qqq-roll"></div></div>
       <div class="card"><h3>月度季节性</h3><div class="chart short" id="ch-qqq-season"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 金融 ================= -->
+<section class="panel" id="panel-fin">
+  <div class="hero">
+    <div class="kicker">FINTECH &amp; FINANCIALS · SINCE 2008</div>
+    <h1>金融：钱的生意</h1>
+    <p class="dek">银行、投行、卡组织、券商与资管，十只龙头放在同一起跑线（2008-03，Visa 上市）。</p>
+  </div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>成长的对照</h2></div>
+    <p class="chapter-q">同样的 100 元，各自长成了多少？</p>
+    <div class="card"><h3>归一化成长曲线（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">墨色粗线为十股等权组合</div><div class="chart" id="ch-fin-growth"></div></div>
+    <div class="card"><h3>个股对照</h3><div class="sub">年化收益按各自币种计；YTD 为年初至今涨跌</div><div class="table-wrap"><table id="fin-table"></table></div></div>
+  </div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>组合的脾气</h2></div>
+    <p class="chapter-q">等权拿着这十只，年景和回撤什么样？</p>
+    <div class="grid-2">
+      <div class="card"><h3>等权组合年度回报</h3><div class="chart short" id="ch-fin-annual"></div></div>
+      <div class="card"><h3>等权组合回撤曲线</h3><div class="chart short" id="ch-fin-dd"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 消费 ================= -->
+<section class="panel" id="panel-consumer">
+  <div class="hero">
+    <div class="kicker">CONSUMER STAPLES &amp; RETAIL · SINCE 1987</div>
+    <h1>消费：慢变量的复利</h1>
+    <p class="dek">可乐、超市、仓储会员店、建材、折扣零售与快餐——六只穿越周期的消费龙头。</p>
+  </div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>成长的对照</h2></div>
+    <p class="chapter-q">四十年维度，谁是真正的复利机器？</p>
+    <div class="card"><h3>归一化成长曲线（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">墨色粗线为六股等权组合</div><div class="chart" id="ch-consumer-growth"></div></div>
+    <div class="card"><h3>个股对照</h3><div class="table-wrap"><table id="consumer-table"></table></div></div>
+  </div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>组合的脾气</h2></div>
+    <p class="chapter-q">防守型组合的年景与回撤。</p>
+    <div class="grid-2">
+      <div class="card"><h3>等权组合年度回报</h3><div class="chart short" id="ch-consumer-annual"></div></div>
+      <div class="card"><h3>等权组合回撤曲线</h3><div class="chart short" id="ch-consumer-dd"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 奢侈品 ================= -->
+<section class="panel" id="panel-luxury">
+  <div class="hero">
+    <div class="kicker">LUXURY · SINCE 2015</div>
+    <h1>奢侈品：定价权的溢价</h1>
+    <p class="dek">LVMH、爱马仕、法拉利——三只对定价权的信仰（起点 2015-10，法拉利上市；欧股按欧元计价）。</p>
+  </div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>成长的对照</h2></div>
+    <p class="chapter-q">同为奢侈品，分化有多大？</p>
+    <div class="card"><h3>归一化成长曲线（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">墨色粗线为三股等权组合；MC/RMS 为欧元、RACE 为美元，混币种仅供比较</div><div class="chart" id="ch-luxury-growth"></div></div>
+    <div class="card"><h3>个股对照</h3><div class="table-wrap"><table id="luxury-table"></table></div></div>
+  </div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>组合的脾气</h2></div>
+    <p class="chapter-q">奢侈品也有熊市。</p>
+    <div class="grid-2">
+      <div class="card"><h3>等权组合年度回报</h3><div class="chart short" id="ch-luxury-annual"></div></div>
+      <div class="card"><h3>等权组合回撤曲线</h3><div class="chart short" id="ch-luxury-dd"></div></div>
     </div>
   </div>
 </section>

@@ -44,7 +44,7 @@
 
   // ---------------- 图表注册表 ----------------
   // panel -> [{el, build}]；懒加载：首次进入 tab 才渲染
-  const registry = { kindex: [], spy: [], qqq: [] };
+  const registry = { kindex: [], spy: [], qqq: [], fin: [], consumer: [], luxury: [] };
   const built = new Map(); // el id -> echarts instance
 
   function chart(panel, elId, build) {
@@ -369,6 +369,55 @@
     };
   }
 
+  // ---------------- 个股篮子 ----------------
+  function basketPalette(p) {
+    return [p.blue, p.accent, p.gold, p.moss, p.teal, p.danger,
+            "#7D6A9E", "#5E7C8A", "#A8783C", p.accentDeep];
+  }
+
+  function basketGrowthChart(prefix) {
+    return async (p) => {
+      const d = await load(prefix + "_growth");
+      const colors = basketPalette(p);
+      const series = d.series.map((s, i) => ({
+        name: s.name, type: "line", showSymbol: false,
+        data: zip(d.dates, s.values),
+        lineStyle: { color: colors[i % colors.length], width: 1.1 },
+        itemStyle: { color: colors[i % colors.length] },
+      }));
+      series.push({
+        name: "等权组合", type: "line", showSymbol: false,
+        data: zip(d.ew.dates, d.ew.values),
+        lineStyle: { color: p.ink, width: 2.4 }, itemStyle: { color: p.ink },
+        z: 10,
+      });
+      return {
+        tooltip: tip(p),
+        legend: { textStyle: { color: p.muted, fontSize: 11 }, top: 0, type: "scroll" },
+        grid: { left: 64, right: 24, top: 36, bottom: 60 },
+        xAxis: timeX(p),
+        yAxis: Object.assign({ type: "log" }, baseAxis(p)),
+        dataZoom: [{ type: "inside" }, { type: "slider", bottom: 6, height: 18,
+          borderColor: p.border, fillerColor: "rgba(160,57,47,0.08)",
+          handleStyle: { color: p.accent }, textStyle: { color: p.muted, fontSize: 10 } }],
+        series,
+      };
+    };
+  }
+
+  async function renderBasketTable(prefix, tableId) {
+    const d = await load(prefix + "_table");
+    const c = (v, suffix) => v == null ? "<td>--</td>" :
+      `<td class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(1)}${suffix}</td>`;
+    document.getElementById(tableId).innerHTML =
+      "<tr><th>代码</th><th>名称</th><th>YTD</th><th>1年</th><th>3年年化</th><th>5年年化</th><th>10年年化</th><th>共同起点年化</th><th>最大回撤</th></tr>" +
+      d.rows.map((r) =>
+        `<tr><td>${r.ticker}</td><td>${r.name}</td>` +
+        c(r.ytd, "%") + c(r.y1, "%") + c(r.y3, "%") + c(r.y5, "%") + c(r.y10, "%") + c(r.since, "%") +
+        `<td class="neg">${r.max_dd}%</td></tr>`
+      ).join("");
+  }
+
   // ---------------- 注册 SPY / QQQ ----------------
   chart("spy", "ch-spy-century", centuryChart("sp500_century", [{ ds: "sp500_century", name: "标普 500" }]));
   chart("spy", "ch-spy-annual", annualChart("sp500_annual"));
@@ -389,13 +438,22 @@
   chart("qqq", "ch-qqq-roll", rollChart("ndx_rolling5y"));
   chart("qqq", "ch-qqq-season", seasonChart("ndx_seasonality"));
 
+  ["fin", "consumer", "luxury"].forEach((b) => {
+    chart(b, "ch-" + b + "-growth", basketGrowthChart(b));
+    chart(b, "ch-" + b + "-annual", annualChart(b + "_annual"));
+    chart(b, "ch-" + b + "-dd", ddChart(b + "_drawdowns"));
+  });
+
   // ---------------- 启动 ----------------
   renderKStatus();
   renderDDTable("sp500_drawdowns", "spy-dd-table");
   renderDDTable("ndx_drawdowns", "qqq-dd-table");
+  renderBasketTable("fin", "fin-table");
+  renderBasketTable("consumer", "consumer-table");
+  renderBasketTable("luxury", "luxury-table");
   load("meta").then((m) => {
     document.getElementById("meta-line").textContent =
       "美股编年史 · 自用版 · 数据更新于 " + m.updated.slice(0, 10);
   }).catch(() => {});
-  activatePanel("kindex");
+  activatePanel("spy");
 })();
