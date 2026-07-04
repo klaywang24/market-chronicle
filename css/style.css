@@ -12,7 +12,7 @@
   --accent-soft: rgba(160, 57, 47, 0.08);
   --gold: #B8893E;
   --gold-soft: rgba(184, 137, 62, 0.10);
-  --moss: #4A5D3A;
+  --moss: #14A63E; /* 苹果绿：鲜艳亮色，全站涨幅/正值统一用 */
   --blue: #2B5F8F;
   --teal: #2D4A48;
   --purple: #6A4E9E;
@@ -21,7 +21,7 @@
   --cmp-red: #B01212;
   --cmp-blue: #117ACA;
   --cmp-purple: #6A3FB5;
-  --cmp-green: #007A33;
+  --cmp-green: #00A93E;
   --grid: rgba(26, 20, 16, 0.10);
   --grid-strong: rgba(26, 20, 16, 0.18);
   --border: #D8D0BA;
@@ -39,7 +39,7 @@
   --accent-soft: rgba(212, 93, 79, 0.14);
   --gold: #E0B05A;
   --gold-soft: rgba(224, 176, 90, 0.14);
-  --moss: #8AA176;
+  --moss: #34D96C; /* 苹果绿（夜间提亮版） */
   --blue: #6FA0CC;
   --teal: #6A8C88;
   --purple: #A88FD8;
@@ -47,7 +47,7 @@
   --cmp-red: #FF5C5C;
   --cmp-blue: #4BA8FF;
   --cmp-purple: #B78FFF;
-  --cmp-green: #2FC97A;
+  --cmp-green: #3BE577;
   --grid: rgba(241, 236, 223, 0.10);
   --grid-strong: rgba(241, 236, 223, 0.18);
   --border: #3D352D;

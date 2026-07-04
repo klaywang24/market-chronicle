@@ -488,6 +488,12 @@
     "2011 年以来每次极端恐惧，6 / 12 / 18 个月后指数在哪里？（LEAPS 的持有视界）": ["After every extreme-fear window since 2011 — where was the index 6/12/18 months later? (the LEAPS holding horizon)", "Après chaque fenêtre de peur extrême depuis 2011 — où était l'indice 6/12/18 mois plus tard ?", "Nach jedem Extremangst-Fenster seit 2011 — wo stand der Index 6/12/18 Monate später?", "Tras cada ventana de miedo extremo desde 2011, ¿dónde estaba el índice 6/12/18 meses después?"],
     "恐贪 < 25 窗口逐次对账": ["Every window below 25, audited", "Chaque fenêtre sous 25, auditée", "Jedes Fenster unter 25, geprüft", "Cada ventana bajo 25, auditada"],
     "NDX至今": ["NDX to date", "NDX à ce jour", "NDX bis heute", "NDX hasta hoy"],
+    "前二十大持仓（权重 · 每日刷新）": ["Top 20 holdings (weights, refreshed daily)", "Top 20 des positions (pondérations, quotidien)", "Top-20-Positionen (Gewichte, täglich)", "Las 20 mayores posiciones (pesos, diario)"],
+    "季度/年度调仓后权重自动更新": ["Weights update automatically after each rebalance", "Pondérations mises à jour après chaque rebalancement", "Gewichte aktualisieren sich nach jedem Rebalancing", "Los pesos se actualizan tras cada rebalanceo"],
+    "ICB 行业分布（按家数）": ["ICB sector breakdown (by count)", "Répartition ICB (par nombre)", "ICB-Sektoren (nach Anzahl)", "Sectores ICB (por número)"],
+    "行业": ["Sector", "Secteur", "Sektor", "Sector"],
+    "市值 ($B)": ["Mkt cap ($B)", "Cap. (Md$)", "MktKap (Mrd$)", "Cap. ($mm)"],
+    "权重": ["Weight", "Poids", "Gewicht", "Peso"],
   };
 
   // 带动态数字的句式：正则 → 各语言模板（$1…为捕获组）

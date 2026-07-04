@@ -770,7 +770,10 @@
       const d = await load(dsName);
       return {
         tooltip: tip(p),
-        grid: { left: 54, right: 20, top: 20, bottom: 28 },
+        grid: { left: 54, right: 20, top: 20, bottom: 60 },
+        dataZoom: [{ type: "inside" }, { type: "slider", bottom: 6, height: 18,
+          borderColor: p.border, fillerColor: "rgba(160,57,47,0.08)",
+          handleStyle: { color: p.accent }, textStyle: { color: p.muted, fontSize: 10 } }],
         xAxis: timeX(p),
         yAxis: Object.assign({ type: "value", max: 0, axisLabel: { formatter: "{value}%", color: p.muted, fontFamily: "JetBrains Mono", fontSize: 11 } }, baseAxis(p)),
         series: [{
@@ -1023,7 +1026,10 @@
       return {
         tooltip: tip(p),
         legend: { textStyle: { color: p.muted, fontSize: 11 }, top: 0 },
-        grid: { left: 54, right: 20, top: 30, bottom: 28 },
+        grid: { left: 54, right: 20, top: 30, bottom: 60 },
+        dataZoom: [{ type: "inside" }, { type: "slider", bottom: 6, height: 18,
+          borderColor: p.border, fillerColor: "rgba(160,57,47,0.08)",
+          handleStyle: { color: p.accent }, textStyle: { color: p.muted, fontSize: 10 } }],
         xAxis: timeX(p),
         yAxis: Object.assign({ type: "value", axisLabel: { formatter: "{value}%", color: p.muted, fontFamily: "JetBrains Mono", fontSize: 11 } }, baseAxis(p)),
         series: defs.filter(([k]) => d[k]).map(([k, n, c]) => ({
@@ -1111,6 +1117,20 @@
           label: { show: true, position: "right", color: p.muted, fontFamily: "JetBrains Mono", fontSize: 11 } }],
       };
     };
+  }
+
+  async function renderTopTable(dsName, tableId) {
+    const d = await load(dsName);
+    const tbl = document.getElementById(tableId);
+    tbl.innerHTML =
+      "<tr><th>#</th><th>代码</th><th>公司</th><th>行业</th><th>市值 ($B)</th><th>权重</th></tr>" +
+      d.rows.map((r, i) =>
+        `<tr><td>${i + 1}</td><td>${r.ticker}</td>` +
+        `<td style="text-align:left">${r.name}</td>` +
+        `<td style="text-align:left;font-family:'Noto Sans SC',sans-serif">${r.sector || "--"}</td>` +
+        `<td>${r.mcap ? r.mcap.toLocaleString("en-US") : "--"}</td>` +
+        `<td class="k-min">${r.weight.toFixed(2)}%</td></tr>`).join("") +
+      (d.asof ? `<tr><td colspan="6" style="text-align:left;color:var(--ink-muted)">数据截至 ${d.asof} · ${d.source}</td></tr>` : "");
   }
 
   async function renderConstituents(dsName, tableId) {
@@ -1404,6 +1424,8 @@
   renderExtremesTable("ndx_extremes", "qqq-extremes-table");
   renderConstituents("sp500_constituents", "spy-constituents");
   renderConstituents("ndx_constituents", "qqq-constituents");
+  renderTopTable("sp500_top", "spy-top-table");
+  renderTopTable("ndx_top", "qqq-top-table");
   renderBasketTable("fin", "fin-table");
   renderBasketTable("consumer", "consumer-table");
   renderBasketTable("luxury", "luxury-table");
