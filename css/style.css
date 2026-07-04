@@ -239,6 +239,91 @@ tr:hover td { background: var(--bg-card-hover); }
 .k-min { color: var(--accent-deep); font-weight: 700; }
 
 .footnote { color: var(--ink-muted); font-size: 12.5px; margin-top: 10px; }
+
+/* ---------- 二级胶囊导航（板块总览 ↔ 个股） ---------- */
+.subnav {
+  position: sticky;
+  top: 58px;
+  z-index: 90;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 0;
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.pill {
+  font-size: 13px;
+  padding: 4px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--ink-muted);
+  text-decoration: none;
+  font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+}
+.pill:hover { background: var(--bg-card-hover); color: var(--ink); }
+.pill.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-deep);
+  font-weight: 600;
+}
+.pill .zh { font-family: 'Noto Sans SC', sans-serif; }
+
+/* ---------- 个股专页 ---------- */
+.stock-hero { margin: 20px 0 8px; }
+.stock-hero h1 { font-family: 'Noto Serif SC', serif; font-size: 30px; font-weight: 700; }
+.stock-hero .ticker {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--ink-muted);
+  font-size: 14px;
+  margin-left: 10px;
+}
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  margin: 18px 0 8px;
+}
+@media (max-width: 900px) { .stat-strip { grid-template-columns: repeat(3, 1fr); } }
+.stat-strip .stat .value { font-size: 20px; }
+.stock-nav {
+  display: flex;
+  justify-content: space-between;
+  margin: 30px 0 10px;
+}
+.stock-nav a { color: var(--accent-deep); text-decoration: none; font-size: 14px; }
+.stock-nav a:hover { text-decoration: underline; }
+tr.clickable { cursor: pointer; }
+tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
+
+/* ---------- 右侧悬浮章节目录 ---------- */
+.toc {
+  display: none;
+  position: fixed;
+  top: 120px;
+  right: 24px;
+  width: 168px;
+  z-index: 80;
+}
+@media (min-width: 1560px) { .toc { display: block; } }
+.toc a {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  border-radius: 6px;
+  padding: 4px 10px;
+  margin-bottom: 6px;
+  font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+}
+.toc a:hover { color: var(--ink); background: var(--bg-card-hover); }
+.toc a.active { border-color: var(--accent); color: var(--accent-deep); font-weight: 600; }
 footer {
   border-top: 1px solid var(--border);
   color: var(--ink-muted);

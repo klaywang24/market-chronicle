@@ -248,10 +248,11 @@ def build_index_panels(prefix: str, close: pd.Series, vol_index: pd.Series | Non
 # ------------------------------------------------------- 个股篮子板块
 
 BASKETS = {
+    # 顺序即页面展示顺序：银行 → 卡组织 → 投行 → 资管 → 券商
     "fin": [
         ("JPM", "摩根大通"), ("BAC", "美国银行"), ("V", "Visa"), ("MA", "万事达"),
         ("AXP", "美国运通"), ("GS", "高盛"), ("MS", "摩根士丹利"), ("BLK", "贝莱德"),
-        ("IBKR", "盈透证券"), ("SCHW", "嘉信理财"),
+        ("SCHW", "嘉信理财"), ("IBKR", "盈透证券"),
     ],
     "consumer": [
         ("KO", "可口可乐"), ("WMT", "沃尔玛"), ("COST", "好市多"),
@@ -261,6 +262,13 @@ BASKETS = {
         ("MC.PA", "LVMH"), ("RMS.PA", "爱马仕"), ("RACE", "法拉利"),
     ],
 }
+
+# 板块锚 ETF（个股钻取页之上的"总览"层；奢侈品无合适 ETF，用等权组合当锚）
+ETF_ANCHORS = ["XLF", "XLP", "XLY"]
+
+
+def safe_ticker(t: str) -> str:
+    return t.lower().replace(".", "-")
 
 
 def build_basket(prefix: str, members: list):
@@ -302,7 +310,7 @@ def build_basket(prefix: str, members: list):
         "episodes": sorted(episodes, key=lambda e: e["depth"])[:15],
     })
 
-    # 个股对照表
+    # 个股对照表（共同起点口径）+ 各自全历史统计（个股页 hero 用）
     rows = []
     last_year_end = df[df.index.year < df.index[-1].year].index[-1]
     for t, n in members:
@@ -314,14 +322,23 @@ def build_basket(prefix: str, members: list):
                 return None
             return round(((s.iloc[-1] / past.iloc[-1]) ** (1 / y) - 1) * 100, 1)
         max_dd = (s / s.cummax() - 1).min() * 100
+        full = closes[t]
+        full_years = (full.index[-1] - full.index[0]).days / 365.25
         rows.append({
-            "ticker": t, "name": n,
+            "ticker": t, "name": n, "safe": safe_ticker(t),
             "ytd": round((s.iloc[-1] / s.loc[last_year_end] - 1) * 100, 1),
             "y1": cagr(1), "y3": cagr(3), "y5": cagr(5), "y10": cagr(10),
             "since": round(((s.iloc[-1] / s.iloc[0]) ** (1 / years_total) - 1) * 100, 1),
             "max_dd": round(float(max_dd), 1),
+            "start_full": full.index[0].strftime("%Y-%m-%d"),
+            "since_full": round(float(((full.iloc[-1] / full.iloc[0]) ** (1 / full_years) - 1) * 100), 1),
+            "max_dd_full": round(float((full / full.cummax() - 1).min() * 100), 1),
         })
     write_json(f"{prefix}_table.json", {"rows": rows, "start": start.strftime("%Y-%m-%d")})
+
+    # 个股钻取页：每只成员生成全套指数面板（各自全历史）
+    for t, n in members:
+        build_index_panels(f"s_{safe_ticker(t)}", closes[t])
 
 
 def build_cape():
@@ -358,6 +375,9 @@ def main():
     build_index_panels("ndx", ndx, vxn, "VXN")
     for prefix, members in BASKETS.items():
         build_basket(prefix, members)
+    for etf in ETF_ANCHORS:
+        build_index_panels(f"s_{safe_ticker(etf)}", fetch_history(etf)["Close"])
+        time.sleep(1)
     build_cape()
 
     write_json("meta.json", {

@@ -78,13 +78,173 @@
     for (const name of panelDone) {
       for (const { elId, build } of registry[name]) await buildOne(elId, build);
     }
+    if (currentStock) showStock(currentStock.basket, currentStock.safe);
   }
 
   document.getElementById("tabs").addEventListener("click", (e) => {
     const tab = e.target.closest(".tab");
-    if (tab) activatePanel(tab.dataset.panel);
+    if (tab) location.hash = "#" + tab.dataset.panel;
   });
   window.addEventListener("resize", () => built.forEach((c) => c.resize()));
+
+  // ---------------- 篮子板块配置（与 build_data.py 的 BASKETS 保持一致） ----------------
+  const BASKET_CFG = {
+    fin: {
+      anchorLabel: "XLF 总览",
+      members: [["JPM", "摩根大通"], ["BAC", "美国银行"], ["V", "Visa"], ["MA", "万事达"],
+                ["AXP", "美国运通"], ["GS", "高盛"], ["MS", "摩根士丹利"], ["BLK", "贝莱德"],
+                ["SCHW", "嘉信理财"], ["IBKR", "盈透证券"]],
+    },
+    consumer: {
+      anchorLabel: "XLP·XLY 总览",
+      members: [["KO", "可口可乐"], ["WMT", "沃尔玛"], ["COST", "好市多"],
+                ["HD", "家得宝"], ["TJX", "TJX"], ["MCD", "麦当劳"]],
+    },
+    luxury: {
+      anchorLabel: "组合总览",
+      members: [["MC.PA", "LVMH"], ["RMS.PA", "爱马仕"], ["RACE", "法拉利"]],
+    },
+  };
+  const safeTicker = (t) => t.toLowerCase().replace(".", "-");
+
+  let currentStock = null; // {basket, safe}
+
+  function renderSubnav(basket) {
+    const cfg = BASKET_CFG[basket];
+    const cur = currentStock && currentStock.basket === basket ? currentStock.safe : null;
+    document.getElementById("subnav-" + basket).innerHTML =
+      `<a class="pill ${cur ? "" : "active"}" href="#${basket}"><span class="zh">${cfg.anchorLabel}</span></a>` +
+      cfg.members.map(([t, n]) => {
+        const s = safeTicker(t);
+        return `<a class="pill ${cur === s ? "active" : ""}" href="#${basket}/${s}">${t.split(".")[0]} <span class="zh">${n}</span></a>`;
+      }).join("");
+  }
+
+  function showOverview(basket) {
+    currentStock = null;
+    document.getElementById(basket + "-overview").style.display = "";
+    document.getElementById(basket + "-stock").style.display = "none";
+    renderSubnav(basket);
+    registry[basket].forEach(({ elId }) => built.get(elId) && built.get(elId).resize());
+  }
+
+  async function showStock(basket, safe) {
+    const cfg = BASKET_CFG[basket];
+    const idx = cfg.members.findIndex(([t]) => safeTicker(t) === safe);
+    if (idx < 0) return showOverview(basket);
+    const [ticker, name] = cfg.members[idx];
+    currentStock = { basket, safe };
+    renderSubnav(basket);
+    document.getElementById(basket + "-overview").style.display = "none";
+    const host = document.getElementById(basket + "-stock");
+    host.style.display = "";
+    const p = "s_" + safe;
+    const prev = cfg.members[(idx + cfg.members.length - 1) % cfg.members.length];
+    const next = cfg.members[(idx + 1) % cfg.members.length];
+    host.innerHTML = `
+      <div class="stock-hero">
+        <div class="kicker">${basket.toUpperCase()} · ${ticker}</div>
+        <h1>${name}<span class="ticker">${ticker}</span></h1>
+        <div class="stat-strip" id="${basket}-sd-stats"></div>
+      </div>
+      <div class="chapter">
+        <div class="chapter-head"><span class="chapter-no">第一章</span><h2>上市以来</h2></div>
+        <div class="card"><h3>走势（月线 · 对数坐标 · 复权价）</h3><div class="chart" id="${basket}-sd-century"></div></div>
+      </div>
+      <div class="chapter">
+        <div class="chapter-head"><span class="chapter-no">第二章</span><h2>回报的形状</h2></div>
+        <div class="grid-2">
+          <div class="card"><h3>年度回报</h3><div class="chart short" id="${basket}-sd-annual"></div></div>
+          <div class="card"><h3>年内最大回撤 vs 全年收益</h3><div class="chart short" id="${basket}-sd-intra"></div></div>
+        </div>
+      </div>
+      <div class="chapter">
+        <div class="chapter-head"><span class="chapter-no">第三章</span><h2>危机的节奏</h2></div>
+        <div class="card"><h3>历史回撤曲线</h3><div class="chart short" id="${basket}-sd-dd"></div></div>
+        <div class="card"><h3>深度回撤一览（≥10%）</h3><div class="table-wrap"><table id="${basket}-sd-ddtable"></table></div></div>
+      </div>
+      <div class="chapter">
+        <div class="chapter-head"><span class="chapter-no">第四章</span><h2>时间的纹理</h2></div>
+        <div class="grid-2">
+          <div class="card"><h3>滚动 5 年年化</h3><div class="chart short" id="${basket}-sd-roll"></div></div>
+          <div class="card"><h3>月度季节性</h3><div class="chart short" id="${basket}-sd-season"></div></div>
+        </div>
+        <div class="card"><h3>已实现波动率（20 日年化）</h3><div class="chart short" id="${basket}-sd-vol"></div></div>
+      </div>
+      <div class="stock-nav">
+        <a href="#${basket}/${safeTicker(prev[0])}">← ${prev[1]} ${prev[0]}</a>
+        <a href="#${basket}">回到${cfg.anchorLabel}</a>
+        <a href="#${basket}/${safeTicker(next[0])}">${next[1]} ${next[0]} →</a>
+      </div>`;
+
+    // 关键数据条
+    load(basket + "_table").then((d) => {
+      const r = d.rows.find((x) => x.ticker === ticker);
+      if (!r) return;
+      const f = (v) => v == null ? "--" : (v > 0 ? "+" : "") + v.toFixed(1) + "%";
+      const cls = (v) => v == null ? "" : v >= 0 ? "pos" : "neg";
+      document.getElementById(basket + "-sd-stats").innerHTML = [
+        ["上市数据起点", r.start_full.slice(0, 7), ""],
+        ["YTD", f(r.ytd), cls(r.ytd)],
+        ["5 年年化", f(r.y5), cls(r.y5)],
+        ["10 年年化", f(r.y10), cls(r.y10)],
+        ["上市以来年化", f(r.since_full), cls(r.since_full)],
+        ["历史最大回撤", r.max_dd_full + "%", "neg"],
+      ].map(([l, v, c]) =>
+        `<div class="stat"><div class="label">${l}</div><div class="value ${c}">${v}</div></div>`
+      ).join("");
+    });
+
+    await buildOne(basket + "-sd-century", centuryChart(null, [{ ds: p + "_century", name: name }]));
+    await buildOne(basket + "-sd-annual", annualChart(p + "_annual"));
+    await buildOne(basket + "-sd-intra", intraChart(p + "_intrayear"));
+    await buildOne(basket + "-sd-dd", ddChart(p + "_drawdowns"));
+    await buildOne(basket + "-sd-roll", rollChart(p + "_rolling5y"));
+    await buildOne(basket + "-sd-season", seasonChart(p + "_seasonality"));
+    await buildOne(basket + "-sd-vol", volChart(p + "_volatility"));
+    renderDDTable(p + "_drawdowns", basket + "-sd-ddtable");
+    window.scrollTo(0, 0);
+  }
+
+  // ---------------- hash 路由 ----------------
+  function route() {
+    const h = location.hash.slice(1) || "spy";
+    const [panel, stock] = h.split("/");
+    const target = registry[panel] ? panel : "spy";
+    activatePanel(target).then(() => {
+      if (BASKET_CFG[target]) {
+        if (stock) showStock(target, stock);
+        else showOverview(target);
+      }
+      buildToc();
+    });
+  }
+  window.addEventListener("hashchange", route);
+
+  // ---------------- 右侧悬浮章节目录 ----------------
+  const ROMAN = ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ"];
+  function buildToc() {
+    const toc = document.getElementById("toc");
+    const panel = document.querySelector(".panel.active");
+    if (!panel) { toc.innerHTML = ""; return; }
+    let scope = panel;
+    const stockView = panel.querySelector(".basket-stock");
+    if (stockView && stockView.style.display !== "none") scope = stockView;
+    else {
+      const ov = panel.querySelector(".basket-overview");
+      if (ov) scope = ov;
+    }
+    const heads = [...scope.querySelectorAll(".chapter-head h2")];
+    toc.innerHTML = heads.map((h, i) => {
+      const id = panel.id + "-ch" + i;
+      h.closest(".chapter").id = id;
+      return `<a data-target="${id}">${ROMAN[i] || i + 1} · ${h.textContent.split("：")[0]}</a>`;
+    }).join("");
+  }
+  document.getElementById("toc").addEventListener("click", (e) => {
+    const a = e.target.closest("a");
+    if (a) document.getElementById(a.dataset.target).scrollIntoView({ behavior: "smooth" });
+  });
 
   // ---------------- 通用 option 片段 ----------------
   function baseAxis(p) {
@@ -203,6 +363,7 @@
       const datasets = await Promise.all(seriesDefs.map((s) => load(s.ds)));
       return {
         tooltip: tip(p),
+        legend: seriesDefs.length > 1 ? { textStyle: { color: p.muted, fontSize: 11 }, top: 0 } : undefined,
         grid: { left: 70, right: 24, top: 30, bottom: 60 },
         xAxis: timeX(p),
         yAxis: Object.assign({ type: "log", splitLine: { lineStyle: { color: pal().grid } } }, baseAxis(p)),
@@ -409,13 +570,18 @@
     const d = await load(prefix + "_table");
     const c = (v, suffix) => v == null ? "<td>--</td>" :
       `<td class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(1)}${suffix}</td>`;
-    document.getElementById(tableId).innerHTML =
+    const tbl = document.getElementById(tableId);
+    tbl.innerHTML =
       "<tr><th>代码</th><th>名称</th><th>YTD</th><th>1年</th><th>3年年化</th><th>5年年化</th><th>10年年化</th><th>共同起点年化</th><th>最大回撤</th></tr>" +
       d.rows.map((r) =>
-        `<tr><td>${r.ticker}</td><td>${r.name}</td>` +
+        `<tr class="clickable" data-hash="#${prefix}/${r.safe}"><td>${r.ticker}</td><td>${r.name}</td>` +
         c(r.ytd, "%") + c(r.y1, "%") + c(r.y3, "%") + c(r.y5, "%") + c(r.y10, "%") + c(r.since, "%") +
         `<td class="neg">${r.max_dd}%</td></tr>`
       ).join("");
+    tbl.addEventListener("click", (e) => {
+      const tr = e.target.closest("tr.clickable");
+      if (tr) location.hash = tr.dataset.hash;
+    });
   }
 
   // ---------------- 注册 SPY / QQQ ----------------
@@ -443,6 +609,14 @@
     chart(b, "ch-" + b + "-annual", annualChart(b + "_annual"));
     chart(b, "ch-" + b + "-dd", ddChart(b + "_drawdowns"));
   });
+  chart("fin", "ch-fin-etf", centuryChart(null, [{ ds: "s_xlf_century", name: "XLF" }]));
+  chart("fin", "ch-fin-etf-annual", annualChart("s_xlf_annual"));
+  chart("fin", "ch-fin-etf-dd", ddChart("s_xlf_drawdowns"));
+  chart("consumer", "ch-consumer-etf", centuryChart(null, [
+    { ds: "s_xlp_century", name: "XLP 必需消费" }, { ds: "s_xly_century", name: "XLY 可选消费" },
+  ]));
+  chart("consumer", "ch-consumer-etf-annual", annualChart("s_xlp_annual"));
+  chart("consumer", "ch-consumer-etf2-annual", annualChart("s_xly_annual"));
 
   // ---------------- 启动 ----------------
   renderKStatus();
@@ -455,5 +629,5 @@
     document.getElementById("meta-line").textContent =
       "美股编年史 · 自用版 · 数据更新于 " + m.updated.slice(0, 10);
   }).catch(() => {});
-  activatePanel("spy");
+  route();
 })();

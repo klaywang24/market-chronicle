@@ -156,52 +156,80 @@
 
 <!-- ================= 金融 ================= -->
 <section class="panel" id="panel-fin">
+  <nav class="subnav" id="subnav-fin"></nav>
+  <div class="basket-overview" id="fin-overview">
   <div class="hero">
-    <div class="kicker">FINTECH &amp; FINANCIALS · SINCE 2008</div>
+    <div class="kicker">FINTECH &amp; FINANCIALS</div>
     <h1>金融：钱的生意</h1>
-    <p class="dek">银行、投行、卡组织、券商与资管，十只龙头放在同一起跑线（2008-03，Visa 上市）。</p>
+    <p class="dek">银行、卡组织、投行、资管与券商，十只龙头。先看板块的锚 XLF，再把十股放上同一起跑线（2008-03，Visa 上市），点个股名徐徐展开各自的历史。</p>
   </div>
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>成长的对照</h2></div>
+    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>板块的锚：XLF</h2></div>
+    <p class="chapter-q">1998 年至今，金融板块 ETF 走过了什么？</p>
+    <div class="card"><h3>XLF 走势（月线 · 对数坐标）</h3><div class="chart short" id="ch-fin-etf"></div></div>
+    <div class="grid-2">
+      <div class="card"><h3>XLF 年度回报</h3><div class="chart short" id="ch-fin-etf-annual"></div></div>
+      <div class="card"><h3>XLF 回撤曲线</h3><div class="chart short" id="ch-fin-etf-dd"></div></div>
+    </div>
+  </div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>成长的对照</h2></div>
     <p class="chapter-q">同样的 100 元，各自长成了多少？</p>
     <div class="card"><h3>归一化成长曲线（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">墨色粗线为十股等权组合</div><div class="chart" id="ch-fin-growth"></div></div>
-    <div class="card"><h3>个股对照</h3><div class="sub">年化收益按各自币种计；YTD 为年初至今涨跌</div><div class="table-wrap"><table id="fin-table"></table></div></div>
+    <div class="card"><h3>个股对照</h3><div class="sub">年化收益按各自币种计；YTD 为年初至今涨跌 · 点击任意一行进入个股页</div><div class="table-wrap"><table id="fin-table"></table></div></div>
   </div>
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>组合的脾气</h2></div>
+    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>组合的脾气</h2></div>
     <p class="chapter-q">等权拿着这十只，年景和回撤什么样？</p>
     <div class="grid-2">
       <div class="card"><h3>等权组合年度回报</h3><div class="chart short" id="ch-fin-annual"></div></div>
       <div class="card"><h3>等权组合回撤曲线</h3><div class="chart short" id="ch-fin-dd"></div></div>
     </div>
   </div>
+  </div>
+  <div class="basket-stock" id="fin-stock" style="display:none"></div>
 </section>
 
 <!-- ================= 消费 ================= -->
 <section class="panel" id="panel-consumer">
+  <nav class="subnav" id="subnav-consumer"></nav>
+  <div class="basket-overview" id="consumer-overview">
   <div class="hero">
-    <div class="kicker">CONSUMER STAPLES &amp; RETAIL · SINCE 1987</div>
+    <div class="kicker">CONSUMER STAPLES &amp; DISCRETIONARY</div>
     <h1>消费：慢变量的复利</h1>
-    <p class="dek">可乐、超市、仓储会员店、建材、折扣零售与快餐——六只穿越周期的消费龙头。</p>
+    <p class="dek">可乐、超市、仓储会员店、建材、折扣零售与快餐——六只穿越周期的消费龙头，锚定 XLP（必需）与 XLY（可选）双 ETF。</p>
   </div>
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>成长的对照</h2></div>
+    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>板块的锚：XLP × XLY</h2></div>
+    <p class="chapter-q">防守与周期，两条消费曲线怎么走？</p>
+    <div class="card"><h3>XLP（必需消费）× XLY（可选消费）走势（月线 · 对数坐标）</h3><div class="chart short" id="ch-consumer-etf"></div></div>
+    <div class="grid-2">
+      <div class="card"><h3>XLP 年度回报</h3><div class="chart short" id="ch-consumer-etf-annual"></div></div>
+      <div class="card"><h3>XLY 年度回报</h3><div class="chart short" id="ch-consumer-etf2-annual"></div></div>
+    </div>
+  </div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>成长的对照</h2></div>
     <p class="chapter-q">四十年维度，谁是真正的复利机器？</p>
     <div class="card"><h3>归一化成长曲线（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">墨色粗线为六股等权组合</div><div class="chart" id="ch-consumer-growth"></div></div>
-    <div class="card"><h3>个股对照</h3><div class="table-wrap"><table id="consumer-table"></table></div></div>
+    <div class="card"><h3>个股对照</h3><div class="sub">点击任意一行进入个股页</div><div class="table-wrap"><table id="consumer-table"></table></div></div>
   </div>
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>组合的脾气</h2></div>
+    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>组合的脾气</h2></div>
     <p class="chapter-q">防守型组合的年景与回撤。</p>
     <div class="grid-2">
       <div class="card"><h3>等权组合年度回报</h3><div class="chart short" id="ch-consumer-annual"></div></div>
       <div class="card"><h3>等权组合回撤曲线</h3><div class="chart short" id="ch-consumer-dd"></div></div>
     </div>
   </div>
+  </div>
+  <div class="basket-stock" id="consumer-stock" style="display:none"></div>
 </section>
 
 <!-- ================= 奢侈品 ================= -->
 <section class="panel" id="panel-luxury">
+  <nav class="subnav" id="subnav-luxury"></nav>
+  <div class="basket-overview" id="luxury-overview">
   <div class="hero">
     <div class="kicker">LUXURY · SINCE 2015</div>
     <h1>奢侈品：定价权的溢价</h1>
@@ -221,9 +249,13 @@
       <div class="card"><h3>等权组合回撤曲线</h3><div class="chart short" id="ch-luxury-dd"></div></div>
     </div>
   </div>
+  </div>
+  <div class="basket-stock" id="luxury-stock" style="display:none"></div>
 </section>
 
 </main>
+
+<nav class="toc" id="toc"></nav>
 
 <footer>
   <span id="meta-line">美股编年史 · 自用版</span> · 数据源：Yahoo Finance / CNN Fear &amp; Greed / multpl.com · 仅供个人研究，不构成投资建议
