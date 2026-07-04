@@ -91,12 +91,16 @@
   const BASKET_CFG = {
     fin: {
       anchorLabel: "XLF 总览",
+      // groups 决定胶囊条的分组展示；members 顺序 = 上一只/下一只的翻页顺序
+      groups: [["银行", ["JPM", "BAC"]], ["卡组织", ["V", "MA", "AXP"]],
+               ["投行", ["GS", "MS"]], ["资管", ["BLK"]], ["券商", ["SCHW", "IBKR"]]],
       members: [["JPM", "摩根大通"], ["BAC", "美国银行"], ["V", "Visa"], ["MA", "万事达"],
                 ["AXP", "美国运通"], ["GS", "高盛"], ["MS", "摩根士丹利"], ["BLK", "贝莱德"],
                 ["SCHW", "嘉信理财"], ["IBKR", "盈透证券"]],
     },
     consumer: {
       anchorLabel: "XLP·XLY 总览",
+      groups: [["必需", ["KO", "WMT", "COST"]], ["可选", ["HD", "TJX", "MCD"]]],
       members: [["KO", "可口可乐"], ["WMT", "沃尔玛"], ["COST", "好市多"],
                 ["HD", "家得宝"], ["TJX", "TJX"], ["MCD", "麦当劳"]],
     },
@@ -112,12 +116,18 @@
   function renderSubnav(basket) {
     const cfg = BASKET_CFG[basket];
     const cur = currentStock && currentStock.basket === basket ? currentStock.safe : null;
-    document.getElementById("subnav-" + basket).innerHTML =
-      `<a class="pill ${cur ? "" : "active"}" href="#${basket}"><span class="zh">${cfg.anchorLabel}</span></a>` +
-      cfg.members.map(([t, n]) => {
-        const s = safeTicker(t);
-        return `<a class="pill ${cur === s ? "active" : ""}" href="#${basket}/${s}">${t.split(".")[0]} <span class="zh">${n}</span></a>`;
-      }).join("");
+    const nameOf = Object.fromEntries(cfg.members);
+    const pill = (t) => {
+      const s = safeTicker(t);
+      return `<a class="pill ${cur === s ? "active" : ""}" href="#${basket}/${s}">${t.split(".")[0]} <span class="zh">${nameOf[t]}</span></a>`;
+    };
+    const anchor = `<a class="pill ${cur ? "" : "active"}" href="#${basket}"><span class="zh">${cfg.anchorLabel}</span></a>`;
+    const body = cfg.groups
+      ? cfg.groups.map(([label, ticks]) =>
+          `<span class="pill-group"><span class="pill-group-label">${label}</span>${ticks.map(pill).join("")}</span>`
+        ).join("")
+      : cfg.members.map(([t]) => pill(t)).join("");
+    document.getElementById("subnav-" + basket).innerHTML = anchor + body;
   }
 
   function showOverview(basket) {
@@ -172,6 +182,51 @@
         </div>
         <div class="card"><h3>已实现波动率（20 日年化）</h3><div class="chart short" id="${basket}-sd-vol"></div></div>
       </div>
+      <div class="chapter" id="${basket}-fd-dash">
+        <div class="chapter-head"><span class="chapter-no"></span><h2>关键指标仪表盘</h2></div>
+        <p class="chapter-q">巴菲特们打开报表前先看的一屏。</p>
+        <div class="stat-strip" id="${basket}-fd-dash-cards"></div>
+      </div>
+      <div class="chapter" id="${basket}-fd-profit">
+        <div class="chapter-head"><span class="chapter-no"></span><h2>利润基本面</h2></div>
+        <p class="chapter-q">股价背后，利润跟上了吗？</p>
+        <div class="card"><h3>EPS（TTM · 季频）</h3><div class="chart short" id="${basket}-fd-eps"></div></div>
+        <div class="grid-2">
+          <div class="card"><h3>营业收入（近四财年 · 十亿美元）</h3><div class="chart short" id="${basket}-fd-rev"></div></div>
+          <div class="card"><h3>净利润（近四财年 · 十亿美元）</h3><div class="chart short" id="${basket}-fd-ni"></div></div>
+        </div>
+      </div>
+      <div class="chapter" id="${basket}-fd-capital">
+        <div class="chapter-head"><span class="chapter-no"></span><h2>资本效率</h2></div>
+        <p class="chapter-q">一块钱资本，赚回多少？（芒格：长期回报趋近 ROIC）</p>
+        <div class="grid-2">
+          <div class="card"><h3>ROE × ROIC（TTM）</h3><div class="chart short" id="${basket}-fd-roe"></div></div>
+          <div class="card"><h3>自由现金流（年度 · 十亿美元）</h3><div class="chart short" id="${basket}-fd-fcf"></div></div>
+        </div>
+      </div>
+      <div class="chapter" id="${basket}-fd-valuation">
+        <div class="chapter-head"><span class="chapter-no"></span><h2>估值的锚</h2></div>
+        <p class="chapter-q">现在的价格，在自己的历史里算贵吗？</p>
+        <div class="grid-2">
+          <div class="card"><h3>PE（TTM · 含历史中位数）</h3><div class="chart short" id="${basket}-fd-pe"></div></div>
+          <div class="card"><h3 id="${basket}-fd-ps-title">PS（TTM）</h3><div class="chart short" id="${basket}-fd-ps"></div></div>
+        </div>
+      </div>
+      <div class="chapter" id="${basket}-fd-driver">
+        <div class="chapter-head"><span class="chapter-no"></span><h2>估值驱动 vs EPS 驱动</h2></div>
+        <p class="chapter-q">每年的涨跌，是利润挣来的，还是估值给的？</p>
+        <div class="card"><h3>年度回报分解</h3><div class="sub">(1+回报) = (1+EPS变化) × (1+估值变化)，年末对年末</div><div class="chart short" id="${basket}-fd-driver-ch"></div></div>
+      </div>
+      <div class="chapter" id="${basket}-fd-payout">
+        <div class="chapter-head"><span class="chapter-no"></span><h2>股东回报</h2></div>
+        <p class="chapter-q">分红有没有年年长大？</p>
+        <div class="card"><h3>每股分红（年度合计 · 各自币种）</h3><div class="chart short" id="${basket}-fd-div"></div></div>
+      </div>
+      <div class="chapter" id="${basket}-fd-peers">
+        <div class="chapter-head"><span class="chapter-no"></span><h2>同业对比</h2></div>
+        <p class="chapter-q">放回同一个篮子里看，贵还是便宜、强还是弱？</p>
+        <div class="card"><h3>估值与质量 vs 同篮子</h3><div class="chart short" id="${basket}-fd-peers-ch"></div></div>
+      </div>
       <div class="stock-nav">
         <a href="#${basket}/${safeTicker(prev[0])}">← ${prev[1]} ${prev[0]}</a>
         <a href="#${basket}">回到${cfg.anchorLabel}</a>
@@ -208,7 +263,146 @@
     await buildOne(basket + "-sd-season", seasonChart(p + "_seasonality"));
     await buildOne(basket + "-sd-vol", volChart(p + "_volatility"));
     renderDDTable(p + "_drawdowns", basket + "-sd-ddtable");
+    await renderFund(basket, safe, ticker);
     window.scrollTo(0, 0);
+  }
+
+  // ---------------- 个股基本面章节（数据可用才显示对应章） ----------------
+  const CN_NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"];
+
+  function renumberChapters(scope) {
+    [...scope.querySelectorAll(".chapter")].forEach((ch, i) => {
+      const no = ch.querySelector(".chapter-no");
+      if (no) no.textContent = "第" + (CN_NUM[i] || i + 1) + "章";
+    });
+  }
+
+  async function renderFund(basket, safe, ticker) {
+    let fund = null, peers = null;
+    try { fund = await load("s_" + safe + "_fund"); } catch (e) {}
+    try { peers = await load(basket + "_peers"); } catch (e) {}
+    const host = document.getElementById(basket + "-stock");
+    const drop = (key) => { const el = document.getElementById(basket + "-fd-" + key); if (el) el.remove(); };
+
+    const snap = fund && fund.snapshot;
+    if (!snap) drop("dash");
+    if (!fund || !(fund.eps || fund.income4)) drop("profit");
+    if (!fund || !(fund.roe || fund.roic || fund.fcf)) drop("capital");
+    if (!fund || !(fund.pe || fund.ps || fund.pb_hist)) drop("valuation");
+    if (!fund || !fund.driver || fund.driver.length < 4) drop("driver");
+    if (!fund || !fund.dividends) drop("payout");
+    if (!peers || !peers.rows || peers.rows.length < 2) drop("peers");
+    renumberChapters(host);
+    buildToc();
+    if (!fund && !peers) return;
+
+    const fmt = (v, d, suffix) => v == null ? "--" : v.toFixed(d) + (suffix || "");
+    if (snap) {
+      const cards = [
+        ["市值", snap.market_cap ? "$" + (snap.market_cap / 1e9).toFixed(0) + "B" : "--"],
+        ["PE (TTM)", fmt(snap.pe, 1)], ["远期 PE", fmt(snap.fwd_pe, 1)],
+        ["PS", fmt(snap.ps, 1)], ["PB", fmt(snap.pb, 1)],
+        ["ROE", fmt(snap.roe, 1, "%")],
+        ["毛利率", fmt(snap.gross_margin, 1, "%")], ["净利率", fmt(snap.net_margin, 1, "%")],
+        ["股息率", fmt(snap.div_yield, 2, "%")], ["派息率", fmt(snap.payout, 0, "%")],
+        ["自由现金流", snap.fcf ? "$" + (snap.fcf / 1e9).toFixed(1) + "B" : "--"],
+        ["Beta", fmt(snap.beta, 2)],
+      ];
+      const el = document.getElementById(basket + "-fd-dash-cards");
+      if (el) el.innerHTML = cards.map(([l, v]) =>
+        `<div class="stat"><div class="label">${l}</div><div class="value" style="font-size:19px">${v}</div></div>`).join("");
+    }
+
+    const line = (data, name, colorKey, opts) => async (p) => {
+      const s = {
+        name, type: "line", showSymbol: false, data: zip(data.dates, data.values),
+        lineStyle: { color: p[colorKey], width: 1.3 }, itemStyle: { color: p[colorKey] },
+      };
+      if (opts && opts.median) {
+        const sorted = data.values.filter((v) => v != null).slice().sort((a, b) => a - b);
+        const med = sorted[Math.floor(sorted.length / 2)];
+        s.markLine = { silent: true, symbol: "none", lineStyle: { color: p.ink, type: "dashed" },
+          label: { color: p.muted, formatter: "中位 " + med.toFixed(1), fontFamily: "JetBrains Mono" },
+          data: [{ yAxis: med }] };
+      }
+      return { tooltip: tip(p), grid: { left: 54, right: 20, top: 20, bottom: 26 },
+        xAxis: timeX(p), yAxis: Object.assign({ type: "value" }, baseAxis(p)), series: [s] };
+    };
+    const bars = (cats, vals, colorKey, signColor) => async (p) => ({
+      tooltip: tip(p, { axisPointer: { type: "shadow" } }),
+      grid: { left: 54, right: 20, top: 20, bottom: 26 },
+      xAxis: Object.assign({ type: "category", data: cats, splitLine: { show: false } }, baseAxis(p)),
+      yAxis: Object.assign({ type: "value" }, baseAxis(p)),
+      series: [{ type: "bar", barCategoryGap: "30%",
+        data: vals.map((v) => ({ value: v, itemStyle: { color: signColor && v < 0 ? p.danger : p[colorKey] } })) }],
+    });
+
+    if (fund) {
+      if (fund.eps) await buildOne(basket + "-fd-eps", line(fund.eps, "EPS TTM", "moss"));
+      else { const c = document.getElementById(basket + "-fd-eps"); if (c) c.closest(".card").remove(); }
+      if (fund.income4 && fund.income4.revenue) {
+        await buildOne(basket + "-fd-rev", bars(fund.income4.years, fund.income4.revenue, "blue"));
+        await buildOne(basket + "-fd-ni", bars(fund.income4.years, fund.income4.net_income, "moss", true));
+      }
+      if (fund.roe || fund.roic) {
+        await buildOne(basket + "-fd-roe", async (p) => ({
+          tooltip: tip(p), legend: { textStyle: { color: p.muted, fontSize: 11 }, top: 0 },
+          grid: { left: 54, right: 20, top: 28, bottom: 26 },
+          xAxis: timeX(p),
+          yAxis: Object.assign({ type: "value", axisLabel: { formatter: "{value}%", color: p.muted, fontFamily: "JetBrains Mono", fontSize: 11 } }, baseAxis(p)),
+          series: [fund.roe && { name: "ROE", type: "line", showSymbol: false, data: zip(fund.roe.dates, fund.roe.values),
+              lineStyle: { color: p.accent, width: 1.3 }, itemStyle: { color: p.accent } },
+            fund.roic && { name: "ROIC", type: "line", showSymbol: false, data: zip(fund.roic.dates, fund.roic.values),
+              lineStyle: { color: p.teal, width: 1.3 }, itemStyle: { color: p.teal } }].filter(Boolean),
+        }));
+      }
+      if (fund.fcf) await buildOne(basket + "-fd-fcf",
+        bars(fund.fcf.dates, fund.fcf.values.map((v) => v == null ? null : Math.round(v / 100) / 10), "gold", true));
+      else { const c = document.getElementById(basket + "-fd-fcf"); if (c) c.closest(".card").remove(); }
+      if (fund.pe) await buildOne(basket + "-fd-pe", line(fund.pe, "PE", "accent", { median: true }));
+      const psData = fund.ps || fund.pb_hist;
+      if (psData) {
+        const t = document.getElementById(basket + "-fd-ps-title");
+        if (t) t.textContent = fund.ps ? "PS（TTM）" : "PB（银行类更看市净率）";
+        await buildOne(basket + "-fd-ps", line(psData, fund.ps ? "PS" : "PB", "gold", { median: true }));
+      } else { const c = document.getElementById(basket + "-fd-ps"); if (c) c.closest(".card").remove(); }
+      if (fund.driver && fund.driver.length >= 4) {
+        await buildOne(basket + "-fd-driver-ch", async (p) => ({
+          tooltip: tip(p, { axisPointer: { type: "shadow" } }),
+          legend: { textStyle: { color: p.muted, fontSize: 11 }, top: 0 },
+          grid: { left: 54, right: 20, top: 28, bottom: 26 },
+          xAxis: Object.assign({ type: "category", data: fund.driver.map((d) => d.year), splitLine: { show: false } }, baseAxis(p)),
+          yAxis: Object.assign({ type: "value", axisLabel: { formatter: "{value}%", color: p.muted, fontFamily: "JetBrains Mono", fontSize: 11 } }, baseAxis(p)),
+          series: [
+            { name: "EPS 变化", type: "bar", stack: "drv", data: fund.driver.map((d) => d.eps_chg), itemStyle: { color: p.moss, opacity: 0.85 } },
+            { name: "估值变化", type: "bar", stack: "drv", data: fund.driver.map((d) => d.pe_chg), itemStyle: { color: p.gold, opacity: 0.85 } },
+            { name: "全年回报", type: "line", symbolSize: 5, data: fund.driver.map((d) => d.price_ret),
+              lineStyle: { color: p.ink, width: 1.6 }, itemStyle: { color: p.ink } },
+          ],
+        }));
+      }
+      if (fund.dividends) await buildOne(basket + "-fd-div",
+        bars(fund.dividends.years, fund.dividends.amounts, "moss"));
+    }
+
+    if (peers && peers.rows && peers.rows.length > 1) {
+      await buildOne(basket + "-fd-peers-ch", async (p) => ({
+        tooltip: tip(p, { axisPointer: { type: "shadow" } }),
+        legend: { textStyle: { color: p.muted, fontSize: 11 }, top: 0 },
+        grid: { left: 54, right: 20, top: 28, bottom: 26 },
+        xAxis: Object.assign({ type: "category", data: peers.rows.map((r) => r.ticker.split(".")[0]), splitLine: { show: false } }, baseAxis(p)),
+        yAxis: Object.assign({ type: "value" }, baseAxis(p)),
+        series: [
+          ["PE (TTM)", "pe", "accent"], ["ROE %", "roe", "teal"], ["净利率 %", "net_margin", "gold"],
+        ].map(([n, k, c]) => ({
+          name: n, type: "bar",
+          data: peers.rows.map((r) => ({
+            value: r[k] == null ? null : Math.round(r[k] * 10) / 10,
+            itemStyle: { color: p[c], opacity: r.ticker === ticker ? 1 : 0.35 },
+          })),
+        })),
+      }));
+    }
   }
 
   // ---------------- hash 路由 ----------------
@@ -262,11 +456,11 @@
     const heads = [...scope.querySelectorAll(".chapter-head h2")];
     const chapters = heads.map((h, i) => {
       const ch = h.closest(".chapter");
-      ch.id = panel.id + "-ch" + i;
+      if (!ch.id) ch.id = panel.id + "-ch" + i; // 已有 id（如 fd-* 章节）保留，供数据裁剪定位
       return ch;
     });
     tocEl.innerHTML = heads.map((h, i) =>
-      `<a data-target="${panel.id}-ch${i}">${ROMAN[i] || i + 1} · ${h.textContent.split("：")[0]}</a>`
+      `<a data-target="${chapters[i].id}">${ROMAN[i] || i + 1} · ${h.textContent.split("：")[0]}</a>`
     ).join("");
     tocChapters = chapters;
     highlightToc();

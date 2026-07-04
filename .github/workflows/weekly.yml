@@ -1,0 +1,24 @@
+name: weekly-fundamentals
+on:
+  schedule:
+    - cron: '0 8 * * 6'   # 每周六 08:00 UTC，基本面/成分股类低频数据
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install yfinance pandas requests lxml
+      - run: python scripts/build_fundamentals.py
+      - name: commit data
+        run: |
+          git config user.name "chronicle-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data
+          git commit -m "data: weekly fundamentals $(date -u +%F)" || echo "no changes"
+          git push

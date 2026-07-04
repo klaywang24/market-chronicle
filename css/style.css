@@ -272,6 +272,20 @@ tr:hover td { background: var(--bg-card-hover); }
   font-weight: 600;
 }
 .pill .zh { font-family: 'Noto Sans SC', sans-serif; }
+.pill-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 10px;
+  border-left: 1px dashed var(--border);
+}
+.pill-group-label {
+  font-size: 11px;
+  color: var(--ink-muted);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.subnav .pill { font-size: 12.5px; padding: 3px 12px; }
 
 /* ---------- 个股专页 ---------- */
 .stock-hero { margin: 20px 0 8px; }
