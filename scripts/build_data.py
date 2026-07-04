@@ -299,10 +299,11 @@ def build_pulse():
     sectors.sort(key=lambda x: -x["chg"])
 
     # 指数当日行情 + 现有信号
-    idx_px = yf.download("^GSPC ^NDX ^VIX", period="5d", interval="1d",
+    idx_px = yf.download("^GSPC ^NDX ^DJI ^RUT ^VIX", period="5d", interval="1d",
                          progress=False, auto_adjust=True)["Close"]
     quotes = {}
-    for sym, key in (("^GSPC", "spx"), ("^NDX", "ndx"), ("^VIX", "vix")):
+    for sym, key in (("^GSPC", "spx"), ("^NDX", "ndx"), ("^DJI", "dji"),
+                     ("^RUT", "rut"), ("^VIX", "vix")):
         s = idx_px[sym].dropna()
         quotes[key] = {"close": round(float(s.iloc[-1]), 2),
                        "chg": round(float(s.iloc[-1] / s.iloc[-2] - 1) * 100, 2)}
@@ -794,8 +795,13 @@ def build_basket(prefix: str, members: list):
         full_years = max((full.index[-1] - full.index[0]).days / 365.25, 0.25)
         prev_year = s[s.index.year < s.index[-1].year]
         ytd = round((s.iloc[-1] / prev_year.iloc[-1] - 1) * 100, 1) if len(prev_year) else None
+        try:
+            mc = yf.Ticker(t.replace(".", "-")).fast_info["market_cap"]
+            mc = round(mc / 1e9, 1) if mc else None
+        except Exception:
+            mc = None
         rows.append({
-            "ticker": t, "name": n, "safe": safe_ticker(t),
+            "ticker": t, "name": n, "safe": safe_ticker(t), "mcap": mc,
             "ytd": ytd,
             "y1": cagr(1), "y3": cagr(3), "y5": cagr(5), "y10": cagr(10),
             "since": None if is_sat else round(((s.iloc[-1] / s.iloc[0]) ** (1 / years_total) - 1) * 100, 1),

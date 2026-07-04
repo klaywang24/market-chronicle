@@ -303,6 +303,7 @@
     await buildOne(basket + "-sd-vol", volChart(p + "_volatility"));
     renderDDTable(p + "_drawdowns", basket + "-sd-ddtable");
     await renderFund(basket, safe, ticker);
+    stampSources();
     window.scrollTo(0, 0);
   }
 
@@ -951,9 +952,11 @@
       `<td class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(1)}${suffix}</td>`;
     const tbl = document.getElementById(tableId);
     tbl.innerHTML =
-      "<tr><th>代码</th><th>名称</th><th>YTD</th><th>1年</th><th>3年年化</th><th>5年年化</th><th>10年年化</th><th>共同起点年化</th><th>最大回撤</th></tr>" +
+      '<tr><th>代码</th><th class="left">名称</th><th>市值 ($B)</th><th>YTD</th><th>1年</th><th>3年年化</th><th>5年年化</th><th>10年年化</th><th>共同起点年化</th><th>最大回撤</th></tr>' +
       d.rows.map((r) =>
-        `<tr class="clickable" data-hash="#${prefix}/${r.safe}"><td>${r.ticker}</td><td>${r.name}</td>` +
+        `<tr class="clickable" data-hash="#${prefix}/${r.safe}"><td>${r.ticker}</td>` +
+        `<td style="text-align:left">${tblLogo(r.ticker)}${r.name}</td>` +
+        `<td>${r.mcap ? Math.round(r.mcap).toLocaleString("en-US") : "--"}</td>` +
         c(r.ytd, "%") + c(r.y1, "%") + c(r.y3, "%") + c(r.y5, "%") + c(r.y10, "%") + c(r.since, "%") +
         `<td class="neg">${r.max_dd}%</td></tr>`
       ).join("");
@@ -1329,13 +1332,21 @@
         <div class="pulse-title">
           <h1>今日，市场的体温</h1>
           <p class="sub">温度 = （估值百分位 ${pct(d.val_pct)} + 情绪百分位 ${pct(d.sent_pct)}）÷ 2。估值取标普 500 PE(TTM) 在 1871 年以来全历史的位置；情绪取今日上涨家数占比在近一年中的位置。</p>
-          <div class="pulse-quotes" style="margin-top:14px">
-            ${q.spx ? `<span class="pq">标普 500 <b>${q.spx.close.toLocaleString("en-US")}</b> ${chg(q.spx.chg)}</span>` : ""}
-            ${q.ndx ? `<span class="pq">纳指 100 <b>${q.ndx.close.toLocaleString("en-US")}</b> ${chg(q.ndx.chg)}</span>` : ""}
-            ${q.vix ? `<span class="pq">VIX <b>${q.vix.close}</b> ${chg(q.vix.chg)}</span>` : ""}
-            ${d.fng != null ? `<span class="pq">恐贪 <b>${Math.round(d.fng)}</b></span>` : ""}
-            ${d.k != null ? `<span class="pq">K 指数 <b>${d.k.toFixed(2)}</b></span>` : ""}
-            ${leaps ? `<span class="pq">LEAPS 窗口 <b class="${windowOpen ? "neg" : "pos"}">${windowOpen ? "开启" : "关闭"}</b></span>` : ""}
+          <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+            <div class="pulse-quotes">
+              ${q.spx ? `<span class="pq">标普 500 <b>${q.spx.close.toLocaleString("en-US")}</b> ${chg(q.spx.chg)}</span>` : ""}
+              ${q.ndx ? `<span class="pq">纳指 100 <b>${q.ndx.close.toLocaleString("en-US")}</b> ${chg(q.ndx.chg)}</span>` : ""}
+              ${q.dji ? `<span class="pq">道琼斯 <b>${q.dji.close.toLocaleString("en-US")}</b> ${chg(q.dji.chg)}</span>` : ""}
+              ${q.rut ? `<span class="pq">罗素 2000 <b>${q.rut.close.toLocaleString("en-US")}</b> ${chg(q.rut.chg)}</span>` : ""}
+            </div>
+            <div class="pulse-quotes">
+              ${q.vix ? `<span class="pq">VIX 恐慌指数 <b>${q.vix.close}</b> ${chg(q.vix.chg)}</span>` : ""}
+              ${d.fng != null ? `<span class="pq">恐惧贪婪指数 <b>${Math.round(d.fng)}</b></span>` : ""}
+            </div>
+            <div class="pulse-quotes">
+              ${d.k != null ? `<span class="pq">K 指数 <b>${d.k.toFixed(2)}</b></span>` : ""}
+              ${leaps ? `<span class="pq">LEAPS Call 窗口 <b class="${windowOpen ? "neg" : "pos"}">${windowOpen ? "开启" : "关闭"}</b></span>` : ""}
+            </div>
           </div>
         </div>
       </div>
@@ -1362,20 +1373,29 @@
       </div>
       <div class="pulse-foot">滑动光标，掀开夜之一角。数据每交易日收盘后自动更新；温度是尺度不是信号——96 度的估值曾经烫了三年。</div>`;
 
-    // 揭示层 = 同一内容的夜间克隆 + 发光的百年走势线
+    // 自绘的百年走势线：日间层淡墨、夜间揭示层金色发光，加载时描线动画
+    const drawCentury = async (host, stroke, width, glow, opacity) => {
+      try {
+        const c = await load("sp500_century");
+        const vals = c.close, n = vals.length;
+        const lo = Math.log(Math.min(...vals)), hi = Math.log(Math.max(...vals));
+        const pts = vals.map((v, i) =>
+          `${(i / (n - 1) * 100).toFixed(2)},${(94 - (Math.log(v) - lo) / (hi - lo) * 82).toFixed(2)}`).join(" ");
+        host.insertAdjacentHTML("afterbegin",
+          `<svg class="pulse-chartline" viewBox="0 0 100 100" preserveAspectRatio="none" style="opacity:${opacity}">
+             <polyline class="draw-line" points="${pts}" pathLength="1000" fill="none"
+               style="stroke:${stroke};stroke-width:${width}${glow ? `;filter:drop-shadow(0 0 ${glow}px ${stroke})` : ""}"/></svg>`);
+      } catch (e) {}
+    };
+    const base = document.getElementById("pulse-base");
+    await drawCentury(base, "var(--accent)", 0.45, 0, 0.16);
+
+    // 揭示层 = 同一内容的夜间克隆 + 金色发光线
     const reveal = document.getElementById("pulse-reveal");
-    reveal.innerHTML = document.getElementById("pulse-base").innerHTML;
-    try {
-      const c = await load("sp500_century");
-      const vals = c.close, n = vals.length;
-      const lo = Math.log(Math.min(...vals)), hi = Math.log(Math.max(...vals));
-      const pts = vals.map((v, i) =>
-        `${(i / (n - 1) * 100).toFixed(2)},${(92 - (Math.log(v) - lo) / (hi - lo) * 80).toFixed(2)}`).join(" ");
-      reveal.insertAdjacentHTML("afterbegin",
-        `<svg class="pulse-chartline" viewBox="0 0 100 100" preserveAspectRatio="none">
-           <polyline points="${pts}" fill="none" stroke="#E0B05A" stroke-width="0.35"
-             style="filter:drop-shadow(0 0 1.2px #E0B05A)"/></svg>`);
-    } catch (e) {}
+    reveal.innerHTML = base.innerHTML;
+    const clonedSvg = reveal.querySelector("svg.pulse-chartline");
+    if (clonedSvg) clonedSvg.remove();
+    await drawCentury(reveal, "#E0B05A", 0.7, 2, 0.85);
 
     // 聚光灯：纯 CSS mask 跟随光标；触屏设备自动巡游
     const hero = document.getElementById("pulse-hero");
@@ -1399,6 +1419,40 @@
                 (0.45 + 0.3 * Math.sin(t * 1.1 + 1.3)) * r.height);
       }, 40);
     }
+  }
+
+  // ---------------- 数据出处标注（每张图/表下方统一小字） ----------------
+  const SRC_BY_PANEL = {
+    pulse: "Yahoo Finance + CNN Fear & Greed", spy: "Yahoo Finance", qqq: "Yahoo Finance",
+    fin: "Yahoo Finance", consumer: "Yahoo Finance", luxury: "Yahoo Finance",
+    macro: "FRED", kindex: "CNN Fear & Greed + Yahoo Finance", leaps: "CNN Fear & Greed + Yahoo Finance",
+  };
+  const SRC_OVERRIDES = [
+    ["ch-spy-cape", "multpl / Robert Shiller"], ["ch-spy-pettm", "multpl"],
+    ["ch-spy-eps", "multpl"], ["ch-spy-val", "multpl / Shiller"],
+    ["spy-constituents", "Wikipedia"], ["qqq-constituents", "Wikipedia"],
+    ["ch-spy-sectors", "Wikipedia"], ["ch-qqq-sectors", "Wikipedia"],
+    ["spy-top-table", "SSGA (SPDR)"], ["qqq-top-table", "stockanalysis"],
+  ];
+  let metaDate = "";
+
+  function stampSources() {
+    if (!metaDate) return;
+    document.querySelectorAll(".panel .card").forEach((card) => {
+      if (card.querySelector(".src-note")) return;
+      const inner = card.querySelector(".chart, table");
+      if (!inner) return;
+      const panelKey = card.closest(".panel").id.replace("panel-", "");
+      let src = SRC_BY_PANEL[panelKey] || "Yahoo Finance";
+      for (const [id, s] of SRC_OVERRIDES) {
+        if (card.querySelector("#" + id)) { src = s; break; }
+      }
+      const weekly = /-fd-/.test(inner.id || "");
+      const line = weekly
+        ? `数据截至 ${metaDate} · macrotrends + Yahoo Finance · 每周六自动更新`
+        : `数据截至 ${metaDate} · ${src} · 每交易日收盘后自动更新`;
+      card.insertAdjacentHTML("beforeend", `<p class="footnote src-note">${line}</p>`);
+    });
   }
 
   // ---------------- LEAPS 窗口 ----------------
@@ -1535,9 +1589,12 @@
   load("meta").then((m) => {
     document.getElementById("meta-line").textContent =
       "美股编年史 · 自用版 · 数据更新于 " + m.updated.slice(0, 10);
+    const [y, mo, dd] = m.updated.slice(0, 10).split("-");
+    metaDate = `${dd}-${mo}-${y}`; // 日-月-年
+    stampSources();
   }).catch(() => {});
   if (window.MC_I18N) {
-    MC_I18N.onChange(() => rebuildAll()); // canvas 里的文字随语言重建
+    MC_I18N.onChange(() => { rebuildAll(); renderPulse(); }); // 图表与头版随语言重建
     MC_I18N.ready.then(route);
   } else route();
 })();

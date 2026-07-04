@@ -269,6 +269,7 @@ tr:hover td { background: var(--bg-card-hover); }
 .k-min { color: var(--accent-deep); font-weight: 700; }
 
 .footnote { color: var(--ink-muted); font-size: 12.5px; margin-top: 10px; }
+.src-note { font-size: 11.5px; opacity: 0.85; margin-top: 8px; }
 
 /* ---------- 今日 · 头版（聚光灯封面） ---------- */
 .pulse-hero {
@@ -298,12 +299,32 @@ tr:hover td { background: var(--bg-card-hover); }
   -webkit-mask-image: radial-gradient(circle 0px at -999px -999px, #fff 0%, transparent 100%);
   mask-image: radial-gradient(circle 0px at -999px -999px, #fff 0%, transparent 100%);
 }
-.pulse-reveal .pulse-chartline {
+.pulse-chartline {
   position: absolute;
   inset: 0;
-  opacity: 0.5;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
+/* 描线动画：走势线从左至右自己画出来 */
+.draw-line {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawLine 3.4s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+}
+@keyframes drawLine { to { stroke-dashoffset: 0; } }
+/* 入场动画：血压计式的错峰浮现 */
+@keyframes heroRise {
+  from { opacity: 0; transform: translateY(20px); filter: blur(7px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.pulse-base > * { animation: heroRise 0.85s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+.pulse-base > :nth-child(1) { animation-delay: 0.1s; }
+.pulse-base > :nth-child(2) { animation-delay: 0.28s; }
+.pulse-base > :nth-child(3) { animation-delay: 0.5s; }
+.pulse-base > :nth-child(4) { animation-delay: 0.68s; }
+.pulse-base > :nth-child(5) { animation-delay: 0.85s; }
+.pulse-base > :nth-child(6) { animation-delay: 1s; }
 /* 揭示层强制夜间调色（scoped 副本） */
 .force-dark {
   --bg: #1A1410; --bg-card: #241C16; --bg-card-hover: #2D241D; --bg-deep: #20180F;
