@@ -14,6 +14,10 @@
     "K 指数": ["K-Index", "Indice K", "K-Index", "Índice K"],
     "LEAPS 窗口": ["LEAPS Window", "Fenêtre LEAPS", "LEAPS-Fenster", "Ventana LEAPS"],
     "宏观": ["Macro", "Macro", "Makro", "Macro"],
+    "纳指 100": ["Nasdaq-100", "Nasdaq-100", "Nasdaq-100", "Nasdaq-100"],
+    "XLF 金融": ["XLF Financials", "XLF Finance", "XLF Finanzen", "XLF Finanzas"],
+    "XLP 必需消费": ["XLP Staples", "XLP conso. de base", "XLP Basiskonsum", "XLP básico"],
+    "XLY 可选消费": ["XLY Discretionary", "XLY conso. cyclique", "XLY Zyklisch", "XLY discrecional"],
     "宏观：市场的水位": ["Macro: The Market's Water Level", "Macro : le niveau d'eau du marché", "Makro: Der Wasserstand des Marktes", "Macro: el nivel del agua del mercado"],
     "资金面、信用、物价与增长——指数涨跌的四个上游变量，全部来自圣路易斯联储 FRED，随每日更新刷新。": [
       "Capital, credit, prices and growth — four upstream variables of the index, all from the St. Louis Fed's FRED, refreshed daily.",
