@@ -6,7 +6,7 @@
 
 - **线上地址**：<https://klaywang24.github.io/market-chronicle/>
 - **仓库**：<https://github.com/klaywang24/market-chronicle>（public）
-- **本地目录**：`/Users/klay/Desktop/market-chronicle/`
+- **本地目录**：`/Users/klay/Desktop/可视化学习汇总/美股编年史/market-chronicle 公开 git 仓库/`
 
 ---
 
