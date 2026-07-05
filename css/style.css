@@ -754,9 +754,11 @@ th.left { text-align: left; }
   padding-bottom: 18px;
   border-bottom: 1px solid var(--border);
 }
+.footer-brand-col { flex: 1 1 240px; min-width: 0; }
 .footer-brand { font-family: 'Noto Serif SC', serif; font-weight: 700; font-size: 16px; color: var(--ink); }
 .footer-tag { margin-top: 4px; font-size: 12px; }
-.footer-links { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+/* 链接区始终靠右：撑满剩余宽度、右对齐，即使换行也在右下而非左下 */
+.footer-links { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: flex-end; flex: 1 1 auto; }
 .footer-links a { color: var(--ink-muted); text-decoration: none; white-space: nowrap; }
 .footer-links a:hover { color: var(--accent-deep); }
 .footer-note { margin-top: 16px; line-height: 1.7; }
