@@ -314,6 +314,26 @@ def build_pulse():
     except Exception:
         pass
 
+    # 全成分股热力图：面积=市值、颜色=当日涨跌、按 GICS 行业分组（Finviz 式 treemap）
+    sec_of = {r["ticker"].replace(".", "-"): r["sector"]
+              for r in json.loads((DATA / "sp500_constituents.json").read_text())["rows"]}
+    last_ret = ret.iloc[-1]
+    heat = []
+    for t in px.columns:
+        c = last_ret.get(t)
+        if pd.isna(c):
+            continue
+        try:
+            mc = yf.Ticker(t).fast_info["market_cap"]
+        except Exception:
+            mc = None
+        if not mc:
+            continue
+        heat.append([t.replace("-", "."), sec_of.get(t, "Other"),
+                     round(float(c) * 100, 2), round(mc / 1e9, 1)])
+        time.sleep(0.15)
+    write_json("pulse_heatmap.json", {"date": today.strftime("%Y-%m-%d"), "rows": heat})
+
     write_json("pulse.json", {
         "date": today.strftime("%Y-%m-%d"),
         "temp": temp, "val_pct": val_pct, "sent_pct": sent_pct,

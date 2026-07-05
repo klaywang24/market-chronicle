@@ -1305,6 +1305,80 @@
   });
   chart("macro", "ch-macro-profits", macroBars("cp_yoy", "企业利润同比"));
 
+  // ---------------- 今日 · 头版：全成分股热力图（Finviz 式 treemap） ----------------
+  function heatColor(c) {
+    // 涨跌幅 → 色阶：深红(-3%↓) … 中性灰 … 深绿(+3%↑)，日夜通用（白字可读）
+    const stops = [
+      [-3, "#7f1710"], [-1.5, "#a83326"], [-0.5, "#b86a5c"],
+      [0, "#7d776c"],
+      [0.5, "#5a9e6f"], [1.5, "#2c9653"], [3, "#0c7a3a"],
+    ];
+    let best = stops[0][1], dist = Infinity;
+    for (const [v, hex] of stops) {
+      const dd = Math.abs(Math.max(-3, Math.min(3, c)) - v);
+      if (dd < dist) { dist = dd; best = hex; }
+    }
+    return best;
+  }
+
+  async function initHeatTree(el, key) {
+    if (!el) return;
+    try {
+      const d = await load("pulse_heatmap");
+      const bySec = {};
+      for (const [t, s, c, m] of d.rows) {
+        (bySec[s] = bySec[s] || []).push({
+          name: t, value: m, chg: c, sector: s,
+          itemStyle: { color: heatColor(c) },
+          label: { color: "#fff" },
+        });
+      }
+      const data = Object.entries(bySec)
+        .map(([sec, kids]) => ({
+          name: sec,
+          value: kids.reduce((a, b) => a + b.value, 0),
+          children: kids.sort((a, b) => b.value - a.value),
+        }))
+        .sort((a, b) => b.value - a.value);
+      if (built.has(key)) built.get(key).dispose();
+      const inst = echarts.init(el, null, { renderer: "canvas" });
+      built.set(key, inst);
+      const p = pal();
+      inst.setOption({
+        tooltip: {
+          backgroundColor: p.card, borderColor: p.border,
+          textStyle: { color: p.ink, fontSize: 12, fontFamily: "JetBrains Mono" },
+          formatter: (n) => n.data.chg == null ? n.name :
+            `<b>${n.name}</b> · ${n.data.sector}<br/>${n.data.chg > 0 ? "+" : ""}${n.data.chg}% · $${Math.round(n.value).toLocaleString("en-US")}B`,
+        },
+        series: [{
+          type: "treemap", roam: false, nodeClick: false,
+          breadcrumb: { show: false },
+          left: 0, right: 0, top: 0, bottom: 0,
+          visibleMin: 120,
+          label: {
+            show: true, fontFamily: "JetBrains Mono", fontSize: 11, lineHeight: 14,
+            formatter: (n) => `${n.name}\n${n.data.chg > 0 ? "+" : ""}${n.data.chg}%`,
+            overflow: "truncate",
+          },
+          upperLabel: {
+            show: true, height: 18, fontSize: 10.5, color: "#fff",
+            backgroundColor: "rgba(0,0,0,0.35)", overflow: "truncate",
+          },
+          itemStyle: { borderColor: "rgba(0,0,0,0.28)", borderWidth: 1, gapWidth: 1 },
+          levels: [
+            { itemStyle: { gapWidth: 3, borderWidth: 0 } },
+            { itemStyle: { gapWidth: 2 }, upperLabel: { show: true } },
+            {},
+          ],
+          data,
+        }],
+      });
+    } catch (e) {
+      el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-muted);font-size:13px">数据更新中，稍后自动出现 · data updating</div>';
+    }
+  }
+
   // ---------------- 今日 · 头版（聚光灯封面） ----------------
   async function renderPulse() {
     let d, leaps = null;
@@ -1359,16 +1433,8 @@
         <div class="breadth-note">上涨家数占比 ${d.adv_ratio}%（(涨 + 平÷2) ÷ ${d.total}），处于近一年第 ${pct(d.sent_pct)} 百分位</div>
       </div>
       <div>
-        <div class="pulse-section-label">板块温度 · 11 只 SPDR 行业 ETF 当日涨跌</div>
-        <div class="heat-grid">
-          ${d.sectors.map((s) => {
-            const a = Math.min(Math.abs(s.chg) / 2.5, 1) * 0.75 + 0.1;
-            const base = s.chg >= 0 ? "20,166,62" : "184,66,30";
-            return `<div class="heat-tile" style="background:rgba(${base},${a.toFixed(2)})">
-              <div class="n">${s.name} <span style="opacity:.6">${s.etf}</span></div>
-              <div class="c">${(s.chg > 0 ? "+" : "") + s.chg.toFixed(2)}%</div></div>`;
-          }).join("")}
-        </div>
+        <div class="pulse-section-label">板块热力图 · 标普 500 全成分股（面积 = 市值 · 颜色 = 当日涨跌）</div>
+        <div class="heat-tree"></div>
       </div>
       <div class="pulse-foot">滑动光标，掀开夜之一角。数据每交易日收盘后自动更新；温度是尺度不是信号——96 度的估值曾经烫了三年。</div>`;
 
@@ -1411,6 +1477,10 @@
     const clonedSvg = rBand && rBand.querySelector("svg.pulse-chartline");
     if (clonedSvg) clonedSvg.remove();
     if (rBand) await drawCentury(rBand, "#E0B05A", 0.8, 2, 0.9, false);
+
+    // 热力图 treemap：canvas 不能随 innerHTML 克隆，两层各自初始化
+    await initHeatTree(base.querySelector(".heat-tree"), "pulse-tree-base");
+    await initHeatTree(reveal.querySelector(".heat-tree"), "pulse-tree-reveal");
 
     // 聚光灯：纯 CSS mask 跟随光标；触屏设备自动巡游
     const hero = document.getElementById("pulse-hero");

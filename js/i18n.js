@@ -504,6 +504,7 @@
     "冰点": ["Freezing", "Glacial", "Eiskalt", "Helado"],
     "涨跌分布 · 标普 500 成分股": ["Advance / decline · S&P 500 members", "Hausse / baisse · membres du S&P 500", "Steiger / Faller · S&P-500-Mitglieder", "Suben / bajan · miembros del S&P 500"],
     "板块温度 · 11 只 SPDR 行业 ETF 当日涨跌": ["Sector heat · 11 SPDR sector ETFs today", "Chaleur sectorielle · 11 ETF SPDR", "Sektorhitze · 11 SPDR-ETFs heute", "Calor sectorial · 11 ETF SPDR hoy"],
+    "板块热力图 · 标普 500 全成分股（面积 = 市值 · 颜色 = 当日涨跌）": ["Sector heatmap · all S&P 500 members (size = market cap, color = daily change)", "Carte thermique · tous les membres du S&P 500 (taille = capitalisation, couleur = variation)", "Sektor-Heatmap · alle S&P-500-Mitglieder (Größe = Marktkapitalisierung, Farbe = Tagesänderung)", "Mapa de calor · todos los miembros del S&P 500 (tamaño = capitalización, color = variación diaria)"],
     "滑动光标，掀开夜之一角。数据每交易日收盘后自动更新；温度是尺度不是信号——96 度的估值曾经烫了三年。": [
       "Move the cursor to lift a corner of the night. Data refreshes after each close; temperature is a scale, not a signal — 96-degree valuations once stayed hot for three years.",
       "Déplacez le curseur pour soulever un coin de la nuit. Données actualisées après chaque clôture ; la température est une échelle, pas un signal.",
