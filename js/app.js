@@ -604,7 +604,7 @@
   }
   tocEl.addEventListener("click", (e) => {
     const a = e.target.closest("a");
-    if (!a) return;
+    if (!a) { tocEl.classList.remove("open"); return; } // 点遮罩空白处即收起抽屉
     const target = document.getElementById(a.dataset.target);
     if (target) {
       const y = target.getBoundingClientRect().top + window.scrollY - 120;
