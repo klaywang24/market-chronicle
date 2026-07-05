@@ -1649,8 +1649,9 @@
   renderBasketTable("consumer", "consumer-table");
   renderBasketTable("luxury", "luxury-table");
   load("meta").then((m) => {
-    document.getElementById("meta-line").textContent =
-      "美股编年史 · 自用版 · 数据更新于 " + m.updated.slice(0, 10);
+    // "数据更新于" 单独包 span 以便 i18n 词典翻译；日期语言中性
+    document.getElementById("meta-line").innerHTML =
+      '<span>数据更新于</span> ' + m.updated.slice(0, 10);
     const [y, mo, dd] = m.updated.slice(0, 10).split("-");
     metaDate = `${dd}-${mo}-${y}`; // 日-月-年
     stampSources();

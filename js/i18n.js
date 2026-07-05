@@ -5,6 +5,17 @@
 
   // 词条格式："简体原文": [EN, FR, DE, ES]
   const D = {
+    // ---- 页脚 ----
+    "每个交易日自动更新的美股百年图表档案 · 免费 · 开源": ["A self-updating archive of a century of US market charts · free · open source", "Une archive auto-actualisée d'un siècle de graphiques boursiers américains · gratuit · open source", "Ein selbstaktualisierendes Archiv aus einem Jahrhundert US-Börsencharts · kostenlos · quelloffen", "Un archivo autoactualizado de un siglo de gráficos del mercado de EE. UU. · gratis · código abierto"],
+    "关于": ["About", "À propos", "Über", "Acerca de"],
+    "联系": ["Contact", "Contact", "Kontakt", "Contacto"],
+    "定价": ["Pricing", "Tarifs", "Preise", "Precios"],
+    "隐私政策": ["Privacy", "Confidentialité", "Datenschutz", "Privacidad"],
+    "服务条款": ["Terms", "Conditions", "AGB", "Términos"],
+    "退款政策": ["Refunds", "Remboursements", "Erstattungen", "Reembolsos"],
+    "数据源：": ["Data sources: ", "Sources : ", "Datenquellen: ", "Fuentes: "],
+    "仅供信息与教育用途，不构成投资建议": ["For information and education only; not investment advice", "À titre d'information et d'éducation uniquement ; pas un conseil en investissement", "Nur zur Information und Bildung; keine Anlageberatung", "Solo con fines informativos y educativos; no es asesoramiento de inversión"],
+    "数据更新于": ["Data updated", "Données au", "Daten aktualisiert", "Datos actualizados"],
     // ---- 顶栏 tab ----
     "标普 500": ["S&P 500", "S&P 500", "S&P 500", "S&P 500"],
     "纳斯达克": ["Nasdaq", "Nasdaq", "Nasdaq", "Nasdaq"],
