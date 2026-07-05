@@ -157,6 +157,33 @@ html:not([lang^="zh"]) .brand em { display: none; }
 }
 .theme-toggle:hover { background: var(--bg-card-hover); }
 
+/* ---------- 窄屏 / 平板顶栏 ----------
+   桌面端顶栏是「品牌 · tab · 控件」一行。窄屏时品牌 + 六语切换会占满整行，
+   而 .tabs 因 overflow-x:auto 的最小宽度为 0，被 flex 挤成 0 宽度整条消失。
+   这里让顶栏换行：品牌与控件占首行，tab 栏独占次行满宽横向滚动。 */
+@media (max-width: 820px) {
+  .topbar-inner {
+    flex-wrap: wrap;
+    height: auto;
+    gap: 8px 12px;
+    padding: 8px 16px;
+  }
+  .brand { order: 1; font-size: 17px; }
+  .top-controls { order: 2; margin-left: auto; }
+  .tabs {
+    order: 3;
+    flex: 0 0 100%;
+    width: 100%;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    /* 右缘渐隐，提示 tab 栏可横向滑动、并非被截断 */
+    -webkit-mask-image: linear-gradient(90deg, #000 90%, transparent);
+    mask-image: linear-gradient(90deg, #000 90%, transparent);
+  }
+  .lang-switch { font-size: 11px; padding: 3px 8px; }
+  .tab { font-size: 13.5px; padding: 6px 9px; }
+}
+
 /* ---------- 版面 ---------- */
 .container { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
 .panel { display: none; }
