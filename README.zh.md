@@ -9,7 +9,7 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-4a5d3a)](LICENSE)
 [![在线访问](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E8%AE%BF%E9%97%AE-klaywang24.github.io-a0392f)](https://klaywang24.github.io/market-chronicle/)
 [![数据集](https://img.shields.io/badge/%E9%A2%84%E7%94%9F%E6%88%90%E6%95%B0%E6%8D%AE%E9%9B%86-250%2B%20JSON-b8893e)](data/)
-[![EN](https://img.shields.io/badge/EN-README-2b5f8f)](README.en.md)
+[![EN](https://img.shields.io/badge/EN-README-2b5f8f)](README.md)
 
 **在线地址：<https://klaywang24.github.io/market-chronicle/>**
 

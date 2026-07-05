@@ -9,7 +9,7 @@
 [![weekly-fundamentals](https://github.com/klaywang24/market-chronicle/actions/workflows/weekly.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/weekly.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-4a5d3a)](LICENSE)
 [![Live](https://img.shields.io/badge/live-klaywang24.github.io-a0392f)](https://klaywang24.github.io/market-chronicle/)
-[![中文](https://img.shields.io/badge/%E4%B8%AD%E6%96%87-README-2b5f8f)](README.md)
+[![中文](https://img.shields.io/badge/%E4%B8%AD%E6%96%87-README-2b5f8f)](README.zh.md)
 
 **Live: <https://klaywang24.github.io/market-chronicle/>**
 
