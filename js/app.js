@@ -1413,35 +1413,35 @@
       </div>
       <div class="pulse-foot">滑动光标，掀开夜之一角。数据每交易日收盘后自动更新；温度是尺度不是信号——96 度的估值曾经烫了三年。</div>`;
 
-    // 顶部世纪带：百年走势线 + 六个闪烁的危机红点
-    // 第 4 项 = 标签上/下；第 5 项 = 水平微调 px（负=左移）；第 6 项 = 垂直微调 px（正=下移，离曲线远些）
-    const CRISES = [
-      ["1929-09", "1929", "大萧条", "above", -34, 0], ["1974-10", "1974", "滞胀", "below", 0, 0],
-      ["1987-10", "1987", "黑色星期一", "above", -48, 0], ["2000-03", "2000", "互联网泡沫", "above", -48, 0],
-      ["2008-09", "2008", "金融危机", "below", 0, 18], ["2020-02", "2020", "疫情冲击", "above", 0, 0],
+    // 顶部世纪带：一条「编辑部示意」式的百年走势线（装饰性首图，非对数真实数据——
+    // 真实百年走势见「标普 500」章节一）。危机以夸张的 V 型呈现，便于在首图一眼辨识。
+    // 走势锚点：[x, y]（viewBox 0..100，y 越小越高）
+    const PTS = [
+      [2, 64], [4, 58], [6, 90], [9, 80], [12, 84], [15, 74], [19, 66], [23, 70], [27, 60], [31, 56],
+      [35, 62], [40, 58], [44, 52], [46.5, 74], [50, 60], [54, 50], [57, 44], [59.4, 66], [62, 46], [66, 40],
+      [69, 36], [72.3, 58], [75, 48], [77, 46], [80.2, 68], [83, 46], [86, 36], [89, 28], [90.5, 24], [92.1, 60],
+      [93, 30], [93.6, 22], [94.2, 54], [95, 30], [96.5, 18], [98, 8],
     ];
-    const drawCentury = async (band, stroke, width, glow, opacity, withDots) => {
-      try {
-        const c = await load("sp500_century");
-        const vals = c.close, n = vals.length;
-        const lo = Math.log(Math.min(...vals)), hi = Math.log(Math.max(...vals));
-        const xy = (i) => [i / (n - 1) * 100, 96 - (Math.log(vals[i]) - lo) / (hi - lo) * 92];
-        const pts = vals.map((v, i) => xy(i).map((z) => z.toFixed(2)).join(",")).join(" ");
-        band.insertAdjacentHTML("afterbegin",
-          `<svg class="pulse-chartline" viewBox="0 0 100 100" preserveAspectRatio="none" style="opacity:${opacity}">
-             <polyline class="draw-line" points="${pts}" pathLength="1000" fill="none"
-               style="stroke:${stroke};stroke-width:${width}${glow ? `;filter:drop-shadow(0 0 ${glow}px ${stroke})` : ""}"/></svg>`);
-        if (!withDots) return;
-        for (const [ym, year, name, place, dx, dy] of CRISES) {
-          let i = c.dates.findIndex((dt) => dt >= ym);
-          if (i < 0) continue;
-          const [x, y] = xy(i);
-          const cls = (place === "below" ? "below " : "") + (x > 90 ? "edge-r" : x < 6 ? "edge-l" : "");
-          band.insertAdjacentHTML("beforeend",
-            `<div class="crisis-dot ${cls}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%${dx ? `;--dx:${dx}px` : ""}${dy ? `;--dy:${dy}px` : ""}">
-               <i></i><span>${year} · <span>${name}</span></span></div>`);
-        }
-      } catch (e) {}
+    // 危机节点：[x, y, 年份, 名称, 标签上/下, 水平微调 px, 垂直微调 px]
+    const CRISES = [
+      [6, 90, "1929", "大萧条", "above", 10, -2], [46.5, 74, "1974", "滞胀", "below", 0, 0],
+      [59.4, 66, "1987", "黑色星期一", "above", -40, 0], [72.3, 58, "2000", "互联网泡沫", "above", -72, -6],
+      [80.2, 68, "2008", "金融危机", "below", 0, 16], [92.1, 60, "2020", "疫情冲击", "above", -6, 0],
+      [94.2, 54, "2022", "加息", "below", 6, 10],
+    ];
+    const drawCentury = (band, stroke, width, glow, opacity, withDots) => {
+      const pts = PTS.map((p) => p.join(",")).join(" ");
+      band.insertAdjacentHTML("afterbegin",
+        `<svg class="pulse-chartline" viewBox="0 0 100 100" preserveAspectRatio="none" style="opacity:${opacity}">
+           <polyline class="draw-line" points="${pts}" pathLength="1000" fill="none"
+             style="stroke:${stroke};stroke-width:${width}${glow ? `;filter:drop-shadow(0 0 ${glow}px ${stroke})` : ""}"/></svg>`);
+      if (!withDots) return;
+      for (const [x, y, year, name, place, dx, dy] of CRISES) {
+        const cls = (place === "below" ? "below " : "") + (x > 90 ? "edge-r" : x < 6 ? "edge-l" : "");
+        band.insertAdjacentHTML("beforeend",
+          `<div class="crisis-dot ${cls}" style="left:${x}%;top:${y}%${dx ? `;--dx:${dx}px` : ""}${dy ? `;--dy:${dy}px` : ""}">
+             <i></i><span>${year} · <span>${name}</span></span></div>`);
+      }
     };
     const base = document.getElementById("pulse-base");
     await drawCentury(base.querySelector(".pulse-chartband"), "var(--accent)", 0.5, 0, 0.55, true);

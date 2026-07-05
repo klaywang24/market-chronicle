@@ -543,6 +543,7 @@
     "互联网泡沫": ["Dot-com bubble", "Bulle Internet", "Dotcom-Blase", "Burbuja puntocom"],
     "金融危机": ["Financial crisis", "Crise financière", "Finanzkrise", "Crisis financiera"],
     "疫情冲击": ["COVID shock", "Choc COVID", "COVID-Schock", "Shock del COVID"],
+    "加息": ["Rate hikes", "Hausse des taux", "Zinserhöhungen", "Subida de tipos"],
     "必需消费": ["Staples", "Conso. de base", "Basiskonsum", "Consumo básico"],
     "可选消费": ["Discretionary", "Conso. cyclique", "Zykl. Konsum", "Consumo discrecional"],
     "道琼斯": ["Dow Jones", "Dow Jones", "Dow Jones", "Dow Jones"],

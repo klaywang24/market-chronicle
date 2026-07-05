@@ -129,6 +129,13 @@ body {
 /* 窄屏收起品牌副题，给 tab 让位；非中文界面下主名已译为英文，副题冗余 */
 @media (max-width: 1560px) { .brand em { display: none; } }
 html:not([lang^="zh"]) .brand em { display: none; }
+/* 西语系 tab 标签更宽（Consommation / LEAPS-Fenster…），9 个 tab 会把最后一个
+   「LEAPS Window」挤出 .tabs 的 overflow-x 边界被截断。非中文界面下收紧 tab 字号/
+   内边距、顶栏间距与右侧控件占位，让全部 tab 单行完整显示。 */
+html:not([lang^="zh"]) .topbar-inner { gap: 14px; }
+html:not([lang^="zh"]) .tab { font-size: 12.5px; padding: 6px 7px; }
+html:not([lang^="zh"]) .top-controls { margin-left: 8px; gap: 8px; }
+html:not([lang^="zh"]) .lang-switch { font-size: 11.5px; padding: 3px 8px; }
 .lang-switch {
   white-space: nowrap;
   flex-shrink: 0;
