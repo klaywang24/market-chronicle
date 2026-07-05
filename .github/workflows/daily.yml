@@ -25,3 +25,8 @@ jobs:
           git commit -m "data: daily update $(date -u +%F)" || echo "no changes"
           git pull --rebase origin main
           git push
+      - name: notify Discord
+        if: always()
+        run: python scripts/notify_discord.py
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
