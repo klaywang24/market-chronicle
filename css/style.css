@@ -338,11 +338,11 @@ tr:hover td { background: var(--bg-card-hover); }
 /* 顶部世纪带：百年走势 + 危机红点 */
 .pulse-chartband {
   position: relative;
-  height: 340px;
+  height: 280px;
   flex-shrink: 0;
   margin: 2px 0 4px;
 }
-@media (max-width: 900px) { .pulse-chartband { height: 200px; } }
+@media (max-width: 900px) { .pulse-chartband { height: 190px; } }
 .crisis-dot {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -374,7 +374,7 @@ tr:hover td { background: var(--bg-card-hover); }
 .crisis-dot > span {
   position: absolute;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(calc(-50% + var(--dx, 0px)));
   top: -26px;
   white-space: nowrap;
   font-size: 12px;
@@ -386,8 +386,8 @@ tr:hover td { background: var(--bg-card-hover); }
   border-radius: 5px;
 }
 .crisis-dot.below > span { top: auto; bottom: -28px; }
-.crisis-dot.edge-r > span { left: auto; right: -8px; transform: none; }
-.crisis-dot.edge-l > span { left: -8px; transform: none; }
+.crisis-dot.edge-r > span { left: auto; right: -8px; transform: translateX(var(--dx, 0px)); }
+.crisis-dot.edge-l > span { left: -8px; transform: translateX(var(--dx, 0px)); }
 /* 描线动画：走势线从左至右自己画出来 */
 .draw-line {
   stroke-dasharray: 1000;
@@ -435,14 +435,16 @@ tr:hover td { background: var(--bg-card-hover); }
   width: 190px; height: 190px;
   border-radius: 50%;
   background:
-    radial-gradient(closest-side, var(--bg) 76%, transparent 77% 100%),
+    radial-gradient(closest-side, var(--bg) 82%, transparent 83% 100%),
     conic-gradient(var(--temp-color, #B8421E) calc(var(--pct) * 1%), var(--bg-deep) 0);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.temp-ring .val { font-family: 'JetBrains Mono', monospace; font-size: 44px; font-weight: 700; }
+.temp-ring .val { font-family: 'JetBrains Mono', monospace; font-size: 44px; font-weight: 700; line-height: 1.1; }
 .temp-ring .val em { font-style: normal; font-size: 20px; color: var(--ink-muted); }
-.temp-ring .lbl { font-size: 12px; color: var(--ink-muted); letter-spacing: 0.1em; }
+.temp-ring .lbl { font-size: 12px; color: var(--ink-muted); letter-spacing: 0.08em; max-width: 132px; text-align: center; line-height: 1.25; }
+/* 西语系文案更长，缩小字号+去字距，配合加宽的圆心区，确保落在浅色圆内不压到色环 */
+html:not([lang^="zh"]) .temp-ring .lbl { font-size: 9.5px; letter-spacing: 0; }
 .pulse-quotes { display: flex; gap: 10px; flex-wrap: wrap; }
 .pq {
   border: 1px solid var(--border);
@@ -457,16 +459,30 @@ tr:hover td { background: var(--bg-card-hover); }
 @media (min-width: 1000px) { .pulse-quotes { flex-wrap: nowrap; } }
 /* 涨跌带 */
 .breadth-bar { display: flex; height: 30px; border-radius: 8px; overflow: hidden; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-.breadth-bar div { display: flex; align-items: center; justify-content: center; color: #fff; min-width: 34px; }
+.breadth-bar div { display: flex; align-items: center; justify-content: center; color: #fff; min-width: 40px; white-space: nowrap; padding: 0 8px; box-sizing: border-box; }
+/* 西语系"平/flat/stable"更长，给窄段留足宽度不被截断 */
+html:not([lang^="zh"]) .breadth-bar div { min-width: 62px; }
 .breadth-note { color: var(--ink-muted); font-size: 12.5px; margin-top: 6px; }
-/* 全成分股热力图 treemap */
+/* 板块热力图（TradingView 官方 widget 容器）——始终暗色，做成嵌入式数据面板 */
 .heat-tree {
   width: 100%;
-  height: 560px;
+  height: 620px;
   border-radius: 10px;
   overflow: hidden;
+  background: #0e0e0e;               /* 与 TradingView dark 主题一致的深底，无缝框住 */
+  border: 1px solid var(--border);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
 }
-@media (max-width: 900px) { .heat-tree { height: 400px; } }
+@media (max-width: 900px) { .heat-tree { height: 460px; } }
+/* TradingView 版权小字：暗底上用浅灰，两种主题都可读 */
+.tv-heatmap .tradingview-widget-copyright {
+  font-size: 11px;
+  line-height: 22px;
+  text-align: right;
+  padding: 0 8px;
+  color: #7d7d7d;
+}
+.tv-heatmap .tradingview-widget-copyright a { color: #8f8f8f; text-decoration: none; }
 /* 板块热力图（旧 11 格，保留样式以防复用） */
 .heat-grid {
   display: grid;

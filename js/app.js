@@ -1305,124 +1305,49 @@
   });
   chart("macro", "ch-macro-profits", macroBars("cp_yoy", "企业利润同比"));
 
-  // ---------------- 今日 · 头版：全成分股热力图（Finviz 式 treemap） ----------------
-  function heatColor(c) {
-    // 涨跌幅 → 色阶：深红(-3%↓) … 中性灰 … 苹果绿(+3%↑)，日夜通用（白字可读）
-    // 绿档锚定全站统一的苹果绿 --moss #14A63E，深浅两端围绕它铺开
-    const stops = [
-      [-3, "#7f1710"], [-1.5, "#a83326"], [-0.5, "#b86a5c"],
-      [0, "#7d776c"],
-      [0.5, "#3FB268"], [1.5, "#14A63E"], [3, "#0A7C2E"],
-    ];
-    let best = stops[0][1], dist = Infinity;
-    for (const [v, hex] of stops) {
-      const dd = Math.abs(Math.max(-3, Math.min(3, c)) - v);
-      if (dd < dist) { dist = dd; best = hex; }
-    }
-    return best;
+  // ---------------- 今日 · 头版：板块热力图（TradingView 官方免费 widget） ----------------
+  // MC 语言码 → TradingView locale
+  function tvLocale() {
+    const L = document.documentElement.lang;
+    return L === "zh-CN" ? "zh_CN" : L === "zh-TW" ? "zh_TW" : (L || "en");
   }
-
-  // GICS 行业名较长，窄块的 upperLabel 会被截断——统一用短名显示（tooltip 仍用全名）
-  const SEC_SHORT = {
-    "Communication Services": "通讯服务",
-    "Consumer Discretionary": "可选消费",
-    "Consumer Staples": "日常消费",
-    "Information Technology": "信息技术",
-    "Health Care": "医疗保健",
-    "Financials": "金融", "Industrials": "工业", "Energy": "能源",
-    "Materials": "原材料", "Real Estate": "房地产", "Utilities": "公用事业",
-  };
-  const LOGO_MIN = 300; // 只给市值≥300B 的大块加公司 logo（约 40 只，覆盖 ~62% 面积）
-  const logoCache = {}; // ticker -> HTMLImageElement（已加载）| null（加载失败）
-  function ensureLogos(tickers) {
-    const need = tickers.filter((t) => !(t in logoCache));
-    if (!need.length) return Promise.resolve();
-    return new Promise((resolve) => {
-      let pending = need.length;
-      const done = () => { if (--pending === 0) resolve(); };
-      need.forEach((t) => {
-        const img = new Image();
-        img.onload = () => { logoCache[t] = img; done(); };
-        img.onerror = () => { logoCache[t] = null; done(); };
-        img.src = `https://assets.parqet.com/logos/symbol/${t}?format=png`;
-      });
+  // 把 TradingView 标普 500 热图挂到 #pulse-base 里的容器；随日夜/语言重新挂载
+  function mountHeatmap() {
+    const box = document.querySelector("#pulse-base .tv-heatmap");
+    if (!box) return;
+    // TradingView 组件按配置里的固定像素高度自撑（用 "100%" 会取父高→塌成 0）
+    const h = window.innerWidth <= 900 ? 460 : 620;
+    const L = tvLocale();
+    // 版权署名随语言（TradingView 名字+链接必须保留；后缀本地化避免中文残留）
+    const credit = { zh_CN: " 提供热图数据", zh_TW: " 提供熱圖數據", en: " heatmap data",
+      fr: " — données heatmap", de: " — Heatmap-Daten", es: " — datos del mapa" }[L] || " heatmap data";
+    box.innerHTML =
+      '<div class="tradingview-widget-container__widget" style="height:' + (h - 22) + 'px;width:100%"></div>' +
+      '<div class="tradingview-widget-copyright">' +
+      '<a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">TradingView</a>' + credit + '</div>';
+    const s = document.createElement("script");
+    s.type = "text/javascript";
+    s.async = true;
+    s.src = "https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js";
+    s.textContent = JSON.stringify({
+      dataSource: "SPX500",
+      blockSize: "market_cap_basic",
+      blockColor: "change",
+      grouping: "sector",
+      locale: L,
+      symbolUrl: "",
+      // TradingView 不支持自定义背景/透明（isTransparent 会被丢弃），亮色主题是刺眼白底。
+      // 故始终用 dark 主题 + 深色边框，做成「嵌入式数据面板」，在羊皮纸亮色下也像有意为之的暗屏。
+      colorTheme: "dark",
+      hasTopBar: false,
+      isDataSetEnabled: false,
+      isZoomEnabled: true,
+      hasSymbolTooltip: true,
+      isMonoSize: false,
+      width: "100%",
+      height: h,
     });
-  }
-
-  async function initHeatTree(el, key) {
-    if (!el) return;
-    try {
-      const d = await load("pulse_heatmap");
-      // 大块 logo：先把需要的 logo 预加载好，canvas 才能一次画出
-      await ensureLogos(d.rows.filter((r) => r[3] >= LOGO_MIN).map((r) => r[0]));
-      const bySec = {};
-      for (const [t, s, c, m] of d.rows) {
-        const node = {
-          name: t, value: m, chg: c, sector: s,
-          itemStyle: { color: heatColor(c) },
-          label: { color: "#fff" },
-        };
-        const img = m >= LOGO_MIN ? logoCache[t] : null;
-        if (img) {
-          const cstr = (c > 0 ? "+" : "") + c + "%";
-          node.label = {
-            color: "#fff",
-            formatter: `{logo|}\n{t|${t}}\n{c|${cstr}}`,
-            rich: {
-              logo: { height: 24, width: 24, align: "center", backgroundColor: { image: img } },
-              t: { color: "#fff", fontFamily: "JetBrains Mono", fontSize: 12.5, fontWeight: "bold", lineHeight: 16, align: "center" },
-              c: { color: "#fff", fontFamily: "JetBrains Mono", fontSize: 11, lineHeight: 14, align: "center" },
-            },
-          };
-        }
-        (bySec[s] = bySec[s] || []).push(node);
-      }
-      const data = Object.entries(bySec)
-        .map(([sec, kids]) => ({
-          name: SEC_SHORT[sec] || sec,
-          value: kids.reduce((a, b) => a + b.value, 0),
-          children: kids.sort((a, b) => b.value - a.value),
-        }))
-        .sort((a, b) => b.value - a.value);
-      if (built.has(key)) built.get(key).dispose();
-      const inst = echarts.init(el, null, { renderer: "canvas" });
-      built.set(key, inst);
-      const p = pal();
-      inst.setOption({
-        tooltip: {
-          backgroundColor: p.card, borderColor: p.border,
-          textStyle: { color: p.ink, fontSize: 12, fontFamily: "JetBrains Mono" },
-          formatter: (n) => n.data.chg == null ? n.name :
-            `<b>${n.name}</b> · ${n.data.sector}<br/>${n.data.chg > 0 ? "+" : ""}${n.data.chg}% · $${Math.round(n.value).toLocaleString("en-US")}B`,
-        },
-        series: [{
-          type: "treemap", roam: false, nodeClick: false,
-          breadcrumb: { show: false },
-          left: 0, right: 0, top: 0, bottom: 0,
-          visibleMin: 6, // 放开小块：502 只全部可见（小块无字只有色）
-          label: {
-            show: true, fontFamily: "JetBrains Mono", fontSize: 11, lineHeight: 14,
-            formatter: (n) => n.data.chg == null ? n.name
-              : `${n.name}\n${n.data.chg > 0 ? "+" : ""}${n.data.chg}%`,
-            overflow: "truncate",
-          },
-          upperLabel: {
-            show: true, height: 22, fontSize: 11, color: "#fff", fontWeight: "bold",
-            padding: [0, 6], backgroundColor: "rgba(0,0,0,0.40)", overflow: "truncate",
-            formatter: (n) => n.name, // 行业条只显示行业名，不接 chg
-          },
-          itemStyle: { borderColor: "rgba(0,0,0,0.28)", borderWidth: 1, gapWidth: 1 },
-          levels: [
-            { itemStyle: { gapWidth: 3, borderWidth: 0 } },
-            { itemStyle: { gapWidth: 2 }, upperLabel: { show: true } },
-            {},
-          ],
-          data,
-        }],
-      });
-    } catch (e) {
-      el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--ink-muted);font-size:13px">数据更新中，稍后自动出现 · data updating</div>';
-    }
+    box.appendChild(s);
   }
 
   // ---------------- 今日 · 头版（聚光灯封面） ----------------
@@ -1479,16 +1404,17 @@
         <div class="breadth-note">上涨家数占比 ${d.adv_ratio}%（(涨 + 平÷2) ÷ ${d.total}），处于近一年第 ${pct(d.sent_pct)} 百分位</div>
       </div>
       <div>
-        <div class="pulse-section-label">板块热力图 · 标普 500 全成分股（面积 = 市值 · 颜色 = 当日涨跌）</div>
-        <div class="heat-tree"></div>
+        <div class="pulse-section-label">板块热力图 · 标普 500 全成分股（面积 = 市值 · 颜色 = 当日涨跌 · 点任意板块可放大细看）</div>
+        <div class="tv-heatmap heat-tree tradingview-widget-container"></div>
       </div>
       <div class="pulse-foot">滑动光标，掀开夜之一角。数据每交易日收盘后自动更新；温度是尺度不是信号——96 度的估值曾经烫了三年。</div>`;
 
     // 顶部世纪带：百年走势线 + 六个闪烁的危机红点
+    // 第 4 项 = 标签上/下；第 5 项 = 水平微调 px（负=左移），错开彼此、避免压到曲线
     const CRISES = [
-      ["1929-09", "1929", "大萧条"], ["1974-10", "1974", "滞胀"],
-      ["1987-10", "1987", "黑色星期一"], ["2000-03", "2000", "互联网泡沫"],
-      ["2008-09", "2008", "金融危机"], ["2020-02", "2020", "疫情冲击"],
+      ["1929-09", "1929", "大萧条", "above", -34], ["1974-10", "1974", "滞胀", "below", 0],
+      ["1987-10", "1987", "黑色星期一", "above", -48], ["2000-03", "2000", "互联网泡沫", "above", -48],
+      ["2008-09", "2008", "金融危机", "below", 0], ["2020-02", "2020", "疫情冲击", "above", 0],
     ];
     const drawCentury = async (band, stroke, width, glow, opacity, withDots) => {
       try {
@@ -1502,13 +1428,13 @@
              <polyline class="draw-line" points="${pts}" pathLength="1000" fill="none"
                style="stroke:${stroke};stroke-width:${width}${glow ? `;filter:drop-shadow(0 0 ${glow}px ${stroke})` : ""}"/></svg>`);
         if (!withDots) return;
-        for (const [ym, year, name] of CRISES) {
+        for (const [ym, year, name, place, dx] of CRISES) {
           let i = c.dates.findIndex((dt) => dt >= ym);
           if (i < 0) continue;
           const [x, y] = xy(i);
-          const cls = (y < 34 ? "below " : "") + (x > 90 ? "edge-r" : x < 6 ? "edge-l" : "");
+          const cls = (place === "below" ? "below " : "") + (x > 90 ? "edge-r" : x < 6 ? "edge-l" : "");
           band.insertAdjacentHTML("beforeend",
-            `<div class="crisis-dot ${cls}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%">
+            `<div class="crisis-dot ${cls}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%${dx ? `;--dx:${dx}px` : ""}">
                <i></i><span>${year} · <span>${name}</span></span></div>`);
         }
       } catch (e) {}
@@ -1524,13 +1450,13 @@
     if (clonedSvg) clonedSvg.remove();
     if (rBand) await drawCentury(rBand, "#E0B05A", 0.8, 2, 0.9, false);
 
-    // 热力图 treemap：canvas 不能随 innerHTML 克隆，两层各自初始化
-    await initHeatTree(base.querySelector(".heat-tree"), "pulse-tree-base");
-    await initHeatTree(reveal.querySelector(".heat-tree"), "pulse-tree-reveal");
+    // 板块热力图：挂 TradingView 官方 widget（只挂日间层；揭示层的空容器留着不挂，
+    // 聚光灯只掀开顶部时间线，热图区不会被揭示，无需第二个 widget）
+    mountHeatmap();
 
     // 聚光灯：只在悬停/点击世纪时间线上的六个危机点时亮起，定位在该点；离开即熄灭
     const hero = document.getElementById("pulse-hero");
-    const R = 90;
+    const R = 30; // 聚光灯半径（比之前缩小约 2/3，只掀开危机点附近一小块）
     const setSpot = (x, y) => {
       const m = `radial-gradient(circle ${R}px at ${x}px ${y}px, #fff 0%, #fff 45%, rgba(255,255,255,.55) 68%, rgba(255,255,255,.15) 86%, transparent 100%)`;
       reveal.style.webkitMaskImage = m;
