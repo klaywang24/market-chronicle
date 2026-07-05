@@ -1307,11 +1307,12 @@
 
   // ---------------- 今日 · 头版：全成分股热力图（Finviz 式 treemap） ----------------
   function heatColor(c) {
-    // 涨跌幅 → 色阶：深红(-3%↓) … 中性灰 … 深绿(+3%↑)，日夜通用（白字可读）
+    // 涨跌幅 → 色阶：深红(-3%↓) … 中性灰 … 苹果绿(+3%↑)，日夜通用（白字可读）
+    // 绿档锚定全站统一的苹果绿 --moss #14A63E，深浅两端围绕它铺开
     const stops = [
       [-3, "#7f1710"], [-1.5, "#a83326"], [-0.5, "#b86a5c"],
       [0, "#7d776c"],
-      [0.5, "#5a9e6f"], [1.5, "#2c9653"], [3, "#0c7a3a"],
+      [0.5, "#3FB268"], [1.5, "#14A63E"], [3, "#0A7C2E"],
     ];
     let best = stops[0][1], dist = Infinity;
     for (const [v, hex] of stops) {
@@ -1321,21 +1322,64 @@
     return best;
   }
 
+  // GICS 行业名较长，窄块的 upperLabel 会被截断——统一用短名显示（tooltip 仍用全名）
+  const SEC_SHORT = {
+    "Communication Services": "通讯服务",
+    "Consumer Discretionary": "可选消费",
+    "Consumer Staples": "日常消费",
+    "Information Technology": "信息技术",
+    "Health Care": "医疗保健",
+    "Financials": "金融", "Industrials": "工业", "Energy": "能源",
+    "Materials": "原材料", "Real Estate": "房地产", "Utilities": "公用事业",
+  };
+  const LOGO_MIN = 300; // 只给市值≥300B 的大块加公司 logo（约 40 只，覆盖 ~62% 面积）
+  const logoCache = {}; // ticker -> HTMLImageElement（已加载）| null（加载失败）
+  function ensureLogos(tickers) {
+    const need = tickers.filter((t) => !(t in logoCache));
+    if (!need.length) return Promise.resolve();
+    return new Promise((resolve) => {
+      let pending = need.length;
+      const done = () => { if (--pending === 0) resolve(); };
+      need.forEach((t) => {
+        const img = new Image();
+        img.onload = () => { logoCache[t] = img; done(); };
+        img.onerror = () => { logoCache[t] = null; done(); };
+        img.src = `https://assets.parqet.com/logos/symbol/${t}?format=png`;
+      });
+    });
+  }
+
   async function initHeatTree(el, key) {
     if (!el) return;
     try {
       const d = await load("pulse_heatmap");
+      // 大块 logo：先把需要的 logo 预加载好，canvas 才能一次画出
+      await ensureLogos(d.rows.filter((r) => r[3] >= LOGO_MIN).map((r) => r[0]));
       const bySec = {};
       for (const [t, s, c, m] of d.rows) {
-        (bySec[s] = bySec[s] || []).push({
+        const node = {
           name: t, value: m, chg: c, sector: s,
           itemStyle: { color: heatColor(c) },
           label: { color: "#fff" },
-        });
+        };
+        const img = m >= LOGO_MIN ? logoCache[t] : null;
+        if (img) {
+          const cstr = (c > 0 ? "+" : "") + c + "%";
+          node.label = {
+            color: "#fff",
+            formatter: `{logo|}\n{t|${t}}\n{c|${cstr}}`,
+            rich: {
+              logo: { height: 24, width: 24, align: "center", backgroundColor: { image: img } },
+              t: { color: "#fff", fontFamily: "JetBrains Mono", fontSize: 12.5, fontWeight: "bold", lineHeight: 16, align: "center" },
+              c: { color: "#fff", fontFamily: "JetBrains Mono", fontSize: 11, lineHeight: 14, align: "center" },
+            },
+          };
+        }
+        (bySec[s] = bySec[s] || []).push(node);
       }
       const data = Object.entries(bySec)
         .map(([sec, kids]) => ({
-          name: sec,
+          name: SEC_SHORT[sec] || sec,
           value: kids.reduce((a, b) => a + b.value, 0),
           children: kids.sort((a, b) => b.value - a.value),
         }))
@@ -1355,15 +1399,17 @@
           type: "treemap", roam: false, nodeClick: false,
           breadcrumb: { show: false },
           left: 0, right: 0, top: 0, bottom: 0,
-          visibleMin: 120,
+          visibleMin: 6, // 放开小块：502 只全部可见（小块无字只有色）
           label: {
             show: true, fontFamily: "JetBrains Mono", fontSize: 11, lineHeight: 14,
-            formatter: (n) => `${n.name}\n${n.data.chg > 0 ? "+" : ""}${n.data.chg}%`,
+            formatter: (n) => n.data.chg == null ? n.name
+              : `${n.name}\n${n.data.chg > 0 ? "+" : ""}${n.data.chg}%`,
             overflow: "truncate",
           },
           upperLabel: {
-            show: true, height: 18, fontSize: 10.5, color: "#fff",
-            backgroundColor: "rgba(0,0,0,0.35)", overflow: "truncate",
+            show: true, height: 22, fontSize: 11, color: "#fff", fontWeight: "bold",
+            padding: [0, 6], backgroundColor: "rgba(0,0,0,0.40)", overflow: "truncate",
+            formatter: (n) => n.name, // 行业条只显示行业名，不接 chg
           },
           itemStyle: { borderColor: "rgba(0,0,0,0.28)", borderWidth: 1, gapWidth: 1 },
           levels: [
@@ -1482,28 +1528,29 @@
     await initHeatTree(base.querySelector(".heat-tree"), "pulse-tree-base");
     await initHeatTree(reveal.querySelector(".heat-tree"), "pulse-tree-reveal");
 
-    // 聚光灯：纯 CSS mask 跟随光标；触屏设备自动巡游
+    // 聚光灯：只在悬停/点击世纪时间线上的六个危机点时亮起，定位在该点；离开即熄灭
     const hero = document.getElementById("pulse-hero");
-    const R = 80;
+    const R = 90;
     const setSpot = (x, y) => {
       const m = `radial-gradient(circle ${R}px at ${x}px ${y}px, #fff 0%, #fff 45%, rgba(255,255,255,.55) 68%, rgba(255,255,255,.15) 86%, transparent 100%)`;
       reveal.style.webkitMaskImage = m;
       reveal.style.maskImage = m;
     };
-    hero.addEventListener("mousemove", (e) => {
-      const r = hero.getBoundingClientRect();
-      setSpot(e.clientX - r.left, e.clientY - r.top);
+    const hideSpot = () => setSpot(-99999, -99999);
+    const spotAtDot = (dot) => {
+      const hr = hero.getBoundingClientRect();
+      const ir = (dot.querySelector("i") || dot).getBoundingClientRect();
+      setSpot(ir.left + ir.width / 2 - hr.left, ir.top + ir.height / 2 - hr.top);
+    };
+    hideSpot();
+    // 事件绑在日间层的危机点上（揭示层 pointer-events:none，不拦截）
+    base.querySelectorAll(".crisis-dot").forEach((dot) => {
+      dot.addEventListener("mouseenter", () => spotAtDot(dot));
+      dot.addEventListener("mouseleave", hideSpot);
+      dot.addEventListener("click", (e) => { e.stopPropagation(); spotAtDot(dot); }); // 触屏点亮
     });
-    hero.addEventListener("mouseleave", () => setSpot(-999, -999));
-    if (window.matchMedia("(hover: none)").matches) {
-      let t = 0;
-      setInterval(() => {
-        t += 0.016;
-        const r = hero.getBoundingClientRect();
-        setSpot((0.5 + 0.38 * Math.sin(t * 0.7)) * r.width,
-                (0.45 + 0.3 * Math.sin(t * 1.1 + 1.3)) * r.height);
-      }, 40);
-    }
+    // 点击时间线以外任意处熄灭（触屏收起）
+    hero.addEventListener("click", hideSpot);
   }
 
   // ---------------- 数据出处标注（每张图/表下方统一小字） ----------------

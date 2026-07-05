@@ -306,7 +306,6 @@ tr:hover td { background: var(--bg-card-hover); }
   border-radius: 14px;
   overflow: hidden;
   margin-top: 18px;
-  cursor: crosshair;
 }
 .pulse-layer {
   background: var(--bg);
@@ -348,8 +347,17 @@ tr:hover td { background: var(--bg-card-hover); }
   position: absolute;
   transform: translate(-50%, -50%);
   z-index: 2;
+  cursor: pointer;
+}
+/* 放大不可见的命中区，13px 的小点也好悬停/点击 */
+.crisis-dot i::after {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
 }
 .crisis-dot i {
+  position: relative;
   display: block;
   width: 13px;
   height: 13px;
