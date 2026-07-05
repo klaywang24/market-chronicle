@@ -16,7 +16,7 @@
   --blue: #2B5F8F;
   --teal: #2D4A48;
   --purple: #6A4E9E;
-  --danger: #B8421E;
+  --danger: #FF2400;
   /* 对比图专用四色：深红 / Chase 蓝 / 深紫 / 凯尔特人绿 —— 高饱和高区分 */
   --cmp-red: #B01212;
   --cmp-blue: #117ACA;
@@ -43,7 +43,7 @@
   --blue: #6FA0CC;
   --teal: #6A8C88;
   --purple: #A88FD8;
-  --danger: #E06F4A;
+  --danger: #FF2400;
   --cmp-red: #FF5C5C;
   --cmp-blue: #4BA8FF;
   --cmp-purple: #B78FFF;
@@ -415,7 +415,7 @@ tr:hover td { background: var(--bg-card-hover); }
   --accent: #D45D4F; --accent-deep: #B8421E; --accent-soft: rgba(212, 93, 79, 0.14);
   --gold: #E0B05A; --gold-soft: rgba(224, 176, 90, 0.14);
   --moss: #34D96C; --blue: #6FA0CC; --teal: #6A8C88; --purple: #A88FD8;
-  --danger: #E06F4A; --grid: rgba(241, 236, 223, 0.10); --grid-strong: rgba(241, 236, 223, 0.18);
+  --danger: #FF2400; --grid: rgba(241, 236, 223, 0.10); --grid-strong: rgba(241, 236, 223, 0.18);
   --border: #3D352D;
   --cmp-red: #FF5C5C; --cmp-blue: #4BA8FF; --cmp-purple: #B78FFF; --cmp-green: #3BE577;
 }
