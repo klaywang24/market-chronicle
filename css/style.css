@@ -374,7 +374,7 @@ tr:hover td { background: var(--bg-card-hover); }
 .crisis-dot > span {
   position: absolute;
   left: 50%;
-  transform: translateX(calc(-50% + var(--dx, 0px)));
+  transform: translate(calc(-50% + var(--dx, 0px)), var(--dy, 0px));
   top: -26px;
   white-space: nowrap;
   font-size: 12px;
@@ -386,8 +386,8 @@ tr:hover td { background: var(--bg-card-hover); }
   border-radius: 5px;
 }
 .crisis-dot.below > span { top: auto; bottom: -28px; }
-.crisis-dot.edge-r > span { left: auto; right: -8px; transform: translateX(var(--dx, 0px)); }
-.crisis-dot.edge-l > span { left: -8px; transform: translateX(var(--dx, 0px)); }
+.crisis-dot.edge-r > span { left: auto; right: -8px; transform: translate(var(--dx, 0px), var(--dy, 0px)); }
+.crisis-dot.edge-l > span { left: -8px; transform: translate(var(--dx, 0px), var(--dy, 0px)); }
 /* 描线动画：走势线从左至右自己画出来 */
 .draw-line {
   stroke-dasharray: 1000;
@@ -736,10 +736,48 @@ th.left { text-align: left; }
 .stock-hero .stat-strip { grid-template-columns: repeat(7, 1fr); }
 @media (max-width: 1000px) { .stock-hero .stat-strip { grid-template-columns: repeat(4, 1fr); } }
 .stock-hero .stat .value { font-size: 18px; }
-footer {
+/* ---------- 页脚合规区 ---------- */
+.site-footer {
   border-top: 1px solid var(--border);
   color: var(--ink-muted);
   font-size: 12.5px;
-  padding: 20px 24px;
-  text-align: center;
+  padding: 30px 24px 44px;
+  max-width: 1180px;
+  margin: 40px auto 0;
 }
+.footer-cols {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.footer-brand { font-family: 'Noto Serif SC', serif; font-weight: 700; font-size: 16px; color: var(--ink); }
+.footer-tag { margin-top: 4px; font-size: 12px; }
+.footer-links { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.footer-links a { color: var(--ink-muted); text-decoration: none; white-space: nowrap; }
+.footer-links a:hover { color: var(--accent-deep); }
+.footer-note { margin-top: 16px; line-height: 1.7; }
+
+/* ---------- 页脚静态页（关于/联系/隐私/条款/退款/定价） ---------- */
+.doc-page { max-width: 760px; margin: 0 auto; }
+.doc-body { font-size: 15px; line-height: 1.85; color: var(--ink); }
+.doc-body h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 18px; font-weight: 700;
+  margin: 30px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.doc-body p { margin: 0 0 12px; }
+.doc-body ul { margin: 0 0 14px; padding-left: 22px; }
+.doc-body li { margin-bottom: 6px; }
+.doc-body a { color: var(--accent-deep); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
+.doc-body a:hover { border-bottom-color: var(--accent); }
+.doc-body strong { color: var(--ink); font-weight: 600; }
+.doc-fineprint { font-size: 12.5px; color: var(--ink-muted); margin-top: 16px; }
+.contact-list { list-style: none; padding: 0; margin: 8px 0; }
+.contact-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.contact-list .c-label { min-width: 92px; color: var(--ink-muted); font-size: 13px; }

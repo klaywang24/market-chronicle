@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=20260705">
+<link rel="stylesheet" href="css/style.css?v=20260705h">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -466,17 +466,167 @@
   </div>
 </section>
 
+<!-- ================= 关于 ================= -->
+<section class="panel" id="panel-about">
+  <div class="doc-page">
+    <div class="hero"><div class="kicker">ABOUT · 关于</div><h1>关于美股编年史</h1>
+      <p class="dek">一个每个交易日收盘后自动更新的美股历史图表档案站——免费、无广告、开源。把近百年的市场，做成一部可以读的编年史。</p></div>
+    <div class="doc-body">
+      <h3>这是什么</h3>
+      <p>美股编年史（Market Chronicle）把标普 500、纳斯达克，以及金融、消费、奢侈品等个股篮子的历史，整理成章节式的可视化：回报的形状、危机的节奏、估值的锚、波动的纹理、时间的复利。除了长历史图表，还有三个自研视角——「今日头版」的市场温度、「K 指数」、「LEAPS 窗口」。</p>
+      <h3>数据与口径</h3>
+      <p>价格与回报以复权收盘价（Adj Close）近似含分红总回报；估值 CAPE / PE(TTM) 来自 multpl / Robert Shiller 的长历史序列；恐惧贪婪指数来自 CNN；个股基本面来自 macrotrends 与 Yahoo Finance；今日板块热力图为 TradingView 实时数据。长历史图表多采用对数坐标，以如实呈现百年尺度上的涨跌——1929 年跌得比 2000、2008 深得多，图上就应当更陡，这是数据本身的诚实。</p>
+      <h3>怎么建的</h3>
+      <p>本站由一人 + AI 搭建，纯静态托管在 GitHub Pages 上，无服务器、无数据库。数据管线用 Python（yfinance / pandas）+ GitHub Actions，每个交易日收盘后自动拉数、算指标、提交、重新部署。代码以 Apache-2.0 开源。</p>
+      <h3>一句话免责</h3>
+      <p>本站所有内容仅供信息与教育用途，<strong>不构成任何投资建议</strong>。市场有风险，决策请独立判断。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 联系 ================= -->
+<section class="panel" id="panel-contact">
+  <div class="doc-page">
+    <div class="hero"><div class="kicker">CONTACT · 联系</div><h1>联系我</h1>
+      <p class="dek">数据问题、功能建议、合作，欢迎随时来找。</p></div>
+    <div class="doc-body">
+      <ul class="contact-list">
+        <li><span class="c-label">邮箱</span><a href="mailto:klaywang24+marketchronicle@gmail.com">klaywang24+marketchronicle@gmail.com</a></li>
+        <li><span class="c-label">X（推特）</span><a href="https://x.com/_Klay24_" target="_blank" rel="noopener">@_Klay24_</a></li>
+        <li><span class="c-label">GitHub</span><a href="https://github.com/klaywang24/market-chronicle" target="_blank" rel="noopener">klaywang24/market-chronicle</a> · 提 bug 与建议走 Issues</li>
+        <li><span class="c-label">Discord 社群</span>筹备中，即将开放</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 隐私政策 ================= -->
+<section class="panel" id="panel-privacy">
+  <div class="doc-page">
+    <div class="hero"><div class="kicker">PRIVACY</div><h1>隐私政策</h1>
+      <p class="dek">最后更新：2026-07-05</p></div>
+    <div class="doc-body">
+      <p class="doc-fineprint">本页为合规信息说明，非法律意见。</p>
+      <h3>概述与运营者</h3>
+      <p>本站是托管在 GitHub Pages 上的纯静态网站，没有账户系统、没有服务器后端。本站由个人独立运营（即数据控制者 / data controller）。任何隐私相关请求，请邮件 <a href="mailto:klaywang24+marketchronicle@gmail.com">klaywang24+marketchronicle@gmail.com</a>。</p>
+      <h3>我们处理哪些数据、依据是什么</h3>
+      <p>本站不主动收集你主动提交的个人信息。可能涉及的数据仅有：</p>
+      <ul>
+        <li><strong>服务器访问日志</strong>：托管方 GitHub 在向你提供网页时，可能记录你的 IP、浏览器 UA 等技术信息（处理依据：为提供网站服务的正当利益 / legitimate interest）。这些日志由 GitHub 掌握与控制，我们无法访问其明细。</li>
+        <li><strong>浏览器本地存储</strong>：仅用于记住你的「日/夜主题」与「界面语言」两项偏好，属功能必需，存在你本地设备、不上传、不含可识别到你的个人身份信息。</li>
+      </ul>
+      <h3>Cookie</h3>
+      <p>我们<strong>自己不设置任何追踪 cookie，也不运行自建统计分析</strong>。下述第三方嵌入组件（尤其 TradingView）可能设置其自身 cookie；你可随时在浏览器中屏蔽或清除。</p>
+      <h3>第三方与跨境传输</h3>
+      <p>加载页面时会向以下第三方发起请求，可能将你的 IP 等技术信息传输至你所在地以外（含美国等）的服务器，它们各自的隐私政策适用，我们不控制其处理行为：</p>
+      <ul>
+        <li>Google Fonts（fonts.googleapis.com）——网页字体；</li>
+        <li>TradingView（tradingview.com）——板块热力图组件，可能设置其自身 cookie；</li>
+        <li>parqet（assets.parqet.com）——公司 logo 图标；</li>
+        <li>GitHub Pages（github.io）——网站托管方。</li>
+      </ul>
+      <h3>我们不做的事</h3>
+      <p>我们<strong>不出售、不出租、不交易你的个人信息</strong>（包括美国加州 CCPA 定义下的「出售 / 分享」），也不进行定向广告。</p>
+      <h3>你的权利</h3>
+      <p>在适用法律（如欧盟 GDPR、英国 UK-GDPR、加州 CCPA/CPRA）下，你可能享有访问、更正、删除、限制或反对处理、数据可携等权利。由于本站几乎不掌握可识别到你个人的数据，多数请求可直接通过清除浏览器数据完成；如需我们协助，请邮件联系，我们将在合理期限内回应。你也有权向你所在地的数据保护机构投诉。</p>
+      <h3>儿童</h3>
+      <p>本站不面向 13 岁以下儿童，也不会有意收集其信息。</p>
+      <h3>变更与联系</h3>
+      <p>政策如有更新，会在本页顶部注明最后更新日期。隐私相关问题，请邮件 <a href="mailto:klaywang24+marketchronicle@gmail.com">klaywang24+marketchronicle@gmail.com</a>。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 服务条款 ================= -->
+<section class="panel" id="panel-terms">
+  <div class="doc-page">
+    <div class="hero"><div class="kicker">TERMS</div><h1>服务条款</h1>
+      <p class="dek">最后更新：2026-07-05</p></div>
+    <div class="doc-body">
+      <h3>接受条款</h3>
+      <p>访问或使用本站，即表示你已阅读并同意以下条款。</p>
+      <h3>用途与非投资建议</h3>
+      <p>本站内容仅供信息与教育用途，<strong>不构成任何投资、财务、法律或税务建议</strong>。所有数据可能存在延迟、错误或不完整，请勿仅凭本站信息做出交易或投资决策。</p>
+      <h3>无担保</h3>
+      <p>本站按「现状」与「现有」提供，不对其准确性、完整性、可用性或对特定用途的适用性作任何明示或默示担保。</p>
+      <h3>责任限制</h3>
+      <p>在适用法律允许的最大范围内，对于因使用或无法使用本站而产生的任何直接或间接损失，我们不承担责任。</p>
+      <h3>知识产权与第三方</h3>
+      <p>本站代码以 Apache-2.0 开源（见 GitHub 仓库）；图表与文案供个人非商业参考。站内嵌入的第三方组件（如 TradingView）受其各自条款约束。</p>
+      <h3>付费产品与结算</h3>
+      <p>当付费订阅产品（如 LEAPS Pro）上线后，将由支付服务商 <strong>Paddle 作为 Merchant of Record（记录商户）</strong> 处理结账、发票与税费——即你的付款合同对方为 Paddle，其条款与隐私政策一并适用。购买者须年满 18 周岁或所在地法定成年年龄。退款遵循本站《退款政策》。</p>
+      <h3>适用法律与可分割性</h3>
+      <p>本条款受运营者所在司法管辖区的法律约束（具体管辖地将随正式运营明确）。若其中任一条款被认定无效，其余条款仍然有效。本条款构成你与我们之间就使用本站的完整约定。</p>
+      <h3>变更</h3>
+      <p>我们可能随时更新本条款，更新后继续使用即视为接受。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 退款政策 ================= -->
+<section class="panel" id="panel-refunds">
+  <div class="doc-page">
+    <div class="hero"><div class="kicker">REFUNDS</div><h1>退款政策</h1>
+      <p class="dek">最后更新：2026-07-05</p></div>
+    <div class="doc-body">
+      <h3>当前状态</h3>
+      <p>本站目前<strong>完全免费</strong>，没有任何收费项目，因此暂不涉及退款。</p>
+      <h3>未来付费产品</h3>
+      <p>当「LEAPS Pro 每日盘前情报」等订阅产品上线后，将适用以下政策：</p>
+      <ul>
+        <li><strong>14 天无理由退款</strong>：订阅后 14 天内不满意，可全额退款，无需说明理由；</li>
+        <li>退款通过支付服务商 Paddle 处理，原路退回；</li>
+        <li>申请方式：邮件 <a href="mailto:klaywang24+marketchronicle@gmail.com">klaywang24+marketchronicle@gmail.com</a>，附订单信息即可。</li>
+      </ul>
+      <p>本政策将随付费产品正式上线补充细节。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 定价 ================= -->
+<section class="panel" id="panel-pricing">
+  <div class="doc-page">
+    <div class="hero"><div class="kicker">PRICING · 定价</div><h1>定价</h1>
+      <p class="dek">现在：整站免费。</p></div>
+    <div class="doc-body">
+      <h3>免费</h3>
+      <p>所有历史图表、今日头版（市场温度）、K 指数、LEAPS 窗口、板块热力图，全部<strong>免费开放</strong>——无广告、无墙、无需注册。</p>
+      <h3>筹备中：LEAPS Pro（每日盘前情报）</h3>
+      <p>面向期权用户的付费订阅：LEAP 比、均笔大小、最热合约、全市场标的排行，每个交易日盘前送达。定价与上线时间待定。</p>
+      <h3>抢先订阅</h3>
+      <p>想在上线时第一时间知道，可邮件 <a href="mailto:klaywang24+marketchronicle@gmail.com">klaywang24+marketchronicle@gmail.com</a> 留言「LEAPS Pro」，我们会通知你并提供创始订户价。</p>
+      <p class="doc-fineprint">以上「筹备中」内容为规划信息，非最终承诺，具体以正式上线为准。</p>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <button class="toc-toggle" id="toc-toggle" title="章节目录">☰</button>
 <nav class="toc" id="toc"></nav>
 
-<footer>
-  <span id="meta-line">美股编年史 · 自用版</span> · 数据源：Yahoo Finance / CNN Fear &amp; Greed / multpl.com · 仅供个人研究，不构成投资建议
+<footer class="site-footer">
+  <div class="footer-cols">
+    <div class="footer-brand-col">
+      <div class="footer-brand">美股编年史 · Market Chronicle</div>
+      <div class="footer-tag">每个交易日自动更新的美股百年图表档案 · 免费 · 开源</div>
+    </div>
+    <nav class="footer-links">
+      <a href="#about">关于</a>
+      <a href="#contact">联系</a>
+      <a href="#pricing">定价</a>
+      <a href="#privacy">隐私政策</a>
+      <a href="#terms">服务条款</a>
+      <a href="#refunds">退款政策</a>
+      <a href="https://github.com/klaywang24/market-chronicle" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://x.com/_Klay24_" target="_blank" rel="noopener">X</a>
+    </nav>
+  </div>
+  <div class="footer-note"><span id="meta-line">美股编年史 · 自用版</span> · 数据源：Yahoo Finance / CNN Fear &amp; Greed / multpl.com / TradingView · 仅供信息与教育用途，不构成投资建议 · © 2026 Market Chronicle</div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 <script src="js/i18n.js"></script>
-<script src="js/app.js?v=20260705"></script>
+<script src="js/app.js?v=20260705h"></script>
 </body>
 </html>

@@ -46,7 +46,9 @@
 
   // ---------------- 图表注册表 ----------------
   // panel -> [{el, build}]；懒加载：首次进入 tab 才渲染
-  const registry = { pulse: [], kindex: [], spy: [], qqq: [], fin: [], consumer: [], luxury: [], macro: [], leaps: [] };
+  const registry = { pulse: [], kindex: [], spy: [], qqq: [], fin: [], consumer: [], luxury: [], macro: [], leaps: [],
+    // 页脚静态页（无图表，空数组即可，让路由识别并显示对应 panel）
+    about: [], contact: [], privacy: [], terms: [], refunds: [], pricing: [] };
   const built = new Map(); // el id -> echarts instance
 
   function chart(panel, elId, build) {
@@ -552,6 +554,8 @@
       }
       buildToc();
     });
+    // 页脚静态页从顶部看起
+    if (["about", "contact", "privacy", "terms", "refunds", "pricing"].includes(target)) window.scrollTo(0, 0);
   }
   window.addEventListener("hashchange", route);
 
@@ -1410,11 +1414,11 @@
       <div class="pulse-foot">滑动光标，掀开夜之一角。数据每交易日收盘后自动更新；温度是尺度不是信号——96 度的估值曾经烫了三年。</div>`;
 
     // 顶部世纪带：百年走势线 + 六个闪烁的危机红点
-    // 第 4 项 = 标签上/下；第 5 项 = 水平微调 px（负=左移），错开彼此、避免压到曲线
+    // 第 4 项 = 标签上/下；第 5 项 = 水平微调 px（负=左移）；第 6 项 = 垂直微调 px（正=下移，离曲线远些）
     const CRISES = [
-      ["1929-09", "1929", "大萧条", "above", -34], ["1974-10", "1974", "滞胀", "below", 0],
-      ["1987-10", "1987", "黑色星期一", "above", -48], ["2000-03", "2000", "互联网泡沫", "above", -48],
-      ["2008-09", "2008", "金融危机", "below", 0], ["2020-02", "2020", "疫情冲击", "above", 0],
+      ["1929-09", "1929", "大萧条", "above", -34, 0], ["1974-10", "1974", "滞胀", "below", 0, 0],
+      ["1987-10", "1987", "黑色星期一", "above", -48, 0], ["2000-03", "2000", "互联网泡沫", "above", -48, 0],
+      ["2008-09", "2008", "金融危机", "below", 0, 18], ["2020-02", "2020", "疫情冲击", "above", 0, 0],
     ];
     const drawCentury = async (band, stroke, width, glow, opacity, withDots) => {
       try {
@@ -1428,13 +1432,13 @@
              <polyline class="draw-line" points="${pts}" pathLength="1000" fill="none"
                style="stroke:${stroke};stroke-width:${width}${glow ? `;filter:drop-shadow(0 0 ${glow}px ${stroke})` : ""}"/></svg>`);
         if (!withDots) return;
-        for (const [ym, year, name, place, dx] of CRISES) {
+        for (const [ym, year, name, place, dx, dy] of CRISES) {
           let i = c.dates.findIndex((dt) => dt >= ym);
           if (i < 0) continue;
           const [x, y] = xy(i);
           const cls = (place === "below" ? "below " : "") + (x > 90 ? "edge-r" : x < 6 ? "edge-l" : "");
           band.insertAdjacentHTML("beforeend",
-            `<div class="crisis-dot ${cls}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%${dx ? `;--dx:${dx}px` : ""}">
+            `<div class="crisis-dot ${cls}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%${dx ? `;--dx:${dx}px` : ""}${dy ? `;--dy:${dy}px` : ""}">
                <i></i><span>${year} · <span>${name}</span></span></div>`);
         }
       } catch (e) {}
