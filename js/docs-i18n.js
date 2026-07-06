@@ -198,8 +198,10 @@
     },
 
     terms: {
-      en: { kicker: "TERMS", h1: "Terms of Service", dek: "Last updated: 2026-07-05",
-        body: `<h3>Acceptance</h3>
+      en: { kicker: "TERMS", h1: "Terms of Service", dek: "Last updated: 2026-07-06",
+        body: `<h3>Operator</h3>
+<p>This website and its paid products are operated by <strong>XIN WANG</strong>, a sole proprietor trading as <strong>Market Chronicle</strong>. Contact details are on the Contact page.</p>
+<h3>Acceptance</h3>
 <p>By accessing or using this site, you agree to the terms below.</p>
 <h3>Purpose &amp; not investment advice</h3>
 <p>All content is for information and education only and <strong>does not constitute investment, financial, legal or tax advice</strong>. Any data may be delayed, inaccurate or incomplete; do not rely on it alone for trading or investment decisions.</p>
@@ -215,8 +217,10 @@
 <p>These terms are governed by the law of the operator's jurisdiction (to be specified as operations formalize). If any provision is held invalid, the rest remain in effect. These terms are the entire agreement between you and us regarding use of the site.</p>
 <h3>Changes</h3>
 <p>We may update these terms at any time; continued use after an update means acceptance.</p>` },
-      fr: { kicker: "CONDITIONS", h1: "Conditions d'utilisation", dek: "Dernière mise à jour : 2026-07-05",
-        body: `<h3>Acceptation</h3>
+      fr: { kicker: "CONDITIONS", h1: "Conditions d'utilisation", dek: "Dernière mise à jour : 2026-07-06",
+        body: `<h3>Exploitant</h3>
+<p>Ce site et ses produits payants sont exploités par <strong>XIN WANG</strong>, entrepreneur individuel exerçant sous le nom <strong>Market Chronicle</strong>. Coordonnées sur la page Contact.</p>
+<h3>Acceptation</h3>
 <p>En accédant au site ou en l'utilisant, vous acceptez les conditions ci-dessous.</p>
 <h3>Objet et absence de conseil</h3>
 <p>Tout le contenu est fourni à titre d'information et d'éducation et <strong>ne constitue pas un conseil en investissement, financier, juridique ou fiscal</strong>. Les données peuvent être différées, inexactes ou incomplètes ; ne vous y fiez pas seul pour vos décisions.</p>
@@ -232,8 +236,10 @@
 <p>Ces conditions sont régies par le droit de la juridiction de l'exploitant (à préciser lors de la formalisation). Si une clause est jugée invalide, les autres restent en vigueur. Ces conditions constituent l'intégralité de l'accord entre vous et nous.</p>
 <h3>Modifications</h3>
 <p>Nous pouvons mettre à jour ces conditions à tout moment ; poursuivre l'utilisation vaut acceptation.</p>` },
-      de: { kicker: "AGB", h1: "Nutzungsbedingungen", dek: "Zuletzt aktualisiert: 2026-07-05",
-        body: `<h3>Annahme</h3>
+      de: { kicker: "AGB", h1: "Nutzungsbedingungen", dek: "Zuletzt aktualisiert: 2026-07-06",
+        body: `<h3>Betreiber</h3>
+<p>Diese Website und ihre Bezahlprodukte werden von <strong>XIN WANG</strong> betrieben, Einzelunternehmer, tätig unter dem Namen <strong>Market Chronicle</strong>. Kontaktdaten auf der Kontaktseite.</p>
+<h3>Annahme</h3>
 <p>Mit dem Zugriff auf die Seite oder ihrer Nutzung stimmen Sie den folgenden Bedingungen zu.</p>
 <h3>Zweck &amp; keine Anlageberatung</h3>
 <p>Alle Inhalte dienen nur der Information und Bildung und <strong>stellen keine Anlage-, Finanz-, Rechts- oder Steuerberatung dar</strong>. Daten können verzögert, fehlerhaft oder unvollständig sein; verlassen Sie sich für Entscheidungen nicht allein darauf.</p>
@@ -249,8 +255,10 @@
 <p>Diese Bedingungen unterliegen dem Recht der Gerichtsbarkeit des Betreibers (wird bei Formalisierung präzisiert). Ist eine Bestimmung unwirksam, bleiben die übrigen wirksam. Diese Bedingungen sind die vollständige Vereinbarung zwischen Ihnen und uns.</p>
 <h3>Änderungen</h3>
 <p>Wir können diese Bedingungen jederzeit aktualisieren; fortgesetzte Nutzung gilt als Zustimmung.</p>` },
-      es: { kicker: "TÉRMINOS", h1: "Términos del servicio", dek: "Última actualización: 2026-07-05",
-        body: `<h3>Aceptación</h3>
+      es: { kicker: "TÉRMINOS", h1: "Términos del servicio", dek: "Última actualización: 2026-07-06",
+        body: `<h3>Operador</h3>
+<p>Este sitio y sus productos de pago son operados por <strong>XIN WANG</strong>, empresario individual que opera como <strong>Market Chronicle</strong>. Datos de contacto en la página de Contacto.</p>
+<h3>Aceptación</h3>
 <p>Al acceder o usar este sitio, aceptas los términos siguientes.</p>
 <h3>Finalidad y no es asesoramiento</h3>
 <p>Todo el contenido es solo informativo y educativo y <strong>no constituye asesoramiento de inversión, financiero, jurídico ni fiscal</strong>. Los datos pueden estar retrasados, ser inexactos o incompletos; no te bases solo en ellos para decisiones.</p>
@@ -319,32 +327,40 @@
       en: { kicker: "PRICING", h1: "Pricing", dek: "Right now: the whole site is free.",
         body: `<h3>Free</h3>
 <p>All historical charts, Today's Front Page (market temperature), the K-Index, the LEAPS Window and the sector heatmap are <strong>free and open</strong> — no ads, no paywall, no sign-up.</p>
-<h3>Coming soon: LEAPS Pro (daily pre-market intel)</h3>
-<p>A paid subscription for options traders: LEAP ratio, average trade size, hottest contracts, and a market-wide ranking, delivered before the open every trading day. Price and launch date to be determined.</p>
+<h3>Coming soon: LEAPS Pro (daily pre-market data brief)</h3>
+<p>A paid subscription for options users: <strong>$9.9 / month</strong>. The content is objective market-data statistics — LEAPS share of volume, average trade size, most-active contracts, and a market-wide ranking — delivered to your inbox before the open every trading day. <strong>Data and information only; not investment advice; no buy or sell recommendations.</strong> Launch date to be determined.</p>
+<h3>Subscription terms (once live)</h3>
+<p>Billed monthly and <strong>renews automatically each month</strong>; <strong>cancel anytime</strong> — self-serve via the manage link in your subscription confirmation email, or by emailing us. After cancellation, access continues to the end of the current billing period; see the <a href="#refunds">Refund Policy</a> for refunds. Orders and payments will be handled by our payments partner (Merchant of Record), whose name will appear on your statement.</p>
 <h3>Get early access</h3>
 <p>To hear first when it launches, email <a href="mailto:${EMAIL}">${EMAIL}</a> with "LEAPS Pro" and we'll notify you and offer a founding-subscriber price.</p>
 <p class="doc-fineprint">The "coming soon" items above are planning information, not a final commitment; the official launch prevails.</p>` },
       fr: { kicker: "TARIFS", h1: "Tarifs", dek: "Pour l'instant : tout le site est gratuit.",
         body: `<h3>Gratuit</h3>
 <p>Tous les graphiques historiques, la Une du jour (température du marché), l'indice K, la fenêtre LEAPS et la carte thermique sectorielle sont <strong>gratuits et ouverts</strong> — sans publicité, sans péage, sans inscription.</p>
-<h3>Bientôt : LEAPS Pro (info pré-marché quotidienne)</h3>
-<p>Un abonnement payant pour les traders d'options : ratio LEAP, taille moyenne des ordres, contrats les plus actifs et un classement du marché entier, livrés avant l'ouverture chaque jour de bourse. Prix et date de lancement à déterminer.</p>
+<h3>Bientôt : LEAPS Pro (bulletin de données pré-marché quotidien)</h3>
+<p>Un abonnement payant pour les utilisateurs d'options : <strong>9,9 $ / mois</strong>. Le contenu est constitué de statistiques de données de marché objectives — part des LEAPS dans le volume, taille moyenne des transactions, contrats les plus actifs, classement du marché entier — livrées par e-mail avant l'ouverture chaque jour de bourse. <strong>Données et informations uniquement ; pas de conseil en investissement ; aucune recommandation d'achat ou de vente.</strong> Date de lancement à déterminer.</p>
+<h3>Conditions d'abonnement (une fois lancé)</h3>
+<p>Facturation mensuelle avec <strong>renouvellement automatique chaque mois</strong> ; <strong>résiliable à tout moment</strong> — en autonomie via le lien de gestion de l'e-mail de confirmation, ou par e-mail. Après résiliation, l'accès reste actif jusqu'à la fin de la période en cours ; voir la <a href="#refunds">politique de remboursement</a>. Les commandes et paiements seront traités par notre partenaire de paiement (Merchant of Record), dont le nom figurera sur votre relevé.</p>
 <h3>Accès anticipé</h3>
 <p>Pour être prévenu en premier, écrivez à <a href="mailto:${EMAIL}">${EMAIL}</a> avec « LEAPS Pro » ; nous vous préviendrons et proposerons un tarif de membre fondateur.</p>
 <p class="doc-fineprint">Les éléments « bientôt » ci-dessus sont indicatifs, non un engagement définitif ; le lancement officiel prévaut.</p>` },
       de: { kicker: "PREISE", h1: "Preise", dek: "Derzeit: die ganze Seite ist kostenlos.",
         body: `<h3>Kostenlos</h3>
 <p>Alle historischen Charts, die heutige Titelseite (Markttemperatur), der K-Index, das LEAPS-Fenster und die Sektor-Heatmap sind <strong>kostenlos und offen</strong> — werbefrei, ohne Bezahlschranke, ohne Anmeldung.</p>
-<h3>Bald: LEAPS Pro (tägliche Vorbörsen-Infos)</h3>
-<p>Ein kostenpflichtiges Abo für Optionshändler: LEAP-Ratio, durchschnittliche Ordergröße, heißeste Kontrakte und ein marktweites Ranking, an jedem Handelstag vor der Eröffnung geliefert. Preis und Starttermin noch offen.</p>
+<h3>Bald: LEAPS Pro (tägliches Vorbörsen-Datenbriefing)</h3>
+<p>Ein kostenpflichtiges Abo für Options-Nutzer: <strong>9,9 $ / Monat</strong>. Der Inhalt besteht aus objektiven Marktdaten-Statistiken — LEAPS-Anteil am Volumen, durchschnittliche Ordergröße, aktivste Kontrakte, marktweites Ranking — an jedem Handelstag vor der Eröffnung per E-Mail. <strong>Nur Daten und Informationen; keine Anlageberatung; keine Kauf- oder Verkaufsempfehlungen.</strong> Starttermin noch offen.</p>
+<h3>Abo-Bedingungen (nach dem Start)</h3>
+<p>Monatliche Abrechnung mit <strong>automatischer monatlicher Verlängerung</strong>; <strong>jederzeit kündbar</strong> — selbstständig über den Verwaltungslink in der Bestätigungs-E-Mail oder per E-Mail an uns. Nach der Kündigung bleibt der Zugang bis zum Ende des laufenden Abrechnungszeitraums bestehen; zu Erstattungen siehe die <a href="#refunds">Erstattungsrichtlinie</a>. Bestellungen und Zahlungen werden über unseren Zahlungspartner (Merchant of Record) abgewickelt, dessen Name auf Ihrer Abrechnung erscheint.</p>
 <h3>Früher Zugang</h3>
 <p>Um beim Start zuerst Bescheid zu wissen, mailen Sie „LEAPS Pro" an <a href="mailto:${EMAIL}">${EMAIL}</a>; wir benachrichtigen Sie und bieten einen Gründerpreis.</p>
 <p class="doc-fineprint">Die „bald"-Angaben sind Planungsinformationen, keine endgültige Zusage; maßgeblich ist der offizielle Start.</p>` },
       es: { kicker: "PRECIOS", h1: "Precios", dek: "Ahora mismo: todo el sitio es gratis.",
         body: `<h3>Gratis</h3>
 <p>Todos los gráficos históricos, la portada del día (temperatura del mercado), el índice K, la ventana LEAPS y el mapa de calor sectorial son <strong>gratuitos y abiertos</strong> — sin anuncios, sin muro de pago, sin registro.</p>
-<h3>Próximamente: LEAPS Pro (información pre-mercado diaria)</h3>
-<p>Una suscripción de pago para operadores de opciones: ratio LEAP, tamaño medio de operación, contratos más activos y un ranking de todo el mercado, entregado antes de la apertura cada día de bolsa. Precio y fecha de lanzamiento por determinar.</p>
+<h3>Próximamente: LEAPS Pro (boletín diario de datos pre-mercado)</h3>
+<p>Una suscripción de pago para usuarios de opciones: <strong>9,9 $ / mes</strong>. El contenido son estadísticas objetivas de datos de mercado — cuota de volumen de LEAPS, tamaño medio de operación, contratos más activos y un ranking de todo el mercado — entregadas por correo antes de la apertura cada día de bolsa. <strong>Solo datos e información; no es asesoramiento de inversión; sin recomendaciones de compra o venta.</strong> Fecha de lanzamiento por determinar.</p>
+<h3>Condiciones de suscripción (una vez activo)</h3>
+<p>Facturación mensual con <strong>renovación automática cada mes</strong>; <strong>cancelable en cualquier momento</strong> — de forma autónoma mediante el enlace de gestión del correo de confirmación, o escribiéndonos. Tras la cancelación, el acceso continúa hasta el final del período de facturación en curso; para reembolsos, consulta la <a href="#refunds">política de reembolsos</a>. Los pedidos y pagos serán gestionados por nuestro socio de pagos (Merchant of Record), cuyo nombre aparecerá en tu extracto.</p>
 <h3>Acceso anticipado</h3>
 <p>Para enterarte el primero, escribe a <a href="mailto:${EMAIL}">${EMAIL}</a> con «LEAPS Pro» y te avisaremos con un precio de suscriptor fundador.</p>
 <p class="doc-fineprint">Lo «próximamente» es información de planificación, no un compromiso definitivo; prevalece el lanzamiento oficial.</p>` },
