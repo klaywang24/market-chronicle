@@ -120,9 +120,13 @@ def build_stock_fund(ticker: str):
                        "values": [num(r[1]) for r in annual]}
 
     # ---- yfinance：快照 / 近4年报表 / 分红史 ----
+    # 美股含点代码（BRK.B）Yahoo 用连字符；欧股（MC.PA）带点有效，靠 marketCap 判空回退
     t = yf.Ticker(ticker)
     try:
         info = t.info
+        if "." in ticker and not info.get("marketCap"):
+            t = yf.Ticker(ticker.replace(".", "-"))
+            info = t.info
         fund["snapshot"] = {
             "pe": info.get("trailingPE"), "fwd_pe": info.get("forwardPE"),
             "ps": info.get("priceToSalesTrailing12Months"), "pb": info.get("priceToBook"),

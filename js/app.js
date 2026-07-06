@@ -46,7 +46,7 @@
 
   // ---------------- 图表注册表 ----------------
   // panel -> [{el, build}]；懒加载：首次进入 tab 才渲染
-  const registry = { pulse: [], kindex: [], spy: [], qqq: [], fin: [], consumer: [], luxury: [], macro: [], leaps: [],
+  const registry = { pulse: [], kindex: [], spy: [], qqq: [], tech: [], fin: [], consumer: [], luxury: [], macro: [], leaps: [],
     // 页脚静态页（无图表，空数组即可，让路由识别并显示对应 panel）
     about: [], contact: [], privacy: [], terms: [], refunds: [], pricing: [] };
   const built = new Map(); // el id -> echarts instance
@@ -114,21 +114,37 @@
 
   // ---------------- 篮子板块配置（与 build_data.py 的 BASKETS 保持一致） ----------------
   const BASKET_CFG = {
+    tech: {
+      anchorLabel: "QQQ 总览",
+      rows: [
+        [["半导体", ["NVDA", "AVGO", "TSM"]]],
+        [["平台·软件", ["MSFT", "GOOGL", "META", "AMZN"]]],
+        [["硬件·终端", ["AAPL", "TSLA"]]],
+      ],
+      members: [["NVDA", "英伟达"], ["AVGO", "博通"], ["TSM", "台积电"],
+                ["MSFT", "微软"], ["GOOGL", "谷歌"], ["META", "Meta"], ["AMZN", "亚马逊"],
+                ["AAPL", "苹果"], ["TSLA", "特斯拉"]],
+    },
     fin: {
       anchorLabel: "XLF 总览",
       // rows：两行分组布局（左侧锚胶囊纵跨两行）；members 顺序 = 上一只/下一只的翻页顺序
       rows: [
-        [["银行", ["JPM", "BAC"]], ["卡组织", ["V", "MA", "AXP"]], ["投行", ["GS", "MS"]]],
-        [["资管", ["BLK"]], ["券商", ["SCHW", "IBKR"]], ["加密·稳定币", ["COIN", "HOOD", "CRCL"]]],
+        [["银行", ["JPM", "BAC"]], ["卡组织", ["V", "MA", "AXP"]]],
+        [["券商", ["SCHW", "IBKR"]], ["投行", ["GS", "MS"]]],
+        [["资管", ["BLK"]], ["保险", ["BRK.B"]]],
+        [["加密·稳定币", ["COIN", "HOOD", "CRCL"]]],
       ],
       members: [["JPM", "摩根大通"], ["BAC", "美国银行"], ["V", "Visa"], ["MA", "万事达"],
-                ["AXP", "美国运通"], ["GS", "高盛"], ["MS", "摩根士丹利"], ["BLK", "贝莱德"],
-                ["SCHW", "嘉信理财"], ["IBKR", "盈透证券"],
+                ["AXP", "美国运通"], ["SCHW", "嘉信理财"], ["IBKR", "盈透证券"],
+                ["GS", "高盛"], ["MS", "摩根士丹利"], ["BLK", "贝莱德"], ["BRK.B", "伯克希尔"],
                 ["COIN", "Coinbase"], ["HOOD", "Robinhood"], ["CRCL", "Circle"]],
     },
     consumer: {
       anchorLabel: "XLP·XLY 总览",
-      groups: [["必需", ["KO", "WMT", "COST"]], ["可选", ["HD", "TJX", "MCD"]]],
+      rows: [
+        [["必需", ["KO", "WMT", "COST"]]],
+        [["可选", ["HD", "TJX", "MCD"]]],
+      ],
       members: [["KO", "可口可乐"], ["WMT", "沃尔玛"], ["COST", "好市多"],
                 ["HD", "家得宝"], ["TJX", "TJX"], ["MCD", "麦当劳"]],
     },
@@ -314,7 +330,8 @@
   // 对比四色：个股深红 / 标普 Chase 蓝 / 纳指深紫 / 行业ETF 凯尔特人绿
   function cmpDefs(basket, ticker) {
     const defs = [["sp500_century", "标普 500", "cmpBlue"], ["ndx_century", "纳指 100", "cmpPurple"]];
-    if (basket === "fin") defs.push(["s_xlf_century", "XLF 金融", "cmpGreen"]);
+    if (basket === "tech") defs.push(["s_xlk_century", "XLK 科技", "cmpGreen"]);
+    else if (basket === "fin") defs.push(["s_xlf_century", "XLF 金融", "cmpGreen"]);
     else if (basket === "consumer") defs.push(XLP_MEMBERS.has(ticker)
       ? ["s_xlp_century", "XLP 必需消费", "cmpGreen"] : ["s_xly_century", "XLY 可选消费", "cmpGreen"]);
     return defs;
@@ -1493,7 +1510,7 @@
   // ---------------- 数据出处标注（每张图/表下方统一小字） ----------------
   const SRC_BY_PANEL = {
     pulse: "Yahoo Finance + CNN Fear & Greed", spy: "Yahoo Finance", qqq: "Yahoo Finance",
-    fin: "Yahoo Finance", consumer: "Yahoo Finance", luxury: "Yahoo Finance",
+    tech: "Yahoo Finance", fin: "Yahoo Finance", consumer: "Yahoo Finance", luxury: "Yahoo Finance",
     macro: "FRED", kindex: "CNN Fear & Greed + Yahoo Finance", leaps: "CNN Fear & Greed + Yahoo Finance",
   };
   const SRC_OVERRIDES = [
@@ -1621,11 +1638,15 @@
   chart("qqq", "ch-qqq-season", seasonChart("ndx_seasonality"));
   chart("qqq", "ch-qqq-sectors", sectorChart("ndx_constituents"));
 
-  ["fin", "consumer", "luxury"].forEach((b) => {
+  ["tech", "fin", "consumer", "luxury"].forEach((b) => {
     chart(b, "ch-" + b + "-growth", basketGrowthChart(b));
     chart(b, "ch-" + b + "-annual", annualChart(b + "_annual"));
     chart(b, "ch-" + b + "-dd", ddChart(b + "_drawdowns"));
   });
+  // 科技板块锚 = QQQ，复用纳指 100（ndx）面板
+  chart("tech", "ch-tech-etf", centuryChart(null, [{ ds: "ndx_century", name: "QQQ 纳指 100" }]));
+  chart("tech", "ch-tech-etf-annual", annualChart("ndx_annual"));
+  chart("tech", "ch-tech-etf-dd", ddChart("ndx_drawdowns"));
   chart("fin", "ch-fin-etf", centuryChart(null, [{ ds: "s_xlf_century", name: "XLF" }]));
   chart("fin", "ch-fin-etf-annual", annualChart("s_xlf_annual"));
   chart("fin", "ch-fin-etf-dd", ddChart("s_xlf_drawdowns"));
@@ -1652,6 +1673,7 @@
   renderConstituents("ndx_constituents", "qqq-constituents");
   renderTopTable("sp500_top", "spy-top-table");
   renderTopTable("ndx_top", "qqq-top-table");
+  renderBasketTable("tech", "tech-table");
   renderBasketTable("fin", "fin-table");
   renderBasketTable("consumer", "consumer-table");
   renderBasketTable("luxury", "luxury-table");

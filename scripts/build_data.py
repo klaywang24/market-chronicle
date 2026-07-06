@@ -37,14 +37,17 @@ def write_json(name: str, obj):
 
 
 def fetch_history(ticker: str, retries: int = 3) -> pd.DataFrame:
+    # 美股含点代码（BRK.B）Yahoo 用连字符，欧股（MC.PA）保留点：原样优先、连字符兜底
+    candidates = [ticker] + ([ticker.replace(".", "-")] if "." in ticker else [])
     for i in range(retries):
-        try:
-            df = yf.Ticker(ticker).history(period="max", auto_adjust=True)
-            if len(df) > 100:
-                df.index = df.index.tz_localize(None)
-                return df
-        except Exception as e:
-            print(f"  {ticker} attempt {i+1} failed: {e}")
+        for sym in candidates:
+            try:
+                df = yf.Ticker(sym).history(period="max", auto_adjust=True)
+                if len(df) > 100:
+                    df.index = df.index.tz_localize(None)
+                    return df
+            except Exception as e:
+                print(f"  {sym} attempt {i+1} failed: {e}")
         time.sleep(3 * (i + 1))
     raise RuntimeError(f"failed to fetch {ticker}")
 
@@ -730,11 +733,17 @@ def build_valuation_extras():
 # ------------------------------------------------------- 个股篮子板块
 
 BASKETS = {
-    # 顺序即页面展示顺序：银行 → 卡组织 → 投行 → 资管 → 券商 → 加密/稳定币
+    # 科技：半导体 → 平台/软件 → 硬件/终端（总览锚用 QQQ，复用 ndx 面板）
+    "tech": [
+        ("NVDA", "英伟达"), ("AVGO", "博通"), ("TSM", "台积电"),
+        ("MSFT", "微软"), ("GOOGL", "谷歌"), ("META", "Meta"), ("AMZN", "亚马逊"),
+        ("AAPL", "苹果"), ("TSLA", "特斯拉"),
+    ],
+    # 顺序即页面展示顺序：银行 → 卡组织 → 券商 → 投行 → 资管 → 保险 → 加密/稳定币
     "fin": [
         ("JPM", "摩根大通"), ("BAC", "美国银行"), ("V", "Visa"), ("MA", "万事达"),
-        ("AXP", "美国运通"), ("GS", "高盛"), ("MS", "摩根士丹利"), ("BLK", "贝莱德"),
-        ("SCHW", "嘉信理财"), ("IBKR", "盈透证券"),
+        ("AXP", "美国运通"), ("SCHW", "嘉信理财"), ("IBKR", "盈透证券"),
+        ("GS", "高盛"), ("MS", "摩根士丹利"), ("BLK", "贝莱德"), ("BRK.B", "伯克希尔"),
         ("COIN", "Coinbase"), ("HOOD", "Robinhood"), ("CRCL", "Circle"),
     ],
     "consumer": [
@@ -746,8 +755,8 @@ BASKETS = {
     ],
 }
 
-# 板块锚 ETF（个股钻取页之上的"总览"层；奢侈品无合适 ETF，用等权组合当锚）
-ETF_ANCHORS = ["XLF", "XLP", "XLY"]
+# 板块锚 ETF（个股钻取页之上的"总览"层；奢侈品无合适 ETF，用等权组合当锚；XLK 只作个股对比线）
+ETF_ANCHORS = ["XLF", "XLP", "XLY", "XLK"]
 
 # 卫星成员：上市太晚，不进"共同起点"的成长曲线与等权组合，但有个股页和对照表
 BASKET_SATELLITES = {"fin": {"COIN", "HOOD", "CRCL"}}

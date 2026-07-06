@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=20260705p">
+<link rel="stylesheet" href="css/style.css?v=20260706d">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -26,6 +26,7 @@
       <button class="tab active" data-panel="pulse">今日</button>
       <button class="tab" data-panel="spy">标普 500</button>
       <button class="tab" data-panel="qqq">纳斯达克</button>
+      <button class="tab" data-panel="tech">科技</button>
       <button class="tab" data-panel="fin">金融</button>
       <button class="tab" data-panel="consumer">消费</button>
       <button class="tab" data-panel="luxury">奢侈品</button>
@@ -290,6 +291,42 @@
   </div>
 </section>
 
+<!-- ================= 科技 ================= -->
+<section class="panel" id="panel-tech">
+  <nav class="subnav" id="subnav-tech"></nav>
+  <div class="basket-overview" id="tech-overview">
+  <div class="hero">
+    <div class="kicker">TECHNOLOGY &amp; MEGACAP</div>
+    <h1>科技：增长的引擎</h1>
+    <p class="dek">七姐妹加博通与台积电——扛起纳指的九只巨头。先看板块的锚 QQQ，再点个股名徐徐展开各自的历史。</p>
+  </div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>板块的锚：QQQ</h2></div>
+    <p class="chapter-q">纳斯达克 100 至今，科技巨头共同走过了什么？</p>
+    <div class="card"><h3>QQQ 走势（月线 · 对数坐标）</h3><div class="chart short" id="ch-tech-etf"></div></div>
+    <div class="grid-2">
+      <div class="card"><h3>QQQ 年度回报</h3><div class="chart short" id="ch-tech-etf-annual"></div></div>
+      <div class="card"><h3>QQQ 回撤曲线</h3><div class="chart short" id="ch-tech-etf-dd"></div></div>
+    </div>
+  </div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>成长的对照</h2></div>
+    <p class="chapter-q">同样的 100 元，各自长成了多少？</p>
+    <div class="card"><h3>归一化成长曲线（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">九只成员自最晚上市者同一起跑线（Meta 2012 上市）；墨色粗线为等权组合。</div><div class="chart" id="ch-tech-growth"></div></div>
+    <div class="card"><h3>个股对照</h3><div class="sub">年化收益按各自币种计；YTD 为年初至今涨跌 · 点击任意一行进入个股页</div><div class="table-wrap"><table id="tech-table"></table></div></div>
+  </div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>组合的脾气</h2></div>
+    <p class="chapter-q">等权拿着这九只，年景和回撤什么样？</p>
+    <div class="grid-2">
+      <div class="card"><h3>等权组合年度回报</h3><div class="chart short" id="ch-tech-annual"></div></div>
+      <div class="card"><h3>等权组合回撤曲线</h3><div class="chart short" id="ch-tech-dd"></div></div>
+    </div>
+  </div>
+  </div>
+  <div class="basket-stock" id="tech-stock" style="display:none"></div>
+</section>
+
 <!-- ================= 金融 ================= -->
 <section class="panel" id="panel-fin">
   <nav class="subnav" id="subnav-fin"></nav>
@@ -297,7 +334,7 @@
   <div class="hero">
     <div class="kicker">FINTECH &amp; FINANCIALS</div>
     <h1>金融：钱的生意</h1>
-    <p class="dek">银行、卡组织、投行、资管、券商与加密/稳定币，十三只龙头。先看板块的锚 XLF，再点个股名徐徐展开各自的历史。</p>
+    <p class="dek">银行、卡组织、投行、资管、券商、保险与加密/稳定币，十四只龙头。先看板块的锚 XLF，再点个股名徐徐展开各自的历史。</p>
   </div>
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第一章</span><h2>板块的锚：XLF</h2></div>
@@ -311,12 +348,12 @@
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第二章</span><h2>成长的对照</h2></div>
     <p class="chapter-q">同样的 100 元，各自长成了多少？</p>
-    <div class="card"><h3>归一化成长曲线（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">十只核心成员自 2008-03（Visa 上市）同一起跑线；墨色粗线为等权组合。COIN/HOOD/CRCL 上市较晚，不入组合、只出个股页。</div><div class="chart" id="ch-fin-growth"></div></div>
+    <div class="card"><h3>归一化成长曲线（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">十一只核心成员自 2008-03（Visa 上市）同一起跑线；墨色粗线为等权组合。COIN/HOOD/CRCL 上市较晚，不入组合、只出个股页。</div><div class="chart" id="ch-fin-growth"></div></div>
     <div class="card"><h3>个股对照</h3><div class="sub">年化收益按各自币种计；YTD 为年初至今涨跌 · 点击任意一行进入个股页</div><div class="table-wrap"><table id="fin-table"></table></div></div>
   </div>
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第三章</span><h2>组合的脾气</h2></div>
-    <p class="chapter-q">等权拿着这十只，年景和回撤什么样？</p>
+    <p class="chapter-q">等权拿着这十一只，年景和回撤什么样？</p>
     <div class="grid-2">
       <div class="card"><h3>等权组合年度回报</h3><div class="chart short" id="ch-fin-annual"></div></div>
       <div class="card"><h3>等权组合回撤曲线</h3><div class="chart short" id="ch-fin-dd"></div></div>
@@ -627,8 +664,8 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260705p"></script>
-<script src="js/app.js?v=20260705p"></script>
-<script src="js/docs-i18n.js?v=20260705p"></script>
+<script src="js/i18n.js?v=20260706d"></script>
+<script src="js/app.js?v=20260706d"></script>
+<script src="js/docs-i18n.js?v=20260706d"></script>
 </body>
 </html>
