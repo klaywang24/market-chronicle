@@ -25,6 +25,8 @@
     "奢侈品": ["Luxury", "Luxe", "Luxus", "Lujo"],
     "K 指数": ["K-Index", "Indice K", "K-Index", "Índice K"],
     "LEAPS 窗口": ["LEAPS Window", "Fenêtre LEAPS", "LEAPS-Fenster", "Ventana LEAPS"],
+    "行情": ["Quotes", "Cours", "Kurse", "Cotización"],
+    "指数 ETF": ["Index ETFs", "ETF indiciels", "Index-ETFs", "ETF de índice"],
     "宏观": ["Macro", "Macro", "Makro", "Macro"],
     "纳指 100": ["Nasdaq-100", "Nasdaq-100", "Nasdaq-100", "Nasdaq-100"],
     "纳指综指": ["Nasdaq Composite", "Nasdaq Composite", "Nasdaq Composite", "Nasdaq Composite"],
@@ -653,17 +655,16 @@
        "Metodología: PER y CAPE de multpl/Shiller (desde $1); percentil = posición actual en el histórico. Datos a $2."]],
   ];
 
+  // 精简为两种语言：简体（你与核心读者）+ English（全球 / LLM / GitHub 门面）。
+  // 词典数组仍是 [en, fr, de, es]，只用到 en 那一列；繁/FR/DE/ES 已下架。
   const LANG_META = {
     zh: { label: "简", html: "zh-CN" },
-    tw: { label: "繁", html: "zh-TW" },
     en: { label: "EN", html: "en" },
-    fr: { label: "FR", html: "fr" },
-    de: { label: "DE", html: "de" },
-    es: { label: "ES", html: "es" },
   };
-  const COL = { en: 0, fr: 1, de: 2, es: 3 };
+  const COL = { en: 0 };
 
   let cur = localStorage.getItem("mc-lang") || "zh";
+  if (!LANG_META[cur]) cur = "zh"; // 旧访客存了繁/法/德/西，回退简体
   let twConv = null;
 
   function ensureOpenCC() {

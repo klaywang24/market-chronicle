@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=20260706e">
+<link rel="stylesheet" href="css/style.css?v=20260706l">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -33,6 +33,7 @@
       <button class="tab" data-panel="macro">宏观</button>
       <button class="tab" data-panel="kindex">K 指数</button>
       <button class="tab" data-panel="leaps">LEAPS 窗口</button>
+      <button class="tab" data-panel="quote">行情</button>
     </nav>
     <div class="top-controls">
       <div class="lang-switch" id="lang-switch"></div>
@@ -503,6 +504,23 @@
   </div>
 </section>
 
+<!-- ================= 行情（TradingView 高级图表） ================= -->
+<section class="panel" id="panel-quote">
+  <div class="hero quote-hero">
+    <div class="kicker">LIVE QUOTES · TRADINGVIEW</div>
+    <h1>行情</h1>
+    <p class="dek">左侧目录选标的，中间即时出图：日 / 周 / 月 / 年 K 线，成交量、MACD、KDJ、BOLL 等指标一应俱全——无需再回到券商 App。目录外的任意标的，可用图表左上角的代码框直接搜索。</p>
+  </div>
+  <div class="quote-layout">
+    <aside class="quote-nav" id="quote-nav"></aside>
+    <div class="quote-main">
+      <div class="quote-toolbar" id="quote-toolbar"></div>
+      <div id="quote-widget" class="tradingview-widget-container"></div>
+      <p class="quote-note">上方按钮切换 分时 / 5 日 / 日 / 周 / 月 / 年 K，及 1–45 分钟与小时线。分时默认叠加 VWAP 均价线；K 线默认叠加 EMA 均线带（5/10/20/60）、成交量、MACD、KDJ。想自己加指标或改参数（均线周期等）：点图表顶部工具栏的 <b>指标</b> 按钮添加；把鼠标移到左上角图例里的指标名上，点右侧齿轮即可改参数或删除。右下角 <b>A / L</b> 为坐标轴模式（自动 / 对数）。右侧详情面板显示今开 / 昨收 / 最高 / 最低 / 成交量 / 52 周高低 / 市值等。换手率、振幅、成交额为券商 App 专有口径，此处不单列。图表与数据由 TradingView 提供（实时或延迟视各交易所而定）。</p>
+    </div>
+  </div>
+</section>
+
 <!-- ================= 关于 ================= -->
 <section class="panel" id="panel-about">
   <div class="doc-page">
@@ -668,8 +686,8 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260706e"></script>
-<script src="js/app.js?v=20260706e"></script>
-<script src="js/docs-i18n.js?v=20260706e"></script>
+<script src="js/i18n.js?v=20260706l"></script>
+<script src="js/app.js?v=20260706l"></script>
+<script src="js/docs-i18n.js?v=20260706l"></script>
 </body>
 </html>

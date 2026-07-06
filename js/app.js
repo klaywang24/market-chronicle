@@ -14,6 +14,7 @@
     localStorage.setItem("mc-theme", isDark() ? "dark" : "light");
     syncToggleIcon();
     rebuildAll();
+    if (quoteMounted) mountQuote(true); // TradingView 主题跟随日夜切换（需重挂）
   });
   syncToggleIcon();
 
@@ -47,6 +48,8 @@
   // ---------------- 图表注册表 ----------------
   // panel -> [{el, build}]；懒加载：首次进入 tab 才渲染
   const registry = { pulse: [], kindex: [], spy: [], qqq: [], tech: [], fin: [], consumer: [], luxury: [], macro: [], leaps: [],
+    // 行情（TradingView widget，非 ECharts；空数组让路由识别，挂载逻辑见 mountQuote）
+    quote: [],
     // 页脚静态页（无图表，空数组即可，让路由识别并显示对应 panel）
     about: [], contact: [], privacy: [], terms: [], refunds: [], pricing: [] };
   const built = new Map(); // el id -> echarts instance
@@ -95,6 +98,8 @@
       panelDone.add(name);
       for (const { elId, build } of registry[name]) await buildOne(elId, build);
     }
+    // 行情 tab：首次进入渲染左目录 + 挂载 TradingView widget
+    if (name === "quote") mountQuote();
     // 切换显示后需要 resize（display:none 时初始化的尺寸不对）
     registry[name].forEach(({ elId }) => built.get(elId) && built.get(elId).resize());
   }
@@ -154,6 +159,124 @@
     },
   };
   const safeTicker = (t) => t.toLowerCase().replace(".", "-");
+
+  // ---------------- 行情 tab（TradingView 高级图表） ----------------
+  // 篮子 ticker → TradingView 符号；只对裸 ticker 会歧义的欧股/双重上市做显式交易所前缀，美股默认裸符号由 TV 解析
+  const TV_SYM = { "MC.PA": "EURONEXT:MC", "RMS.PA": "EURONEXT:RMS", "RACE": "NYSE:RACE", "BRK.B": "NYSE:BRK.B" };
+  const tvSymbol = (t) => TV_SYM[t] || t;
+  // 左目录：指数 ETF + 宏观为静态；科技/金融/消费/奢侈品从 BASKET_CFG.members 派生，永远与篮子同步
+  const QUOTE_STATIC = [
+    ["指数 ETF", [{ label: "SPY", sub: "标普 500", sym: "AMEX:SPY" }, { label: "QQQ", sub: "纳指 100", sym: "NASDAQ:QQQ" },
+                  { label: "DIA", sub: "道指", sym: "AMEX:DIA" }, { label: "IWM", sub: "罗素 2000", sym: "AMEX:IWM" }]],
+    // 宏观：VIX/美债收益率/美元指数在 TradingView 免费 widget 里是被 gate 的指数（TVC/ICE 口径）——
+    // 改用免费可看的 ETF 替身：VIXY(波动率)/IEF·TLH·TLT(中→长端美债)/UUP(美元)。方向信号一致，口径为 ETF。
+    ["宏观", [{ label: "VIXY", sub: "VIX 波动率", sym: "VIXY" }, { label: "IEF", sub: "7-10Y 美债", sym: "IEF" },
+              { label: "TLH", sub: "10-20Y 美债", sym: "TLH" }, { label: "TLT", sub: "20Y+ 美债", sym: "TLT" },
+              { label: "UUP", sub: "美元指数", sym: "UUP" }]],
+  ];
+  function quoteNav() {
+    const nav = QUOTE_STATIC.map(([g, items]) => [g, items]);
+    for (const [g, key] of [["科技", "tech"], ["金融", "fin"], ["消费", "consumer"], ["奢侈品", "luxury"]]) {
+      nav.push([g, BASKET_CFG[key].members.map(([t, zh]) => ({ label: t.split(".")[0], sub: zh, sym: tvSymbol(t) }))]);
+    }
+    return nav;
+  }
+  const TV_LOCALE = { zh: "zh_CN", tw: "zh_TW", en: "en", fr: "fr", de: "de", es: "es" };
+  // 券商式周期档：style 3=面积（分时用）/ 1=蜡烛（K线用）；range=初始可视窗口；studies=预挂指标
+  // K 线主图 = EMA 均线带（5/10/20/60，对齐券商默认）；副图 = 成交量 / MACD / KDJ(Stochastic)。BOLL 不默认叠加。
+  const STUDIES_K = [
+    { id: "MAExp@tv-basicstudies", inputs: { length: 5 } },
+    { id: "MAExp@tv-basicstudies", inputs: { length: 10 } },
+    { id: "MAExp@tv-basicstudies", inputs: { length: 20 } },
+    { id: "MAExp@tv-basicstudies", inputs: { length: 60 } },
+    "Volume@tv-basicstudies", "MACD@tv-basicstudies", "Stochastic@tv-basicstudies",
+  ];
+  const QUOTE_VIEWS = [
+    ["intraday", "分时", { interval: "1", range: "1D", style: "3", studies: ["VWAP@tv-basicstudies", "Volume@tv-basicstudies"] }],
+    ["d5", "5 日", { interval: "15", range: "5D", style: "3", studies: ["Volume@tv-basicstudies"] }],
+    ["dK", "日 K", { interval: "D", range: "6M", style: "1", studies: STUDIES_K }],
+    ["wK", "周 K", { interval: "W", range: "60M", style: "1", studies: STUDIES_K }],
+    ["mK", "月 K", { interval: "M", range: "ALL", style: "1", studies: STUDIES_K }],
+    ["yK", "年 K", { interval: "12M", range: "ALL", style: "1", studies: STUDIES_K }],
+  ];
+  const QUOTE_MINS = [["1", "1 分"], ["2", "2 分"], ["5", "5 分"], ["10", "10 分"], ["15", "15 分"],
+                      ["20", "20 分"], ["30", "30 分"], ["45", "45 分"], ["60", "小时"]];
+  function viewConfig(mode) {
+    const v = QUOTE_VIEWS.find((x) => x[0] === mode);
+    if (v) return v[2];
+    if (mode && mode[0] === "m") { const iv = mode.slice(1); return { interval: iv, range: Number(iv) <= 5 ? "1D" : "5D", style: "1", studies: STUDIES_K }; }
+    return QUOTE_VIEWS[0][2];
+  }
+  let quoteNavBuilt = false, quoteToolbarBuilt = false, quoteMounted = false;
+  let currentQuoteSymbol = "NASDAQ:QQQ", currentQuoteMode = "intraday"; // 默认：日内分时
+
+  function renderQuoteNav() {
+    const el = document.getElementById("quote-nav");
+    if (!el) return;
+    el.innerHTML = quoteNav().map(([g, items]) =>
+      `<div class="qn-group"><div class="qn-label">${g}</div>` +
+      items.map((it) => `<a class="qn-item${it.sym === currentQuoteSymbol ? " active" : ""}" data-sym="${it.sym}"><b>${it.label}</b>${it.sub ? `<span>${it.sub}</span>` : ""}</a>`).join("") +
+      `</div>`).join("");
+    quoteNavBuilt = true;
+    // 组名（宏观/科技…）与中文名随语言翻译：交给 i18n 的 MutationObserver 自动处理（它监听 body 子树变更）
+  }
+  function renderQuoteToolbar() {
+    const el = document.getElementById("quote-toolbar");
+    if (!el) return;
+    const onView = QUOTE_VIEWS.some((x) => x[0] === currentQuoteMode);
+    const btns = QUOTE_VIEWS.map(([k, label]) =>
+      `<button class="qt-btn${k === currentQuoteMode ? " active" : ""}" data-mode="${k}">${label}</button>`).join("");
+    const opts = QUOTE_MINS.map(([v, l]) => `<option value="m${v}"${("m" + v) === currentQuoteMode ? " selected" : ""}>${l}</option>`).join("");
+    el.innerHTML = `<div class="qt-btns">${btns}</div>` +
+      `<select class="qt-mins" title="分钟线"><option value="" disabled${onView ? " selected" : ""}>分钟线</option>${opts}</select>`;
+    quoteToolbarBuilt = true;
+  }
+  function mountQuote(force) {
+    const host = document.getElementById("quote-widget");
+    if (!host) return;
+    if (!quoteNavBuilt) renderQuoteNav();
+    renderQuoteToolbar();
+    if (quoteMounted && !force) return;
+    quoteMounted = true;
+    document.querySelectorAll("#quote-nav .qn-item").forEach((a) =>
+      a.classList.toggle("active", a.dataset.sym === currentQuoteSymbol));
+    host.innerHTML = '<div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>';
+    const lang = (window.MC_I18N && MC_I18N.lang && MC_I18N.lang()) || "zh";
+    const v = viewConfig(currentQuoteMode);
+    const cfg = {
+      autosize: true, symbol: currentQuoteSymbol, interval: v.interval, timezone: "America/New_York",
+      theme: isDark() ? "dark" : "light", style: v.style, locale: TV_LOCALE[lang] || "en",
+      // 顶部工具栏放出来：用户用它的「指标(fx)」按钮加指标、点图例齿轮改参数（均线周期等）+ 搜索框搜任意标的。
+      // 侧栏（画线工具）仍隐藏保持简洁。周期切换用我自造的按钮条，与顶栏 interval 选择器并存（略冗余但功能全）。
+      range: v.range, hide_top_toolbar: false, hide_side_toolbar: true, hide_legend: false,
+      allow_symbol_change: true, details: true, hotlist: false, calendar: false,
+      studies: v.studies, support_host: "https://www.tradingview.com",
+    };
+    const s = document.createElement("script");
+    s.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+    s.async = true;
+    s.innerHTML = JSON.stringify(cfg);
+    host.appendChild(s);
+  }
+  document.addEventListener("click", (e) => {
+    const item = e.target.closest("#quote-nav .qn-item");
+    if (item) {
+      e.preventDefault();
+      currentQuoteSymbol = item.dataset.sym;
+      document.querySelectorAll("#quote-nav .qn-item").forEach((x) => x.classList.toggle("active", x === item));
+      mountQuote(true);
+      return;
+    }
+    const btn = e.target.closest("#quote-toolbar .qt-btn");
+    if (btn) { currentQuoteMode = btn.dataset.mode; renderQuoteToolbar(); mountQuote(true); }
+  });
+  document.addEventListener("change", (e) => {
+    const sel = e.target.closest("#quote-toolbar .qt-mins");
+    if (!sel || !sel.value) return;
+    currentQuoteMode = sel.value; // "m5" 等
+    renderQuoteToolbar();
+    mountQuote(true);
+  });
 
   let currentStock = null; // {basket, safe}
 
@@ -1686,7 +1809,7 @@
     stampSources();
   }).catch(() => {});
   if (window.MC_I18N) {
-    MC_I18N.onChange(() => { rebuildAll(); renderPulse(); }); // 图表与头版随语言重建
+    MC_I18N.onChange(() => { rebuildAll(); renderPulse(); if (quoteMounted) mountQuote(true); }); // 图表/头版/行情随语言重建
     MC_I18N.ready.then(route);
   } else route();
 })();
