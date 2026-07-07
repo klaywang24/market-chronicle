@@ -160,16 +160,17 @@
   };
   const safeTicker = (t) => t.toLowerCase().replace(".", "-");
 
-  // parqet logo 加载失败先带缓存穿透重试一次（CDN 偶发限流/挡板误伤）；
-  // 再失败换成 ticker 首字母圆章兜底（iPad 等设备 CDN 被整体拦截时不再白闪后空缺）
+  // logo 三级加载链：自托管 logos/（scripts/fetch_logos.py 每周同步，与站点同源、
+  // 不受客户端拦截影响——iPad 曾整站拦掉 parqet 直连）→ parqet 直连（新 ticker 兜底）→ 首字母圆章
   window.__logoErr = function (img) {
-    if (!img.dataset.retried) {
-      img.dataset.retried = "1";
-      img.src = img.src.replace(/&mcr=\d+/, "") + "&mcr=" + Date.now();
+    const t = img.dataset.t || "";
+    if (!img.dataset.step) {
+      img.dataset.step = "1";
+      img.src = "https://assets.parqet.com/logos/symbol/" + encodeURIComponent(t) + "?format=png&size=64";
     } else {
       const s = document.createElement("span");
       s.className = img.className + " logo-mono";
-      s.textContent = (img.dataset.t || "?").charAt(0);
+      s.textContent = (t || "?").charAt(0);
       img.replaceWith(s);
     }
   };
@@ -341,7 +342,7 @@
     host.innerHTML = `
       <div class="stock-hero">
         <div class="kicker">${basket.toUpperCase()} · ${ticker}</div>
-        <h1><img class="stock-logo" data-t="${ticker}" src="https://assets.parqet.com/logos/symbol/${ticker}?format=png"
+        <h1><img class="stock-logo" data-t="${ticker}" src="logos/${safeTicker(ticker)}.png"
              referrerpolicy="no-referrer" onerror="__logoErr(this)" alt="">${name}<span class="ticker">${ticker}</span></h1>
         <div class="stat-strip" id="${basket}-sd-stats"></div>
       </div>
@@ -1281,7 +1282,7 @@
   }
 
   const tblLogo = (ticker) =>
-    `<img class="tbl-logo" loading="lazy" data-t="${ticker}" src="https://assets.parqet.com/logos/symbol/${ticker}?format=png" referrerpolicy="no-referrer" onerror="__logoErr(this)" alt="">`;
+    `<img class="tbl-logo" loading="lazy" data-t="${ticker}" src="logos/${safeTicker(ticker)}.png" referrerpolicy="no-referrer" onerror="__logoErr(this)" alt="">`;
 
   async function renderTopTable(dsName, tableId) {
     const d = await load(dsName);

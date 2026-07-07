@@ -869,6 +869,12 @@ th.left { text-align: left; }
   .pill-group { display: contents; }
   .pill-group-label { font-size: 11px; }
   .subnav .pill { white-space: nowrap; }
+  /* 金融首行「银行+卡组织」在手机上拆开：第二组（卡组织）前插满宽伪元素强制换行（桌面不受影响） */
+  #subnav-fin .pill-row:first-child .pill-group + .pill-group::before {
+    content: "";
+    flex-basis: 100%;
+    height: 0;
+  }
 }
 
 @media (max-width: 900px) {
