@@ -160,6 +160,15 @@
   };
   const safeTicker = (t) => t.toLowerCase().replace(".", "-");
 
+  // parqet logo 加载失败先带缓存穿透重试一次（CDN 偶发限流/挡板误伤），再失败才隐藏——
+  // 之前失败即永久隐藏，iPad 等设备一次网络抖动就整页无 logo
+  window.__logoErr = function (img) {
+    if (!img.dataset.retried) {
+      img.dataset.retried = "1";
+      img.src = img.src.replace(/&mcr=\d+/, "") + "&mcr=" + Date.now();
+    } else img.style.display = "none";
+  };
+
   // ---------------- 行情 tab（TradingView 高级图表） ----------------
   // 篮子 ticker → TradingView 符号；只对裸 ticker 会歧义的欧股/双重上市做显式交易所前缀，美股默认裸符号由 TV 解析
   const TV_SYM = { "MC.PA": "EURONEXT:MC", "RMS.PA": "EURONEXT:RMS", "RACE": "NYSE:RACE", "BRK.B": "NYSE:BRK.B" };
@@ -328,7 +337,7 @@
       <div class="stock-hero">
         <div class="kicker">${basket.toUpperCase()} · ${ticker}</div>
         <h1><img class="stock-logo" src="https://assets.parqet.com/logos/symbol/${ticker}?format=png"
-             onerror="this.style.display='none'" alt="">${name}<span class="ticker">${ticker}</span></h1>
+             referrerpolicy="no-referrer" onerror="__logoErr(this)" alt="">${name}<span class="ticker">${ticker}</span></h1>
         <div class="stat-strip" id="${basket}-sd-stats"></div>
       </div>
       <div class="chapter">
@@ -1267,7 +1276,7 @@
   }
 
   const tblLogo = (ticker) =>
-    `<img class="tbl-logo" loading="lazy" src="https://assets.parqet.com/logos/symbol/${ticker}?format=png" onerror="this.style.display='none'" alt="">`;
+    `<img class="tbl-logo" loading="lazy" src="https://assets.parqet.com/logos/symbol/${ticker}?format=png" referrerpolicy="no-referrer" onerror="__logoErr(this)" alt="">`;
 
   async function renderTopTable(dsName, tableId) {
     const d = await load(dsName);

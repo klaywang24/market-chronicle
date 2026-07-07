@@ -839,6 +839,22 @@ th.left { text-align: left; }
 #quote-widget iframe { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; border: 0; }
 .quote-note { color: var(--ink-muted); font-size: 12px; margin-top: 10px; line-height: 1.5; }
 
+/* 手机端篮子二级导航：拍扁「锚胶囊纵跨 + 分组行」布局 → 全部胶囊统一大小流式换行（同奢侈品板块效果）。
+   display:contents 让行/组容器消失，胶囊与组名直接成为 .subnav 的 flex 子项自然换行；
+   nowrap 防个股中文名被挤成竖排（此前「台积电」在窄屏拆三行变圆球）。 */
+@media (max-width: 700px) {
+  .subnav { gap: 6px; }
+  .subnav .pill-anchor {
+    align-self: auto;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 4px 12px;
+  }
+  .pill-rows, .pill-row, .pill-group { display: contents; }
+  .pill-group-label { font-size: 11px; }
+  .subnav .pill { white-space: nowrap; }
+}
+
 @media (max-width: 900px) {
   .quote-layout { flex-direction: column; }
   .quote-nav {
