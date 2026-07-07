@@ -160,13 +160,18 @@
   };
   const safeTicker = (t) => t.toLowerCase().replace(".", "-");
 
-  // parqet logo 加载失败先带缓存穿透重试一次（CDN 偶发限流/挡板误伤），再失败才隐藏——
-  // 之前失败即永久隐藏，iPad 等设备一次网络抖动就整页无 logo
+  // parqet logo 加载失败先带缓存穿透重试一次（CDN 偶发限流/挡板误伤）；
+  // 再失败换成 ticker 首字母圆章兜底（iPad 等设备 CDN 被整体拦截时不再白闪后空缺）
   window.__logoErr = function (img) {
     if (!img.dataset.retried) {
       img.dataset.retried = "1";
       img.src = img.src.replace(/&mcr=\d+/, "") + "&mcr=" + Date.now();
-    } else img.style.display = "none";
+    } else {
+      const s = document.createElement("span");
+      s.className = img.className + " logo-mono";
+      s.textContent = (img.dataset.t || "?").charAt(0);
+      img.replaceWith(s);
+    }
   };
 
   // ---------------- 行情 tab（TradingView 高级图表） ----------------
@@ -336,7 +341,7 @@
     host.innerHTML = `
       <div class="stock-hero">
         <div class="kicker">${basket.toUpperCase()} · ${ticker}</div>
-        <h1><img class="stock-logo" src="https://assets.parqet.com/logos/symbol/${ticker}?format=png"
+        <h1><img class="stock-logo" data-t="${ticker}" src="https://assets.parqet.com/logos/symbol/${ticker}?format=png"
              referrerpolicy="no-referrer" onerror="__logoErr(this)" alt="">${name}<span class="ticker">${ticker}</span></h1>
         <div class="stat-strip" id="${basket}-sd-stats"></div>
       </div>
@@ -1276,7 +1281,7 @@
   }
 
   const tblLogo = (ticker) =>
-    `<img class="tbl-logo" loading="lazy" src="https://assets.parqet.com/logos/symbol/${ticker}?format=png" referrerpolicy="no-referrer" onerror="__logoErr(this)" alt="">`;
+    `<img class="tbl-logo" loading="lazy" data-t="${ticker}" src="https://assets.parqet.com/logos/symbol/${ticker}?format=png" referrerpolicy="no-referrer" onerror="__logoErr(this)" alt="">`;
 
   async function renderTopTable(dsName, tableId) {
     const d = await load(dsName);

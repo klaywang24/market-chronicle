@@ -839,8 +839,22 @@ th.left { text-align: left; }
 #quote-widget iframe { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; border: 0; }
 .quote-note { color: var(--ink-muted); font-size: 12px; margin-top: 10px; line-height: 1.5; }
 
-/* 手机端篮子二级导航：拍扁「锚胶囊纵跨 + 分组行」布局 → 全部胶囊统一大小流式换行（同奢侈品板块效果）。
-   display:contents 让行/组容器消失，胶囊与组名直接成为 .subnav 的 flex 子项自然换行；
+/* logo 加载失败的兜底圆章：ticker 首字母，占位尺寸随 .tbl-logo/.stock-logo 类走 */
+.logo-mono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-deep) !important;
+  border: 1px solid var(--border);
+  color: var(--ink-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+.tbl-logo.logo-mono { font-size: 10px; }
+.stock-logo.logo-mono { font-size: 19px; }
+
+/* 手机端篮子二级导航：锚胶囊缩成普通大小独占首行；每个分组行（.pill-row）各起一行
+  （科技=半导体/平台·软件/硬件·终端 三行；金融=银行·卡组织/券商·投行/资管·保险/加密 四行，与桌面行分组一致）。
    nowrap 防个股中文名被挤成竖排（此前「台积电」在窄屏拆三行变圆球）。 */
 @media (max-width: 700px) {
   .subnav { gap: 6px; }
@@ -850,7 +864,9 @@ th.left { text-align: left; }
     font-weight: 600;
     padding: 4px 12px;
   }
-  .pill-rows, .pill-row, .pill-group { display: contents; }
+  .pill-rows { flex: 1 0 100%; display: flex; flex-direction: column; gap: 6px; }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .pill-group { display: contents; }
   .pill-group-label { font-size: 11px; }
   .subnav .pill { white-space: nowrap; }
 }
