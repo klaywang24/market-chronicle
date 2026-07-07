@@ -707,5 +707,7 @@
 // PWA：注册 service worker（离线外壳 + 静态资源缓存；data/*.json 网络优先不影响每日更新）
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
+<!-- Cloudflare Web Analytics（无 cookie 访客统计；被拦截器挡掉属正常，数字是下限） -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "21badd8cf43d430e8b00d2fcad37a312"}'></script>
 </body>
 </html>
