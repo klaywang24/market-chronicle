@@ -1,0 +1,17 @@
+{
+  "name": "美股编年史 Market Chronicle",
+  "short_name": "编年史",
+  "description": "每个交易日自动更新的美股百年图表档案 · A century of U.S. market history, updated every trading day",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F1ECDF",
+  "theme_color": "#F1ECDF",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
