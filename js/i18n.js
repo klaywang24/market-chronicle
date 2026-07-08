@@ -27,6 +27,10 @@
     "LEAPS 窗口": ["LEAPS Window", "Fenêtre LEAPS", "LEAPS-Fenster", "Ventana LEAPS"],
     "行情": ["Quotes", "Cours", "Kurse", "Cotización"],
     "指数 ETF": ["Index ETFs", "ETF indiciels", "Index-ETFs", "ETF de índice"],
+    "行情图表暂时加载不出来": ["Live chart can't load right now", "", "", ""],
+    "图表由 TradingView 提供，当前网络连不上它的服务器（中国大陆地区需要国际网络）。站内其他板块的历史数据不受影响，可正常浏览。": [
+      "Charts are served by TradingView, which is unreachable on the current network (mainland China requires an international connection). All other sections of this site work normally.", "", "", ""],
+    "重试": ["Retry", "", "", ""],
     "宏观": ["Macro", "Macro", "Makro", "Macro"],
     "纳指 100": ["Nasdaq-100", "Nasdaq-100", "Nasdaq-100", "Nasdaq-100"],
     "纳指综指": ["Nasdaq Composite", "Nasdaq Composite", "Nasdaq Composite", "Nasdaq Composite"],

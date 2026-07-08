@@ -222,7 +222,7 @@
     if (mode && mode[0] === "m") { const iv = mode.slice(1); return { interval: iv, range: Number(iv) <= 5 ? "1D" : "5D", style: "1", studies: STUDIES_K }; }
     return QUOTE_VIEWS[0][2];
   }
-  let quoteNavBuilt = false, quoteToolbarBuilt = false, quoteMounted = false;
+  let quoteNavBuilt = false, quoteToolbarBuilt = false, quoteMounted = false, quoteFallbackTimer = 0;
   let currentQuoteSymbol = "NASDAQ:QQQ", currentQuoteMode = "intraday"; // 默认：日内分时
 
   function renderQuoteNav() {
@@ -271,6 +271,19 @@
     s.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
     s.async = true;
     s.innerHTML = JSON.stringify(cfg);
+    // TradingView 在部分网络不可达（中国大陆被墙）——脚本加载失败或超时未出 iframe 时给人话提示，不留静默白板
+    clearTimeout(quoteFallbackTimer);
+    const showFallback = () => {
+      host.innerHTML = '<div class="quote-fallback"><b>行情图表暂时加载不出来</b>' +
+        '<span>图表由 TradingView 提供，当前网络连不上它的服务器（中国大陆地区需要国际网络）。' +
+        '站内其他板块的历史数据不受影响，可正常浏览。</span>' +
+        '<button class="qt-btn" onclick="location.reload()">重试</button></div>';
+    };
+    s.onerror = () => { clearTimeout(quoteFallbackTimer); showFallback(); };
+    quoteFallbackTimer = setTimeout(() => {
+      const ifr = host.querySelector("iframe");
+      if (!ifr || ifr.getBoundingClientRect().height < 100) showFallback();
+    }, 12000);
     host.appendChild(s);
   }
   document.addEventListener("click", (e) => {
