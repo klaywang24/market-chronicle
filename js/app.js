@@ -255,7 +255,6 @@
     quoteMounted = true;
     document.querySelectorAll("#quote-nav .qn-item").forEach((a) =>
       a.classList.toggle("active", a.dataset.sym === currentQuoteSymbol));
-    host.innerHTML = '<div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>';
     const lang = (window.MC_I18N && MC_I18N.lang && MC_I18N.lang()) || "zh";
     const v = viewConfig(currentQuoteMode);
     const cfg = {
@@ -267,11 +266,16 @@
       allow_symbol_change: true, details: true, hotlist: false, calendar: false,
       studies: v.studies, support_host: "https://www.tradingview.com",
     };
-    const s = document.createElement("script");
-    s.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
-    s.async = true;
-    s.innerHTML = JSON.stringify(cfg);
-    // TradingView 在部分网络不可达（中国大陆被墙）——脚本加载失败或超时未出 iframe 时给人话提示，不留静默白板
+    // 不注入 TradingView 的引导脚本（TV 文档明确警告动态注入会出问题，Safari 实测反复崩溃渲染进程）——
+    // 该脚本唯一职责是拼 iframe，这里直接自己拼：页面零第三方脚本执行，崩溃向量消除
+    const ifr = document.createElement("iframe");
+    ifr.src = "https://www.tradingview-widget.com/embed-widget/advanced-chart/?locale=" +
+      (TV_LOCALE[lang] || "en") + "#" + encodeURIComponent(JSON.stringify(cfg));
+    ifr.setAttribute("frameborder", "0");
+    ifr.setAttribute("allowtransparency", "true");
+    ifr.setAttribute("scrolling", "no");
+    ifr.allow = "clipboard-write";
+    // TradingView 在部分网络不可达（中国大陆被墙）——超时未加载时给人话提示，不留静默白板
     clearTimeout(quoteFallbackTimer);
     const showFallback = () => {
       host.innerHTML = '<div class="quote-fallback"><b>行情图表暂时加载不出来</b>' +
@@ -279,12 +283,10 @@
         '站内其他板块的历史数据不受影响，可正常浏览。</span>' +
         '<button class="qt-btn" onclick="location.reload()">重试</button></div>';
     };
-    s.onerror = () => { clearTimeout(quoteFallbackTimer); showFallback(); };
-    quoteFallbackTimer = setTimeout(() => {
-      const ifr = host.querySelector("iframe");
-      if (!ifr || ifr.getBoundingClientRect().height < 100) showFallback();
-    }, 12000);
-    host.appendChild(s);
+    ifr.onload = () => clearTimeout(quoteFallbackTimer);
+    quoteFallbackTimer = setTimeout(showFallback, 12000);
+    host.innerHTML = "";
+    host.appendChild(ifr);
   }
   document.addEventListener("click", (e) => {
     const item = e.target.closest("#quote-nav .qn-item");
