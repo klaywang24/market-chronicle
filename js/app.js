@@ -1499,11 +1499,9 @@
       '<div class="tradingview-widget-container__widget" style="height:' + (h - 22) + 'px;width:100%"></div>' +
       '<div class="tradingview-widget-copyright">' +
       '<a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">TradingView</a>' + credit + '</div>';
-    const s = document.createElement("script");
-    s.type = "text/javascript";
-    s.async = true;
-    s.src = "https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js";
-    s.textContent = JSON.stringify({
+    // 与行情 tab 同理：不注入 TradingView 引导脚本（TV 文档警告动态注入会出问题、Safari 曾因此反复崩溃渲染进程），
+    // 直接自己拼 iframe——引导脚本唯一职责就是拼它
+    const cfg = {
       dataSource: "SPX500",
       blockSize: "market_cap_basic",
       blockColor: "change",
@@ -1519,9 +1517,16 @@
       hasSymbolTooltip: true,
       isMonoSize: false,
       width: "100%",
-      height: h,
-    });
-    box.appendChild(s);
+      height: h - 22,
+    };
+    const ifr = document.createElement("iframe");
+    ifr.src = "https://www.tradingview-widget.com/embed-widget/stock-heatmap/?locale=" + L +
+      "#" + encodeURIComponent(JSON.stringify(cfg));
+    ifr.style.cssText = "width:100%;height:" + (h - 22) + "px;border:0;display:block";
+    ifr.setAttribute("frameborder", "0");
+    ifr.setAttribute("allowtransparency", "true");
+    ifr.setAttribute("scrolling", "no");
+    box.querySelector(".tradingview-widget-container__widget").appendChild(ifr);
   }
 
   // ---------------- 今日 · 头版（聚光灯封面） ----------------
