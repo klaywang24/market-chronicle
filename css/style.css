@@ -791,6 +791,10 @@ th.left { text-align: left; }
 .contact-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .contact-list .c-icon { display: inline-flex; align-items: center; justify-content: center; width: 22px; flex-shrink: 0; }
 .c-ic { width: 19px; height: 19px; fill: var(--ink); opacity: 0.8; }
+/* 联系页品牌色图标；X/GitHub 官方品牌色即黑（深色模式随 --ink 反白），不单独上色 */
+.c-ic-web { fill: #1878BF; opacity: 1; }
+.c-ic-mail { fill: #EA4335; opacity: 1; }
+.c-ic-discord { fill: #5865F2; opacity: 1; }
 .contact-list .c-label { min-width: 84px; color: var(--ink-muted); font-size: 13px; }
 
 /* ---------------- 行情 tab（左目录 + TradingView 图表） ---------------- */
