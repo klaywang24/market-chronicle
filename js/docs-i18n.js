@@ -8,6 +8,7 @@
 
   // 各平台品牌图标（inline SVG，随文本色，各语言通用）
   const ICON = {
+    web: '<svg class="c-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm7.93 9h-3.02c-.13-2.4-.72-4.6-1.64-6.24A8.01 8.01 0 0119.93 11zM12 4.04c1.1 1.36 1.95 3.82 2.11 6.96H9.89c.16-3.14 1.01-5.6 2.11-6.96zM8.73 4.76C7.81 6.4 7.22 8.6 7.09 11H4.07a8.01 8.01 0 014.66-6.24zM4.07 13h3.02c.13 2.4.72 4.6 1.64 6.24A8.01 8.01 0 014.07 13zM12 19.96c-1.1-1.36-1.95-3.82-2.11-6.96h4.22c-.16 3.14-1.01 5.6-2.11 6.96zm3.27-.72c.92-1.64 1.51-3.84 1.64-6.24h3.02a8.01 8.01 0 01-4.66 6.24z"/></svg>',
     email: '<svg class="c-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg>',
     x: '<svg class="c-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
     github: '<svg class="c-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>',
@@ -17,6 +18,7 @@
   // 联系页正文按语言拼装（图标+链接不变，仅文案变）
   const contactBody = (t) =>
     `<ul class="contact-list">
+      <li><span class="c-icon">${ICON.web}</span><span class="c-label">${t.site}</span><a href="https://klay-wang.com/" target="_blank" rel="noopener">klay-wang.com</a></li>
       <li><span class="c-icon">${ICON.email}</span><span class="c-label">${t.email}</span><a href="mailto:${EMAIL}">${EMAIL}</a></li>
       <li><span class="c-icon">${ICON.x}</span><span class="c-label">X</span><a href="https://x.com/_Klay24_" target="_blank" rel="noopener">@_Klay24_</a></li>
       <li><span class="c-icon">${ICON.github}</span><span class="c-label">GitHub</span><a href="https://github.com/klaywang24/market-chronicle" target="_blank" rel="noopener">klaywang24/market-chronicle</a> · ${t.issues}</li>
@@ -70,7 +72,7 @@
     contact: {
       en: { kicker: "CONTACT", h1: "Contact",
         dek: "Data issues, feature ideas, collaboration — reach out anytime.",
-        body: contactBody({ email: "Email", issues: "bugs &amp; ideas via Issues", join: "Join Discord", channels: "daily front-page bot · market chat · LEAPS talk" }) },
+        body: contactBody({ site: "Website", email: "Email", issues: "bugs &amp; ideas via Issues", join: "Join Discord", channels: "daily front-page bot · market chat · LEAPS talk" }) },
       fr: { kicker: "CONTACT", h1: "Contact",
         dek: "Problèmes de données, idées de fonctionnalités, collaboration — écrivez quand vous voulez.",
         body: contactBody({ email: "E-mail", issues: "bugs &amp; idées via Issues", join: "Rejoindre Discord", channels: "bot Une quotidienne · discussion marché · LEAPS" }) },
