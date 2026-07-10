@@ -1593,7 +1593,7 @@
         { name: "纳指 100", type: "line", data: zip(lp.dates, lp.ndx), showSymbol: false, silent: true,
           lineStyle: { color: p.muted, width: 1, opacity: 0.7 }, itemStyle: { color: p.muted } },
         { name: "LEAPS 窗口开启", type: "scatter", data: lPts, symbolSize: 9, itemStyle: { color: p.moss } },
-        { name: "K < 1 信号", type: "scatter", data: kPts, symbol: "diamond", symbolSize: 14, itemStyle: { color: p.accent } },
+        { name: "K < 1 信号", type: "scatter", data: kPts, symbol: "diamond", symbolSize: 14, itemStyle: { color: p.danger } },
       ],
     };
   }
@@ -1687,7 +1687,7 @@
       series: [
         { name: "纳指 100", type: "line", data: zip(kd.dates, kd.ndx), showSymbol: false, silent: true,
           lineStyle: { color: p.muted, width: 1, opacity: 0.7 }, itemStyle: { color: p.muted } },
-        { name: "K < 1 信号", type: "scatter", data: pts, symbol: "diamond", symbolSize: 15, itemStyle: { color: p.accent } },
+        { name: "K < 1 信号", type: "scatter", data: pts, symbol: "diamond", symbolSize: 15, itemStyle: { color: p.danger } },
       ],
     };
   }
