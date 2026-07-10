@@ -797,6 +797,23 @@ th.left { text-align: left; }
 .c-ic-discord { fill: #5865F2; opacity: 1; }
 .contact-list .c-label { min-width: 84px; color: var(--ink-muted); font-size: 13px; }
 
+/* Icon-only contact row (mirrors klay-wang.com footer): brand-colored circles,
+   glyph in white, tooltip via title. Old .contact-list styles kept for safety. */
+.contact-icons { display: flex; flex-wrap: wrap; gap: 14px; margin: 18px 0 6px; }
+.contact-icons .ci {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 46px; height: 46px; border-radius: 50%;
+  border: 1px solid var(--border); text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.contact-icons .ci:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
+.contact-icons .ci .c-ic { width: 21px; height: 21px; fill: #fff; opacity: 1; }
+.ci-web { background: #1878BF; }
+.ci-mail { background: #EA4335; }
+.ci-x { background: #14171a; }
+.ci-github { background: #24292f; }
+.ci-discord { background: #5865F2; }
+
 /* ---------------- 行情 tab（左目录 + TradingView 图表） ---------------- */
 .quote-hero { margin-bottom: 18px; }
 .quote-layout { display: flex; gap: 16px; align-items: stretch; }

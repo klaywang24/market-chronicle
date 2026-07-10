@@ -17,13 +17,13 @@
 
   // 联系页正文按语言拼装（图标+链接不变，仅文案变）
   const contactBody = (t) =>
-    `<ul class="contact-list">
-      <li><span class="c-icon">${ICON.web}</span><span class="c-label">${t.site}</span><a href="https://klay-wang.com/" target="_blank" rel="noopener">klay-wang.com</a></li>
-      <li><span class="c-icon">${ICON.email}</span><span class="c-label">${t.email}</span><a href="mailto:${EMAIL}">${EMAIL}</a></li>
-      <li><span class="c-icon">${ICON.x}</span><span class="c-label">X</span><a href="https://x.com/_Klay24_" target="_blank" rel="noopener">@_Klay24_</a></li>
-      <li><span class="c-icon">${ICON.github}</span><span class="c-label">GitHub</span><a href="https://github.com/klaywang24/market-chronicle" target="_blank" rel="noopener">klaywang24/market-chronicle</a> · ${t.issues}</li>
-      <li><span class="c-icon">${ICON.discord}</span><span class="c-label">Discord</span><a href="https://discord.gg/MnMEZg7Kx2" target="_blank" rel="noopener">${t.join}</a> · ${t.channels}</li>
-    </ul>`;
+    `<div class="contact-icons">
+      <a class="ci ci-web" href="https://klay-wang.com/" target="_blank" rel="noopener" title="klay-wang.com" aria-label="Personal website">${ICON.web}</a>
+      <a class="ci ci-mail" href="mailto:${EMAIL}" title="${EMAIL}" aria-label="Email">${ICON.email}</a>
+      <a class="ci ci-x" href="https://x.com/_Klay24_" target="_blank" rel="noopener" title="@_Klay24_" aria-label="X">${ICON.x}</a>
+      <a class="ci ci-github" href="https://github.com/klaywang24/market-chronicle" target="_blank" rel="noopener" title="klaywang24/market-chronicle" aria-label="GitHub">${ICON.github}</a>
+      <a class="ci ci-discord" href="https://discord.gg/MnMEZg7Kx2" target="_blank" rel="noopener" title="Discord" aria-label="Discord">${ICON.discord}</a>
+    </div>`;
 
   const DOC_TR = {
     about: {

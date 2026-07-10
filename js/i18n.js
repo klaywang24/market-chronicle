@@ -6,7 +6,7 @@
   // 词条格式："简体原文": [EN, FR, DE, ES]
   const D = {
     // ---- 页脚 ----
-    "每个交易日自动更新的美股百年图表档案与信号台账 · 免费 · 代码公开": ["A self-updating archive of a century of US market charts, plus a public signal ledger · free · source-available", "", "", ""],
+    "每个交易日自动更新的美股百年图表档案与信号台账": ["A self-updating archive of a century of US market charts, plus a public signal ledger", "", "", ""],
     "关于": ["About", "À propos", "Über", "Acerca de"],
     "联系": ["Contact", "Contact", "Kontakt", "Contacto"],
     "定价": ["Pricing", "Tarifs", "Preise", "Precios"],
