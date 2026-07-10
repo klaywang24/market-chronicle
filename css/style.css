@@ -1020,3 +1020,14 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 .ledger-card .lc-val { text-align: center; font-size: 44px; margin: 10px 0 4px; }
 .ledger-card .lc-state { text-align: center; }
 @media (max-width: 900px) { .ledger-card .lc-val { font-size: 36px; } }
+
+/* 情绪仪表盘二轮：数字居中放大 + 期限结构四值网格 */
+.senti-card .lc-val { text-align: center; font-size: 38px; margin: 10px 0 4px; }
+.senti-card .lc-state { text-align: center; }
+.term-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+  margin: 10px 0 10px; text-align: center;
+}
+.term-grid span { display: block; font-size: 11px; color: var(--ink-muted); }
+.term-grid b { display: block; font-family: "JetBrains Mono", monospace; font-size: 15px; margin-top: 2px; }
+@media (max-width: 900px) { .senti-card .lc-val { font-size: 32px; } }

@@ -1907,6 +1907,7 @@
       }).join("");
       const t = senti.term.current;
       const inverted = t.ratio_3m > 1;
+      // 布局：第一行 = 三张单数字卡（P/C · 纳指溢价 · SKEW），第二行 = 广度 · 期限结构 · 七分量
       sentiHTML = `
       <div class="pulse-senti">
         <div class="pulse-section-label">情绪仪表盘 · 恐惧的分解</div>
@@ -1915,16 +1916,6 @@
             <div class="lc-name">Put/Call 比 <span>全市场 · 5 日均值</span></div>
             <div class="lc-val">${senti.pc.current == null ? "--" : senti.pc.current.toFixed(2)}</div>
             <div class="lc-meta"><span>近一年百分位</span> <b>${senti.pc.pctile == null ? "--" : senti.pc.pctile.toFixed(0)}</b><br><span>越高 = 买保护的人越多 = 越恐慌</span></div>
-          </div>
-          <div class="senti-card">
-            <div class="lc-name">VIX 期限结构 <span>VIX ÷ VIX3M</span></div>
-            <div class="lc-val">${t.ratio_3m.toFixed(2)}</div>
-            <div class="lc-state ${inverted ? "neg" : "pos"}">${inverted ? "倒挂（近端恐慌）" : "升水（结构正常）"}</div>
-            <div class="lc-meta"><span>9天</span> <b>${t.vix9d.toFixed(1)}</b> · <span>30天</span> <b>${t.vix.toFixed(1)}</b> · <span>3月</span> <b>${t.vix3m.toFixed(1)}</b> · <span>6月</span> <b>${t.vix6m.toFixed(1)}</b><br><span>比值 2011 年来百分位</span> <b>${t.pctile.toFixed(0)}</b> · <span>大于 1 = 倒挂 = 历史级恐慌</span></div>
-          </div>
-          <div class="senti-card">
-            <div class="lc-name">恐贪指数的七个分量 <span>CNN 官方口径</span></div>
-            ${subRows}
           </div>
           ${senti.vxn ? `
           <div class="senti-card">
@@ -1944,6 +1935,22 @@
             <div class="lc-val">${breadth.current.toFixed(0)}%</div>
             <div class="lc-meta"><span>累积史百分位</span> <b>${breadth.pctile.toFixed(0)}</b>（<span>自</span> ${breadth.since}）<br><span>越低 = 超卖越深，历史底部常见个位数</span></div>
           </div>` : ""}
+          <div class="senti-card">
+            <div class="lc-name">VIX 期限结构 <span>VIX ÷ VIX3M</span></div>
+            <div class="lc-val">${t.ratio_3m.toFixed(2)}</div>
+            <div class="lc-state ${inverted ? "neg" : "pos"}">${inverted ? "倒挂（近端恐慌）" : "升水（结构正常）"}</div>
+            <div class="term-grid">
+              <div><span>9天</span><b>${t.vix9d.toFixed(1)}</b></div>
+              <div><span>30天</span><b>${t.vix.toFixed(1)}</b></div>
+              <div><span>3月</span><b>${t.vix3m.toFixed(1)}</b></div>
+              <div><span>6月</span><b>${t.vix6m.toFixed(1)}</b></div>
+            </div>
+            <div class="lc-meta"><span>比值 2011 年来百分位</span> <b>${t.pctile.toFixed(0)}</b> · <span>大于 1 = 倒挂 = 历史级恐慌</span></div>
+          </div>
+          <div class="senti-card">
+            <div class="lc-name">恐贪指数的七个分量 <span>CNN 官方口径</span></div>
+            ${subRows}
+          </div>
         </div>
         <p class="footnote senti-note"><span>数据截至</span> ${senti.date} · CNN Fear & Greed + Cboe + Yahoo Finance · <span>每交易日收盘后自动更新</span></p>
       </div>`;
