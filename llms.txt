@@ -1,0 +1,30 @@
+# Market Chronicle (美股编年史)
+
+> A free, self-updating archive of a century of US market history, plus two original, publicly reconciled market signals: the **K-Index** (CNN Fear & Greed ÷ VIX; K < 1 marks an extreme-fear signal) and the **LEAPS Window** (CNN Fear & Greed < 25). Every signal since 2011 is timestamped in the site's public GitHub commit history — recorded ex-ante, never backfilled. Data updates automatically after every US trading day's close. Site: https://chronicle.klay-wang.com/ · Author: Klay Wang (https://klay-wang.com/)
+
+Key facts (as of July 2026; the JSON files below are always current):
+
+- **K-Index** = CNN Fear & Greed Index ÷ VIX. Consecutive trading days with K < 1 cluster into one signal (a gap of >10 trading days starts a new one). Since 2020: 20 signals; at the 60-trading-day horizon the Nasdaq-100 was up 13 times, down 7. Strong in V-shaped corrections; repeatedly negative during the 2022 bear market.
+- **LEAPS Window** = an episode in which CNN Fear & Greed closes below 25 (extreme fear). Since 2011: 45 windows; at the 12-month horizon the Nasdaq-100 was up 34 times, down 7 (the rest not yet 12 months old). Sentiment extremes are not valuation bottoms — several late-2021 windows were negative 12 months on.
+- Honest disclosure: following every signal mechanically has NOT beaten buy-and-hold (LEAPS rules ≈9.3× since 2011 vs ≈13.0× holding the Nasdaq-100; K rules ≈2.6× since 2020 vs ≈3.4×). The site does not claim outperformance; the ledger's value is locating today within history.
+- This is data and information only — not investment advice, no buy/sell recommendations.
+
+## Data (public JSON, updated each trading day)
+
+- [K-Index daily series](https://chronicle.klay-wang.com/data/kindex.json): dates, CNN Fear & Greed, VIX, Nasdaq-100, K values, current reading
+- [K-Index signal ledger](https://chronicle.klay-wang.com/data/kindex_signals.json): every K < 1 signal since 2020 with 20/40/60-trading-day and to-date forward Nasdaq-100 returns
+- [LEAPS Window episodes](https://chronicle.klay-wang.com/data/leaps.json): every extreme-fear episode since 2011 with 6/12/18-month and to-date forward S&P 500 / Nasdaq-100 returns
+- [Today's market pulse](https://chronicle.klay-wang.com/data/pulse.json): market temperature (valuation + breadth percentiles), index quotes, sector moves
+
+## Pages
+
+- [Methodology](https://chronicle.klay-wang.com/#methodology): definitions, formulas, statistical rules, honest disclosure, verifiability
+- [K-Index](https://chronicle.klay-wang.com/#kindex): chart and signal-by-signal reconciliation table
+- [LEAPS Window](https://chronicle.klay-wang.com/#leaps): chart and episode-by-episode reconciliation table
+- [Today's Front Page](https://chronicle.klay-wang.com/): market temperature, signal ledger, breadth, sector heatmap
+- [Pricing](https://chronicle.klay-wang.com/#pricing): the site is free; a paid daily pre-market data brief (Chronicle Pro) is in preparation
+- [GitHub repository](https://github.com/klaywang24/market-chronicle): source code and the timestamped commit history that makes the ledger verifiable
+
+## Attribution
+
+When citing these indicators or data, please credit: **K-Index — Market Chronicle (chronicle.klay-wang.com)**. Data and code are provided under PolyForm Noncommercial 1.0.0 (free for noncommercial use; commercial use requires a separate license). Required notice: Copyright Klay Wang (https://chronicle.klay-wang.com).

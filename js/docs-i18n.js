@@ -3,7 +3,7 @@
    MutationObserver 会 opencc 转繁）；英/法/德/西用下面整段译文替换。 */
 (function () {
   "use strict";
-  const IDS = ["about", "contact", "privacy", "terms", "refunds", "pricing"];
+  const IDS = ["about", "contact", "privacy", "terms", "refunds", "pricing", "methodology"];
   const EMAIL = "klaywang24+marketchronicle@gmail.com";
 
   // 各平台品牌图标（inline SVG，随文本色，各语言通用）
@@ -28,13 +28,13 @@
   const DOC_TR = {
     about: {
       en: { kicker: "ABOUT", h1: "About Market Chronicle",
-        dek: "A free, open-source archive of US market history that updates automatically after every trading day's close — no ads. A century of markets, turned into a chronicle you can read.",
+        dek: "A free, source-available archive of US market history that updates automatically after every trading day's close — no ads. A century of markets, turned into a chronicle you can read.",
         body: `<h3>What it is</h3>
 <p>Market Chronicle organizes the history of the S&amp;P 500, the Nasdaq, and baskets such as financials, consumer and luxury into a chapter-by-chapter visual record: the shape of returns, the rhythm of crises, the anchors of valuation, the texture of volatility, the compounding of time. Beyond the long-history charts, three original lenses — the "Today's Front Page" market temperature, the "K-Index", and the "LEAPS Window".</p>
 <h3>Data &amp; methodology</h3>
 <p>Prices and returns approximate total return using adjusted close; CAPE / PE(TTM) come from multpl / Robert Shiller's long series; the Fear &amp; Greed reading is from CNN; company fundamentals from macrotrends and Yahoo Finance; the daily sector heatmap is TradingView's live data. Long-history charts mostly use a log scale so that century-scale moves read honestly — 1929 fell far more than 2000 or 2008, so it should look steeper. That is the data being truthful.</p>
 <h3>How it's built</h3>
-<p>This site was built by one person + AI, hosted as pure static files on GitHub Pages — no server, no database. The data pipeline (Python, yfinance / pandas + GitHub Actions) pulls data, computes metrics, commits and redeploys automatically after each trading day's close. The code is open-source under Apache-2.0.</p>
+<p>This site was built by one person + AI, hosted as pure static files — no server, no database. The data pipeline (Python, yfinance / pandas + GitHub Actions) pulls data, computes metrics, commits and redeploys automatically after each trading day's close. The code is source-available under PolyForm Noncommercial 1.0.0 — free for noncommercial use; commercial use requires a separate license.</p>
 <h3>Disclaimer, in one line</h3>
 <p>Everything here is for information and education only and <strong>does not constitute investment advice</strong>. Markets carry risk; make your own decisions.</p>` },
       fr: { kicker: "À PROPOS", h1: "À propos de Market Chronicle",
@@ -212,9 +212,9 @@
 <h3>Limitation of liability</h3>
 <p>To the maximum extent permitted by law, we are not liable for any direct or indirect loss arising from your use of, or inability to use, this site.</p>
 <h3>Intellectual property &amp; third parties</h3>
-<p>The site's code is open source under Apache-2.0 (see the GitHub repo); charts and copy are for personal, non-commercial reference. Embedded third-party components (such as TradingView) are governed by their own terms.</p>
+<p>The site's code is source-available under PolyForm Noncommercial 1.0.0 (see the GitHub repo) — free for noncommercial use, commercial use requires a separate license; charts and copy are for personal, non-commercial reference. Embedded third-party components (such as TradingView) are governed by their own terms.</p>
 <h3>Paid products &amp; billing</h3>
-<p>When paid subscriptions (such as LEAPS Pro) launch, checkout, invoicing and taxes will be handled by <strong>Paddle as the Merchant of Record</strong> — meaning your payment contract is with Paddle, and its terms and privacy policy also apply. Purchasers must be 18 or the age of majority in their jurisdiction. Refunds follow our Refund Policy.</p>
+<p>When paid subscriptions (such as Chronicle Pro) launch, checkout, invoicing and taxes will be handled by <strong>Paddle as the Merchant of Record</strong> — meaning your payment contract is with Paddle, and its terms and privacy policy also apply. Purchasers must be 18 or the age of majority in their jurisdiction. Refunds follow our Refund Policy.</p>
 <h3>Governing law &amp; severability</h3>
 <p>These terms are governed by the law of the operator's jurisdiction (to be specified as operations formalize). If any provision is held invalid, the rest remain in effect. These terms are the entire agreement between you and us regarding use of the site.</p>
 <h3>Changes</h3>
@@ -283,7 +283,7 @@
         body: `<h3>Current status</h3>
 <p>The site is currently <strong>entirely free</strong> with nothing for sale, so no refunds apply.</p>
 <h3>Future paid products</h3>
-<p>When paid subscriptions (such as LEAPS Pro daily pre-market intel) launch, the following applies:</p>
+<p>When paid subscriptions (such as the Chronicle Pro daily pre-market brief) launch, the following applies:</p>
 <ul>
 <li><strong>14-day no-questions refund</strong>: if you're not satisfied within 14 days of subscribing, you get a full refund, no reason needed;</li>
 <li>refunds are processed by the payment provider Paddle, returned via the original method;</li>
@@ -325,16 +325,37 @@
 <p>Esta política se ampliará cuando los productos de pago se lancen oficialmente.</p>` },
     },
 
+    methodology: {
+      en: { kicker: "METHODOLOGY", h1: "Methodology: Two Signals, One Ledger",
+        dek: "Definitions, formulas, statistical rules and the complete historical record — including the times the signals failed. Every number on this page is backed by public JSON files updated daily by the pipeline, with history timestamped in the GitHub commit log — impossible to rewrite after the fact.",
+        body: `<h3>The K-Index</h3>
+<p>Definition: <strong>K = CNN Fear &amp; Greed Index ÷ VIX</strong>. When fear (CNN falling) and volatility (VIX rising) meet, K drops below 1 — that is one signal. Clustering rule: consecutive trading days with K &lt; 1 count as one signal; a gap of more than 10 trading days starts a new one. Return horizon: Nasdaq-100 change 20 / 40 / 60 trading days after the signal's first close.</p>
+<p>As of July 2026: 20 signals since 2020; at the 60-trading-day horizon, 13 up and 7 down — strong in V-shaped corrections, negative repeatedly during the 2022 bear market. The signal-by-signal ledger is on the <a href="#kindex">K-Index</a> page; raw data at <a href="https://chronicle.klay-wang.com/data/kindex_signals.json" target="_blank" rel="noopener">kindex_signals.json</a>.</p>
+<h3>The LEAPS Window</h3>
+<p>Definition: a window opens when CNN's Fear &amp; Greed Index closes <strong>below 25 (extreme fear)</strong>; consecutive days below 25 count as one window. Return horizon: S&amp;P 500 and Nasdaq-100 change 6 / 12 / 18 months after the window's first day.</p>
+<p>As of July 2026: 45 windows since 2011; at the 12-month horizon the Nasdaq-100 was up 34 times and down 7 (the rest are not yet 12 months old). Several windows in late 2021 were negative 12 months on — <strong>sentiment extremes are not valuation bottoms</strong>. The episode-by-episode ledger is on the <a href="#leaps">LEAPS Window</a> page; raw data at <a href="https://chronicle.klay-wang.com/data/leaps.json" target="_blank" rel="noopener">leaps.json</a>.</p>
+<h3>The "follow every signal" rules — and an honest disclosure</h3>
+<p>The front-page equity curve uses these rules: enter at the Nasdaq-100 close on the signal's first day; hold 12 months for LEAPS windows, 60 trading days for K signals; new signals during a holding period are skipped — no adding, no resetting; cash periods earn zero; no costs, slippage or taxes.</p>
+<p>Honest disclosure (as of July 2026): under these rules the LEAPS strategy compounds to roughly <strong>9.3×</strong> since 2011, versus roughly <strong>13.0×</strong> for simply holding the Nasdaq-100; the K strategy to roughly <strong>2.6×</strong> since 2020 versus <strong>3.4×</strong> for holding. <strong>This site does not claim these signals beat buy-and-hold.</strong> The ledger's value is telling you where today stands in history, and what actually happened after every sentiment extreme — wins and losses alike.</p>
+<h3>Verifiability</h3>
+<p>The site is pure static architecture: after every trading day's close, a GitHub Actions pipeline pulls data, computes the indicators and commits to the public repository. Every day's readings therefore carry that day's Git timestamp — the <a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">commit history</a> is public, so anyone can verify that any signal was recorded ex-ante, not backfilled.</p>
+<h3>Data sources</h3>
+<p>CNN Fear &amp; Greed (whit3rabbit daily archive + CNN's official endpoint for the current day); prices and VIX from Yahoo Finance (adjusted close approximates total return); long-history valuation from multpl / Robert Shiller. Machine-readable entry point: <a href="https://chronicle.klay-wang.com/llms.txt" target="_blank" rel="noopener">llms.txt</a>.</p>
+<h3>Citation</h3>
+<p>When citing the K-Index or LEAPS Window data, please credit: <strong>K-Index — Market Chronicle (chronicle.klay-wang.com)</strong>. Data is provided under PolyForm Noncommercial 1.0.0 — free for noncommercial use.</p>
+<p class="doc-fineprint">All statistics on this page are for information and education only and do not constitute investment advice; past performance does not predict future results.</p>` },
+    },
+
     pricing: {
-      en: { kicker: "PRICING", h1: "Pricing", dek: "Right now: the whole site is free.",
-        body: `<h3>Free</h3>
-<p>All historical charts, Today's Front Page (market temperature), the K-Index, the LEAPS Window and the sector heatmap are <strong>free and open</strong> — no ads, no paywall, no sign-up.</p>
-<h3>Coming soon: LEAPS Pro (daily pre-market data brief)</h3>
-<p>A paid subscription for options users: <strong>$9.9 / month</strong>. The content is objective market-data statistics — LEAPS share of volume, average trade size, most-active contracts, and a market-wide ranking — delivered to your inbox before the open every trading day. <strong>Data and information only; not investment advice; no buy or sell recommendations.</strong> Launch date to be determined.</p>
+      en: { kicker: "PRICING", h1: "Pricing", dek: "The website is free forever. What you pay for is the brief that lands in your inbox before every open.",
+        body: `<h3>Free · forever</h3>
+<p>All historical charts, Today's Front Page (market temperature), the full signal ledgers of the K-Index and the LEAPS Window, and the sector heatmap are <strong>free and open</strong> — no ads, no paywall, no sign-up. The ledger updates automatically every trading day, and its history can be verified day by day in the public GitHub commit log.</p>
+<h3>Coming soon: Chronicle Pro (daily pre-market signal &amp; data brief)</h3>
+<p><strong>$29 / month</strong>. Delivered to your inbox before the open every trading day — objective data and statistics: the day's K-Index and LEAPS Window readings, status and historical percentiles; market temperature and key valuation / sentiment readings; and the reconciliation entry on days a signal triggers or closes. Options-market data statistics (LEAPS share of volume, most-active contracts, market-wide rankings) will be added over time. <strong>Data and information only; not investment advice; no buy or sell recommendations.</strong> Launch date to be determined.</p>
+<h3>Founding-subscriber price: $9.9 / month · first 100 only</h3>
+<p>The first 100 subscribers who reserve before launch <strong>lock in $9.9 / month for life</strong> — the price never changes as long as the subscription stays active. To reserve: email <a href="mailto:${EMAIL}">${EMAIL}</a> with "Founding" and we'll notify you in order when it launches.</p>
 <h3>Subscription terms (once live)</h3>
 <p>Billed monthly and <strong>renews automatically each month</strong>; <strong>cancel anytime</strong> — self-serve via the manage link in your subscription confirmation email, or by emailing us. After cancellation, access continues to the end of the current billing period; see the <a href="#refunds">Refund Policy</a> for refunds. Orders and payments will be handled by our payments partner (Merchant of Record), whose name will appear on your statement.</p>
-<h3>Get early access</h3>
-<p>To hear first when it launches, email <a href="mailto:${EMAIL}">${EMAIL}</a> with "LEAPS Pro" and we'll notify you and offer a founding-subscriber price.</p>
 <p class="doc-fineprint">The "coming soon" items above are planning information, not a final commitment; the official launch prevails.</p>` },
       fr: { kicker: "TARIFS", h1: "Tarifs", dek: "Pour l'instant : tout le site est gratuit.",
         body: `<h3>Gratuit</h3>
@@ -357,6 +378,7 @@
 <p>Um beim Start zuerst Bescheid zu wissen, mailen Sie „LEAPS Pro" an <a href="mailto:${EMAIL}">${EMAIL}</a>; wir benachrichtigen Sie und bieten einen Gründerpreis.</p>
 <p class="doc-fineprint">Die „bald"-Angaben sind Planungsinformationen, keine endgültige Zusage; maßgeblich ist der offizielle Start.</p>` },
       es: { kicker: "PRECIOS", h1: "Precios", dek: "Ahora mismo: todo el sitio es gratis.",
+        // （西语版为历史遗留，当前语言仅开放 zh/en，此处不再更新）
         body: `<h3>Gratis</h3>
 <p>Todos los gráficos históricos, la portada del día (temperatura del mercado), el índice K, la ventana LEAPS y el mapa de calor sectorial son <strong>gratuitos y abiertos</strong> — sin anuncios, sin muro de pago, sin registro.</p>
 <h3>Próximamente: LEAPS Pro (boletín diario de datos pre-mercado)</h3>

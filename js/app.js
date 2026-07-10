@@ -51,7 +51,7 @@
     // 行情（TradingView widget，非 ECharts；空数组让路由识别，挂载逻辑见 mountQuote）
     quote: [],
     // 页脚静态页（无图表，空数组即可，让路由识别并显示对应 panel）
-    about: [], contact: [], privacy: [], terms: [], refunds: [], pricing: [] };
+    about: [], contact: [], privacy: [], terms: [], refunds: [], pricing: [], methodology: [] };
   const built = new Map(); // el id -> echarts instance
 
   function chart(panel, elId, build) {
@@ -725,7 +725,7 @@
       buildToc();
     });
     // 页脚静态页从顶部看起
-    if (["about", "contact", "privacy", "terms", "refunds", "pricing"].includes(target)) window.scrollTo(0, 0);
+    if (["about", "contact", "privacy", "terms", "refunds", "pricing", "methodology"].includes(target)) window.scrollTo(0, 0);
   }
   window.addEventListener("hashchange", route);
 
@@ -1530,14 +1530,90 @@
   }
 
   // ---------------- 今日 · 头版（聚光灯封面） ----------------
+  // ---------------- 头版 · 信号台账两张图 ----------------
+  // 落点图：纳指 100 对数线 + 每一次 LEAPS 窗口 / K<1 信号的入场点
+  async function buildLedgerMap(p) {
+    const [lp, ks] = await Promise.all([load("leaps"), load("kindex_signals")]);
+    const idx = new Map(lp.dates.map((d, i) => [d, i]));
+    const at = (ds) => {
+      let i = idx.has(ds) ? idx.get(ds) : lp.dates.findIndex((x) => x >= ds);
+      return i == null || i < 0 ? null : [lp.dates[i], lp.ndx[i]];
+    };
+    const lPts = lp.episodes.map((e) => { const q = at(e.start); return q && { value: q, ep: e }; }).filter(Boolean);
+    const kPts = ks.signals.map((s) => { const q = at(s.start); return q && { value: q, sg: s }; }).filter(Boolean);
+    return {
+      tooltip: tip(p, {
+        trigger: "item",
+        formatter: (o) => {
+          if (o.data && o.data.ep) { const e = o.data.ep; return `${e.start}<br/>LEAPS 窗口 · 最低恐贪 ${e.min_fng}<br/>12 个月后 ${pct(e.ndx_m12)}（纳指 100）`; }
+          if (o.data && o.data.sg) { const s = o.data.sg; return `${s.start}<br/>K &lt; 1 信号 · 最低 K ${s.min_k}<br/>60 个交易日后 ${pct(s.fwd60)}（纳指 100）`; }
+          return "";
+        },
+      }),
+      legend: { top: 0, left: 0, textStyle: { color: p.muted, fontSize: 11 }, itemWidth: 12, itemHeight: 8 },
+      grid: { left: 52, right: 18, top: 34, bottom: 28 },
+      xAxis: timeX(p),
+      yAxis: Object.assign({ type: "log", splitLine: { show: false } }, baseAxis(p)),
+      series: [
+        { name: "纳指 100", type: "line", data: zip(lp.dates, lp.ndx), showSymbol: false, silent: true,
+          lineStyle: { color: p.muted, width: 1, opacity: 0.7 }, itemStyle: { color: p.muted } },
+        { name: "LEAPS 窗口开启", type: "scatter", data: lPts, symbolSize: 7, itemStyle: { color: p.moss } },
+        { name: "K < 1 信号", type: "scatter", data: kPts, symbol: "diamond", symbolSize: 9, itemStyle: { color: p.accent } },
+      ],
+    };
+  }
+
+  // 净值曲线：每次窗口首日买入纳指 100 持有 12 个月（持有期内新窗口跳过、空仓期记零、不计成本），对照一直持有
+  async function buildLedgerEq(p) {
+    const lp = await load("leaps");
+    const dates = lp.dates, px = lp.ndx, HOLD = 252;
+    const idx = new Map(dates.map((d, i) => [d, i]));
+    const segs = [];
+    let exit = -1;
+    for (const e of lp.episodes) {
+      let i = idx.has(e.start) ? idx.get(e.start) : dates.findIndex((x) => x >= e.start);
+      if (i == null || i < 0 || i <= exit) continue;
+      const j = Math.min(i + HOLD, px.length - 1);
+      segs.push([i, j]); exit = j;
+    }
+    if (!segs.length) throw new Error("no episodes");
+    const first = segs[0][0];
+    const strat = [], hold = [];
+    let eq = 1, si = 0;
+    for (let t = first; t < dates.length; t++) {
+      if (t > first) {
+        while (si < segs.length && t > segs[si][1]) si++;
+        if (si < segs.length && t > segs[si][0] && t <= segs[si][1]) eq *= px[t] / px[t - 1];
+      }
+      strat.push([dates[t], +eq.toFixed(4)]);
+      hold.push([dates[t], +(px[t] / px[first]).toFixed(4)]);
+    }
+    const endLbl = (color) => ({ show: true, formatter: (o) => "×" + (+o.value[1]).toFixed(1),
+      fontFamily: "JetBrains Mono", fontSize: 11, color });
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => "×" + (+v).toFixed(2) }),
+      legend: { top: 0, left: 0, textStyle: { color: p.muted, fontSize: 11 } },
+      grid: { left: 52, right: 56, top: 34, bottom: 28 },
+      xAxis: timeX(p),
+      yAxis: Object.assign({ type: "log", splitLine: { show: false } }, baseAxis(p)),
+      series: [
+        { name: "每次窗口都跟（持有 12 个月）", type: "line", data: strat, showSymbol: false,
+          lineStyle: { color: p.accent, width: 2 }, itemStyle: { color: p.accent }, endLabel: endLbl(p.accent) },
+        { name: "一直持有纳指 100", type: "line", data: hold, showSymbol: false,
+          lineStyle: { color: p.blue, width: 1.2, type: "dashed" }, itemStyle: { color: p.blue }, endLabel: endLbl(p.blue) },
+      ],
+    };
+  }
+
   async function renderPulse() {
-    let d, leaps = null;
+    let d, leaps = null, kd = null, ks = null;
     try { d = await load("pulse"); } catch (e) {
       document.getElementById("pulse-base").innerHTML =
         '<p style="color:var(--ink-muted)">数据更新中，稍后自动出现 · data updating</p>';
       return;
     }
     try { leaps = await load("leaps"); } catch (e) {}
+    try { kd = await load("kindex"); ks = await load("kindex_signals"); } catch (e) { kd = ks = null; }
 
     const chg = (v) => `<span class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(2)}%</span>`;
     const tempColor = d.temp >= 75 ? "#B8421E" : d.temp >= 50 ? "#C9882E" : d.temp >= 25 ? "#14A63E" : "#2B5F8F";
@@ -1545,6 +1621,59 @@
     const pct = (v) => v.toFixed(1);
     const q = d.quotes || {};
     const windowOpen = leaps && leaps.current && leaps.current.window_open;
+
+    // 信号台账区块（数据不全时整块跳过，不出残缺 UI）
+    let ledgerHTML = "";
+    if (leaps && kd && ks && kd.current && leaps.current) {
+      const fmt = (v) => (v == null ? "--" : (v > 0 ? "+" : "") + v.toFixed(1) + "%");
+      const sigs = ks.signals, eps = leaps.episodes;
+      const kAll = sigs.length, kW = sigs.filter((s) => s.fwd60 > 0).length,
+        kL = sigs.filter((s) => s.fwd60 != null && s.fwd60 <= 0).length;
+      const lAll = eps.length, lW = eps.filter((e) => e.ndx_m12 > 0).length,
+        lL = eps.filter((e) => e.ndx_m12 != null && e.ndx_m12 <= 0).length;
+      const kTrig = kd.current.k < 1, lOpen = leaps.current.window_open;
+      const lastK = sigs[sigs.length - 1], lastL = eps[eps.length - 1];
+      const lastLRet = lastL.ndx_to_date != null ? lastL.ndx_to_date : lastL.spx_to_date;
+      ledgerHTML = `
+      <div class="pulse-ledger">
+        <div class="pulse-section-label">信号台账 · 逐次公开对账</div>
+        <p class="ledger-intro">两个原创指标，一本逐日自动记的账——赢的和输的都在账上。读数由数据管线每个交易日自动提交，带 GitHub 时间戳，事后不可改写。</p>
+        <div class="ledger-cards">
+          <a class="ledger-card" href="#kindex">
+            <div class="lc-name">K 指数 <span>CNN 恐贪 ÷ VIX</span></div>
+            <div class="lc-val">${kd.current.k.toFixed(2)}</div>
+            <div class="lc-state ${kTrig ? "neg" : "pos"}">${kTrig ? "触发中" : "未触发"} <span>（K &lt; 1 触发）</span></div>
+            <div class="lc-meta"><b>${kAll}</b> <span>次信号（2020 年起）</span> · <span>60 个交易日后</span> <b class="pos">${kW}</b> <span>涨</span> <b class="neg">${kL}</b> <span>跌</span></div>
+          </a>
+          <a class="ledger-card" href="#leaps">
+            <div class="lc-name">LEAPS 窗口 <span>恐贪 &lt; 25 · 极端恐惧</span></div>
+            <div class="lc-val">${Math.round(leaps.current.fng)}</div>
+            <div class="lc-state ${lOpen ? "neg" : "pos"}">${lOpen ? "窗口开启" : "窗口关闭"} <span>（恐贪 &lt; 25 开启）</span></div>
+            <div class="lc-meta"><b>${lAll}</b> <span>次窗口（2011 年起）</span> · <span>12 个月后</span> <b class="pos">${lW}</b> <span>涨</span> <b class="neg">${lL}</b> <span>跌</span></div>
+          </a>
+          <div class="ledger-card">
+            <div class="lc-name">最近战报 <span>按信号首日纳指 100 收盘价计</span></div>
+            <div class="lc-row"><span class="lc-tag">K</span> <span class="lc-date">${lastK.start}</span> <span>至今</span> <b class="${lastK.fwd_to_date >= 0 ? "pos" : "neg"}">${fmt(lastK.fwd_to_date)}</b></div>
+            <div class="lc-row"><span class="lc-tag">LEAPS</span> <span class="lc-date">${lastL.start}</span> <span>至今</span> <b class="${lastLRet >= 0 ? "pos" : "neg"}">${fmt(lastLRet)}</b></div>
+            <div class="lc-meta"><span>完整对账表见 K 指数与 LEAPS 窗口两页</span></div>
+          </div>
+        </div>
+        <div class="ledger-charts">
+          <div class="card"><h3>十五年，每一次入场都标在这条线上</h3>
+            <div class="sub">纳指 100（对数坐标）· 圆点 = LEAPS 窗口开启（2011 年起）· 菱形 = K &lt; 1 信号（2020 年起）· 点任意标记看当次结果</div>
+            <div class="chart short" id="ch-ledger-map"></div></div>
+          <div class="card"><h3>如果每次窗口都跟，这本账长这样</h3>
+            <div class="sub">窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；虚线为同期一直持有</div>
+            <div class="chart short" id="ch-ledger-eq"></div></div>
+        </div>
+        <p class="ledger-note">示意口径：信号首日按收盘价入场，空仓期收益记零，不计成本与滑点。本站不宣称信号能跑赢买入持有——右图如实呈现了这一点；台账的价值在于告诉你「现在处于历史的哪个位置」。完整口径与如实披露见方法论。历史表现不预示未来，不构成投资建议。</p>
+        <div class="ledger-cta">
+          <a class="lcta lcta-primary" href="#pricing">盘前信号简报 · 创始价预约</a>
+          <a class="lcta" href="#methodology">方法论全文</a>
+          <a class="lcta" href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">在 GitHub 验证台账</a>
+        </div>
+      </div>`;
+    }
 
     document.getElementById("pulse-base").innerHTML = `
       <div class="pulse-kicker">TODAY'S FRONT PAGE · ${d.date}</div>
@@ -1573,6 +1702,7 @@
           </div>
         </div>
       </div>
+      ${ledgerHTML}
       <div>
         <div class="pulse-section-label">涨跌分布 · 标普 500 成分股</div>
         <div class="breadth-bar">
@@ -1631,6 +1761,8 @@
     // 揭示层 = 同一内容的夜间克隆 + 金色发光线（红点随克隆保留）
     const reveal = document.getElementById("pulse-reveal");
     reveal.innerHTML = base.innerHTML;
+    // 克隆层去掉 id，避免与日间层重复（getElementById/ECharts 挂载只认日间层）
+    reveal.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
     const rBand = reveal.querySelector(".pulse-chartband");
     const clonedSvg = rBand && rBand.querySelector("svg.pulse-chartline");
     if (clonedSvg) clonedSvg.remove();
@@ -1639,6 +1771,17 @@
     // 板块热力图：挂 TradingView 官方 widget（只挂日间层；揭示层的空容器留着不挂，
     // 聚光灯只掀开顶部时间线，热图区不会被揭示，无需第二个 widget）
     mountHeatmap();
+
+    // 台账两张图：DOM 就位后初始化；注册进 registry 让主题/语言切换时随 rebuildAll 重建
+    if (ledgerHTML) {
+      if (!registry.pulse.some((r) => r.elId === "ch-ledger-map")) {
+        chart("pulse", "ch-ledger-map", buildLedgerMap);
+        chart("pulse", "ch-ledger-eq", buildLedgerEq);
+      }
+      await buildOne("ch-ledger-map", buildLedgerMap);
+      await buildOne("ch-ledger-eq", buildLedgerEq);
+      stampSources();
+    }
 
     // 聚光灯：只在悬停/点击世纪时间线上的六个危机点时亮起，定位在该点；离开即熄灭
     const hero = document.getElementById("pulse-hero");

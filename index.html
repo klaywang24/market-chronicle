@@ -4,6 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>美股编年史 · Market Chronicle</title>
+<!-- SEO / GEO：主推域名 canonical + 摘要 + 社交卡片 + 结构化数据 -->
+<link rel="canonical" href="https://chronicle.klay-wang.com/">
+<meta name="description" content="美股编年史 Market Chronicle — 每个交易日自动更新的美股百年图表档案与信号台账：K 指数（CNN 恐贪 ÷ VIX）、LEAPS 极端恐惧窗口，逐次公开对账。A century of US market history plus the K-Index sentiment signal ledger, reconciled daily.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="美股编年史 · Market Chronicle">
+<meta property="og:description" content="每个交易日自动更新的美股百年图表档案与信号台账：K 指数（CNN 恐贪 ÷ VIX）与 LEAPS 极端恐惧窗口，历史逐次公开对账，包括亏损的那几次。">
+<meta property="og:url" content="https://chronicle.klay-wang.com/">
+<meta property="og:image" content="https://chronicle.klay-wang.com/icons/icon-512.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@_Klay24_">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"WebSite","name":"Market Chronicle 美股编年史","alternateName":"美股编年史","url":"https://chronicle.klay-wang.com/","inLanguage":["zh-CN","en"],
+  "description":"A free, self-updating archive of a century of US market history, plus two original, publicly reconciled market signals: the K-Index and the LEAPS Window.",
+  "publisher":{"@type":"Person","name":"Klay Wang","url":"https://klay-wang.com/"}},
+ {"@type":"Dataset","name":"K-Index daily series (CNN Fear & Greed ÷ VIX)","alternateName":"K 指数",
+  "description":"The K-Index is an original contrarian US equity sentiment indicator: K = CNN Fear & Greed Index ÷ VIX. K < 1 marks extreme-fear signals. Daily values plus a public ledger reconciling every signal since 2020 against forward Nasdaq-100 returns — wins and losses alike. Updated each trading day by an automated pipeline; history is timestamped in the site's public GitHub commit log.",
+  "url":"https://chronicle.klay-wang.com/#kindex","isAccessibleForFree":true,
+  "creator":{"@type":"Person","name":"Klay Wang","url":"https://klay-wang.com/"},
+  "license":"https://polyformproject.org/licenses/noncommercial/1.0.0/",
+  "distribution":[
+   {"@type":"DataDownload","encodingFormat":"application/json","contentUrl":"https://chronicle.klay-wang.com/data/kindex.json"},
+   {"@type":"DataDownload","encodingFormat":"application/json","contentUrl":"https://chronicle.klay-wang.com/data/kindex_signals.json"}]},
+ {"@type":"Dataset","name":"LEAPS Window episodes (CNN Fear & Greed < 25)","alternateName":"LEAPS 窗口",
+  "description":"Every episode since 2011 in which CNN's Fear & Greed Index closed below 25 (extreme fear), reconciled against 6/12/18-month forward S&P 500 and Nasdaq-100 returns. Updated each trading day.",
+  "url":"https://chronicle.klay-wang.com/#leaps","isAccessibleForFree":true,
+  "creator":{"@type":"Person","name":"Klay Wang","url":"https://klay-wang.com/"},
+  "license":"https://polyformproject.org/licenses/noncommercial/1.0.0/",
+  "distribution":[{"@type":"DataDownload","encodingFormat":"application/json","contentUrl":"https://chronicle.klay-wang.com/data/leaps.json"}]}
+]}
+</script>
 <!-- PWA：主屏图标 + 独立窗口 + 离线外壳 -->
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#F1ECDF" media="(prefers-color-scheme: light)">
@@ -21,7 +52,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260707i">
+<link rel="stylesheet" href="css/style.css?v=20260710a">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -38,6 +69,8 @@
     <div class="brand">美股编年史<em>Market Chronicle</em></div>
     <nav class="tabs" id="tabs">
       <button class="tab active" data-panel="pulse">今日</button>
+      <button class="tab" data-panel="kindex">K 指数</button>
+      <button class="tab" data-panel="leaps">LEAPS 窗口</button>
       <button class="tab" data-panel="spy">标普 500</button>
       <button class="tab" data-panel="qqq">纳斯达克</button>
       <button class="tab" data-panel="tech">科技</button>
@@ -45,8 +78,6 @@
       <button class="tab" data-panel="consumer">消费</button>
       <button class="tab" data-panel="luxury">奢侈品</button>
       <button class="tab" data-panel="macro">宏观</button>
-      <button class="tab" data-panel="kindex">K 指数</button>
-      <button class="tab" data-panel="leaps">LEAPS 窗口</button>
       <button class="tab" data-panel="quote">行情</button>
     </nav>
     <div class="top-controls">
@@ -539,14 +570,14 @@
 <section class="panel" id="panel-about">
   <div class="doc-page">
     <div class="hero"><div class="kicker">ABOUT · 关于</div><h1>关于美股编年史</h1>
-      <p class="dek">一个每个交易日收盘后自动更新的美股历史图表档案站——免费、无广告、开源。把近百年的市场，做成一部可以读的编年史。</p></div>
+      <p class="dek">一个每个交易日收盘后自动更新的美股历史图表档案站——免费、无广告、代码公开。把近百年的市场，做成一部可以读的编年史。</p></div>
     <div class="doc-body">
       <h3>这是什么</h3>
       <p>美股编年史（Market Chronicle）把标普 500、纳斯达克，以及金融、消费、奢侈品等个股篮子的历史，整理成章节式的可视化：回报的形状、危机的节奏、估值的锚、波动的纹理、时间的复利。除了长历史图表，还有三个自研视角——「今日头版」的市场温度、「K 指数」、「LEAPS 窗口」。</p>
       <h3>数据与口径</h3>
       <p>价格与回报以复权收盘价（Adj Close）近似含分红总回报；估值 CAPE / PE(TTM) 来自 multpl / Robert Shiller 的长历史序列；恐惧贪婪指数来自 CNN；个股基本面来自 macrotrends 与 Yahoo Finance；今日板块热力图为 TradingView 实时数据。长历史图表多采用对数坐标，以如实呈现百年尺度上的涨跌——1929 年跌得比 2000、2008 深得多，图上就应当更陡，这是数据本身的诚实。</p>
       <h3>怎么建的</h3>
-      <p>本站由一人 + AI 搭建，纯静态托管在 GitHub Pages 上，无服务器、无数据库。数据管线用 Python（yfinance / pandas）+ GitHub Actions，每个交易日收盘后自动拉数、算指标、提交、重新部署。代码以 Apache-2.0 开源。</p>
+      <p>本站由一人 + AI 搭建，纯静态托管，无服务器、无数据库。数据管线用 Python（yfinance / pandas）+ GitHub Actions，每个交易日收盘后自动拉数、算指标、提交、重新部署。代码以 PolyForm Noncommercial 1.0.0 许可公开——非商业使用免费，商业使用需另行授权。</p>
       <h3>一句话免责</h3>
       <p>本站所有内容仅供信息与教育用途，<strong>不构成任何投资建议</strong>。市场有风险，决策请独立判断。</p>
     </div>
@@ -624,9 +655,9 @@
       <h3>责任限制</h3>
       <p>在适用法律允许的最大范围内，对于因使用或无法使用本站而产生的任何直接或间接损失，我们不承担责任。</p>
       <h3>知识产权与第三方</h3>
-      <p>本站代码以 Apache-2.0 开源（见 GitHub 仓库）；图表与文案供个人非商业参考。站内嵌入的第三方组件（如 TradingView）受其各自条款约束。</p>
+      <p>本站代码以 PolyForm Noncommercial 1.0.0 许可公开（见 GitHub 仓库）——非商业使用免费，商业使用需另行授权；图表与文案供个人非商业参考。站内嵌入的第三方组件（如 TradingView）受其各自条款约束。</p>
       <h3>付费产品与结算</h3>
-      <p>当付费订阅产品（如 LEAPS Pro）上线后，将由支付服务商 <strong>Paddle 作为 Merchant of Record（记录商户）</strong> 处理结账、发票与税费——即你的付款合同对方为 Paddle，其条款与隐私政策一并适用。购买者须年满 18 周岁或所在地法定成年年龄。退款遵循本站《退款政策》。</p>
+      <p>当付费订阅产品（如 Chronicle Pro）上线后，将由支付服务商 <strong>Paddle 作为 Merchant of Record（记录商户）</strong> 处理结账、发票与税费——即你的付款合同对方为 Paddle，其条款与隐私政策一并适用。购买者须年满 18 周岁或所在地法定成年年龄。退款遵循本站《退款政策》。</p>
       <h3>适用法律与可分割性</h3>
       <p>本条款受运营者所在司法管辖区的法律约束（具体管辖地将随正式运营明确）。若其中任一条款被认定无效，其余条款仍然有效。本条款构成你与我们之间就使用本站的完整约定。</p>
       <h3>变更</h3>
@@ -644,7 +675,7 @@
       <h3>当前状态</h3>
       <p>本站目前<strong>完全免费</strong>，没有任何收费项目，因此暂不涉及退款。</p>
       <h3>未来付费产品</h3>
-      <p>当「LEAPS Pro 每日盘前情报」等订阅产品上线后，将适用以下政策：</p>
+      <p>当「Chronicle Pro 每日盘前信号与数据简报」等订阅产品上线后，将适用以下政策：</p>
       <ul>
         <li><strong>14 天无理由退款</strong>：订阅后 14 天内不满意，可全额退款，无需说明理由；</li>
         <li>退款通过支付服务商 Paddle 处理，原路退回；</li>
@@ -655,20 +686,46 @@
   </div>
 </section>
 
+<!-- ================= 方法论 ================= -->
+<section class="panel" id="panel-methodology">
+  <div class="doc-page">
+    <div class="hero"><div class="kicker">METHODOLOGY · 方法论</div><h1>方法论：两个信号，一本台账</h1>
+      <p class="dek">定义、公式、统计口径与全部历史结果——包括失效的那几次。本页所有数字由每日数据管线自动更新的公开 JSON 支撑，历史记录带 GitHub 提交时间戳，事后不可改写。</p></div>
+    <div class="doc-body">
+      <h3>K 指数（K-Index）</h3>
+      <p>定义：<strong>K = CNN 恐惧贪婪指数 ÷ VIX</strong>。当恐惧（CNN 走低）与波动（VIX 走高）同时出现，K 跌破 1，记为一次信号。聚类口径：连续 K &lt; 1 的交易日聚为一次信号，间隔超过 10 个交易日记为新信号。收益视界：信号首日纳指 100 收盘价之后 20 / 40 / 60 个交易日的涨跌幅。</p>
+      <p>截至 2026 年 7 月：2020 年以来共 20 次信号，60 个交易日视界下 13 次上涨、7 次下跌——V 形回调中胜率高，2022 年持续熊市中多次为负。逐次对账表见「<a href="#kindex">K 指数</a>」页，原始数据见 <a href="https://chronicle.klay-wang.com/data/kindex_signals.json" target="_blank" rel="noopener">kindex_signals.json</a>。</p>
+      <h3>LEAPS 窗口（LEAPS Window）</h3>
+      <p>定义：CNN 恐惧贪婪指数收于 <strong>25 以下（极端恐惧）</strong>，即记为一次窗口开启；连续低于 25 的交易日聚为同一次窗口。收益视界：窗口首日之后 6 / 12 / 18 个月的标普 500 与纳指 100 涨跌幅。</p>
+      <p>截至 2026 年 7 月：2011 年以来共 45 次窗口，12 个月视界下纳指 100 为 34 涨 7 跌（其余尚未满 12 个月）——2021 年下半年的几次窗口 12 个月后为负，<strong>情绪极值不等于估值底</strong>。逐次对账见「<a href="#leaps">LEAPS 窗口</a>」页，原始数据见 <a href="https://chronicle.klay-wang.com/data/leaps.json" target="_blank" rel="noopener">leaps.json</a>。</p>
+      <h3>「如果每次都跟」的口径与如实披露</h3>
+      <p>头版净值曲线的计算规则：窗口（或信号）首日按纳指 100 收盘价入场，LEAPS 窗口持有 12 个月、K 信号持有 60 个交易日后离场；持有期内出现的新信号跳过、不加仓、不重置；空仓期收益记零；不计交易成本、滑点与税费。</p>
+      <p>如实披露（截至 2026 年 7 月）：按此口径，LEAPS 策略 2011 年以来净值约 <strong>9.3 倍</strong>，同期一直持有纳指 100 约 <strong>13.0 倍</strong>；K 策略 2020 年以来约 <strong>2.6 倍</strong>，同期一直持有约 <strong>3.4 倍</strong>。<strong>本站不宣称这些信号能跑赢买入持有。</strong>台账的价值在于告诉你「现在处于历史的哪个位置」，以及每一次极端情绪之后市场实际发生了什么——赢的和输的都在账上。</p>
+      <h3>可验证性</h3>
+      <p>本站为纯静态架构：每个交易日收盘后，GitHub Actions 数据管线自动拉取数据、计算指标并提交至公开仓库。这意味着每一天的信号读数都带有当天的 Git 提交时间戳——<a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">提交历史</a>公开可查，任何人都可以验证任何一次信号是「事前记录」而非事后补写。</p>
+      <h3>数据源</h3>
+      <p>CNN Fear &amp; Greed（whit3rabbit 每日存档 + CNN 官方接口当日值）；价格与 VIX 来自 Yahoo Finance（复权收盘价近似含分红总回报）；估值长历史来自 multpl / Robert Shiller。机器可读入口见 <a href="https://chronicle.klay-wang.com/llms.txt" target="_blank" rel="noopener">llms.txt</a>。</p>
+      <h3>引用</h3>
+      <p>引用 K 指数或 LEAPS 窗口数据时，请注明来源：<strong>K-Index — Market Chronicle（chronicle.klay-wang.com）</strong>。数据以 PolyForm Noncommercial 1.0.0 许可提供，非商业使用免费。</p>
+      <p class="doc-fineprint">本页所有统计仅供信息与教育用途，不构成投资建议；历史表现不预示未来。</p>
+    </div>
+  </div>
+</section>
+
 <!-- ================= 定价 ================= -->
 <section class="panel" id="panel-pricing">
   <div class="doc-page">
     <div class="hero"><div class="kicker">PRICING · 定价</div><h1>定价</h1>
-      <p class="dek">现在：整站免费。</p></div>
+      <p class="dek">网站永久免费。付费的，是每个交易日盘前送达你邮箱的那份简报。</p></div>
     <div class="doc-body">
-      <h3>免费</h3>
-      <p>所有历史图表、今日头版（市场温度）、K 指数、LEAPS 窗口、板块热力图，全部<strong>免费开放</strong>——无广告、无墙、无需注册。</p>
-      <h3>筹备中：LEAPS Pro（每日盘前数据简报）</h3>
-      <p>面向期权用户的付费订阅：<strong>$9.9 / 月</strong>。内容为客观的市场数据统计——LEAP 成交占比、均笔大小、最活跃合约、全市场标的排行——每个交易日盘前送达邮箱。<strong>仅为数据信息，不构成投资建议，不含任何买卖推荐。</strong>上线时间待定。</p>
+      <h3>免费 · 永久</h3>
+      <p>全站所有历史图表、今日头版（市场温度）、K 指数与 LEAPS 窗口的完整信号台账、板块热力图，全部<strong>免费开放</strong>——无广告、无墙、无需注册。台账每个交易日自动更新，历史记录可在 GitHub 提交历史中逐日验证。</p>
+      <h3>筹备中：Chronicle Pro（每日盘前信号与数据简报）</h3>
+      <p><strong>$29 / 月</strong>。每个交易日开盘前送达邮箱，内容为客观的数据与统计：K 指数与 LEAPS 窗口的当日读数、状态与历史百分位，市场温度与关键估值 / 情绪读数，信号触发或结束当日的对账记录；后续将陆续加入期权市场数据统计（LEAPS 成交占比、最活跃合约、全市场标的排行等）。<strong>仅为数据与信息，不构成投资建议，不含任何买卖推荐。</strong>上线时间待定。</p>
+      <h3>创始订户价：$9.9 / 月 · 限前 100 名</h3>
+      <p>上线前预约的前 100 名订户，<strong>永久锁定 $9.9 / 月</strong>——只要订阅不中断，价格终身不变。预约方式：邮件 <a href="mailto:klaywang24+marketchronicle@gmail.com">klaywang24+marketchronicle@gmail.com</a> 留言「Founding」，上线时按预约顺序通知。</p>
       <h3>订阅条款（上线后适用）</h3>
       <p>按月订阅，<strong>每月自动续订</strong>；可<strong>随时取消</strong>——通过订阅确认邮件中的管理链接自助取消，或邮件联系我们。取消后服务保留至当期计费周期结束；退款规则见<a href="#refunds">退款政策</a>。订单与支付将由我们的支付合作方（Merchant of Record）处理，你的账单上会显示其名称。</p>
-      <h3>抢先订阅</h3>
-      <p>想在上线时第一时间知道，可邮件 <a href="mailto:klaywang24+marketchronicle@gmail.com">klaywang24+marketchronicle@gmail.com</a> 留言「LEAPS Pro」，我们会通知你并提供创始订户价。</p>
       <p class="doc-fineprint">以上「筹备中」内容为规划信息，非最终承诺，具体以正式上线为准。</p>
     </div>
   </div>
@@ -683,11 +740,12 @@
   <div class="footer-cols">
     <div class="footer-brand-col">
       <div class="footer-brand">美股编年史</div>
-      <div class="footer-tag">每个交易日自动更新的美股百年图表档案 · 免费 · 开源</div>
+      <div class="footer-tag">每个交易日自动更新的美股百年图表档案与信号台账 · 免费 · 代码公开</div>
     </div>
     <nav class="footer-links">
       <a href="#about">关于</a>
       <a href="#contact">联系</a>
+      <a href="#methodology">方法论</a>
       <a href="#pricing">定价</a>
       <a href="#privacy">隐私政策</a>
       <a href="#terms">服务条款</a>
@@ -701,9 +759,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260707i"></script>
-<script src="js/app.js?v=20260707i"></script>
-<script src="js/docs-i18n.js?v=20260707i"></script>
+<script src="js/i18n.js?v=20260710a"></script>
+<script src="js/app.js?v=20260710a"></script>
+<script src="js/docs-i18n.js?v=20260710a"></script>
 <script>
 // PWA：注册 service worker（离线外壳 + 静态资源缓存；data/*.json 网络优先不影响每日更新）
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});

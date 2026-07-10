@@ -899,3 +899,59 @@ th.left { text-align: left; }
   .qn-item { white-space: nowrap; padding: 6px 10px; border: 1px solid var(--border); }
   #quote-widget { height: 70vh !important; min-height: 460px; }
 }
+
+/* ================= 头版 · 信号台账 ================= */
+.pulse-ledger { margin: 30px 0 6px; }
+.ledger-intro {
+  margin: 10px 0 16px; max-width: 760px;
+  font-size: 13.5px; line-height: 1.75; color: var(--ink-soft);
+}
+.ledger-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px;
+}
+.ledger-card {
+  display: block; padding: 16px 18px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+  color: var(--ink); text-decoration: none;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.lc-name {
+  font-size: 13px; letter-spacing: 0.03em; color: var(--ink-soft); font-weight: 600;
+}
+.lc-name span { font-weight: 400; font-size: 11px; color: var(--ink-muted); margin-left: 6px; }
+.lc-val {
+  font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 700;
+  line-height: 1.2; margin: 8px 0 2px;
+}
+.lc-state { font-size: 12.5px; font-weight: 600; margin-bottom: 10px; }
+.lc-state span { font-weight: 400; color: var(--ink-muted); }
+.lc-meta { font-size: 12px; color: var(--ink-muted); line-height: 1.7; }
+.lc-meta b { font-family: "JetBrains Mono", monospace; }
+.lc-row {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  font-size: 13px; margin: 9px 0; color: var(--ink-soft);
+}
+.lc-row b { font-family: "JetBrains Mono", monospace; font-size: 15px; }
+.lc-tag {
+  flex: 0 0 auto; padding: 1px 8px; border: 1px solid var(--border); border-radius: 999px;
+  font-family: "JetBrains Mono", monospace; font-size: 10.5px; color: var(--ink-muted);
+}
+.lc-date { font-family: "JetBrains Mono", monospace; font-size: 12px; }
+.ledger-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ledger-note {
+  margin: 12px 0 16px; font-size: 11.5px; line-height: 1.8; color: var(--ink-muted); max-width: 900px;
+}
+.ledger-cta { display: flex; gap: 10px; flex-wrap: wrap; }
+.lcta {
+  padding: 9px 18px; border: 1px solid var(--border); border-radius: 999px;
+  font-size: 13px; color: var(--ink); text-decoration: none;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+.lcta:hover { border-color: var(--accent); }
+.lcta-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.lcta-primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+@media (max-width: 900px) {
+  .ledger-cards, .ledger-charts { grid-template-columns: 1fr; }
+  .lc-val { font-size: 26px; }
+}
