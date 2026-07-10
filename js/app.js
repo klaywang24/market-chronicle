@@ -883,18 +883,20 @@
     const cell = (v) => v == null ? "<td>--</td>" :
       `<td class="${v >= 0 ? "pos" : "neg"}">${pct(v)}</td>`;
     tbl.innerHTML =
-      "<tr><th>#</th><th>信号首日</th><th>持续(日)</th><th>最低 K</th><th>+20d</th><th>+40d</th><th>+60d</th><th>至今</th></tr>" +
+      "<tr><th>#</th><th>信号首日</th><th>持续(日)</th><th>最低 K</th><th>+20d 纳指</th><th>+40d 纳指</th><th>+60d 纳指</th><th>+60d 标普</th><th>至今 纳指</th><th>至今 标普</th></tr>" +
       sig.signals.map((s, i) =>
         `<tr><td>${i + 1}</td><td>${s.start}</td><td>${s.days_below}</td>` +
         `<td class="k-min">${s.min_k.toFixed(2)}</td>` +
-        cell(s.fwd20) + cell(s.fwd40) + cell(s.fwd60) + cell(s.fwd_to_date) + "</tr>"
+        cell(s.fwd20) + cell(s.fwd40) + cell(s.fwd60) + cell(s.spx_fwd60) + cell(s.fwd_to_date) + cell(s.spx_to_date) + "</tr>"
       ).join("");
 
     const n = sig.signals.length;
     const win60 = sig.signals.filter((s) => s.fwd60 != null && s.fwd60 > 0).length;
     const has60 = sig.signals.filter((s) => s.fwd60 != null).length;
+    const winS = sig.signals.filter((s) => s.spx_fwd60 != null && s.spx_fwd60 > 0).length;
+    const hasS = sig.signals.filter((s) => s.spx_fwd60 != null).length;
     document.getElementById("k-verdict").textContent =
-      `实证结论：2020 年以来共 ${n} 次信号。60 个交易日窗口胜率 ${win60}/${has60}` +
+      `实证结论：2020 年以来共 ${n} 次信号。60 个交易日窗口胜率：纳指 ${win60}/${has60}、标普 ${winS}/${hasS}` +
       `（V 形回调中几乎必胜；2021 末—2022 的持续熊市中信号会连续触发、短期窗口为负）。` +
       `所有信号持有至今全部为正。历史规律不保证未来。`;
   }
@@ -1581,7 +1583,8 @@
     }
     if (!segs.length) throw new Error("no episodes");
     const first = segs[0][0];
-    const strat = [], hold = [];
+    const spx = lp.spx || null;
+    const strat = [], hold = [], holdSpx = [];
     let eq = 1, si = 0;
     for (let t = first; t < dates.length; t++) {
       if (t > first) {
@@ -1590,21 +1593,26 @@
       }
       strat.push([dates[t], +eq.toFixed(4)]);
       hold.push([dates[t], +(px[t] / px[first]).toFixed(4)]);
+      if (spx) holdSpx.push([dates[t], +(spx[t] / spx[first]).toFixed(4)]);
     }
     const endLbl = (color) => ({ show: true, formatter: (o) => "×" + (+o.value[1]).toFixed(1),
       fontFamily: "JetBrains Mono", fontSize: 11, color });
+    const series = [
+      { name: "每次窗口都跟（持有 12 个月）", type: "line", data: strat, showSymbol: false,
+        lineStyle: { color: p.accent, width: 2 }, itemStyle: { color: p.accent }, endLabel: endLbl(p.accent) },
+      { name: "一直持有纳指 100", type: "line", data: hold, showSymbol: false,
+        lineStyle: { color: p.blue, width: 1.2, type: "dashed" }, itemStyle: { color: p.blue }, endLabel: endLbl(p.blue) },
+    ];
+    if (spx) series.push(
+      { name: "一直持有标普 500", type: "line", data: holdSpx, showSymbol: false,
+        lineStyle: { color: p.gold, width: 1.2, type: "dashed" }, itemStyle: { color: p.gold }, endLabel: endLbl(p.gold) });
     return {
       tooltip: tip(p, { valueFormatter: (v) => "×" + (+v).toFixed(2) }),
       legend: { top: 0, left: 0, textStyle: { color: p.muted, fontSize: 11 } },
-      grid: { left: 52, right: 56, top: 34, bottom: 28 },
+      grid: { left: 52, right: 56, top: 56, bottom: 28 },
       xAxis: timeX(p),
       yAxis: Object.assign({ type: "log", splitLine: { show: false } }, baseAxis(p)),
-      series: [
-        { name: "每次窗口都跟（持有 12 个月）", type: "line", data: strat, showSymbol: false,
-          lineStyle: { color: p.accent, width: 2 }, itemStyle: { color: p.accent }, endLabel: endLbl(p.accent) },
-        { name: "一直持有纳指 100", type: "line", data: hold, showSymbol: false,
-          lineStyle: { color: p.blue, width: 1.2, type: "dashed" }, itemStyle: { color: p.blue }, endLabel: endLbl(p.blue) },
-      ],
+      series,
     };
   }
 
@@ -1634,8 +1642,12 @@
       const sigs = ks.signals, eps = leaps.episodes;
       const kAll = sigs.length, kW = sigs.filter((s) => s.fwd60 > 0).length,
         kL = sigs.filter((s) => s.fwd60 != null && s.fwd60 <= 0).length;
+      const kWs = sigs.filter((s) => s.spx_fwd60 > 0).length,
+        kLs = sigs.filter((s) => s.spx_fwd60 != null && s.spx_fwd60 <= 0).length;
       const lAll = eps.length, lW = eps.filter((e) => e.ndx_m12 > 0).length,
         lL = eps.filter((e) => e.ndx_m12 != null && e.ndx_m12 <= 0).length;
+      const lWs = eps.filter((e) => e.spx_m12 > 0).length,
+        lLs = eps.filter((e) => e.spx_m12 != null && e.spx_m12 <= 0).length;
       const kTrig = kd.current.k < 1, lOpen = leaps.current.window_open;
       const lastK = sigs[sigs.length - 1], lastL = eps[eps.length - 1];
       const lastLRet = lastL.ndx_to_date != null ? lastL.ndx_to_date : lastL.spx_to_date;
@@ -1648,13 +1660,13 @@
             <div class="lc-name">K 指数 <span>CNN 恐贪 ÷ VIX</span></div>
             <div class="lc-val">${kd.current.k.toFixed(2)}</div>
             <div class="lc-state ${kTrig ? "neg" : "pos"}">${kTrig ? "触发中" : "未触发"} <span>（K &lt; 1 触发）</span></div>
-            <div class="lc-meta"><b>${kAll}</b> <span>次信号（2020 年起）</span> · <span>60 个交易日后</span> <b class="pos">${kW}</b> <span>涨</span> <b class="neg">${kL}</b> <span>跌</span></div>
+            <div class="lc-meta"><b>${kAll}</b> <span>次信号（2020 年起）</span> · <span>60 个交易日后</span><br><span>纳指</span> <b class="pos">${kW}</b> <span>涨</span> <b class="neg">${kL}</b> <span>跌</span> · <span>标普</span> <b class="pos">${kWs}</b> <span>涨</span> <b class="neg">${kLs}</b> <span>跌</span></div>
           </a>
           <a class="ledger-card" href="#leaps">
             <div class="lc-name">LEAPS 窗口 <span>恐贪 &lt; 25 · 极端恐惧</span></div>
             <div class="lc-val">${Math.round(leaps.current.fng)}</div>
             <div class="lc-state ${lOpen ? "neg" : "pos"}">${lOpen ? "窗口开启" : "窗口关闭"} <span>（恐贪 &lt; 25 开启）</span></div>
-            <div class="lc-meta"><b>${lAll}</b> <span>次窗口（2011 年起）</span> · <span>12 个月后</span> <b class="pos">${lW}</b> <span>涨</span> <b class="neg">${lL}</b> <span>跌</span></div>
+            <div class="lc-meta"><b>${lAll}</b> <span>次窗口（2011 年起）</span> · <span>12 个月后</span><br><span>纳指</span> <b class="pos">${lW}</b> <span>涨</span> <b class="neg">${lL}</b> <span>跌</span> · <span>标普</span> <b class="pos">${lWs}</b> <span>涨</span> <b class="neg">${lLs}</b> <span>跌</span></div>
           </a>
           <div class="ledger-card">
             <div class="lc-name">最近战报 <span>按信号首日纳指 100 收盘价计</span></div>
@@ -1668,7 +1680,7 @@
             <div class="sub">纳指 100（对数坐标）· 圆点 = LEAPS 窗口开启（2011 年起）· 菱形 = K &lt; 1 信号（2020 年起）· 点任意标记看当次结果</div>
             <div class="chart short" id="ch-ledger-map"></div></div>
           <div class="card"><h3>如果每次窗口都跟，这本账长这样</h3>
-            <div class="sub">窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；虚线为同期一直持有</div>
+            <div class="sub">窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；两条虚线为同期一直持有纳指与标普</div>
             <div class="chart short" id="ch-ledger-eq"></div></div>
         </div>
         <p class="ledger-note">示意口径：信号首日按收盘价入场，空仓期收益记零，不计成本与滑点。本站不宣称信号能跑赢买入持有——右图如实呈现了这一点；台账的价值在于告诉你「现在处于历史的哪个位置」。完整口径与如实披露见方法论。历史表现不预示未来，不构成投资建议。</p>

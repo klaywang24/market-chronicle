@@ -6,7 +6,7 @@ Key facts (as of July 2026; the JSON files below are always current):
 
 - **K-Index** = CNN Fear & Greed Index ÷ VIX. Consecutive trading days with K < 1 cluster into one signal (a gap of >10 trading days starts a new one). Since 2020: 20 signals; at the 60-trading-day horizon the Nasdaq-100 was up 13 times, down 7. Strong in V-shaped corrections; repeatedly negative during the 2022 bear market.
 - **LEAPS Window** = an episode in which CNN Fear & Greed closes below 25 (extreme fear). Since 2011: 45 windows; at the 12-month horizon the Nasdaq-100 was up 34 times, down 7 (the rest not yet 12 months old). Sentiment extremes are not valuation bottoms — several late-2021 windows were negative 12 months on.
-- Honest disclosure: following every signal mechanically has NOT beaten buy-and-hold (LEAPS rules ≈9.5× since 2011 vs ≈13.0× holding the Nasdaq-100; K rules ≈2.6× since 2020 vs ≈3.4×). The site does not claim outperformance; the ledger's value is locating today within history.
+- Honest disclosure: following every signal mechanically has NOT beaten buy-and-hold of the same instrument (LEAPS rules ≈9.5× since 2011, vs ≈13.0× holding the Nasdaq-100 and ≈5.8× holding the S&P 500; K rules ≈2.6× since 2020 vs ≈3.4× holding the Nasdaq). Every ledger is dual-anchored: Nasdaq-100 (the strategy's instrument) and S&P 500 (the mainstream anchor). The site does not claim outperformance; the ledger's value is locating today within history.
 - This is data and information only — not investment advice, no buy/sell recommendations.
 
 ## Data (public JSON, updated each trading day)

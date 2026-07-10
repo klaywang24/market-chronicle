@@ -52,6 +52,10 @@
     "K < 1 信号": ["K < 1 signal", "", "", ""],
     "每次窗口都跟（持有 12 个月）": ["Follow every window (12-month hold)", "", "", ""],
     "一直持有纳指 100": ["Buy & hold Nasdaq-100", "", "", ""],
+    "一直持有标普 500": ["Buy & hold S&P 500", "", "", ""],
+    "纳指": ["Nasdaq", "", "", ""],
+    "标普": ["S&P", "", "", ""],
+    "窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；两条虚线为同期一直持有纳指与标普": ["Buy the Nasdaq-100 at each window's first close, hold 12 months, skip windows inside a holding period; the two dashed lines are buy-and-hold Nasdaq and S&P", "", "", ""],
     // ---- 头版 · 情绪仪表盘 ----
     "情绪仪表盘 · 恐惧的分解": ["Sentiment Dashboard · fear, decomposed", "", "", ""],
     "全市场 · 5 日均值": ["all-market · 5-day average", "", "", ""],

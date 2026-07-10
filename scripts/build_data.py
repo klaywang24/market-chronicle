@@ -79,7 +79,7 @@ def fetch_fng():
     return fng[~fng.index.duplicated(keep="last")].sort_index(), live_note
 
 
-def build_kindex(ndx_close: pd.Series, vix_close: pd.Series):
+def build_kindex(ndx_close: pd.Series, spx_close: pd.Series, vix_close: pd.Series):
     print("== K 指数")
     fng, live_note = fetch_fng()
     df = pd.DataFrame({"cnn": fng, "vix": vix_close, "ndx": ndx_close}).dropna()
@@ -103,9 +103,11 @@ def build_kindex(ndx_close: pd.Series, vix_close: pd.Series):
     if cur:
         episodes.append(cur)
 
-    # 收益视界在「纯价格日历」上取（ndx_close 无缺日），而不是合并框行数——
-    # CNN 存档 2021 年前有缺日（wayback 重建），按合并框行数取 +N 行会让视界悄悄变长
+    # 收益视界在「纯价格日历」上取（价格序列无缺日），而不是合并框行数——
+    # CNN 存档 2021 年前有缺日（wayback 重建），按合并框行数取 +N 行会让视界悄悄变长。
+    # 双锚对账：纳指（fwd*，策略实际交易标的）+ 标普（spx_fwd*，主流市场锚）
     ndx_full = ndx_close.dropna()
+    spx_full = spx_close.dropna()
     sig_rows = []
     for ep in episodes:
         if ep["start"] < pd.Timestamp("2020-01-01"):
@@ -122,8 +124,13 @@ def build_kindex(ndx_close: pd.Series, vix_close: pd.Series):
         for horizon in (20, 40, 60):
             p = p0 + horizon
             row[f"fwd{horizon}"] = round(float(ndx_full.iloc[p] / entry - 1) * 100, 2) if p < len(ndx_full) else None
-        # 至今收益（最后一个信号用）
         row["fwd_to_date"] = round(float(ndx_full.iloc[-1] / entry - 1) * 100, 2)
+        ps = int(spx_full.index.get_indexer([ep["start"]], method="backfill")[0])
+        s_entry = spx_full.iloc[ps]
+        for horizon in (20, 40, 60):
+            p = ps + horizon
+            row[f"spx_fwd{horizon}"] = round(float(spx_full.iloc[p] / s_entry - 1) * 100, 2) if p < len(spx_full) else None
+        row["spx_to_date"] = round(float(spx_full.iloc[-1] / s_entry - 1) * 100, 2)
         sig_rows.append(row)
 
     write_json("kindex.json", {
@@ -485,6 +492,7 @@ def build_leaps(spx_close: pd.Series, ndx_close: pd.Series, threshold: float = 2
         "dates": dates(df.index),
         "fng": rnd(df["fng"], 1),
         "ndx": rnd(df["ndx"], 2),
+        "spx": rnd(df["spx"], 2),
         "current": {
             "date": df.index[-1].strftime("%Y-%m-%d"),
             "fng": round(float(df["fng"].iloc[-1]), 1),
@@ -975,7 +983,7 @@ def main():
     except RuntimeError:
         vxn = None
 
-    build_kindex(ndx, vix)
+    build_kindex(ndx, gspc, vix)
     build_leaps(gspc, ndx)
     try:
         build_sentiment(vix)
