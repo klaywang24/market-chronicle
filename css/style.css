@@ -797,22 +797,26 @@ th.left { text-align: left; }
 .c-ic-discord { fill: #5865F2; opacity: 1; }
 .contact-list .c-label { min-width: 84px; color: var(--ink-muted); font-size: 13px; }
 
-/* Icon-only contact row (mirrors klay-wang.com footer): brand-colored circles,
-   glyph in white, tooltip via title. Old .contact-list styles kept for safety. */
-.contact-icons { display: flex; flex-wrap: wrap; gap: 14px; margin: 18px 0 6px; }
+/* Icon-only contact row — same recipe as the klay-wang.com footer:
+   translucent white circle, brand-colored glyph (not white-on-solid),
+   lift on hover. Sized up a touch per Klay: 44px circle / 22px glyph. */
+.contact-icons { display: flex; flex-wrap: wrap; gap: 20px; margin: 20px 0 6px; }
 .contact-icons .ci {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 46px; height: 46px; border-radius: 50%;
-  border: 1px solid var(--border); text-decoration: none;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-decoration: none; border: none;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.contact-icons .ci:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
-.contact-icons .ci .c-ic { width: 21px; height: 21px; fill: #fff; opacity: 1; }
-.ci-web { background: #1878BF; }
-.ci-mail { background: #EA4335; }
-.ci-x { background: #14171a; }
-.ci-github { background: #24292f; }
-.ci-discord { background: #5865F2; }
+.contact-icons .ci:hover { transform: translateY(-3px); box-shadow: 0 5px 14px rgba(0, 0, 0, 0.16); }
+html.dark-mode .contact-icons .ci { background: rgba(255, 255, 255, 0.1); }
+.contact-icons .c-ic { width: 22px; height: 22px; opacity: 1; }
+.ci-web .c-ic { fill: #1878BF; }
+.ci-x .c-ic { fill: #0f1419; }
+.ci-github .c-ic { fill: #181717; }
+.ci-discord .c-ic { fill: #5865F2; }
+html.dark-mode .ci-x .c-ic, html.dark-mode .ci-github .c-ic { fill: #e8e6e1; }
 
 /* ---------------- 行情 tab（左目录 + TradingView 图表） ---------------- */
 .quote-hero { margin-bottom: 18px; }
