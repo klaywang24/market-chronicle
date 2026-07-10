@@ -52,7 +52,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260710f">
+<link rel="stylesheet" href="css/style.css?v=20260710g">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -118,10 +118,25 @@
 
   <div class="card">
     <h3>2020 年以来 K &lt; 1 信号逐次对账</h3>
-    <div class="sub">每段连续 K &lt; 1 的交易日聚为一次信号（间隔超过 10 个交易日记为新信号）。收益为信号首日纳指 100 收盘价之后 20 / 40 / 60 个交易日的涨跌幅。</div>
+    <div class="sub">每段连续 K &lt; 1 的交易日聚为一次信号（间隔超过 10 个交易日记为新信号）。收益为信号首日纳指 100 / 标普 500 收盘价之后 20 / 40 / 60 个交易日的涨跌幅。</div>
     <div class="table-wrap"><table id="k-table"></table></div>
     <p class="footnote" id="k-verdict"></p>
   </div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>落点与净值</h2></div>
+    <p class="chapter-q">如果每次信号都跟，这本账长什么样？</p>
+    <div class="card">
+      <h3>每一次信号都标在这条线上</h3>
+      <div class="sub">纳指 100（对数坐标）· 菱形 = K &lt; 1 信号首日 · 点标记看当次双锚结果 · 底部滑块可拖拽缩放</div>
+      <div class="chart" id="ch-k-map"></div>
+    </div>
+    <div class="card">
+      <h3>如果每次信号都跟（持有 60 个交易日）</h3>
+      <div class="sub">信号首日买入纳指 100、持有 60 个交易日后离场，持有期内新信号跳过；两条虚线为同期一直持有纳指与标普。空仓期记零、不计成本与滑点，完整口径见方法论</div>
+      <div class="chart" id="ch-k-eq"></div>
+    </div>
   </div>
 </section>
 
@@ -547,6 +562,21 @@
       <p class="footnote" id="leaps-verdict"></p>
     </div>
   </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>落点与净值</h2></div>
+    <p class="chapter-q">如果每次窗口都跟，这本账长什么样？</p>
+    <div class="card">
+      <h3>每一次窗口都标在这条线上</h3>
+      <div class="sub">纳指 100（对数坐标）· 圆点 = LEAPS 窗口开启（2011 年起）· 菱形 = K &lt; 1 信号（2020 年起）· 点标记看当次结果 · 底部滑块可拖拽缩放</div>
+      <div class="chart" id="ch-leaps-map"></div>
+    </div>
+    <div class="card">
+      <h3>如果每次窗口都跟（持有 12 个月）</h3>
+      <div class="sub">窗口首日买入纳指 100、持有 12 个月后离场，持有期内新窗口跳过；两条虚线为同期一直持有纳指与标普。空仓期记零、不计成本与滑点，完整口径见方法论</div>
+      <div class="chart" id="ch-leaps-eq"></div>
+    </div>
+  </div>
 </section>
 
 <!-- ================= 行情（TradingView 高级图表） ================= -->
@@ -758,9 +788,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260710f"></script>
-<script src="js/app.js?v=20260710f"></script>
-<script src="js/docs-i18n.js?v=20260710f"></script>
+<script src="js/i18n.js?v=20260710g"></script>
+<script src="js/app.js?v=20260710g"></script>
+<script src="js/docs-i18n.js?v=20260710g"></script>
 <script>
 // PWA：注册 service worker（离线外壳 + 静态资源缓存；data/*.json 网络优先不影响每日更新）
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});

@@ -82,7 +82,7 @@ def fetch_fng():
 def build_kindex(ndx_close: pd.Series, spx_close: pd.Series, vix_close: pd.Series):
     print("== K 指数")
     fng, live_note = fetch_fng()
-    df = pd.DataFrame({"cnn": fng, "vix": vix_close, "ndx": ndx_close}).dropna()
+    df = pd.DataFrame({"cnn": fng, "vix": vix_close, "ndx": ndx_close, "spx": spx_close}).dropna()
     df = df[df.index >= "2019-06-01"]  # 多留半年做图表前置缓冲
     df["k"] = df["cnn"] / df["vix"]
 
@@ -125,6 +125,8 @@ def build_kindex(ndx_close: pd.Series, spx_close: pd.Series, vix_close: pd.Serie
             p = p0 + horizon
             row[f"fwd{horizon}"] = round(float(ndx_full.iloc[p] / entry - 1) * 100, 2) if p < len(ndx_full) else None
         row["fwd_to_date"] = round(float(ndx_full.iloc[-1] / entry - 1) * 100, 2)
+        # K 页净值曲线用：60 个交易日持有的离场日（纳指价格日历）
+        row["exit60"] = ndx_full.index[min(p0 + 60, len(ndx_full) - 1)].strftime("%Y-%m-%d")
         ps = int(spx_full.index.get_indexer([ep["start"]], method="backfill")[0])
         s_entry = spx_full.iloc[ps]
         for horizon in (20, 40, 60):
@@ -138,6 +140,7 @@ def build_kindex(ndx_close: pd.Series, spx_close: pd.Series, vix_close: pd.Serie
         "cnn": rnd(df["cnn"], 1),
         "vix": rnd(df["vix"], 2),
         "ndx": rnd(df["ndx"], 2),
+        "spx": rnd(df["spx"], 2),
         "k": rnd(df["k"], 3),
         "current": {
             "date": df.index[-1].strftime("%Y-%m-%d"),

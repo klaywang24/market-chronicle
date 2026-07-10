@@ -1015,3 +1015,8 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 .senti-row b { flex: 0 0 28px; text-align: right; font-family: "JetBrains Mono", monospace; font-size: 12px; }
 .senti-note { margin-top: 10px; }
 @media (max-width: 900px) { .senti-cards { grid-template-columns: 1fr; } }
+
+/* 台账卡：主数字居中放大（有 lc-val 的信号卡） */
+.ledger-card .lc-val { text-align: center; font-size: 44px; margin: 10px 0 4px; }
+.ledger-card .lc-state { text-align: center; }
+@media (max-width: 900px) { .ledger-card .lc-val { font-size: 36px; } }

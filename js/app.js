@@ -896,7 +896,7 @@
     const winS = sig.signals.filter((s) => s.spx_fwd60 != null && s.spx_fwd60 > 0).length;
     const hasS = sig.signals.filter((s) => s.spx_fwd60 != null).length;
     document.getElementById("k-verdict").textContent =
-      `实证结论：2020 年以来共 ${n} 次信号。60 个交易日窗口胜率：纳指 ${win60}/${has60}、标普 ${winS}/${hasS}` +
+      `实证结论：2020 年以来共 ${n} 次信号。60 个交易日窗口胜率：标普 ${winS}/${hasS}、纳指 ${win60}/${has60}` +
       `（V 形回调中几乎必胜；2021 末—2022 的持续熊市中信号会连续触发、短期窗口为负）。` +
       `所有信号持有至今全部为正。历史规律不保证未来。`;
   }
@@ -1532,9 +1532,17 @@
   }
 
   // ---------------- 今日 · 头版（聚光灯封面） ----------------
-  // ---------------- 头版 · 信号台账两张图 ----------------
+  // ---------------- 信号台账图表（头版紧凑版 + K/LEAPS 页缩放版共用） ----------------
+  const ledgerZoom = (p) => [
+    { type: "inside" },
+    { type: "slider", bottom: 6, height: 18, borderColor: p.border,
+      fillerColor: "rgba(160,57,47,0.08)", handleStyle: { color: p.accent },
+      textStyle: { color: p.muted, fontSize: 10 } },
+  ];
+
   // 落点图：纳指 100 对数线 + 每一次 LEAPS 窗口 / K<1 信号的入场点
-  async function buildLedgerMap(p) {
+  async function buildLedgerMap(p, opts) {
+    const o = opts || {};
     const [lp, ks] = await Promise.all([load("leaps"), load("kindex_signals")]);
     const idx = new Map(lp.dates.map((d, i) => [d, i]));
     const at = (ds) => {
@@ -1553,7 +1561,8 @@
         },
       }),
       legend: { top: 0, left: 0, textStyle: { color: p.muted, fontSize: 11 }, itemWidth: 12, itemHeight: 8 },
-      grid: { left: 52, right: 18, top: 34, bottom: 28 },
+      grid: { left: 52, right: 18, top: 34, bottom: o.zoom ? 60 : 28 },
+      dataZoom: o.zoom ? ledgerZoom(p) : undefined,
       xAxis: timeX(p),
       yAxis: Object.assign({ type: "log", splitLine: { show: false } }, baseAxis(p)),
       series: [
@@ -1566,7 +1575,8 @@
   }
 
   // 净值曲线：每次窗口首日买入纳指 100 持有 12 个月（持有期内新窗口跳过、空仓期记零、不计成本），对照一直持有
-  async function buildLedgerEq(p) {
+  async function buildLedgerEq(p, opts) {
+    const o = opts || {};
     const lp = await load("leaps");
     const dates = lp.dates, px = lp.ndx, HOLD = 252;
     const idx = new Map(dates.map((d, i) => [d, i]));
@@ -1609,12 +1619,99 @@
     return {
       tooltip: tip(p, { valueFormatter: (v) => "×" + (+v).toFixed(2) }),
       legend: { top: 0, left: 0, textStyle: { color: p.muted, fontSize: 11 } },
-      grid: { left: 52, right: 56, top: 56, bottom: 28 },
+      grid: { left: 52, right: 56, top: 56, bottom: o.zoom ? 60 : 28 },
+      dataZoom: o.zoom ? ledgerZoom(p) : undefined,
       xAxis: timeX(p),
       yAxis: Object.assign({ type: "log", splitLine: { show: false } }, baseAxis(p)),
       series,
     };
   }
+
+  // K 指数页专属：落点图（2019-06 起）与 60 个交易日持有净值
+  async function buildKMap(p) {
+    const [kd, ks] = await Promise.all([load("kindex"), load("kindex_signals")]);
+    const idx = new Map(kd.dates.map((d, i) => [d, i]));
+    const at = (ds) => (idx.has(ds) ? idx.get(ds) : kd.dates.findIndex((x) => x >= ds));
+    const pts = ks.signals.map((s) => {
+      const i = at(s.start);
+      return i >= 0 ? { value: [kd.dates[i], kd.ndx[i]], sg: s } : null;
+    }).filter(Boolean);
+    return {
+      tooltip: tip(p, {
+        trigger: "item",
+        formatter: (o2) => {
+          const s = o2.data && o2.data.sg;
+          if (!s) return "";
+          return `${s.start}<br/>K &lt; 1 信号 · 最低 K ${s.min_k}<br/>60 个交易日后：纳指 ${pct(s.fwd60)} · 标普 ${pct(s.spx_fwd60)}`;
+        },
+      }),
+      legend: { top: 0, left: 0, textStyle: { color: p.muted, fontSize: 11 }, itemWidth: 12, itemHeight: 8 },
+      grid: { left: 52, right: 18, top: 34, bottom: 60 },
+      dataZoom: ledgerZoom(p),
+      xAxis: timeX(p),
+      yAxis: Object.assign({ type: "log", splitLine: { show: false } }, baseAxis(p)),
+      series: [
+        { name: "纳指 100", type: "line", data: zip(kd.dates, kd.ndx), showSymbol: false, silent: true,
+          lineStyle: { color: p.muted, width: 1, opacity: 0.7 }, itemStyle: { color: p.muted } },
+        { name: "K < 1 信号", type: "scatter", data: pts, symbol: "diamond", symbolSize: 10, itemStyle: { color: p.accent } },
+      ],
+    };
+  }
+
+  async function buildKEq(p) {
+    const [kd, ks] = await Promise.all([load("kindex"), load("kindex_signals")]);
+    const dates = kd.dates, px = kd.ndx, spx = kd.spx || null;
+    const idx = new Map(dates.map((d, i) => [d, i]));
+    const at = (ds) => (idx.has(ds) ? idx.get(ds) : dates.findIndex((x) => x >= ds));
+    const segs = [];
+    let exit = -1;
+    for (const s of ks.signals) {
+      const i = at(s.start);
+      if (i == null || i < 0 || i <= exit) continue;
+      let j = s.exit60 ? at(s.exit60) : -1;
+      if (j == null || j < 0) j = Math.min(i + 60, px.length - 1);
+      segs.push([i, j]); exit = j;
+    }
+    if (!segs.length) throw new Error("no signals");
+    const first = segs[0][0];
+    const strat = [], hold = [], holdSpx = [];
+    let eq = 1, si = 0;
+    for (let t = first; t < dates.length; t++) {
+      if (t > first) {
+        while (si < segs.length && t > segs[si][1]) si++;
+        if (si < segs.length && t > segs[si][0] && t <= segs[si][1]) eq *= px[t] / px[t - 1];
+      }
+      strat.push([dates[t], +eq.toFixed(4)]);
+      hold.push([dates[t], +(px[t] / px[first]).toFixed(4)]);
+      if (spx) holdSpx.push([dates[t], +(spx[t] / spx[first]).toFixed(4)]);
+    }
+    const endLbl = (color) => ({ show: true, formatter: (o2) => "×" + (+o2.value[1]).toFixed(1),
+      fontFamily: "JetBrains Mono", fontSize: 11, color });
+    const series = [
+      { name: "每次信号都跟（持有 60 个交易日）", type: "line", data: strat, showSymbol: false,
+        lineStyle: { color: p.accent, width: 2 }, itemStyle: { color: p.accent }, endLabel: endLbl(p.accent) },
+      { name: "一直持有纳指 100", type: "line", data: hold, showSymbol: false,
+        lineStyle: { color: p.blue, width: 1.2, type: "dashed" }, itemStyle: { color: p.blue }, endLabel: endLbl(p.blue) },
+    ];
+    if (spx) series.push(
+      { name: "一直持有标普 500", type: "line", data: holdSpx, showSymbol: false,
+        lineStyle: { color: p.gold, width: 1.2, type: "dashed" }, itemStyle: { color: p.gold }, endLabel: endLbl(p.gold) });
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => "×" + (+v).toFixed(2) }),
+      legend: { top: 0, left: 0, textStyle: { color: p.muted, fontSize: 11 } },
+      grid: { left: 52, right: 56, top: 56, bottom: 60 },
+      dataZoom: ledgerZoom(p),
+      xAxis: timeX(p),
+      yAxis: Object.assign({ type: "log", splitLine: { show: false } }, baseAxis(p)),
+      series,
+    };
+  }
+
+  // K / LEAPS 页注册台账图表（带缩放的完整版；头版是紧凑钩子）
+  chart("kindex", "ch-k-map", buildKMap);
+  chart("kindex", "ch-k-eq", buildKEq);
+  chart("leaps", "ch-leaps-map", (p) => buildLedgerMap(p, { zoom: true }));
+  chart("leaps", "ch-leaps-eq", (p) => buildLedgerEq(p, { zoom: true }));
 
   async function renderPulse() {
     let d, leaps = null, kd = null, ks = null;
@@ -1660,13 +1757,13 @@
             <div class="lc-name">K 指数 <span>CNN 恐贪 ÷ VIX</span></div>
             <div class="lc-val">${kd.current.k.toFixed(2)}</div>
             <div class="lc-state ${kTrig ? "neg" : "pos"}">${kTrig ? "触发中" : "未触发"} <span>（K &lt; 1 触发）</span></div>
-            <div class="lc-meta"><b>${kAll}</b> <span>次信号（2020 年起）</span> · <span>60 个交易日后</span><br><span>纳指</span> <b class="pos">${kW}</b> <span>涨</span> <b class="neg">${kL}</b> <span>跌</span> · <span>标普</span> <b class="pos">${kWs}</b> <span>涨</span> <b class="neg">${kLs}</b> <span>跌</span></div>
+            <div class="lc-meta"><b>${kAll}</b> <span>次信号（2020 年起）</span> · <span>60 个交易日后</span><br><span>标普</span> <b class="pos">${kWs}</b> <span>涨</span> <b class="neg">${kLs}</b> <span>跌</span> · <span>纳指</span> <b class="pos">${kW}</b> <span>涨</span> <b class="neg">${kL}</b> <span>跌</span></div>
           </a>
           <a class="ledger-card" href="#leaps">
             <div class="lc-name">LEAPS 窗口 <span>恐贪 &lt; 25 · 极端恐惧</span></div>
             <div class="lc-val">${Math.round(leaps.current.fng)}</div>
             <div class="lc-state ${lOpen ? "neg" : "pos"}">${lOpen ? "窗口开启" : "窗口关闭"} <span>（恐贪 &lt; 25 开启）</span></div>
-            <div class="lc-meta"><b>${lAll}</b> <span>次窗口（2011 年起）</span> · <span>12 个月后</span><br><span>纳指</span> <b class="pos">${lW}</b> <span>涨</span> <b class="neg">${lL}</b> <span>跌</span> · <span>标普</span> <b class="pos">${lWs}</b> <span>涨</span> <b class="neg">${lLs}</b> <span>跌</span></div>
+            <div class="lc-meta"><b>${lAll}</b> <span>次窗口（2011 年起）</span> · <span>12 个月后</span><br><span>标普</span> <b class="pos">${lWs}</b> <span>涨</span> <b class="neg">${lLs}</b> <span>跌</span> · <span>纳指</span> <b class="pos">${lW}</b> <span>涨</span> <b class="neg">${lL}</b> <span>跌</span></div>
           </a>
           <div class="ledger-card">
             <div class="lc-name">最近战报 <span>按信号首日纳指 100 收盘价计</span></div>
