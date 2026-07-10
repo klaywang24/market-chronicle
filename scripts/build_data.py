@@ -121,7 +121,7 @@ def build_kindex(ndx_close: pd.Series, spx_close: pd.Series, vix_close: pd.Serie
             "min_k": round(float(ep["min_k"]), 3),
             "ndx_entry": round(float(entry), 2),
         }
-        for horizon in (20, 40, 60):
+        for horizon in (20, 40, 60, 120, 250):
             p = p0 + horizon
             row[f"fwd{horizon}"] = round(float(ndx_full.iloc[p] / entry - 1) * 100, 2) if p < len(ndx_full) else None
         row["fwd_to_date"] = round(float(ndx_full.iloc[-1] / entry - 1) * 100, 2)
@@ -129,7 +129,7 @@ def build_kindex(ndx_close: pd.Series, spx_close: pd.Series, vix_close: pd.Serie
         row["exit60"] = ndx_full.index[min(p0 + 60, len(ndx_full) - 1)].strftime("%Y-%m-%d")
         ps = int(spx_full.index.get_indexer([ep["start"]], method="backfill")[0])
         s_entry = spx_full.iloc[ps]
-        for horizon in (20, 40, 60):
+        for horizon in (20, 40, 60, 120, 250):
             p = ps + horizon
             row[f"spx_fwd{horizon}"] = round(float(spx_full.iloc[p] / s_entry - 1) * 100, 2) if p < len(spx_full) else None
         row["spx_to_date"] = round(float(spx_full.iloc[-1] / s_entry - 1) * 100, 2)
@@ -443,7 +443,7 @@ def build_macro():
 
 # ---------------------------------------------------------------- LEAPS 窗口
 
-def build_leaps(spx_close: pd.Series, ndx_close: pd.Series, threshold: float = 25.0):
+def build_leaps(spx_close: pd.Series, ndx_close: pd.Series, vix_close: pd.Series = None, threshold: float = 25.0):
     """CNN 恐贪 < 25 = 极端恐惧 = LEAPS call 开仓观察窗口。
     对 2011 年以来每个窗口计算 SPX/NDX 之后 6/12/18 个月（126/252/378 交易日）收益。"""
     print("== LEAPS 窗口")
@@ -488,6 +488,11 @@ def build_leaps(spx_close: pd.Series, ndx_close: pd.Series, threshold: float = 2
         pn = int(full["ndx"].index.get_indexer([ep["start"]], method="backfill")[0])
         pe = min(pn + 252, len(full["ndx"]) - 1)
         row["m12_exit"] = full["ndx"].index[pe].strftime("%Y-%m-%d")
+        # 「恐惧的标价」：窗口开启当天的 VIX（保费水位）
+        if vix_close is not None:
+            vf = vix_close.dropna()
+            pv = int(vf.index.get_indexer([ep["start"]], method="backfill")[0])
+            row["vix_start"] = round(float(vf.iloc[pv]), 2)
         rows.append(row)
 
     write_json("leaps.json", {
@@ -987,7 +992,7 @@ def main():
         vxn = None
 
     build_kindex(ndx, gspc, vix)
-    build_leaps(gspc, ndx)
+    build_leaps(gspc, ndx, vix)
     try:
         build_sentiment(vix)
     except Exception as e:

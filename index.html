@@ -52,7 +52,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260710g">
+<link rel="stylesheet" href="css/style.css?v=20260710h">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -136,6 +136,16 @@
       <h3>如果每次信号都跟（持有 60 个交易日）</h3>
       <div class="sub">信号首日买入纳指 100、持有 60 个交易日后离场，持有期内新信号跳过；两条虚线为同期一直持有纳指与标普。空仓期记零、不计成本与滑点，完整口径见方法论</div>
       <div class="chart" id="ch-k-eq"></div>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第四章</span><h2>入场与离场</h2></div>
+    <p class="chapter-q">信号之后，拿多久最合适？</p>
+    <div class="card">
+      <h3>持有期矩阵：五个视界的胜率与中位收益</h3>
+      <div class="sub">每次信号首日入场，之后 20 / 40 / 60 / 120 / 250 个交易日的胜率与中位涨跌幅（纳指 / 标普双锚）；较新的信号尚未走完长视界，不计入该列</div>
+      <div class="table-wrap"><table id="k-matrix"></table></div>
     </div>
   </div>
 </section>
@@ -577,6 +587,26 @@
       <div class="chart" id="ch-leaps-eq"></div>
     </div>
   </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第四章</span><h2>恐惧的标价</h2></div>
+    <p class="chapter-q">保费越贵，之后的赔付越大吗？</p>
+    <div class="card">
+      <h3>窗口开启日的 VIX × 12 个月后的纳指</h3>
+      <div class="sub">每个点是一次窗口：横轴 = 开窗当日 VIX（恐慌的保费水位），纵轴 = 12 个月后纳指涨跌幅；绿 = 涨、红 = 跌 · 点任意点看当次窗口</div>
+      <div class="chart short" id="ch-leaps-vix"></div>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第五章</span><h2>滚动年化</h2></div>
+    <p class="chapter-q">什么时候跟信号占便宜，什么时候吃亏？</p>
+    <div class="card">
+      <h3>滚动三年年化：策略对两个锚</h3>
+      <div class="sub">任一时点回看三年的年化收益率；实线高于虚线的时段 = 跟信号占优，低于 = 满仓占优 · 底部滑块可拖拽缩放</div>
+      <div class="chart" id="ch-leaps-roll"></div>
+    </div>
+  </div>
 </section>
 
 <!-- ================= 行情（TradingView 高级图表） ================= -->
@@ -788,9 +818,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260710g"></script>
-<script src="js/app.js?v=20260710g"></script>
-<script src="js/docs-i18n.js?v=20260710g"></script>
+<script src="js/i18n.js?v=20260710h"></script>
+<script src="js/app.js?v=20260710h"></script>
+<script src="js/docs-i18n.js?v=20260710h"></script>
 <script>
 // PWA：注册 service worker（离线外壳 + 静态资源缓存；data/*.json 网络优先不影响每日更新）
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});

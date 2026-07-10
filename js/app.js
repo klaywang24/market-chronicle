@@ -890,6 +890,30 @@
         cell(s.fwd20) + cell(s.fwd40) + cell(s.fwd60) + cell(s.spx_fwd60) + cell(s.fwd_to_date) + cell(s.spx_to_date) + "</tr>"
       ).join("");
 
+    // 持有期矩阵：五个视界 × 双锚的胜率与中位收益（120/250 视界未到期的信号不计入）
+    const mtEl = document.getElementById("k-matrix");
+    if (mtEl) {
+      const HZ = [20, 40, 60, 120, 250];
+      const median = (a) => { const b = [...a].sort((x, y) => x - y); const m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
+      const rowFor = (prefix) => {
+        const wins = [], meds = [];
+        for (const h of HZ) {
+          const vals = sig.signals.map((s) => s[`${prefix}fwd${h}`]).filter((v) => v != null);
+          wins.push(vals.length ? `${vals.filter((v) => v > 0).length}/${vals.length}` : "--");
+          meds.push(vals.length ? median(vals) : null);
+        }
+        return { wins, meds };
+      };
+      const nd = rowFor(""), sp = rowFor("spx_");
+      const medCell = (v) => v == null ? "<td>--</td>" : `<td class="${v >= 0 ? "pos" : "neg"}">${pct(v)}</td>`;
+      mtEl.innerHTML =
+        `<tr><th></th>${HZ.map((h) => `<th>+${h}d</th>`).join("")}</tr>` +
+        `<tr><td>纳指 胜率</td>${nd.wins.map((w) => `<td>${w}</td>`).join("")}</tr>` +
+        `<tr><td>纳指 中位收益</td>${nd.meds.map(medCell).join("")}</tr>` +
+        `<tr><td>标普 胜率</td>${sp.wins.map((w) => `<td>${w}</td>`).join("")}</tr>` +
+        `<tr><td>标普 中位收益</td>${sp.meds.map(medCell).join("")}</tr>`;
+    }
+
     const n = sig.signals.length;
     const win60 = sig.signals.filter((s) => s.fwd60 != null && s.fwd60 > 0).length;
     const has60 = sig.signals.filter((s) => s.fwd60 != null).length;
@@ -1574,9 +1598,9 @@
     };
   }
 
-  // 净值曲线：每次窗口首日买入纳指 100 持有 12 个月（持有期内新窗口跳过、空仓期记零、不计成本），对照一直持有
-  async function buildLedgerEq(p, opts) {
-    const o = opts || {};
+  // LEAPS 净值序列（净值曲线与滚动年化共用）：每次窗口首日买入纳指 100 持有 12 个月，
+  // 持有期内新窗口跳过、空仓期记零、不计成本
+  async function leapsEquitySeries() {
     const lp = await load("leaps");
     const dates = lp.dates, px = lp.ndx, HOLD = 252;
     const idx = new Map(dates.map((d, i) => [d, i]));
@@ -1594,17 +1618,27 @@
     if (!segs.length) throw new Error("no episodes");
     const first = segs[0][0];
     const spx = lp.spx || null;
-    const strat = [], hold = [], holdSpx = [];
+    const out = { dates: [], strat: [], hold: [], holdSpx: spx ? [] : null };
     let eq = 1, si = 0;
     for (let t = first; t < dates.length; t++) {
       if (t > first) {
         while (si < segs.length && t > segs[si][1]) si++;
         if (si < segs.length && t > segs[si][0] && t <= segs[si][1]) eq *= px[t] / px[t - 1];
       }
-      strat.push([dates[t], +eq.toFixed(4)]);
-      hold.push([dates[t], +(px[t] / px[first]).toFixed(4)]);
-      if (spx) holdSpx.push([dates[t], +(spx[t] / spx[first]).toFixed(4)]);
+      out.dates.push(dates[t]);
+      out.strat.push(eq);
+      out.hold.push(px[t] / px[first]);
+      if (spx) out.holdSpx.push(spx[t] / spx[first]);
     }
+    return out;
+  }
+
+  async function buildLedgerEq(p, opts) {
+    const o = opts || {};
+    const s = await leapsEquitySeries();
+    const zip4 = (vals) => vals.map((v, i) => [s.dates[i], +v.toFixed(4)]);
+    const strat = zip4(s.strat), hold = zip4(s.hold), holdSpx = s.holdSpx ? zip4(s.holdSpx) : null;
+    const spx = holdSpx;
     const endLbl = (color) => ({ show: true, formatter: (o) => "×" + (+o.value[1]).toFixed(1),
       fontFamily: "JetBrains Mono", fontSize: 11, color });
     const series = [
@@ -1707,11 +1741,67 @@
     };
   }
 
+  // 恐惧的标价：窗口开启日 VIX（保费水位）× 12 个月后纳指涨跌
+  async function buildLeapsVix(p) {
+    const lp = await load("leaps");
+    const pts = lp.episodes
+      .filter((e) => e.vix_start != null && e.ndx_m12 != null)
+      .map((e) => ({ value: [e.vix_start, e.ndx_m12], ep: e,
+        itemStyle: { color: e.ndx_m12 > 0 ? p.moss : p.danger } }));
+    return {
+      tooltip: tip(p, {
+        trigger: "item",
+        formatter: (o) => {
+          const e = o.data && o.data.ep;
+          if (!e) return "";
+          return `${e.start}<br/>开窗日 VIX ${e.vix_start} · 最低恐贪 ${e.min_fng}<br/>12 个月后：纳指 ${pct(e.ndx_m12)} · 标普 ${pct(e.spx_m12)}`;
+        },
+      }),
+      grid: { left: 56, right: 24, top: 30, bottom: 44 },
+      xAxis: Object.assign({ type: "value", name: "开窗日 VIX", nameLocation: "middle", nameGap: 28,
+        nameTextStyle: { color: p.muted, fontSize: 11 } }, baseAxis(p)),
+      yAxis: Object.assign({ type: "value", axisLabel: Object.assign({}, baseAxis(p).axisLabel, { formatter: "{value}%" }) }, baseAxis(p)),
+      series: [{ type: "scatter", data: pts, symbolSize: 11 }],
+    };
+  }
+
+  // 滚动三年年化：策略 vs 两个锚（高于虚线的时段 = 跟信号占优）
+  async function buildLeapsRoll(p) {
+    const s = await leapsEquitySeries();
+    const W = 756; // 3 年 ≈ 756 个交易日
+    const roll = (vals) => {
+      const out = [];
+      for (let t = W; t < vals.length; t++)
+        out.push([s.dates[t], +((Math.pow(vals[t] / vals[t - W], 252 / W) - 1) * 100).toFixed(2)]);
+      return out;
+    };
+    const series = [
+      { name: "每次窗口都跟（持有 12 个月）", type: "line", data: roll(s.strat), showSymbol: false,
+        lineStyle: { color: p.accent, width: 2 }, itemStyle: { color: p.accent } },
+      { name: "一直持有纳指 100", type: "line", data: roll(s.hold), showSymbol: false,
+        lineStyle: { color: p.blue, width: 1.2, type: "dashed" }, itemStyle: { color: p.blue } },
+    ];
+    if (s.holdSpx) series.push(
+      { name: "一直持有标普 500", type: "line", data: roll(s.holdSpx), showSymbol: false,
+        lineStyle: { color: p.gold, width: 1.2, type: "dashed" }, itemStyle: { color: p.gold } });
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => (+v).toFixed(1) + "%" }),
+      legend: { top: 0, left: 0, textStyle: { color: p.muted, fontSize: 11 } },
+      grid: { left: 52, right: 24, top: 56, bottom: 60 },
+      dataZoom: ledgerZoom(p),
+      xAxis: timeX(p),
+      yAxis: Object.assign({ type: "value", axisLabel: Object.assign({}, baseAxis(p).axisLabel, { formatter: "{value}%" }) }, baseAxis(p)),
+      series,
+    };
+  }
+
   // K / LEAPS 页注册台账图表（带缩放的完整版；头版是紧凑钩子）
   chart("kindex", "ch-k-map", buildKMap);
   chart("kindex", "ch-k-eq", buildKEq);
   chart("leaps", "ch-leaps-map", (p) => buildLedgerMap(p, { zoom: true }));
   chart("leaps", "ch-leaps-eq", (p) => buildLedgerEq(p, { zoom: true }));
+  chart("leaps", "ch-leaps-vix", buildLeapsVix);
+  chart("leaps", "ch-leaps-roll", buildLeapsRoll);
 
   async function renderPulse() {
     let d, leaps = null, kd = null, ks = null;
