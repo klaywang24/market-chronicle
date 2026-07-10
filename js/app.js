@@ -1592,8 +1592,8 @@
       series: [
         { name: "纳指 100", type: "line", data: zip(lp.dates, lp.ndx), showSymbol: false, silent: true,
           lineStyle: { color: p.muted, width: 1, opacity: 0.7 }, itemStyle: { color: p.muted } },
-        { name: "LEAPS 窗口开启", type: "scatter", data: lPts, symbolSize: 7, itemStyle: { color: p.moss } },
-        { name: "K < 1 信号", type: "scatter", data: kPts, symbol: "diamond", symbolSize: 9, itemStyle: { color: p.accent } },
+        { name: "LEAPS 窗口开启", type: "scatter", data: lPts, symbolSize: 9, itemStyle: { color: p.moss } },
+        { name: "K < 1 信号", type: "scatter", data: kPts, symbol: "diamond", symbolSize: 14, itemStyle: { color: p.accent } },
       ],
     };
   }
@@ -1643,13 +1643,13 @@
       fontFamily: "JetBrains Mono", fontSize: 11, color });
     const series = [
       { name: "每次窗口都跟（持有 12 个月）", type: "line", data: strat, showSymbol: false,
-        lineStyle: { color: p.accent, width: 2 }, itemStyle: { color: p.accent }, endLabel: endLbl(p.accent) },
+        lineStyle: { color: p.cmpRed, width: 2.6 }, itemStyle: { color: p.cmpRed }, endLabel: endLbl(p.cmpRed) },
       { name: "一直持有纳指 100", type: "line", data: hold, showSymbol: false,
-        lineStyle: { color: p.blue, width: 1.2, type: "dashed" }, itemStyle: { color: p.blue }, endLabel: endLbl(p.blue) },
+        lineStyle: { color: p.cmpPurple, width: 2, type: "dashed" }, itemStyle: { color: p.cmpPurple }, endLabel: endLbl(p.cmpPurple) },
     ];
     if (spx) series.push(
       { name: "一直持有标普 500", type: "line", data: holdSpx, showSymbol: false,
-        lineStyle: { color: p.gold, width: 1.2, type: "dashed" }, itemStyle: { color: p.gold }, endLabel: endLbl(p.gold) });
+        lineStyle: { color: p.cmpBlue, width: 2, type: "dashed" }, itemStyle: { color: p.cmpBlue }, endLabel: endLbl(p.cmpBlue) });
     return {
       tooltip: tip(p, { valueFormatter: (v) => "×" + (+v).toFixed(2) }),
       legend: { top: 0, left: 0, textStyle: { color: p.muted, fontSize: 11 } },
@@ -1687,7 +1687,7 @@
       series: [
         { name: "纳指 100", type: "line", data: zip(kd.dates, kd.ndx), showSymbol: false, silent: true,
           lineStyle: { color: p.muted, width: 1, opacity: 0.7 }, itemStyle: { color: p.muted } },
-        { name: "K < 1 信号", type: "scatter", data: pts, symbol: "diamond", symbolSize: 10, itemStyle: { color: p.accent } },
+        { name: "K < 1 信号", type: "scatter", data: pts, symbol: "diamond", symbolSize: 15, itemStyle: { color: p.accent } },
       ],
     };
   }
@@ -1723,13 +1723,13 @@
       fontFamily: "JetBrains Mono", fontSize: 11, color });
     const series = [
       { name: "每次信号都跟（持有 60 个交易日）", type: "line", data: strat, showSymbol: false,
-        lineStyle: { color: p.accent, width: 2 }, itemStyle: { color: p.accent }, endLabel: endLbl(p.accent) },
+        lineStyle: { color: p.cmpRed, width: 2.6 }, itemStyle: { color: p.cmpRed }, endLabel: endLbl(p.cmpRed) },
       { name: "一直持有纳指 100", type: "line", data: hold, showSymbol: false,
-        lineStyle: { color: p.blue, width: 1.2, type: "dashed" }, itemStyle: { color: p.blue }, endLabel: endLbl(p.blue) },
+        lineStyle: { color: p.cmpPurple, width: 2, type: "dashed" }, itemStyle: { color: p.cmpPurple }, endLabel: endLbl(p.cmpPurple) },
     ];
     if (spx) series.push(
       { name: "一直持有标普 500", type: "line", data: holdSpx, showSymbol: false,
-        lineStyle: { color: p.gold, width: 1.2, type: "dashed" }, itemStyle: { color: p.gold }, endLabel: endLbl(p.gold) });
+        lineStyle: { color: p.cmpBlue, width: 2, type: "dashed" }, itemStyle: { color: p.cmpBlue }, endLabel: endLbl(p.cmpBlue) });
     return {
       tooltip: tip(p, { valueFormatter: (v) => "×" + (+v).toFixed(2) }),
       legend: { top: 0, left: 0, textStyle: { color: p.muted, fontSize: 11 } },
@@ -1777,13 +1777,13 @@
     };
     const series = [
       { name: "每次窗口都跟（持有 12 个月）", type: "line", data: roll(s.strat), showSymbol: false,
-        lineStyle: { color: p.accent, width: 2 }, itemStyle: { color: p.accent } },
+        lineStyle: { color: p.cmpRed, width: 2.6 }, itemStyle: { color: p.cmpRed } },
       { name: "一直持有纳指 100", type: "line", data: roll(s.hold), showSymbol: false,
-        lineStyle: { color: p.blue, width: 1.2, type: "dashed" }, itemStyle: { color: p.blue } },
+        lineStyle: { color: p.cmpPurple, width: 2, type: "dashed" }, itemStyle: { color: p.cmpPurple } },
     ];
     if (s.holdSpx) series.push(
       { name: "一直持有标普 500", type: "line", data: roll(s.holdSpx), showSymbol: false,
-        lineStyle: { color: p.gold, width: 1.2, type: "dashed" }, itemStyle: { color: p.gold } });
+        lineStyle: { color: p.cmpBlue, width: 2, type: "dashed" }, itemStyle: { color: p.cmpBlue } });
     return {
       tooltip: tip(p, { valueFormatter: (v) => (+v).toFixed(1) + "%" }),
       legend: { top: 0, left: 0, textStyle: { color: p.muted, fontSize: 11 } },
@@ -1867,7 +1867,7 @@
             <div class="sub">纳指 100（对数坐标）· 圆点 = LEAPS 窗口开启（2011 年起）· 菱形 = K &lt; 1 信号（2020 年起）· 点任意标记看当次结果</div>
             <div class="chart short" id="ch-ledger-map"></div></div>
           <div class="card"><h3>如果每次窗口都跟，这本账长这样</h3>
-            <div class="sub">窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；两条虚线为同期一直持有纳指与标普</div>
+            <div class="sub">净值 = 1 元照规则操作后变成几元，尾标 ×N 即 1 元变 N 元。窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；两条虚线为同期一直持有纳指与标普</div>
             <div class="chart short" id="ch-ledger-eq"></div></div>
         </div>
         <p class="ledger-note">示意口径：信号首日按收盘价入场，空仓期收益记零，不计成本与滑点。本站不宣称信号能跑赢买入持有——右图如实呈现了这一点；台账的价值在于告诉你「现在处于历史的哪个位置」。完整口径与如实披露见方法论。历史表现不预示未来，不构成投资建议。</p>

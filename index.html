@@ -52,7 +52,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260710h">
+<link rel="stylesheet" href="css/style.css?v=20260710i">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -134,7 +134,7 @@
     </div>
     <div class="card">
       <h3>如果每次信号都跟（持有 60 个交易日）</h3>
-      <div class="sub">信号首日买入纳指 100、持有 60 个交易日后离场，持有期内新信号跳过；两条虚线为同期一直持有纳指与标普。空仓期记零、不计成本与滑点，完整口径见方法论</div>
+      <div class="sub">净值 = 1 元照规则操作后变成几元，尾标 ×N 即 1 元变 N 元。信号首日买入纳指 100、持有 60 个交易日后离场，持有期内新信号跳过；两条虚线为同期一直持有纳指与标普。空仓期记零、不计成本与滑点，完整口径见方法论</div>
       <div class="chart" id="ch-k-eq"></div>
     </div>
   </div>
@@ -583,7 +583,7 @@
     </div>
     <div class="card">
       <h3>如果每次窗口都跟（持有 12 个月）</h3>
-      <div class="sub">窗口首日买入纳指 100、持有 12 个月后离场，持有期内新窗口跳过；两条虚线为同期一直持有纳指与标普。空仓期记零、不计成本与滑点，完整口径见方法论</div>
+      <div class="sub">净值 = 1 元照规则操作后变成几元，尾标 ×N 即 1 元变 N 元。窗口首日买入纳指 100、持有 12 个月后离场，持有期内新窗口跳过；两条虚线为同期一直持有纳指与标普。空仓期记零、不计成本与滑点，完整口径见方法论</div>
       <div class="chart" id="ch-leaps-eq"></div>
     </div>
   </div>
@@ -759,7 +759,7 @@
       <p>定义：CNN 恐惧贪婪指数收于 <strong>25 以下（极端恐惧）</strong>，即记为一次窗口开启；连续低于 25 的交易日聚为同一次窗口。收益视界：窗口首日之后 6 / 12 / 18 个月的标普 500 与纳指 100 涨跌幅。</p>
       <p>截至 2026 年 7 月：2011 年以来共 45 次窗口，12 个月视界下纳指 100 为 34 涨 7 跌（其余尚未满 12 个月）——2021 年下半年的几次窗口 12 个月后为负，<strong>情绪极值不等于估值底</strong>。逐次对账见「<a href="#leaps">LEAPS 窗口</a>」页，原始数据见 <a href="https://chronicle.klay-wang.com/data/leaps.json" target="_blank" rel="noopener">leaps.json</a>。</p>
       <h3>「如果每次都跟」的口径与如实披露</h3>
-      <p>头版净值曲线的计算规则：窗口（或信号）首日按纳指 100 收盘价入场，LEAPS 窗口持有 12 个月、K 信号持有 60 个交易日后离场；持有期内出现的新信号跳过、不加仓、不重置；空仓期收益记零；不计交易成本、滑点与税费。</p>
+      <p>先说人话：<strong>净值就是「1 元变几元」</strong>——曲线走到 ×9.5，意思是期初投入的 1 元变成了 9.5 元。计算规则：窗口（或信号）首日按纳指 100 收盘价入场，LEAPS 窗口持有 12 个月、K 信号持有 60 个交易日后离场；持有期内出现的新信号跳过、不加仓、不重置；空仓期收益记零；不计交易成本、滑点与税费。</p>
       <p>如实披露（截至 2026 年 7 月）：按此口径，LEAPS 策略（买纳指）2011 年以来净值约 <strong>9.5 倍</strong>——高于同期一直持有标普 500 的约 <strong>5.8 倍</strong>，低于一直持有纳指 100 的约 <strong>13.0 倍</strong>；K 策略 2020 年以来约 <strong>2.6 倍</strong>，同期一直持有纳指约 <strong>3.4 倍</strong>。<strong>本站不宣称这些信号能跑赢同标的的买入持有。</strong>台账的价值在于告诉你「现在处于历史的哪个位置」，以及每一次极端情绪之后市场实际发生了什么——赢的和输的都在账上。</p>
       <p>基准说明：对账一律双锚——纳指 100（策略实际交易标的）与标普 500（主流市场锚）并列展示。情绪输入端为标普 / 全市场口径（VIX 期限结构仅标普体系有官方指数，恐贪指数本身以标普为中心），属数据现实而非选择。</p>
       <h3>可验证性</h3>
@@ -818,9 +818,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260710h"></script>
-<script src="js/app.js?v=20260710h"></script>
-<script src="js/docs-i18n.js?v=20260710h"></script>
+<script src="js/i18n.js?v=20260710i"></script>
+<script src="js/app.js?v=20260710i"></script>
+<script src="js/docs-i18n.js?v=20260710i"></script>
 <script>
 // PWA：注册 service worker（离线外壳 + 静态资源缓存；data/*.json 网络优先不影响每日更新）
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
