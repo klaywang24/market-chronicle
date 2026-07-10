@@ -955,3 +955,24 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
   .ledger-cards, .ledger-charts { grid-template-columns: 1fr; }
   .lc-val { font-size: 26px; }
 }
+
+/* 台账订阅框（Buttondown） */
+.ledger-sub {
+  margin-top: 18px; padding: 16px 18px; max-width: 520px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+}
+.sub-title { font-size: 13.5px; font-weight: 600; color: var(--ink-soft); margin-bottom: 10px; }
+.sub-row { display: flex; gap: 8px; }
+.sub-input {
+  flex: 1; min-width: 0; padding: 9px 12px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  font-size: 13px; font-family: "JetBrains Mono", monospace; color: var(--ink);
+}
+.sub-input:focus { outline: none; border-color: var(--accent); }
+.sub-btn {
+  flex: 0 0 auto; padding: 9px 18px; border: 1px solid var(--accent); border-radius: 8px;
+  background: var(--accent); color: #fff; font-size: 13px; cursor: pointer;
+  transition: background 0.18s ease;
+}
+.sub-btn:hover { background: var(--accent-deep); }
+.sub-note { margin-top: 8px; font-size: 11px; color: var(--ink-muted); }
