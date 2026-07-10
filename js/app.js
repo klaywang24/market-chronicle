@@ -1568,12 +1568,15 @@
     const lp = await load("leaps");
     const dates = lp.dates, px = lp.ndx, HOLD = 252;
     const idx = new Map(dates.map((d, i) => [d, i]));
+    const at = (ds) => (idx.has(ds) ? idx.get(ds) : dates.findIndex((x) => x >= ds));
     const segs = [];
     let exit = -1;
     for (const e of lp.episodes) {
-      let i = idx.has(e.start) ? idx.get(e.start) : dates.findIndex((x) => x >= e.start);
+      const i = at(e.start);
       if (i == null || i < 0 || i <= exit) continue;
-      const j = Math.min(i + HOLD, px.length - 1);
+      // 离场日优先用管线在纯价格日历上算好的 m12_exit（恐贪存档缺日会让 +252 行偏长）
+      let j = e.m12_exit ? at(e.m12_exit) : -1;
+      if (j == null || j < 0) j = Math.min(i + HOLD, px.length - 1);
       segs.push([i, j]); exit = j;
     }
     if (!segs.length) throw new Error("no episodes");
@@ -1614,6 +1617,8 @@
     }
     try { leaps = await load("leaps"); } catch (e) {}
     try { kd = await load("kindex"); ks = await load("kindex_signals"); } catch (e) { kd = ks = null; }
+    let senti = null;
+    try { senti = await load("sentiment"); } catch (e) {}
 
     const chg = (v) => `<span class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(2)}%</span>`;
     const tempColor = d.temp >= 75 ? "#B8421E" : d.temp >= 50 ? "#C9882E" : d.temp >= 25 ? "#14A63E" : "#2B5F8F";
@@ -1683,6 +1688,49 @@
       </div>`;
     }
 
+    // 情绪仪表盘（sentiment.json 缺失时整块跳过）
+    let sentiHTML = "";
+    if (senti && senti.pc && senti.term && senti.term.current) {
+      const SUB_NAMES = {
+        market_momentum_sp500: "市场动能", stock_price_strength: "股价强度",
+        stock_price_breadth: "股价广度", put_call_options: "期权 Put/Call",
+        market_volatility_vix: "波动率 VIX", junk_bond_demand: "垃圾债需求",
+        safe_haven_demand: "避险需求",
+      };
+      const subColor = (s) => (s < 45 ? "var(--danger)" : s > 55 ? "var(--moss)" : "var(--ink-muted)");
+      const subRows = Object.entries(SUB_NAMES).map(([k, name]) => {
+        const v = senti.subs && senti.subs[k];
+        if (!v) return "";
+        return `<div class="senti-row"><span class="senti-name">${name}</span>
+          <span class="senti-bar"><i style="width:${Math.max(3, Math.min(100, v.score))}%;background:${subColor(v.score)}"></i></span>
+          <b style="color:${subColor(v.score)}">${v.score.toFixed(0)}</b></div>`;
+      }).join("");
+      const t = senti.term.current;
+      const inverted = t.ratio_3m > 1;
+      sentiHTML = `
+      <div class="pulse-senti">
+        <div class="pulse-section-label">情绪仪表盘 · 恐惧的分解</div>
+        <div class="senti-cards">
+          <div class="senti-card">
+            <div class="lc-name">Put/Call 比 <span>全市场 · 5 日均值</span></div>
+            <div class="lc-val">${senti.pc.current == null ? "--" : senti.pc.current.toFixed(2)}</div>
+            <div class="lc-meta"><span>近一年百分位</span> <b>${senti.pc.pctile == null ? "--" : senti.pc.pctile.toFixed(0)}</b><br><span>越高 = 买保护的人越多 = 越恐慌</span></div>
+          </div>
+          <div class="senti-card">
+            <div class="lc-name">VIX 期限结构 <span>VIX ÷ VIX3M</span></div>
+            <div class="lc-val">${t.ratio_3m.toFixed(2)}</div>
+            <div class="lc-state ${inverted ? "neg" : "pos"}">${inverted ? "倒挂（近端恐慌）" : "升水（结构正常）"}</div>
+            <div class="lc-meta"><span>9天</span> <b>${t.vix9d.toFixed(1)}</b> · <span>30天</span> <b>${t.vix.toFixed(1)}</b> · <span>3月</span> <b>${t.vix3m.toFixed(1)}</b> · <span>6月</span> <b>${t.vix6m.toFixed(1)}</b><br><span>比值 2011 年来百分位</span> <b>${t.pctile.toFixed(0)}</b> · <span>大于 1 = 倒挂 = 历史级恐慌</span></div>
+          </div>
+          <div class="senti-card">
+            <div class="lc-name">恐贪指数的七个分量 <span>CNN 官方口径</span></div>
+            ${subRows}
+          </div>
+        </div>
+        <p class="footnote senti-note"><span>数据截至</span> ${senti.date} · CNN Fear & Greed + Cboe · <span>每交易日收盘后自动更新</span></p>
+      </div>`;
+    }
+
     document.getElementById("pulse-base").innerHTML = `
       <div class="pulse-kicker">TODAY'S FRONT PAGE · ${d.date}</div>
       <div class="pulse-chartband"></div>
@@ -1711,6 +1759,7 @@
         </div>
       </div>
       ${ledgerHTML}
+      ${sentiHTML}
       <div>
         <div class="pulse-section-label">涨跌分布 · 标普 500 成分股</div>
         <div class="breadth-bar">

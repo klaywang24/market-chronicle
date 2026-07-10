@@ -103,13 +103,15 @@ def build_kindex(ndx_close: pd.Series, vix_close: pd.Series):
     if cur:
         episodes.append(cur)
 
-    closes = df["ndx"]
+    # 收益视界在「纯价格日历」上取（ndx_close 无缺日），而不是合并框行数——
+    # CNN 存档 2021 年前有缺日（wayback 重建），按合并框行数取 +N 行会让视界悄悄变长
+    ndx_full = ndx_close.dropna()
     sig_rows = []
     for ep in episodes:
         if ep["start"] < pd.Timestamp("2020-01-01"):
             continue
-        p0 = ep["start_pos"]
-        entry = closes.iloc[p0]
+        p0 = int(ndx_full.index.get_indexer([ep["start"]], method="backfill")[0])
+        entry = ndx_full.iloc[p0]
         row = {
             "start": ep["start"].strftime("%Y-%m-%d"),
             "end": ep["end"].strftime("%Y-%m-%d"),
@@ -119,9 +121,9 @@ def build_kindex(ndx_close: pd.Series, vix_close: pd.Series):
         }
         for horizon in (20, 40, 60):
             p = p0 + horizon
-            row[f"fwd{horizon}"] = round(float(closes.iloc[p] / entry - 1) * 100, 2) if p < len(closes) else None
+            row[f"fwd{horizon}"] = round(float(ndx_full.iloc[p] / entry - 1) * 100, 2) if p < len(ndx_full) else None
         # 至今收益（最后一个信号用）
-        row["fwd_to_date"] = round(float(closes.iloc[-1] / entry - 1) * 100, 2)
+        row["fwd_to_date"] = round(float(ndx_full.iloc[-1] / entry - 1) * 100, 2)
         sig_rows.append(row)
 
     write_json("kindex.json", {
@@ -454,22 +456,28 @@ def build_leaps(spx_close: pd.Series, ndx_close: pd.Series, threshold: float = 2
     if cur:
         episodes.append(cur)
 
+    # 同 build_kindex：收益视界在纯价格日历上取，避免恐贪存档缺日拉长视界
+    full = {"spx": spx_close.dropna(), "ndx": ndx_close.dropna()}
     rows = []
     for ep in episodes:
-        p0 = ep["start_pos"]
         row = {
             "start": ep["start"].strftime("%Y-%m-%d"),
             "end": ep["end"].strftime("%Y-%m-%d"),
             "days_below": int(((df.index >= ep["start"]) & (df.index <= ep["end"]) & below).sum()),
             "min_fng": round(ep["min"], 1),
         }
-        for label, horizon in (("m6", 126), ("m12", 252), ("m18", 378)):
-            p = p0 + horizon
-            for idx in ("spx", "ndx"):
-                entry = df[idx].iloc[p0]
-                row[f"{idx}_{label}"] = round(float(df[idx].iloc[p] / entry - 1) * 100, 1) if p < len(df) else None
-        row["spx_to_date"] = round(float(df["spx"].iloc[-1] / df["spx"].iloc[p0] - 1) * 100, 1)
-        row["ndx_to_date"] = round(float(df["ndx"].iloc[-1] / df["ndx"].iloc[p0] - 1) * 100, 1)
+        for idx in ("spx", "ndx"):
+            s = full[idx]
+            p0 = int(s.index.get_indexer([ep["start"]], method="backfill")[0])
+            entry = s.iloc[p0]
+            for label, horizon in (("m6", 126), ("m12", 252), ("m18", 378)):
+                p = p0 + horizon
+                row[f"{idx}_{label}"] = round(float(s.iloc[p] / entry - 1) * 100, 1) if p < len(s) else None
+            row[f"{idx}_to_date"] = round(float(s.iloc[-1] / entry - 1) * 100, 1)
+        # 头版净值曲线用：12 个月持有的离场日（纳指价格日历 +252 交易日）
+        pn = int(full["ndx"].index.get_indexer([ep["start"]], method="backfill")[0])
+        pe = min(pn + 252, len(full["ndx"]) - 1)
+        row["m12_exit"] = full["ndx"].index[pe].strftime("%Y-%m-%d")
         rows.append(row)
 
     write_json("leaps.json", {
@@ -484,6 +492,81 @@ def build_leaps(spx_close: pd.Series, ndx_close: pd.Series, threshold: float = 2
             "window_open": bool(df["fng"].iloc[-1] < threshold),
         },
         "episodes": rows,
+    })
+
+
+# --------------------------------------------------------- 情绪仪表盘
+CBOE_HIST = "https://cdn.cboe.com/api/global/us_indices/daily_prices/{}_History.csv"
+
+
+def build_sentiment(vix_close: pd.Series):
+    """情绪仪表盘：CNN 恐贪七子指标快照 + Put/Call 比（CNN 原始 5 日均值，滚动累积自建历史）
+    + VIX 期限结构（Cboe 官方历史 CSV：VIX9D/VIX3M/VIX6M + yfinance VIX）。"""
+    print("== 情绪仪表盘")
+    live = requests.get(FNG_LIVE, headers=UA, timeout=30).json()
+
+    # --- 七个子指标当日快照（CNN 官方口径，score 0-100）
+    SUB_KEYS = ["market_momentum_sp500", "stock_price_strength", "stock_price_breadth",
+                "put_call_options", "market_volatility_vix", "junk_bond_demand", "safe_haven_demand"]
+    subs = {}
+    for k in SUB_KEYS:
+        v = live.get(k) or {}
+        if "score" in v:
+            subs[k] = {"score": round(float(v["score"]), 1), "rating": v.get("rating", "")}
+
+    # --- Put/Call 比：CNN put_call_options.data 的 y 就是原始 5 日均值比率（滚动一年窗口）
+    #     每日运行时与已有 sentiment.json 合并，历史随管线逐日累积（超出一年后仍保留）
+    pc_new = {}
+    for pt in (live.get("put_call_options") or {}).get("data", []):
+        d = pd.Timestamp(pt["x"], unit="ms").strftime("%Y-%m-%d")
+        pc_new[d] = round(float(pt["y"]), 4)
+    old_path = DATA / "sentiment.json"
+    if old_path.exists():
+        try:
+            old_pc = json.loads(old_path.read_text()).get("pc", {})
+            merged = dict(zip(old_pc.get("dates", []), old_pc.get("ratio", [])))
+            merged.update(pc_new)  # 新值（含 CNN 修订）覆盖旧值
+            pc_new = merged
+        except Exception as e:
+            print(f"  旧 sentiment.json 读取失败，仅用当次数据: {e}")
+    pc_dates = sorted(pc_new)
+    pc_vals = [pc_new[d] for d in pc_dates]
+    pc_cur = pc_vals[-1] if pc_vals else None
+    pc_pct = round(sum(1 for v in pc_vals if v <= pc_cur) / len(pc_vals) * 100, 1) if pc_vals else None
+
+    # --- VIX 期限结构：Cboe 官方历史 CSV（开高低收，取 CLOSE）+ 管线自有 VIX
+    def cboe_hist(name):
+        r = requests.get(CBOE_HIST.format(name), headers=UA, timeout=30)
+        r.raise_for_status()
+        df = pd.read_csv(pd.io.common.StringIO(r.text), parse_dates=["DATE"]).set_index("DATE")
+        return df["CLOSE"]
+
+    term = pd.DataFrame({
+        "vix9d": cboe_hist("VIX9D"),
+        "vix": vix_close,
+        "vix3m": cboe_hist("VIX3M"),
+        "vix6m": cboe_hist("VIX6M"),
+    }).dropna()
+    term = term[term.index >= "2011-01-01"]
+    ratio = term["vix"] / term["vix3m"]  # >1 = 倒挂（近端恐慌），<1 = 正常升水
+    cur_ratio = round(float(ratio.iloc[-1]), 3)
+    ratio_pct = round(float((ratio <= ratio.iloc[-1]).mean() * 100), 1)
+
+    write_json("sentiment.json", {
+        "date": term.index[-1].strftime("%Y-%m-%d"),
+        "subs": subs,
+        "pc": {"dates": pc_dates, "ratio": pc_vals, "current": pc_cur, "pctile": pc_pct},
+        "term": {
+            "dates": dates(term.index),
+            "vix9d": rnd(term["vix9d"], 2), "vix": rnd(term["vix"], 2),
+            "vix3m": rnd(term["vix3m"], 2), "vix6m": rnd(term["vix6m"], 2),
+            "current": {"vix9d": round(float(term["vix9d"].iloc[-1]), 2),
+                        "vix": round(float(term["vix"].iloc[-1]), 2),
+                        "vix3m": round(float(term["vix3m"].iloc[-1]), 2),
+                        "vix6m": round(float(term["vix6m"].iloc[-1]), 2),
+                        "ratio_3m": cur_ratio, "pctile": ratio_pct,
+                        "state": "backwardation" if cur_ratio > 1 else "contango"},
+        },
     })
 
 
@@ -894,6 +977,10 @@ def main():
 
     build_kindex(ndx, vix)
     build_leaps(gspc, ndx)
+    try:
+        build_sentiment(vix)
+    except Exception as e:
+        print(f"  情绪仪表盘失败（留旧文件）: {e}")
     build_index_val()
     build_macro()
     build_index_panels("sp500", gspc, vix, "VIX")
