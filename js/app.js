@@ -1812,8 +1812,9 @@
     }
     try { leaps = await load("leaps"); } catch (e) {}
     try { kd = await load("kindex"); ks = await load("kindex_signals"); } catch (e) { kd = ks = null; }
-    let senti = null;
+    let senti = null, breadth = null;
     try { senti = await load("sentiment"); } catch (e) {}
+    try { breadth = await load("breadth"); } catch (e) {}
 
     const chg = (v) => `<span class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(2)}%</span>`;
     const tempColor = d.temp >= 75 ? "#B8421E" : d.temp >= 50 ? "#C9882E" : d.temp >= 25 ? "#14A63E" : "#2B5F8F";
@@ -1925,8 +1926,26 @@
             <div class="lc-name">恐贪指数的七个分量 <span>CNN 官方口径</span></div>
             ${subRows}
           </div>
+          ${senti.vxn ? `
+          <div class="senti-card">
+            <div class="lc-name">纳指恐慌溢价 <span>VXN ÷ VIX</span></div>
+            <div class="lc-val">${senti.vxn.current.toFixed(2)}</div>
+            <div class="lc-meta"><span>当前 VXN</span> <b>${senti.vxn.vxn.toFixed(1)}</b> · <span>全史百分位</span> <b>${senti.vxn.pctile.toFixed(0)}</b><br><span>越高 = 市场为纳指波动付的保费越贵</span></div>
+          </div>` : ""}
+          ${senti.skew ? `
+          <div class="senti-card">
+            <div class="lc-name">黑天鹅指数 SKEW <span>尾部保险的价格</span></div>
+            <div class="lc-val">${senti.skew.current.toFixed(1)}</div>
+            <div class="lc-meta"><span>1990 年来百分位</span> <b>${senti.skew.pctile.toFixed(0)}</b><br><span>越高 = 深度崩盘保护越贵</span></div>
+          </div>` : ""}
+          ${breadth && breadth.current != null ? `
+          <div class="senti-card">
+            <div class="lc-name">市场广度 <span>标普成分股在 200 日均线上的占比</span></div>
+            <div class="lc-val">${breadth.current.toFixed(0)}%</div>
+            <div class="lc-meta"><span>累积史百分位</span> <b>${breadth.pctile.toFixed(0)}</b>（<span>自</span> ${breadth.since}）<br><span>越低 = 超卖越深，历史底部常见个位数</span></div>
+          </div>` : ""}
         </div>
-        <p class="footnote senti-note"><span>数据截至</span> ${senti.date} · CNN Fear & Greed + Cboe · <span>每交易日收盘后自动更新</span></p>
+        <p class="footnote senti-note"><span>数据截至</span> ${senti.date} · CNN Fear & Greed + Cboe + Yahoo Finance · <span>每交易日收盘后自动更新</span></p>
       </div>`;
     }
 

@@ -285,7 +285,8 @@ def build_pulse():
     frames = []
     for i in range(0, len(ticks), 110):
         chunk = ticks[i:i + 110]
-        df = yf.download(" ".join(chunk), period="1y", interval="1d",
+        # 2y：多出的一年只为算 200 日均线广度；温度的情绪百分位仍显式取近一年
+        df = yf.download(" ".join(chunk), period="2y", interval="1d",
                          progress=False, auto_adjust=True)["Close"]
         frames.append(df)
         time.sleep(2)
@@ -295,7 +296,35 @@ def build_pulse():
     up = (ret > FLAT).sum(axis=1)
     flat = (ret.abs() <= FLAT).sum(axis=1)
     total = ret.notna().sum(axis=1)
-    ratio = (up + flat / 2) / total
+    ratio = ((up + flat / 2) / total).iloc[-252:]  # 温度口径：近一年，勿随下载窗口变
+
+    # 广度：% 成分股收于 200 日均线上（只留均线覆盖足够的交易日），与旧 breadth.json 合并累积
+    try:
+        ma200 = px.rolling(200).mean()
+        valid = px.notna() & ma200.notna()
+        above = ((px > ma200) & valid).sum(axis=1)
+        cover = valid.sum(axis=1)
+        b = (above / cover * 100)[cover >= 400].round(1)
+        merged = {}
+        old_b = DATA / "breadth.json"
+        if old_b.exists():
+            try:
+                prev = json.loads(old_b.read_text())
+                merged = dict(zip(prev.get("dates", []), prev.get("pct", [])))
+            except Exception:
+                pass
+        merged.update({d.strftime("%Y-%m-%d"): float(v) for d, v in b.items()})
+        b_dates = sorted(merged)
+        b_vals = [merged[d] for d in b_dates]
+        b_cur = b_vals[-1]
+        b_pct = round(sum(1 for v in b_vals if v <= b_cur) / len(b_vals) * 100, 1)
+        write_json("breadth.json", {
+            "dates": b_dates, "pct": b_vals,
+            "current": b_cur, "pctile": b_pct,
+            "since": b_dates[0] if b_dates else None,
+        })
+    except Exception as e:
+        print(f"  广度计算失败（留旧文件）: {e}")
     today = ratio.index[-1]
     adv, fl, tot = int(up.iloc[-1]), int(flat.iloc[-1]), int(total.iloc[-1])
     dec = tot - adv - fl
@@ -515,9 +544,10 @@ def build_leaps(spx_close: pd.Series, ndx_close: pd.Series, vix_close: pd.Series
 CBOE_HIST = "https://cdn.cboe.com/api/global/us_indices/daily_prices/{}_History.csv"
 
 
-def build_sentiment(vix_close: pd.Series):
+def build_sentiment(vix_close: pd.Series, vxn_close: pd.Series = None):
     """情绪仪表盘：CNN 恐贪七子指标快照 + Put/Call 比（CNN 原始 5 日均值，滚动累积自建历史）
-    + VIX 期限结构（Cboe 官方历史 CSV：VIX9D/VIX3M/VIX6M + yfinance VIX）。"""
+    + VIX 期限结构（Cboe 官方历史 CSV：VIX9D/VIX3M/VIX6M + yfinance VIX）
+    + SKEW（黑天鹅保险价格，Cboe 官方 CSV）+ VXN/VIX 比值（纳指恐慌溢价）。"""
     print("== 情绪仪表盘")
     live = requests.get(FNG_LIVE, headers=UA, timeout=30).json()
 
@@ -555,7 +585,9 @@ def build_sentiment(vix_close: pd.Series):
         r = requests.get(CBOE_HIST.format(name), headers=UA, timeout=30)
         r.raise_for_status()
         df = pd.read_csv(pd.io.common.StringIO(r.text), parse_dates=["DATE"]).set_index("DATE")
-        return df["CLOSE"]
+        # VIX 系列是 OHLC（取 CLOSE）；SKEW 等单值序列只有一列
+        col = "CLOSE" if "CLOSE" in df.columns else df.columns[-1]
+        return df[col]
 
     term = pd.DataFrame({
         "vix9d": cboe_hist("VIX9D"),
@@ -568,9 +600,38 @@ def build_sentiment(vix_close: pd.Series):
     cur_ratio = round(float(ratio.iloc[-1]), 3)
     ratio_pct = round(float((ratio <= ratio.iloc[-1]).mean() * 100), 1)
 
+    # --- SKEW：黑天鹅保险的价格（Cboe 官方全史，百分位按全史算，序列存 2011→）
+    skew_obj = None
+    try:
+        skew = cboe_hist("SKEW").dropna()
+        s_cur = round(float(skew.iloc[-1]), 1)
+        s_pct = round(float((skew <= skew.iloc[-1]).mean() * 100), 1)
+        sk = skew[skew.index >= "2011-01-01"]
+        skew_obj = {"dates": dates(sk.index), "values": rnd(sk, 1),
+                    "current": s_cur, "pctile": s_pct}
+    except Exception as e:
+        print(f"  SKEW 拉取失败（跳过该卡）: {e}")
+
+    # --- VXN/VIX 比值：纳指恐慌溢价（>1 = 市场为纳指波动付更高保费）
+    vxn_obj = None
+    if vxn_close is not None:
+        try:
+            pair = pd.DataFrame({"vxn": vxn_close, "vix": vix_close}).dropna()
+            nr = pair["vxn"] / pair["vix"]
+            n_cur = round(float(nr.iloc[-1]), 3)
+            n_pct = round(float((nr <= nr.iloc[-1]).mean() * 100), 1)
+            nrs = nr[nr.index >= "2011-01-01"]
+            vxn_obj = {"dates": dates(nrs.index), "ratio": rnd(nrs, 3),
+                       "current": n_cur, "pctile": n_pct,
+                       "vxn": round(float(pair["vxn"].iloc[-1]), 2)}
+        except Exception as e:
+            print(f"  VXN 比值失败（跳过该卡）: {e}")
+
     write_json("sentiment.json", {
         "date": term.index[-1].strftime("%Y-%m-%d"),
         "subs": subs,
+        "skew": skew_obj,
+        "vxn": vxn_obj,
         "pc": {"dates": pc_dates, "ratio": pc_vals, "current": pc_cur, "pctile": pc_pct},
         "term": {
             "dates": dates(term.index),
@@ -994,7 +1055,7 @@ def main():
     build_kindex(ndx, gspc, vix)
     build_leaps(gspc, ndx, vix)
     try:
-        build_sentiment(vix)
+        build_sentiment(vix, vxn)
     except Exception as e:
         print(f"  情绪仪表盘失败（留旧文件）: {e}")
     build_index_val()
