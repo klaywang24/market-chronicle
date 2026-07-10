@@ -883,7 +883,9 @@
     const cell = (v) => v == null ? "<td>--</td>" :
       `<td class="${v >= 0 ? "pos" : "neg"}">${pct(v)}</td>`;
     tbl.innerHTML =
-      "<tr><th>#</th><th>信号首日</th><th>持续(日)</th><th>最低 K</th><th>+20d 纳指</th><th>+40d 纳指</th><th>+60d 纳指</th><th>+60d 标普</th><th>至今 纳指</th><th>至今 标普</th></tr>" +
+      "<tr><th>#</th><th>信号首日</th><th>持续(日)</th><th>最低 K</th>" +
+      "<th><span>纳指</span> +20d</th><th><span>纳指</span> +40d</th><th><span>纳指</span> +60d</th>" +
+      "<th><span>标普</span> +60d</th><th><span>纳指</span><span>至今</span></th><th><span>标普</span><span>至今</span></th></tr>" +
       sig.signals.map((s, i) =>
         `<tr><td>${i + 1}</td><td>${s.start}</td><td>${s.days_below}</td>` +
         `<td class="k-min">${s.min_k.toFixed(2)}</td>` +

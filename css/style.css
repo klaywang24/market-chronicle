@@ -1038,3 +1038,18 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 .term-grid span { display: block; font-size: 11px; color: var(--ink-muted); }
 .term-grid b { display: block; font-family: "JetBrains Mono", monospace; font-size: 15px; margin-top: 2px; }
 @media (max-width: 900px) { .senti-card .lc-val { font-size: 32px; } }
+
+/* 卡片名后的说明换行独占一行（中英文都更整齐） */
+.ledger-card .lc-name span, .senti-card .lc-name span {
+  display: block; margin-left: 0; margin-top: 3px;
+}
+
+/* 订阅框轻量化：去卡片感，融入 CTA 区块 */
+.ledger-sub {
+  margin-top: 14px; padding: 0; max-width: 400px;
+  background: transparent; border: none; border-radius: 0;
+}
+.ledger-sub .sub-title { font-size: 12.5px; font-weight: 500; color: var(--ink-soft); margin-bottom: 7px; }
+.ledger-sub .sub-input { padding: 7px 10px; font-size: 12px; }
+.ledger-sub .sub-btn { padding: 7px 14px; font-size: 12.5px; }
+.ledger-sub .sub-note { margin-top: 6px; font-size: 10.5px; }

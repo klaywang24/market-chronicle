@@ -85,6 +85,8 @@
     "任一时点回看三年的年化收益率；实线高于虚线的时段 = 跟信号占优，低于 = 满仓占优 · 底部滑块可拖拽缩放": ["Annualized return looking back three years from any point; solid line above the dashed = the signal wins, below = holding wins · drag the bottom slider to zoom", "", "", ""],
     "纳指": ["Nasdaq", "", "", ""],
     "标普": ["S&P", "", "", ""],
+    "Put/Call 比": ["Put/Call Ratio", "", "", ""],
+    "VIX 期限结构": ["VIX Term Structure", "", "", ""],
     "净值 = 1 元照规则操作后变成几元，尾标 ×N 即 1 元变 N 元。窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；两条虚线为同期一直持有纳指与标普": ["The curve is simply what $1 becomes under the rules — an end label of ×N means $1 grew to $N. Buy the Nasdaq-100 at each window's first close, hold 12 months, skip windows inside a holding period; the two dashed lines are buy-and-hold Nasdaq and S&P", "", "", ""],
     // ---- 头版 · 情绪仪表盘 ----
     "情绪仪表盘 · 恐惧的分解": ["Sentiment Dashboard · fear, decomposed", "", "", ""],
@@ -707,6 +709,8 @@
     [/^至今 (.+)$/, ["$1 to date", "$1 à ce jour", "$1 bis heute", "$1 hasta hoy"]],
     [/^NDX 至今 (.+)$/, ["NDX to date: $1", "NDX à ce jour : $1", "NDX bis heute: $1", "NDX hasta hoy: $1"]],
     [/^(\d+) 次$/, ["$1", "$1", "$1", "$1"]],
+    [/^实证结论：2020 年以来共 (\d+) 次信号。60 个交易日窗口胜率：标普 (\d+\/\d+)、纳指 (\d+\/\d+)（V 形回调中几乎必胜；2021 末—2022 的持续熊市中信号会连续触发、短期窗口为负）。所有信号持有至今全部为正。历史规律不保证未来。$/,
+      ["The record: $1 signals since 2020. 60-trading-day win rate: S&P $2, Nasdaq $3 (nearly always wins in V-shaped corrections; in the sustained 2021–22 bear market signals fired repeatedly and short windows went negative). Every signal held to date is positive. History guarantees nothing.", "", "", ""]],
     [/^数据截至 (.+) · (.+) · 每交易日收盘后自动更新$/,
       ["Data as of $1 · $2 · auto-updates after each market close",
        "Données au $1 · $2 · mise à jour après chaque clôture",
