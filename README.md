@@ -7,7 +7,7 @@
 
 [![daily-update](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml)
 [![weekly-fundamentals](https://github.com/klaywang24/market-chronicle/actions/workflows/weekly.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/weekly.yml)
-[![License](https://img.shields.io/badge/license-Apache--2.0-4a5d3a)](LICENSE)
+[![License](https://img.shields.io/badge/license-PolyForm--Noncommercial--1.0.0-4a5d3a)](LICENSE)
 [![Live](https://img.shields.io/badge/live-klaywang24.github.io-a0392f)](https://klaywang24.github.io/market-chronicle/)
 [![中文](https://img.shields.io/badge/%E4%B8%AD%E6%96%87-README-2b5f8f)](README.zh.md)
 
@@ -85,5 +85,11 @@ delays. Signal back-tests are reported faithfully, including failures.
 
 ## License
 
-[Apache 2.0](LICENSE). Code and pages are free to use, fork, and modify; data
-remains the property of its respective sources.
+[PolyForm Noncommercial 1.0.0](LICENSE). You are free to use, fork, and modify
+this project for any **noncommercial** purpose — personal use, research,
+education. Commercial use (selling it, bundling it into a paid product or
+service, running it as a commercial offering) is not permitted without a
+separate license from the author. Data remains the property of its respective
+sources.
+
+> Required Notice: Copyright Klay Wang (https://chronicle.klay-wang.com)

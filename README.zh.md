@@ -6,7 +6,7 @@
 
 [![每日行情更新](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml)
 [![每周基本面更新](https://github.com/klaywang24/market-chronicle/actions/workflows/weekly.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/weekly.yml)
-[![License](https://img.shields.io/badge/license-Apache--2.0-4a5d3a)](LICENSE)
+[![License](https://img.shields.io/badge/license-PolyForm--Noncommercial--1.0.0-4a5d3a)](LICENSE)
 [![在线访问](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E8%AE%BF%E9%97%AE-klaywang24.github.io-a0392f)](https://klaywang24.github.io/market-chronicle/)
 [![数据集](https://img.shields.io/badge/%E9%A2%84%E7%94%9F%E6%88%90%E6%95%B0%E6%8D%AE%E9%9B%86-250%2B%20JSON-b8893e)](data/)
 [![EN](https://img.shields.io/badge/EN-README-2b5f8f)](README.md)
@@ -108,4 +108,6 @@ python3 -m http.server 8137            # 打开 http://localhost:8137
 
 ## License
 
-[Apache 2.0](LICENSE)。代码与页面自由使用、fork、修改；数据版权归各数据源所有。
+[PolyForm Noncommercial 1.0.0](LICENSE)。个人使用、研究、学习等**非商业**用途可自由使用、fork、修改；商业用途（售卖、打包进付费产品/服务、作为商业服务运营）需另行获得作者授权。数据版权归各数据源所有。
+
+> Required Notice: Copyright Klay Wang (https://chronicle.klay-wang.com)
