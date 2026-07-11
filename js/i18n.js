@@ -19,7 +19,7 @@
     "方法论": ["Methodology", "Méthodologie", "Methodik", "Metodología"],
     // ---- 头版 · 信号台账 ----
     "信号台账 · 逐次公开对账": ["The Signal Ledger · every entry reconciled in public", "", "", ""],
-    "两个原创指标，一本逐日自动记的账——赢的和输的都在账上。读数由数据管线每个交易日自动提交，带 GitHub 时间戳，事后不可改写。": ["Two original indicators, one ledger written automatically every trading day — wins and losses alike. Each reading is committed by the pipeline with a GitHub timestamp; nothing can be rewritten after the fact.", "", "", ""],
+    "两个原创指标，一本逐日自动记的账：赢的和输的都在账上。读数由管线每日自动提交，带 GitHub 时间戳，事后不可改写。": ["Two original indicators, one ledger written automatically every trading day: wins and losses alike. Each reading is committed daily with a GitHub timestamp; nothing can be rewritten after the fact.", "", "", ""],
     "CNN 恐贪 ÷ VIX": ["CNN Fear & Greed ÷ VIX", "", "", ""],
     "恐贪 < 25 · 极端恐惧": ["Fear & Greed < 25 · extreme fear", "", "", ""],
     "触发中": ["Triggered", "", "", ""],
@@ -41,7 +41,7 @@
     "纳指 100（对数坐标）· 圆点 = LEAPS 窗口开启（2011 年起）· 菱形 = K < 1 信号（2020 年起）· 点任意标记看当次结果": ["Nasdaq-100 (log scale) · dots = LEAPS windows since 2011 · diamonds = K < 1 signals since 2020 · tap any marker for its outcome", "", "", ""],
     "如果每次窗口都跟，这本账长这样": ["If you had followed every window, the ledger reads like this", "", "", ""],
     "窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；虚线为同期一直持有": ["Buy the Nasdaq-100 at each window's first close, hold 12 months, skip windows inside a holding period; dashed = buy and hold", "", "", ""],
-    "示意口径：信号首日按收盘价入场，空仓期收益记零，不计成本与滑点。本站不宣称信号能跑赢买入持有——右图如实呈现了这一点；台账的价值在于告诉你「现在处于历史的哪个位置」。完整口径与如实披露见方法论。历史表现不预示未来，不构成投资建议。": ["Illustrative rules: enter at the close on a signal's first day; cash periods earn zero; no costs or slippage. This site does not claim the signals beat buy-and-hold — the right-hand chart shows exactly that. The ledger's value is telling you where today stands in history. Full rules and honest disclosure in the Methodology. Past performance does not predict future results; not investment advice.", "", "", ""],
+    "示意口径：信号首日按收盘价入场，空仓期收益记零，不计成本与滑点。本站不宣称信号能跑赢买入持有：右图如实呈现了这一点；台账的价值在于告诉你「现在处于历史的哪个位置」。完整口径与如实披露见方法论。历史表现不预示未来，不构成投资建议。": ["Illustrative rules: enter at the close on a signal's first day; cash periods earn zero; no costs or slippage. This site does not claim the signals beat buy-and-hold: the right-hand chart shows exactly that. The ledger's value is telling you where today stands in history. Full rules and honest disclosure in the Methodology. Past performance does not predict future results; not investment advice.", "", "", ""],
     "盘前信号简报 · 创始价预约": ["Pre-market signal brief · reserve the founding price", "", "", ""],
     "方法论全文": ["Full methodology", "", "", ""],
     "每周一封：台账读数与信号战报（免费）": ["One email a week: ledger readings & signal reports (free)", "", "", ""],
@@ -697,9 +697,9 @@
     "可选消费": ["Discretionary", "Conso. cyclique", "Zykl. Konsum", "Consumo discrecional"],
     "道琼斯": ["Dow Jones", "Dow Jones", "Dow Jones", "Dow Jones"],
     "罗素 2000": ["Russell 2000", "Russell 2000", "Russell 2000", "Russell 2000"],
-    "VIX 恐慌指数": ["VIX Fear Index", "VIX indice de peur", "VIX-Angstindex", "VIX índice del miedo"],
-    "恐惧贪婪指数": ["Fear & Greed Index", "Indice Fear & Greed", "Fear-&-Greed-Index", "Índice Fear & Greed"],
-    "LEAPS Call 窗口": ["LEAPS Call Window", "Fenêtre LEAPS Call", "LEAPS-Call-Fenster", "Ventana LEAPS Call"],
+    "VIX 恐慌指数": ["VIX", "VIX indice de peur", "VIX-Angstindex", "VIX índice del miedo"],
+    "恐惧贪婪指数": ["Fear & Greed", "Indice Fear & Greed", "Fear-&-Greed-Index", "Índice Fear & Greed"],
+    "LEAPS Call 窗口": ["LEAPS Window", "Fenêtre LEAPS Call", "LEAPS-Call-Fenster", "Ventana LEAPS Call"],
   };
 
   // 带动态数字的句式：正则 → 各语言模板（$1…为捕获组）

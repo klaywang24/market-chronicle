@@ -1053,3 +1053,25 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 .ledger-sub .sub-input { padding: 7px 10px; font-size: 12px; }
 .ledger-sub .sub-btn { padding: 7px 14px; font-size: 12.5px; }
 .ledger-sub .sub-note { margin-top: 6px; font-size: 10.5px; }
+
+/* 头版顶部再收紧一档 */
+#panel-pulse .pulse-layer { padding-top: 14px; }
+#panel-pulse { margin-top: -10px; }
+
+/* 芯片弹性结构：标签可截断省略，数字与涨跌幅永远完整显示 */
+.pq { display: inline-flex; align-items: baseline; justify-content: center; gap: 5px; }
+.pq-l { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pq b { margin-left: 0; flex: 0 0 auto; }
+.pq .pos, .pq .neg { flex: 0 0 auto; }
+@media (min-width: 1000px) {
+  html:not([lang^="zh"]) .pq { font-size: 11px; }
+}
+
+/* 台账三卡：压缩高度、放大主数字（保持三等分） */
+.ledger-card { padding: 13px 18px 14px; }
+.ledger-card .lc-val { font-size: 48px; margin: 6px 0 2px; }
+.ledger-card .lc-state { margin-bottom: 8px; }
+
+/* 恐贪分量行：名称列防换行（英文标签较长时省略），条与数值对齐 */
+.senti-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html:not([lang^="zh"]) .senti-name { flex-basis: 118px; font-size: 11.5px; }

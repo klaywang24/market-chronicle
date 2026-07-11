@@ -1844,7 +1844,7 @@
       ledgerHTML = `
       <div class="pulse-ledger">
         <div class="pulse-section-label">信号台账 · 逐次公开对账</div>
-        <p class="ledger-intro">两个原创指标，一本逐日自动记的账——赢的和输的都在账上。读数由数据管线每个交易日自动提交，带 GitHub 时间戳，事后不可改写。</p>
+        <p class="ledger-intro">两个原创指标，一本逐日自动记的账：赢的和输的都在账上。读数由管线每日自动提交，带 GitHub 时间戳，事后不可改写。</p>
         <div class="ledger-cards">
           <a class="ledger-card" href="#kindex">
             <div class="lc-name">K 指数 <span>CNN 恐贪 ÷ VIX</span></div>
@@ -1873,7 +1873,7 @@
             <div class="sub">净值 = 1 元照规则操作后变成几元，尾标 ×N 即 1 元变 N 元。窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；两条虚线为同期一直持有纳指与标普</div>
             <div class="chart short" id="ch-ledger-eq"></div></div>
         </div>
-        <p class="ledger-note">示意口径：信号首日按收盘价入场，空仓期收益记零，不计成本与滑点。本站不宣称信号能跑赢买入持有——右图如实呈现了这一点；台账的价值在于告诉你「现在处于历史的哪个位置」。完整口径与如实披露见方法论。历史表现不预示未来，不构成投资建议。</p>
+        <p class="ledger-note">示意口径：信号首日按收盘价入场，空仓期收益记零，不计成本与滑点。本站不宣称信号能跑赢买入持有：右图如实呈现了这一点；台账的价值在于告诉你「现在处于历史的哪个位置」。完整口径与如实披露见方法论。历史表现不预示未来，不构成投资建议。</p>
         <div class="ledger-cta">
           <a class="lcta lcta-primary" href="#pricing">盘前信号简报 · 创始价预约</a>
           <a class="lcta" href="#methodology">方法论全文</a>
@@ -1935,7 +1935,7 @@
           <div class="senti-card">
             <div class="lc-name">市场广度 <span>标普成分股在 200 日均线上的占比</span></div>
             <div class="lc-val">${breadth.current.toFixed(0)}%</div>
-            <div class="lc-meta"><span>累积史百分位</span> <b>${breadth.pctile.toFixed(0)}</b>（<span>自</span> ${breadth.since}）<br><span>越低 = 超卖越深，历史底部常见个位数</span></div>
+            <div class="lc-meta"><span>累积史百分位</span> <b>${breadth.pctile.toFixed(0)}</b> · <span>自</span> ${breadth.since}<br><span>越低 = 超卖越深，历史底部常见个位数</span></div>
           </div>` : ""}
           <div class="senti-card">
             <div class="lc-name">VIX 期限结构 <span>VIX ÷ VIX3M</span></div>
@@ -1971,16 +1971,16 @@
           <p class="sub">温度 = （估值百分位 ${pct(d.val_pct)} + 情绪百分位 ${pct(d.sent_pct)}）÷ 2。估值取标普 500 PE(TTM) 在 1871 年以来全历史的位置；情绪取今日上涨家数占比在近一年中的位置。</p>
           <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
             <div class="pulse-quotes">
-              ${q.spx ? `<span class="pq">标普 500 <b>${Math.round(q.spx.close).toLocaleString("en-US")}</b> ${chg(q.spx.chg)}</span>` : ""}
-              ${q.ndx ? `<span class="pq">纳指 100 <b>${Math.round(q.ndx.close).toLocaleString("en-US")}</b> ${chg(q.ndx.chg)}</span>` : ""}
-              ${q.dji ? `<span class="pq">道琼斯 <b>${Math.round(q.dji.close).toLocaleString("en-US")}</b> ${chg(q.dji.chg)}</span>` : ""}
-              ${q.rut ? `<span class="pq">罗素 2000 <b>${Math.round(q.rut.close).toLocaleString("en-US")}</b> ${chg(q.rut.chg)}</span>` : ""}
+              ${q.spx ? `<span class="pq"><span class="pq-l">标普 500</span> <b>${Math.round(q.spx.close).toLocaleString("en-US")}</b> ${chg(q.spx.chg)}</span>` : ""}
+              ${q.ndx ? `<span class="pq"><span class="pq-l">纳指 100</span> <b>${Math.round(q.ndx.close).toLocaleString("en-US")}</b> ${chg(q.ndx.chg)}</span>` : ""}
+              ${q.dji ? `<span class="pq"><span class="pq-l">道琼斯</span> <b>${Math.round(q.dji.close).toLocaleString("en-US")}</b> ${chg(q.dji.chg)}</span>` : ""}
+              ${q.rut ? `<span class="pq"><span class="pq-l">罗素 2000</span> <b>${Math.round(q.rut.close).toLocaleString("en-US")}</b> ${chg(q.rut.chg)}</span>` : ""}
             </div>
             <div class="pulse-quotes">
-              ${q.vix ? `<span class="pq">VIX 恐慌指数 <b>${q.vix.close}</b> ${chg(q.vix.chg)}</span>` : ""}
-              ${d.fng != null ? `<span class="pq">恐惧贪婪指数 <b>${Math.round(d.fng)}</b></span>` : ""}
-              ${d.k != null ? `<span class="pq">K 指数 <b>${d.k.toFixed(2)}</b></span>` : ""}
-              ${leaps ? `<span class="pq">LEAPS Call 窗口 <b class="${windowOpen ? "neg" : "pos"}">${windowOpen ? "开启" : "关闭"}</b></span>` : ""}
+              ${q.vix ? `<span class="pq"><span class="pq-l">VIX 恐慌指数</span> <b>${q.vix.close}</b> ${chg(q.vix.chg)}</span>` : ""}
+              ${d.fng != null ? `<span class="pq"><span class="pq-l">恐惧贪婪指数</span> <b>${Math.round(d.fng)}</b></span>` : ""}
+              ${d.k != null ? `<span class="pq"><span class="pq-l">K 指数</span> <b>${d.k.toFixed(2)}</b></span>` : ""}
+              ${leaps ? `<span class="pq"><span class="pq-l">LEAPS Call 窗口</span> <b class="${windowOpen ? "neg" : "pos"}">${windowOpen ? "开启" : "关闭"}</b></span>` : ""}
             </div>
           </div>
         </div>
