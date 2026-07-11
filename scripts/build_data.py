@@ -540,6 +540,33 @@ def build_leaps(spx_close: pd.Series, ndx_close: pd.Series, vix_close: pd.Series
     })
 
 
+# --------------------------------------------------------- 仓位层：NAAIM 经理人敞口
+NAAIM_PAGE = "https://naaim.org/programs/naaim-exposure-index/"
+
+
+def build_naaim():
+    """NAAIM Exposure Index：主动管理人平均股票敞口（周频，2006→）。
+    官网 Excel 文件名带日期每周变，先抓页面找当前链接再下载。"""
+    print("== NAAIM 经理人敞口")
+    page = requests.get(NAAIM_PAGE, headers=UA, timeout=30)
+    page.raise_for_status()
+    m = re.search(r'href="(https://naaim\.org/wp-content/uploads/[^"]+\.xlsx?)"', page.text)
+    if not m:
+        raise RuntimeError("NAAIM xlsx link not found on page")
+    r = requests.get(m.group(1), headers=UA, timeout=60)
+    r.raise_for_status()
+    df = pd.read_excel(pd.io.common.BytesIO(r.content))
+    col = "NAAIM Number" if "NAAIM Number" in df.columns else "Mean/Average"
+    s = df.set_index("Date")[col].dropna().sort_index()
+    cur = round(float(s.iloc[-1]), 1)
+    pct = round(float((s <= s.iloc[-1]).mean() * 100), 1)
+    write_json("naaim.json", {
+        "dates": dates(s.index), "values": rnd(s, 1),
+        "current": cur, "pctile": pct,
+        "date": s.index[-1].strftime("%Y-%m-%d"), "since": s.index[0].strftime("%Y-%m-%d"),
+    })
+
+
 # --------------------------------------------------------- 情绪仪表盘
 CBOE_HIST = "https://cdn.cboe.com/api/global/us_indices/daily_prices/{}_History.csv"
 
@@ -1058,6 +1085,10 @@ def main():
         build_sentiment(vix, vxn)
     except Exception as e:
         print(f"  情绪仪表盘失败（留旧文件）: {e}")
+    try:
+        build_naaim()
+    except Exception as e:
+        print(f"  NAAIM 失败（留旧文件）: {e}")
     build_index_val()
     build_macro()
     build_index_panels("sp500", gspc, vix, "VIX")

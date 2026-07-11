@@ -52,7 +52,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260710t">
+<link rel="stylesheet" href="css/style.css?v=20260710u">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -540,6 +540,16 @@
     </div>
     <div class="card"><h3>企业利润同比（季频）</h3><div class="sub">全美企业税后利润（FRED CP）——指数 EPS 的宏观母体</div><div class="chart short" id="ch-macro-profits"></div></div>
   </div>
+
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第五章</span><h2>仓位与杠杆 · POSITIONING</h2></div>
+    <p class="chapter-q">专业管理人实际把多少钱押在股票上？（嘴会说谎，仓位不会）</p>
+    <div class="card">
+      <h3>NAAIM 经理人敞口指数（2006 年至今 · 周频）</h3>
+      <div class="sub">NAAIM 会员主动管理人的平均股票敞口：0 = 空仓，100 = 满仓，大于 100 = 加杠杆；历史底部常见 20 以下 · 尾标为最新读数 · 底部滑块可拖拽缩放。CFTC 期货持仓与融资余额将陆续入列</div>
+      <div class="chart short" id="ch-naaim"></div>
+    </div>
+  </div>
 </section>
 
 <!-- ================= LEAPS 窗口 ================= -->
@@ -818,9 +828,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260710t"></script>
-<script src="js/app.js?v=20260710t"></script>
-<script src="js/docs-i18n.js?v=20260710t"></script>
+<script src="js/i18n.js?v=20260710u"></script>
+<script src="js/app.js?v=20260710u"></script>
+<script src="js/docs-i18n.js?v=20260710u"></script>
 <script>
 // PWA：注册 service worker（离线外壳 + 静态资源缓存；data/*.json 网络优先不影响每日更新）
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});

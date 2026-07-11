@@ -1797,6 +1797,28 @@
     };
   }
 
+  // 宏观 · 仓位与杠杆：NAAIM 经理人敞口（周频，2006→）
+  chart("macro", "ch-naaim", async (p) => {
+    const d = await load("naaim");
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => (+v).toFixed(1) }),
+      grid: { left: 52, right: 60, top: 24, bottom: 60 },
+      dataZoom: ledgerZoom(p),
+      xAxis: timeX(p),
+      yAxis: Object.assign({ type: "value", min: 0 }, baseAxis(p)),
+      series: [{
+        name: "NAAIM 经理人敞口", type: "line", data: zip(d.dates, d.values), showSymbol: false,
+        lineStyle: { color: p.teal, width: 1.6 }, itemStyle: { color: p.teal },
+        endLabel: { show: true, formatter: (o) => (+o.value[1]).toFixed(0),
+          fontFamily: "JetBrains Mono", fontSize: 11, color: p.teal },
+        markLine: { silent: true, symbol: "none",
+          lineStyle: { color: p.muted, type: "dashed", width: 1 },
+          label: { color: p.muted, fontFamily: "JetBrains Mono", fontSize: 10, formatter: "满仓 100" },
+          data: [{ yAxis: 100 }] },
+      }],
+    };
+  });
+
   // K / LEAPS 页注册台账图表（带缩放的完整版；头版是紧凑钩子）
   chart("kindex", "ch-k-map", buildKMap);
   chart("kindex", "ch-k-eq", buildKEq);
