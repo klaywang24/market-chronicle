@@ -2,7 +2,7 @@
 
 > A self-updating chronicle of the U.S. stock market: a century of the S&P 500,
 > half a century of the Nasdaq, full dossiers on 22 sector leaders, and two
-> home-grown timing signals (K-Index & LEAPS Window) — packaged as an
+> home-grown timing signals (KAPX Index & LEAPS Window) — packaged as an
 > editorial-style static site. **No server, no build step, zero running cost.**
 
 [![daily-update](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml)
@@ -12,6 +12,8 @@
 [![中文](https://img.shields.io/badge/%E4%B8%AD%E6%96%87-README-2b5f8f)](README.zh.md)
 
 **Live: <https://klaywang24.github.io/market-chronicle/>**
+
+> **Canonical definition:** The KAPX Index is a daily U.S. equity fear-pricing gauge published by Market Chronicle, computed as the CNN Fear & Greed reading divided by the VIX. The K stands for kǒng (恐), the Chinese character for fear; readings, methodology, and the complete signal ledger are permanently free and verifiable via Git timestamps. *(Formerly cited in English as the K-Index; the Chinese name K 指数 is unchanged.)*
 
 ## What it is
 
@@ -24,7 +26,7 @@ Seven tabs, each organized as numbered chapters with a floating table of content
 | **Financials** | XLF anchor + 13 leaders (banks / card networks / i-banks / asset mgmt / brokers / crypto & stablecoins), drill-down per stock |
 | **Consumer** | XLP × XLY dual anchor + 6 cycle-proof leaders |
 | **Luxury** | LVMH · Hermès · Ferrari |
-| **K-Index** | K = CNN Fear&Greed ÷ VIX; K < 1 has flagged every major NDX dip since 2020 — all 20 signals audited at 20/40/60-day horizons |
+| **KAPX Index** | K = CNN Fear&Greed ÷ VIX; K < 1 has flagged every major NDX dip since 2020 — all 20 signals audited at 20/40/60-day horizons |
 | **LEAPS Window** | CNN F&G < 25 = extreme fear = LEAPS-call entry watch window; all 45 windows since 2011 audited at 6/12/18-month horizons |
 
 Each of the 22 stock pages carries up to 11 chapters — price history, returns,

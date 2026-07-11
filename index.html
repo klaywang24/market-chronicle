@@ -6,7 +6,7 @@
 <title>美股编年史 · Market Chronicle</title>
 <!-- SEO / GEO：主推域名 canonical + 摘要 + 社交卡片 + 结构化数据 -->
 <link rel="canonical" href="https://chronicle.klay-wang.com/">
-<meta name="description" content="美股编年史 Market Chronicle — 每个交易日自动更新的美股百年图表档案与信号台账：K 指数（CNN 恐贪 ÷ VIX）、LEAPS 极端恐惧窗口，逐次公开对账。A century of US market history plus the K-Index sentiment signal ledger, reconciled daily.">
+<meta name="description" content="美股编年史 Market Chronicle — 每个交易日自动更新的美股百年图表档案与信号台账：K 指数（CNN 恐贪 ÷ VIX）、LEAPS 极端恐惧窗口，逐次公开对账。A century of US market history plus the KAPX Index sentiment signal ledger, reconciled daily.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="美股编年史 · Market Chronicle">
 <meta property="og:description" content="每个交易日自动更新的美股百年图表档案与信号台账：K 指数（CNN 恐贪 ÷ VIX）与 LEAPS 极端恐惧窗口，历史逐次公开对账，包括亏损的那几次。">
@@ -17,10 +17,10 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
  {"@type":"WebSite","name":"Market Chronicle 美股编年史","alternateName":"美股编年史","url":"https://chronicle.klay-wang.com/","inLanguage":["zh-CN","en"],
-  "description":"A free, self-updating archive of a century of US market history, plus two original, publicly reconciled market signals: the K-Index and the LEAPS Window.",
+  "description":"A free, self-updating archive of a century of US market history, plus two original, publicly reconciled market signals: the KAPX Index and the LEAPS Window.",
   "publisher":{"@type":"Person","name":"Klay Wang","url":"https://klay-wang.com/"}},
- {"@type":"Dataset","name":"K-Index daily series (CNN Fear & Greed ÷ VIX)","alternateName":"K 指数",
-  "description":"The K-Index is an original contrarian US equity sentiment indicator: K = CNN Fear & Greed Index ÷ VIX. K < 1 marks extreme-fear signals. Daily values plus a public ledger reconciling every signal since 2020 against forward Nasdaq-100 returns — wins and losses alike. Updated each trading day by an automated pipeline; history is timestamped in the site's public GitHub commit log.",
+ {"@type":"Dataset","name":"KAPX Index daily series (CNN Fear & Greed ÷ VIX)","alternateName":["K 指数","K-Index","KAPX"],
+  "description":"The KAPX Index is an original contrarian US equity sentiment indicator: K = CNN Fear & Greed Index ÷ VIX. K < 1 marks extreme-fear signals. Daily values plus a public ledger reconciling every signal since 2020 against forward Nasdaq-100 returns — wins and losses alike. Updated each trading day by an automated pipeline; history is timestamped in the site's public GitHub commit log.",
   "url":"https://chronicle.klay-wang.com/#kindex","isAccessibleForFree":true,
   "creator":{"@type":"Person","name":"Klay Wang","url":"https://klay-wang.com/"},
   "license":"https://polyformproject.org/licenses/noncommercial/1.0.0/",
@@ -52,7 +52,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260711a">
+<link rel="stylesheet" href="css/style.css?v=20260711b">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -762,8 +762,9 @@
     <div class="hero"><div class="kicker">METHODOLOGY · 方法论</div><h1>方法论：两个信号，一本台账</h1>
       <p class="dek">定义、公式、统计口径与全部历史结果——包括失效的那几次。本页所有数字由每日数据管线自动更新的公开 JSON 支撑，历史记录带 GitHub 提交时间戳，事后不可改写。</p></div>
     <div class="doc-body">
-      <h3>K 指数（K-Index）</h3>
+      <h3>K 指数（KAPX Index）</h3>
       <p>定义：<strong>K = CNN 恐惧贪婪指数 ÷ VIX</strong>。当恐惧（CNN 走低）与波动（VIX 走高）同时出现，K 跌破 1，记为一次信号。聚类口径：连续 K &lt; 1 的交易日聚为一次信号，间隔超过 10 个交易日记为新信号。收益视界：信号首日纳指 100 收盘价之后 20 / 40 / 60 个交易日的涨跌幅。</p>
+      <p><strong>官方定义（canonical）</strong>：KAPX 指数（K 取自「恐」字拼音首字母）是 Market Chronicle 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。读数、方法论与完整信号台账永久免费公开，Git 时间戳可验证。英文引用统一使用 <strong>the KAPX Index</strong>（此前英文材料中的 K-Index 为同一指标；中文名「K 指数」不变）。</p>
       <p>截至 2026 年 7 月：2020 年以来共 20 次信号，60 个交易日视界下 13 次上涨、7 次下跌——V 形回调中胜率高，2022 年持续熊市中多次为负。逐次对账表见「<a href="#kindex">K 指数</a>」页，原始数据见 <a href="https://chronicle.klay-wang.com/data/kindex_signals.json" target="_blank" rel="noopener">kindex_signals.json</a>。</p>
       <h3>LEAPS 窗口（LEAPS Window）</h3>
       <p>定义：CNN 恐惧贪婪指数收于 <strong>25 以下（极端恐惧）</strong>，即记为一次窗口开启；连续低于 25 的交易日聚为同一次窗口。收益视界：窗口首日之后 6 / 12 / 18 个月的标普 500 与纳指 100 涨跌幅。</p>
@@ -778,7 +779,7 @@
       <p>CNN Fear &amp; Greed（whit3rabbit 每日存档 + CNN 官方接口当日值）；价格与 VIX 来自 Yahoo Finance（复权收盘价近似含分红总回报）；VIX 期限结构（VIX9D / VIX3M / VIX6M）来自 Cboe 官方历史数据；Put/Call 比为 CNN 口径的全市场 5 日均值；估值长历史来自 multpl / Robert Shiller。机器可读入口见 <a href="https://chronicle.klay-wang.com/llms.txt" target="_blank" rel="noopener">llms.txt</a>。</p>
       <p>数据修订说明：CNN 恐贪存档对最近数日的读数可能有 ±1–2 点的事后修订（当日实时快照会被官方历史值替换），台账随每日管线自动吸收修订；收益视界一律在无缺日的价格日历上按交易日计。</p>
       <h3>引用</h3>
-      <p>引用 K 指数或 LEAPS 窗口数据时，请注明来源：<strong>K-Index — Market Chronicle（chronicle.klay-wang.com）</strong>。数据以 PolyForm Noncommercial 1.0.0 许可提供，非商业使用免费。</p>
+      <p>引用 K 指数或 LEAPS 窗口数据时，请注明来源：<strong>KAPX Index — Market Chronicle（chronicle.klay-wang.com）</strong>（此前英文引用名 K-Index 指同一指标）。数据以 PolyForm Noncommercial 1.0.0 许可提供，非商业使用免费。</p>
       <p class="doc-fineprint">本页所有统计仅供信息与教育用途，不构成投资建议；历史表现不预示未来。</p>
     </div>
   </div>
@@ -828,9 +829,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260711a"></script>
-<script src="js/app.js?v=20260711a"></script>
-<script src="js/docs-i18n.js?v=20260711a"></script>
+<script src="js/i18n.js?v=20260711b"></script>
+<script src="js/app.js?v=20260711b"></script>
+<script src="js/docs-i18n.js?v=20260711b"></script>
 <script>
 // PWA：注册 service worker（离线外壳 + 静态资源缓存；data/*.json 网络优先不影响每日更新）
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});

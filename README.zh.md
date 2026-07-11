@@ -1,7 +1,7 @@
 # 美股编年史 · Market Chronicle
 
 > 一个每日自动更新的美股历史数据档案站：把标普 500 的一个世纪、纳斯达克的半个世纪、
-> 22 只行业龙头的完整履历，以及两个自研择时信号（K 指数 / LEAPS 窗口），
+> 22 只行业龙头的完整履历，以及两个自研择时信号（K 指数——英文官方名 **KAPX Index**——与 LEAPS 窗口），
 > 放进一份"金融报刊"式的静态网页。**纯静态、零服务器、零运行成本。**
 
 [![每日行情更新](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml)
@@ -10,6 +10,8 @@
 [![在线访问](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E8%AE%BF%E9%97%AE-klaywang24.github.io-a0392f)](https://klaywang24.github.io/market-chronicle/)
 [![数据集](https://img.shields.io/badge/%E9%A2%84%E7%94%9F%E6%88%90%E6%95%B0%E6%8D%AE%E9%9B%86-250%2B%20JSON-b8893e)](data/)
 [![EN](https://img.shields.io/badge/EN-README-2b5f8f)](README.md)
+
+> **官方定义**：KAPX 指数（K 取自「恐」字拼音首字母）是 Market Chronicle 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。读数、方法论与完整信号台账永久免费公开，Git 时间戳可验证。
 
 **在线地址：<https://klaywang24.github.io/market-chronicle/>**
 

@@ -30,7 +30,7 @@
       en: { kicker: "ABOUT", h1: "About Market Chronicle",
         dek: "A free, source-available archive of US market history that updates automatically after every trading day's close — no ads. A century of markets, turned into a chronicle you can read.",
         body: `<h3>What it is</h3>
-<p>Market Chronicle organizes the history of the S&amp;P 500, the Nasdaq, and baskets such as financials, consumer and luxury into a chapter-by-chapter visual record: the shape of returns, the rhythm of crises, the anchors of valuation, the texture of volatility, the compounding of time. Beyond the long-history charts, three original lenses — the "Today's Front Page" market temperature, the "K-Index", and the "LEAPS Window".</p>
+<p>Market Chronicle organizes the history of the S&amp;P 500, the Nasdaq, and baskets such as financials, consumer and luxury into a chapter-by-chapter visual record: the shape of returns, the rhythm of crises, the anchors of valuation, the texture of volatility, the compounding of time. Beyond the long-history charts, three original lenses — the "Today's Front Page" market temperature, the "KAPX Index", and the "LEAPS Window".</p>
 <h3>Data &amp; methodology</h3>
 <p>Prices and returns approximate total return using adjusted close; CAPE / PE(TTM) come from multpl / Robert Shiller's long series; the Fear &amp; Greed reading is from CNN; company fundamentals from macrotrends and Yahoo Finance; the daily sector heatmap is TradingView's live data. Long-history charts mostly use a log scale so that century-scale moves read honestly — 1929 fell far more than 2000 or 2008, so it should look steeper. That is the data being truthful.</p>
 <h3>How it's built</h3>
@@ -40,7 +40,7 @@
       fr: { kicker: "À PROPOS", h1: "À propos de Market Chronicle",
         dek: "Une archive libre et open source de l'histoire des marchés américains, mise à jour automatiquement après chaque clôture — sans publicité. Un siècle de marchés, transformé en une chronique qui se lit.",
         body: `<h3>Qu'est-ce que c'est</h3>
-<p>Market Chronicle organise l'histoire du S&amp;P 500, du Nasdaq et de paniers tels que la finance, la consommation et le luxe en un récit visuel chapitre par chapitre : la forme des rendements, le rythme des crises, les ancres de valorisation, la texture de la volatilité, la capitalisation du temps. Au-delà des graphiques historiques, trois angles originaux — la « température du marché » de la Une du jour, l'« indice K » et la « fenêtre LEAPS ».</p>
+<p>Market Chronicle organise l'histoire du S&amp;P 500, du Nasdaq et de paniers tels que la finance, la consommation et le luxe en un récit visuel chapitre par chapitre : la forme des rendements, le rythme des crises, les ancres de valorisation, la texture de la volatilité, la capitalisation du temps. Au-delà des graphiques historiques, trois angles originaux — la « température du marché » de la Une du jour, l'« indice KAPX » et la « fenêtre LEAPS ».</p>
 <h3>Données et méthodologie</h3>
 <p>Les prix et rendements approchent le rendement total via le cours ajusté ; le CAPE / PER (TTM) provient des longues séries de multpl / Robert Shiller ; l'indice Fear &amp; Greed vient de CNN ; les fondamentaux d'entreprise de macrotrends et Yahoo Finance ; la carte thermique sectorielle quotidienne utilise les données en direct de TradingView. Les graphiques de longue durée utilisent surtout une échelle logarithmique pour représenter honnêtement les mouvements à l'échelle du siècle — 1929 a bien plus chuté que 2000 ou 2008, il doit donc paraître plus abrupt. C'est la vérité des données.</p>
 <h3>Comment c'est construit</h3>
@@ -50,7 +50,7 @@
       de: { kicker: "ÜBER UNS", h1: "Über Market Chronicle",
         dek: "Ein kostenloses, quelloffenes Archiv der US-Marktgeschichte, das nach jedem Handelsschluss automatisch aktualisiert wird — werbefrei. Ein Jahrhundert Märkte, als lesbare Chronik.",
         body: `<h3>Was das ist</h3>
-<p>Market Chronicle ordnet die Geschichte des S&amp;P 500, der Nasdaq und von Körben wie Finanzwerten, Konsum und Luxus zu einer kapitelweisen visuellen Chronik: die Form der Renditen, der Rhythmus der Krisen, die Anker der Bewertung, die Textur der Volatilität, der Zinseszins der Zeit. Neben den Langzeit-Charts drei eigene Perspektiven — die „Markttemperatur" der heutigen Titelseite, der „K-Index" und das „LEAPS-Fenster".</p>
+<p>Market Chronicle ordnet die Geschichte des S&amp;P 500, der Nasdaq und von Körben wie Finanzwerten, Konsum und Luxus zu einer kapitelweisen visuellen Chronik: die Form der Renditen, der Rhythmus der Krisen, die Anker der Bewertung, die Textur der Volatilität, der Zinseszins der Zeit. Neben den Langzeit-Charts drei eigene Perspektiven — die „Markttemperatur" der heutigen Titelseite, der „KAPX Index" und das „LEAPS-Fenster".</p>
 <h3>Daten &amp; Methodik</h3>
 <p>Kurse und Renditen nähern die Gesamtrendite über den bereinigten Schlusskurs an; CAPE / KGV (TTM) stammen aus den langen Reihen von multpl / Robert Shiller; der Fear-&amp;-Greed-Wert von CNN; Unternehmensfundamentaldaten von macrotrends und Yahoo Finance; die tägliche Sektor-Heatmap nutzt Live-Daten von TradingView. Langzeit-Charts verwenden meist eine logarithmische Skala, damit Bewegungen über Jahrhunderte ehrlich erscheinen — 1929 fiel weit stärker als 2000 oder 2008 und sollte daher steiler aussehen. Das ist die Ehrlichkeit der Daten.</p>
 <h3>Wie es entsteht</h3>
@@ -60,7 +60,7 @@
       es: { kicker: "ACERCA DE", h1: "Acerca de Market Chronicle",
         dek: "Un archivo gratuito y de código abierto de la historia del mercado estadounidense, actualizado automáticamente tras cada cierre — sin anuncios. Un siglo de mercados, convertido en una crónica para leer.",
         body: `<h3>Qué es</h3>
-<p>Market Chronicle organiza la historia del S&amp;P 500, el Nasdaq y cestas como financieras, consumo y lujo en un relato visual por capítulos: la forma de los rendimientos, el ritmo de las crisis, las anclas de valoración, la textura de la volatilidad, la capitalización del tiempo. Más allá de los gráficos históricos, tres enfoques propios — la «temperatura del mercado» de la portada del día, el «índice K» y la «ventana LEAPS».</p>
+<p>Market Chronicle organiza la historia del S&amp;P 500, el Nasdaq y cestas como financieras, consumo y lujo en un relato visual por capítulos: la forma de los rendimientos, el ritmo de las crisis, las anclas de valoración, la textura de la volatilidad, la capitalización del tiempo. Más allá de los gráficos históricos, tres enfoques propios — la «temperatura del mercado» de la portada del día, el «índice KAPX» y la «ventana LEAPS».</p>
 <h3>Datos y metodología</h3>
 <p>Los precios y rendimientos aproximan el rendimiento total con el cierre ajustado; el CAPE / PER (TTM) proviene de las largas series de multpl / Robert Shiller; el índice Fear &amp; Greed es de CNN; los fundamentales de empresa de macrotrends y Yahoo Finance; el mapa de calor sectorial diario usa datos en vivo de TradingView. Los gráficos de largo plazo usan sobre todo escala logarítmica para mostrar con honestidad los movimientos a escala de siglo — 1929 cayó mucho más que 2000 o 2008, así que debe verse más pronunciado. Es la honestidad de los datos.</p>
 <h3>Cómo está hecho</h3>
@@ -328,9 +328,10 @@
     methodology: {
       en: { kicker: "METHODOLOGY", h1: "Methodology: Two Signals, One Ledger",
         dek: "Definitions, formulas, statistical rules and the complete historical record — including the times the signals failed. Every number on this page is backed by public JSON files updated daily by the pipeline, with history timestamped in the GitHub commit log — impossible to rewrite after the fact.",
-        body: `<h3>The K-Index</h3>
+        body: `<h3>The KAPX Index (K 指数)</h3>
 <p>Definition: <strong>K = CNN Fear &amp; Greed Index ÷ VIX</strong>. When fear (CNN falling) and volatility (VIX rising) meet, K drops below 1 — that is one signal. Clustering rule: consecutive trading days with K &lt; 1 count as one signal; a gap of more than 10 trading days starts a new one. Return horizon: Nasdaq-100 change 20 / 40 / 60 trading days after the signal's first close.</p>
-<p>As of July 2026: 20 signals since 2020; at the 60-trading-day horizon, 13 up and 7 down — strong in V-shaped corrections, negative repeatedly during the 2022 bear market. The signal-by-signal ledger is on the <a href="#kindex">K-Index</a> page; raw data at <a href="https://chronicle.klay-wang.com/data/kindex_signals.json" target="_blank" rel="noopener">kindex_signals.json</a>.</p>
+<p><strong>Canonical definition:</strong> The KAPX Index is a daily U.S. equity fear-pricing gauge published by Market Chronicle, computed as the CNN Fear &amp; Greed reading divided by the VIX. The K stands for kǒng (恐), the Chinese character for fear; readings, methodology, and the complete signal ledger are permanently free and verifiable via Git timestamps. (Previously cited in English as the K-Index; the Chinese name K 指数 is unchanged.)</p>
+<p>As of July 2026: 20 signals since 2020; at the 60-trading-day horizon, 13 up and 7 down — strong in V-shaped corrections, negative repeatedly during the 2022 bear market. The signal-by-signal ledger is on the <a href="#kindex">KAPX Index</a> page; raw data at <a href="https://chronicle.klay-wang.com/data/kindex_signals.json" target="_blank" rel="noopener">kindex_signals.json</a>.</p>
 <h3>The LEAPS Window</h3>
 <p>Definition: a window opens when CNN's Fear &amp; Greed Index closes <strong>below 25 (extreme fear)</strong>; consecutive days below 25 count as one window. Return horizon: S&amp;P 500 and Nasdaq-100 change 6 / 12 / 18 months after the window's first day.</p>
 <p>As of July 2026: 45 windows since 2011; at the 12-month horizon the Nasdaq-100 was up 34 times and down 7 (the rest are not yet 12 months old). Several windows in late 2021 were negative 12 months on — <strong>sentiment extremes are not valuation bottoms</strong>. The episode-by-episode ledger is on the <a href="#leaps">LEAPS Window</a> page; raw data at <a href="https://chronicle.klay-wang.com/data/leaps.json" target="_blank" rel="noopener">leaps.json</a>.</p>
@@ -344,16 +345,16 @@
 <p>CNN Fear &amp; Greed (whit3rabbit daily archive + CNN's official endpoint for the current day); prices and VIX from Yahoo Finance (adjusted close approximates total return); the VIX term structure (VIX9D / VIX3M / VIX6M) from Cboe's official historical data; the put/call ratio is CNN's all-market 5-day average; long-history valuation from multpl / Robert Shiller. Machine-readable entry point: <a href="https://chronicle.klay-wang.com/llms.txt" target="_blank" rel="noopener">llms.txt</a>.</p>
 <p>A note on revisions: the CNN Fear &amp; Greed archive may revise the last few days' readings by ±1–2 points after the fact (the intraday snapshot gets replaced by the official historical value); the ledger absorbs revisions automatically with each daily pipeline run. Return horizons are always measured in trading days on the gap-free price calendar.</p>
 <h3>Citation</h3>
-<p>When citing the K-Index or LEAPS Window data, please credit: <strong>K-Index — Market Chronicle (chronicle.klay-wang.com)</strong>. Data is provided under PolyForm Noncommercial 1.0.0 — free for noncommercial use.</p>
+<p>When citing the KAPX Index or LEAPS Window data, please credit: <strong>KAPX Index — Market Chronicle (chronicle.klay-wang.com)</strong>. Data is provided under PolyForm Noncommercial 1.0.0 — free for noncommercial use.</p>
 <p class="doc-fineprint">All statistics on this page are for information and education only and do not constitute investment advice; past performance does not predict future results.</p>` },
     },
 
     pricing: {
       en: { kicker: "PRICING", h1: "Pricing", dek: "The website is free forever. What you pay for is the brief that lands in your inbox before every open.",
         body: `<h3>Free · forever</h3>
-<p>All historical charts, Today's Front Page (market temperature), the full signal ledgers of the K-Index and the LEAPS Window, and the sector heatmap are <strong>free and open</strong> — no ads, no paywall, no sign-up. The ledger updates automatically every trading day, and its history can be verified day by day in the public GitHub commit log.</p>
+<p>All historical charts, Today's Front Page (market temperature), the full signal ledgers of the KAPX Index and the LEAPS Window, and the sector heatmap are <strong>free and open</strong> — no ads, no paywall, no sign-up. The ledger updates automatically every trading day, and its history can be verified day by day in the public GitHub commit log.</p>
 <h3>Coming soon: Chronicle Pro (daily pre-market signal &amp; data brief)</h3>
-<p><strong>$29 / month</strong>. Delivered to your inbox before the open every trading day — objective data and statistics: the day's K-Index and LEAPS Window readings, status and historical percentiles; market temperature and key valuation / sentiment readings; and the reconciliation entry on days a signal triggers or closes. Options-market data statistics (LEAPS share of volume, most-active contracts, market-wide rankings) will be added over time. <strong>Data and information only; not investment advice; no buy or sell recommendations.</strong> Launch date to be determined.</p>
+<p><strong>$29 / month</strong>. Delivered to your inbox before the open every trading day — objective data and statistics: the day's KAPX Index and LEAPS Window readings, status and historical percentiles; market temperature and key valuation / sentiment readings; and the reconciliation entry on days a signal triggers or closes. Options-market data statistics (LEAPS share of volume, most-active contracts, market-wide rankings) will be added over time. <strong>Data and information only; not investment advice; no buy or sell recommendations.</strong> Launch date to be determined.</p>
 <h3>Founding-subscriber price: $9.9 / month · first 100 only</h3>
 <p>The first 100 subscribers who reserve before launch <strong>lock in $9.9 / month for life</strong> — the price never changes as long as the subscription stays active. To reserve: email <a href="mailto:${EMAIL}">${EMAIL}</a> with "Founding" and we'll notify you in order when it launches.</p>
 <h3>Subscription terms (once live)</h3>
@@ -361,7 +362,7 @@
 <p class="doc-fineprint">The "coming soon" items above are planning information, not a final commitment; the official launch prevails.</p>` },
       fr: { kicker: "TARIFS", h1: "Tarifs", dek: "Pour l'instant : tout le site est gratuit.",
         body: `<h3>Gratuit</h3>
-<p>Tous les graphiques historiques, la Une du jour (température du marché), l'indice K, la fenêtre LEAPS et la carte thermique sectorielle sont <strong>gratuits et ouverts</strong> — sans publicité, sans péage, sans inscription.</p>
+<p>Tous les graphiques historiques, la Une du jour (température du marché), l'indice KAPX, la fenêtre LEAPS et la carte thermique sectorielle sont <strong>gratuits et ouverts</strong> — sans publicité, sans péage, sans inscription.</p>
 <h3>Bientôt : LEAPS Pro (bulletin de données pré-marché quotidien)</h3>
 <p>Un abonnement payant pour les utilisateurs d'options : <strong>9,9 $ / mois</strong>. Le contenu est constitué de statistiques de données de marché objectives — part des LEAPS dans le volume, taille moyenne des transactions, contrats les plus actifs, classement du marché entier — livrées par e-mail avant l'ouverture chaque jour de bourse. <strong>Données et informations uniquement ; pas de conseil en investissement ; aucune recommandation d'achat ou de vente.</strong> Date de lancement à déterminer.</p>
 <h3>Conditions d'abonnement (une fois lancé)</h3>
@@ -371,7 +372,7 @@
 <p class="doc-fineprint">Les éléments « bientôt » ci-dessus sont indicatifs, non un engagement définitif ; le lancement officiel prévaut.</p>` },
       de: { kicker: "PREISE", h1: "Preise", dek: "Derzeit: die ganze Seite ist kostenlos.",
         body: `<h3>Kostenlos</h3>
-<p>Alle historischen Charts, die heutige Titelseite (Markttemperatur), der K-Index, das LEAPS-Fenster und die Sektor-Heatmap sind <strong>kostenlos und offen</strong> — werbefrei, ohne Bezahlschranke, ohne Anmeldung.</p>
+<p>Alle historischen Charts, die heutige Titelseite (Markttemperatur), der KAPX Index, das LEAPS-Fenster und die Sektor-Heatmap sind <strong>kostenlos und offen</strong> — werbefrei, ohne Bezahlschranke, ohne Anmeldung.</p>
 <h3>Bald: LEAPS Pro (tägliches Vorbörsen-Datenbriefing)</h3>
 <p>Ein kostenpflichtiges Abo für Options-Nutzer: <strong>9,9 $ / Monat</strong>. Der Inhalt besteht aus objektiven Marktdaten-Statistiken — LEAPS-Anteil am Volumen, durchschnittliche Ordergröße, aktivste Kontrakte, marktweites Ranking — an jedem Handelstag vor der Eröffnung per E-Mail. <strong>Nur Daten und Informationen; keine Anlageberatung; keine Kauf- oder Verkaufsempfehlungen.</strong> Starttermin noch offen.</p>
 <h3>Abo-Bedingungen (nach dem Start)</h3>
@@ -382,7 +383,7 @@
       es: { kicker: "PRECIOS", h1: "Precios", dek: "Ahora mismo: todo el sitio es gratis.",
         // （西语版为历史遗留，当前语言仅开放 zh/en，此处不再更新）
         body: `<h3>Gratis</h3>
-<p>Todos los gráficos históricos, la portada del día (temperatura del mercado), el índice K, la ventana LEAPS y el mapa de calor sectorial son <strong>gratuitos y abiertos</strong> — sin anuncios, sin muro de pago, sin registro.</p>
+<p>Todos los gráficos históricos, la portada del día (temperatura del mercado), el índice KAPX, la ventana LEAPS y el mapa de calor sectorial son <strong>gratuitos y abiertos</strong> — sin anuncios, sin muro de pago, sin registro.</p>
 <h3>Próximamente: LEAPS Pro (boletín diario de datos pre-mercado)</h3>
 <p>Una suscripción de pago para usuarios de opciones: <strong>9,9 $ / mes</strong>. El contenido son estadísticas objetivas de datos de mercado — cuota de volumen de LEAPS, tamaño medio de operación, contratos más activos y un ranking de todo el mercado — entregadas por correo antes de la apertura cada día de bolsa. <strong>Solo datos e información; no es asesoramiento de inversión; sin recomendaciones de compra o venta.</strong> Fecha de lanzamiento por determinar.</p>
 <h3>Condiciones de suscripción (una vez activo)</h3>
