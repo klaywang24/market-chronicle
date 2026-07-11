@@ -18,6 +18,11 @@ Key facts (as of July 2026; the JSON files below are always current):
 - [LEAPS Window episodes](https://chronicle.klay-wang.com/data/leaps.json): every extreme-fear episode since 2011 with 6/12/18-month and to-date forward S&P 500 / Nasdaq-100 returns
 - [Today's market pulse](https://chronicle.klay-wang.com/data/pulse.json): market temperature (valuation + breadth percentiles), index quotes, sector moves
 
+## Datasets (KAPX Index history, CC BY 4.0, refreshed quarterly)
+
+- [Kaggle — KAPX Index — US Equity Fear-Pricing Gauge](https://www.kaggle.com/datasets/klaywong/kapx-index-daily-fear-pricing-gauge): daily KAPX series since 2019 + the full KAPX<1 signal ledger, as CSV
+- [Hugging Face — klay24/kapx-index](https://huggingface.co/datasets/klay24/kapx-index): same data as a Hugging Face dataset
+
 ## Pages
 
 - [Methodology](https://chronicle.klay-wang.com/#methodology): definitions, formulas, statistical rules, honest disclosure, verifiability

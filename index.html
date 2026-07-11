@@ -52,7 +52,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260711b">
+<link rel="stylesheet" href="css/style.css?v=20260711c">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -776,7 +776,7 @@
       <h3>可验证性</h3>
       <p>本站为纯静态架构：每个交易日收盘后，GitHub Actions 数据管线自动拉取数据、计算指标并提交至公开仓库。这意味着每一天的信号读数都带有当天的 Git 提交时间戳——<a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">提交历史</a>公开可查，任何人都可以验证任何一次信号是「事前记录」而非事后补写。</p>
       <h3>数据源</h3>
-      <p>CNN Fear &amp; Greed（whit3rabbit 每日存档 + CNN 官方接口当日值）；价格与 VIX 来自 Yahoo Finance（复权收盘价近似含分红总回报）；VIX 期限结构（VIX9D / VIX3M / VIX6M）来自 Cboe 官方历史数据；Put/Call 比为 CNN 口径的全市场 5 日均值；估值长历史来自 multpl / Robert Shiller。机器可读入口见 <a href="https://chronicle.klay-wang.com/llms.txt" target="_blank" rel="noopener">llms.txt</a>。</p>
+      <p>CNN Fear &amp; Greed（whit3rabbit 每日存档 + CNN 官方接口当日值）；价格与 VIX 来自 Yahoo Finance（复权收盘价近似含分红总回报）；VIX 期限结构（VIX9D / VIX3M / VIX6M）来自 Cboe 官方历史数据；Put/Call 比为 CNN 口径的全市场 5 日均值；估值长历史来自 multpl / Robert Shiller。机器可读入口见 <a href="https://chronicle.klay-wang.com/llms.txt" target="_blank" rel="noopener">llms.txt</a>。KAPX 指数历史读数亦以公开数据集形式发布于 <a href="https://www.kaggle.com/datasets/klaywong/kapx-index-daily-fear-pricing-gauge" target="_blank" rel="noopener">Kaggle</a> 与 <a href="https://huggingface.co/datasets/klay24/kapx-index" target="_blank" rel="noopener">Hugging Face</a>（CC BY 4.0，季度更新）。</p>
       <p>数据修订说明：CNN 恐贪存档对最近数日的读数可能有 ±1–2 点的事后修订（当日实时快照会被官方历史值替换），台账随每日管线自动吸收修订；收益视界一律在无缺日的价格日历上按交易日计。</p>
       <h3>引用</h3>
       <p>引用 K 指数或 LEAPS 窗口数据时，请注明来源：<strong>KAPX Index — Market Chronicle（chronicle.klay-wang.com）</strong>（此前英文引用名 K-Index 指同一指标）。数据以 PolyForm Noncommercial 1.0.0 许可提供，非商业使用免费。</p>
@@ -829,9 +829,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260711b"></script>
-<script src="js/app.js?v=20260711b"></script>
-<script src="js/docs-i18n.js?v=20260711b"></script>
+<script src="js/i18n.js?v=20260711c"></script>
+<script src="js/app.js?v=20260711c"></script>
+<script src="js/docs-i18n.js?v=20260711c"></script>
 <script>
 // PWA：注册 service worker（离线外壳 + 静态资源缓存；data/*.json 网络优先不影响每日更新）
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
