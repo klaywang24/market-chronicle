@@ -21,7 +21,7 @@
       <a class="ci ci-web" href="https://klay-wang.com/" target="_blank" rel="noopener" title="klay-wang.com" aria-label="Personal website">${ICON.web}</a>
       <a class="ci ci-mail" href="mailto:${EMAIL}" title="${EMAIL}" aria-label="Email">${ICON.email}</a>
       <a class="ci ci-x" href="https://x.com/_Klay24_" target="_blank" rel="noopener" title="@_Klay24_" aria-label="X">${ICON.x}</a>
-      <a class="ci ci-github" href="https://github.com/klaywang24/market-chronicle" target="_blank" rel="noopener" title="klaywang24/market-chronicle" aria-label="GitHub">${ICON.github}</a>
+      <a class="ci ci-github" href="https://github.com/klaywang24" target="_blank" rel="noopener" title="klaywang24" aria-label="GitHub">${ICON.github}</a>
       <a class="ci ci-discord" href="https://discord.gg/MnMEZg7Kx2" target="_blank" rel="noopener" title="Discord" aria-label="Discord">${ICON.discord}</a>
     </div>`;
 
