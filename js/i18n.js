@@ -553,11 +553,11 @@
     "墨色粗线为三股等权组合；MC/RMS 为欧元、RACE 为美元，混币种仅供比较": ["Bold line = equal-weight basket of three; MC/RMS in EUR, RACE in USD — mixed currencies, for comparison only", "Ligne épaisse = panier des trois ; MC/RMS en EUR, RACE en USD — devises mixtes", "Dicke Linie = Korb der drei; MC/RMS in EUR, RACE in USD — Mischwährung", "Línea gruesa = cesta de tres; MC/RMS en EUR, RACE en USD — divisas mixtas"],
     "年化收益按各自币种计；YTD 为年初至今涨跌 · 点击任意一行进入个股页": ["CAGRs in local currency; YTD = year-to-date · click any row for the stock page", "TCAC en devise locale ; cliquez une ligne pour la fiche valeur", "CAGR in Lokalwährung; Zeile anklicken für die Aktienseite", "TCAC en divisa local; haga clic en una fila para ver el valor"],
     "点击任意一行进入个股页": ["Click any row for the stock page", "Cliquez une ligne pour la fiche valeur", "Zeile anklicken für die Aktienseite", "Haga clic en una fila para ver el valor"],
-    "上图：CNN（黄，左轴 0–100）· VIX（红，左轴）· 纳指 100（蓝，右轴，对数）｜下图：K 指数（红，左轴 1–10），K < 1 区间高亮": [
-      "Top: CNN (gold, left 0–100), VIX (red, left), NDX (blue, right, log). Bottom: KAPX Index (red, 1–10), K < 1 zones highlighted.",
-      "Haut : CNN (or), VIX (rouge), NDX (bleu, log). Bas : indice KAPX (rouge, 1–10), zones K < 1 en surbrillance.",
-      "Oben: CNN (gold), VIX (rot), NDX (blau, log). Unten: KAPX Index (rot, 1–10), K < 1 hervorgehoben.",
-      "Arriba: CNN (oro), VIX (rojo), NDX (azul, log). Abajo: índice KAPX (rojo, 1–10), zonas K < 1 resaltadas."],
+    "上图：CNN（黄，左轴 0–100）· VIX（红，左轴）· 纳指 100（蓝，右轴，对数）｜下图：K 指数（红，左轴 0–12），K < 1 区间高亮": [
+      "Top: CNN (gold, left 0–100), VIX (red, left), NDX (blue, right, log). Bottom: KAPX Index (red, 0–12), K < 1 zones highlighted.",
+      "Haut : CNN (or), VIX (rouge), NDX (bleu, log). Bas : indice KAPX (rouge, 0–12), zones K < 1 en surbrillance.",
+      "Oben: CNN (gold), VIX (rot), NDX (blau, log). Unten: KAPX Index (rot, 0–12), K < 1 hervorgehoben.",
+      "Arriba: CNN (oro), VIX (rojo), NDX (azul, log). Abajo: índice KAPX (rojo, 0–12), zonas K < 1 resaltadas."],
     "CNN 数据 2011 年起为每日存档；图表自 2011 年起展示。数据源：CNN Fear & Greed（whit3rabbit 存档 + 官方接口）、Yahoo Finance。": [
       "CNN data archived daily since 2011; chart shown from 2011. Sources: CNN Fear & Greed (whit3rabbit archive + official endpoint), Yahoo Finance.",
       "Données CNN archivées depuis 2011 ; graphique depuis 2011. Sources : CNN Fear & Greed, Yahoo Finance.",
