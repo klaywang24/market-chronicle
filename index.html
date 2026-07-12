@@ -52,7 +52,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260711e">
+<link rel="stylesheet" href="css/style.css?v=20260712a">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -134,17 +134,17 @@
     </div>
     <div class="card">
       <h3>如果每次信号都跟（持有 60 个交易日）</h3>
-      <div class="sub">净值 = 1 元照规则操作后变成几元，尾标 ×N 即 1 元变 N 元。信号首日买入纳指 100、持有 60 个交易日后离场，持有期内新信号跳过；两条虚线为同期一直持有纳指与标普。空仓期记零、不计成本与滑点，完整口径见方法论</div>
+      <div class="sub">净值 = 1 元照规则操作后变成几元，尾标 ×N 即 1 元变 N 元。信号首日买入纳指 100、持有 60 个交易日后离场，持有期内新信号跳过；两条虚线为同期一直持有纳指与标普。空仓期记零、不计成本与滑点，完整口径见方法论。K 约六成时间空仓：总收益因此结构性低于一路满仓（并非信号失效），回撤也因此更浅——同一枚硬币的两面。台账的价值在历史定位，不在总累计收益</div>
       <div class="chart" id="ch-k-eq"></div>
     </div>
   </div>
 
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第四章</span><h2>入场与离场</h2></div>
-    <p class="chapter-q">信号之后，拿多久最合适？</p>
+    <div class="chapter-head"><span class="chapter-no">第四章</span><h2>恐慌中的买点</h2></div>
+    <p class="chapter-q">在人群最恐慌的那天买入或加仓，之后 1 到 12 个月，市场通常给了什么？</p>
     <div class="card">
-      <h3>持有期矩阵：五个视界的胜率与中位收益</h3>
-      <div class="sub">每次信号首日入场，之后 20 / 40 / 60 / 120 / 250 个交易日的胜率与中位涨跌幅（纳指 / 标普双锚）；较新的信号尚未走完长视界，不计入该列</div>
+      <h3>持有期矩阵：五个视界的胜率、平均与中位收益</h3>
+      <div class="sub">牛市里无人在意恐惧，潮水退去时买点才显形。每次信号首日买入或加仓，之后 20 / 40 / 60 / 120 / 250 个交易日（约 1 / 2 / 3 / 6 / 12 个月）的胜率、平均与中位涨跌幅（纳指 / 标普双锚）；较新的信号尚未走完长视界，不计入该列。这不是跑赢满仓持有的证据（总收益见第三章与方法论）——它回答的是恐慌中手握现金的人最关心的问题：这些时点之后，市场大多走向了哪里</div>
       <div class="table-wrap"><table id="k-matrix"></table></div>
     </div>
   </div>
@@ -772,6 +772,7 @@
       <h3>「如果每次都跟」的口径与如实披露</h3>
       <p>先说人话：<strong>净值就是「1 元变几元」</strong>——曲线走到 ×9.5，意思是期初投入的 1 元变成了 9.5 元。计算规则：窗口（或信号）首日按纳指 100 收盘价入场，LEAPS 窗口持有 12 个月、K 信号持有 60 个交易日后离场；持有期内出现的新信号跳过、不加仓、不重置；空仓期收益记零；不计交易成本、滑点与税费。</p>
       <p>如实披露（截至 2026 年 7 月）：按此口径，LEAPS 策略（买纳指）2011 年以来净值约 <strong>9.5 倍</strong>——高于同期一直持有标普 500 的约 <strong>5.8 倍</strong>，低于一直持有纳指 100 的约 <strong>13.0 倍</strong>；K 策略 2011 年以来约 <strong>4.0 倍</strong>，明显低于同期一直持有纳指的约 <strong>13.0 倍</strong>。<strong>本站不宣称这些信号能跑赢同标的的买入持有。</strong>台账的价值在于告诉你「现在处于历史的哪个位置」，以及每一次极端情绪之后市场实际发生了什么——赢的和输的都在账上。</p>
+      <p>为什么 K 策略的净值远低于一直持有？因为它约有六成时间空仓：只在 K &lt; 1 后持有 60 个交易日，其余时间收益记零。在一个长期上行的市场里，空仓越久，总收益就越难追上一直满仓——这是仓位暴露的结构性差异，不是信号失效。同一个原因也解释了它更浅的回撤（2011 年以来最大回撤约 <strong>−26.7%</strong>，浅于纳指 100 的 −35.6% 与标普 500 的 −33.9%）：一半时间不在场，下跌自然也躲过一半——这是低暴露的机械结果，并非择时技巧。<strong>净值垫底与回撤最浅，是同一枚硬币的两面。</strong>宜把 K 当作定位「现在有多恐慌」的刻度、恐慌时部署现金的纪律锚，而非用来跑赢大盘的策略。</p>
       <p>基准说明：对账一律双锚——纳指 100（策略实际交易标的）与标普 500（主流市场锚）并列展示。情绪输入端为标普 / 全市场口径（VIX 期限结构仅标普体系有官方指数，恐贪指数本身以标普为中心），属数据现实而非选择。</p>
       <h3>可验证性</h3>
       <p>本站为纯静态架构：每个交易日收盘后，GitHub Actions 数据管线自动拉取数据、计算指标并提交至公开仓库。<strong>自本站上线（2026 年 7 月）起</strong>，每一天的信号读数都带有当天的 Git 提交时间戳——<a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">提交历史</a>公开可查，属事前记录。<strong>上线之前、回溯至 2011 年的历史台账</strong>，则是按公开公式、用公开历史数据（CNN 恐贪存档 + VIX）回填而成：任何人都能用同样的公开数据独立复现，但属历史回填、并非事前提交。两段口径分开标注，不混为一谈。</p>
@@ -831,9 +832,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260711e"></script>
-<script src="js/app.js?v=20260711e"></script>
-<script src="js/docs-i18n.js?v=20260711e"></script>
+<script src="js/i18n.js?v=20260712a"></script>
+<script src="js/app.js?v=20260712a"></script>
+<script src="js/docs-i18n.js?v=20260712a"></script>
 <script>
 // PWA：注册 service worker（离线外壳 + 静态资源缓存；data/*.json 网络优先不影响每日更新）
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});

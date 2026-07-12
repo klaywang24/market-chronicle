@@ -898,21 +898,24 @@
       const HZ = [20, 40, 60, 120, 250];
       const median = (a) => { const b = [...a].sort((x, y) => x - y); const m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
       const rowFor = (prefix) => {
-        const wins = [], meds = [];
+        const wins = [], avgs = [], meds = [];
         for (const h of HZ) {
           const vals = sig.signals.map((s) => s[`${prefix}fwd${h}`]).filter((v) => v != null);
           wins.push(vals.length ? `${vals.filter((v) => v > 0).length}/${vals.length}` : "--");
+          avgs.push(vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null);
           meds.push(vals.length ? median(vals) : null);
         }
-        return { wins, meds };
+        return { wins, avgs, meds };
       };
       const nd = rowFor(""), sp = rowFor("spx_");
       const medCell = (v) => v == null ? "<td>--</td>" : `<td class="${v >= 0 ? "pos" : "neg"}">${pct(v)}</td>`;
       mtEl.innerHTML =
         `<tr><th></th>${HZ.map((h) => `<th>+${h}d</th>`).join("")}</tr>` +
         `<tr><td>纳指 胜率</td>${nd.wins.map((w) => `<td>${w}</td>`).join("")}</tr>` +
+        `<tr><td>纳指 平均收益</td>${nd.avgs.map(medCell).join("")}</tr>` +
         `<tr><td>纳指 中位收益</td>${nd.meds.map(medCell).join("")}</tr>` +
         `<tr><td>标普 胜率</td>${sp.wins.map((w) => `<td>${w}</td>`).join("")}</tr>` +
+        `<tr><td>标普 平均收益</td>${sp.avgs.map(medCell).join("")}</tr>` +
         `<tr><td>标普 中位收益</td>${sp.meds.map(medCell).join("")}</tr>`;
     }
 
