@@ -203,9 +203,9 @@ def build_index_panels(prefix: str, close: pd.Series, vol_index: pd.Series | Non
     print(f"== {prefix}")
     close = close.dropna()
 
-    # 月线（世纪图）
-    monthly = close.resample("ME").last()
-    write_json(f"{prefix}_century.json", {"dates": dates(monthly.index), "close": rnd(monthly, 2)})
+    # 世纪图：日频（2020/1987 这类快速崩盘的尖 V 自然显出真实深度；月末收盘会把它抹平）
+    daily_c = close.dropna()
+    write_json(f"{prefix}_century.json", {"dates": dates(daily_c.index), "close": rnd(daily_c, 2)})
 
     # 年度回报 + 分桶
     annual = close.resample("YE").last().pct_change().dropna() * 100
