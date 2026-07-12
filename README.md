@@ -26,7 +26,7 @@ Seven tabs, each organized as numbered chapters with a floating table of content
 | **Financials** | XLF anchor + 13 leaders (banks / card networks / i-banks / asset mgmt / brokers / crypto & stablecoins), drill-down per stock |
 | **Consumer** | XLP × XLY dual anchor + 6 cycle-proof leaders |
 | **Luxury** | LVMH · Hermès · Ferrari |
-| **KAPX Index** | K = CNN Fear&Greed ÷ VIX; K < 1 has flagged every major NDX dip since 2020 — all 20 signals audited at 20/40/60-day horizons |
+| **KAPX Index** | K = CNN Fear&Greed ÷ VIX; K < 1 marks extreme-fear signals — 39 signals since 2011, each audited at 20/40/60-day horizons (26/13 at 60 days; all positive held to date) |
 | **LEAPS Window** | CNN F&G < 25 = extreme fear = LEAPS-call entry watch window; all 45 windows since 2011 audited at 6/12/18-month horizons |
 
 Each of the 22 stock pages carries up to 11 chapters — price history, returns,

@@ -835,7 +835,7 @@
       yAxis: [
         Object.assign({ type: "value", name: "CNN / VIX", min: 0, max: 100, gridIndex: 0 }, baseAxis(p)),
         Object.assign({ type: "log", name: "NDX", gridIndex: 0, position: "right", splitLine: { show: false } }, baseAxis(p)),
-        Object.assign({ type: "value", name: "K 指数", min: 0, max: 10, interval: 1, gridIndex: 1 }, baseAxis(p)),
+        Object.assign({ type: "value", name: "K 指数", min: 0, max: 12, interval: 2, gridIndex: 1 }, baseAxis(p)),
       ],
       dataZoom: [
         { type: "inside", xAxisIndex: [0, 1] },
@@ -922,7 +922,7 @@
     const winS = sig.signals.filter((s) => s.spx_fwd60 != null && s.spx_fwd60 > 0).length;
     const hasS = sig.signals.filter((s) => s.spx_fwd60 != null).length;
     document.getElementById("k-verdict").textContent =
-      `实证结论：2020 年以来共 ${n} 次信号。60 个交易日窗口胜率：标普 ${winS}/${hasS}、纳指 ${win60}/${has60}` +
+      `实证结论：2011 年以来共 ${n} 次信号。60 个交易日窗口胜率：标普 ${winS}/${hasS}、纳指 ${win60}/${has60}` +
       `（V 形回调中几乎必胜；2021 末—2022 的持续熊市中信号会连续触发、短期窗口为负）。` +
       `所有信号持有至今全部为正。历史规律不保证未来。`;
   }
@@ -1663,7 +1663,7 @@
     };
   }
 
-  // K 指数页专属：落点图（2019-06 起）与 60 个交易日持有净值
+  // K 指数页专属：落点图（2011 起）与 60 个交易日持有净值
   async function buildKMap(p) {
     const [kd, ks] = await Promise.all([load("kindex"), load("kindex_signals")]);
     const idx = new Map(kd.dates.map((d, i) => [d, i]));
@@ -1873,7 +1873,7 @@
             <div class="lc-name">K 指数 <span>CNN 恐贪 ÷ VIX</span></div>
             <div class="lc-val">${kd.current.k.toFixed(2)}</div>
             <div class="lc-state ${kTrig ? "neg" : "pos"}">${kTrig ? "触发中" : "未触发"} <span>（K &lt; 1 触发）</span></div>
-            <div class="lc-meta"><b>${kAll}</b> <span>次信号（2020 年起）</span> · <span>60 个交易日后</span><br><span>标普</span> <b class="pos">${kWs}</b> <span>涨</span> <b class="neg">${kLs}</b> <span>跌</span> · <span>纳指</span> <b class="pos">${kW}</b> <span>涨</span> <b class="neg">${kL}</b> <span>跌</span></div>
+            <div class="lc-meta"><b>${kAll}</b> <span>次信号（2011 年起）</span> · <span>60 个交易日后</span><br><span>标普</span> <b class="pos">${kWs}</b> <span>涨</span> <b class="neg">${kLs}</b> <span>跌</span> · <span>纳指</span> <b class="pos">${kW}</b> <span>涨</span> <b class="neg">${kL}</b> <span>跌</span></div>
           </a>
           <a class="ledger-card" href="#leaps">
             <div class="lc-name">LEAPS 窗口 <span>恐贪 &lt; 25 · 极端恐惧</span></div>
@@ -1890,7 +1890,7 @@
         </div>
         <div class="ledger-charts">
           <div class="card"><h3>十五年，每一次入场都标在这条线上</h3>
-            <div class="sub">纳指 100（对数坐标）· 圆点 = LEAPS 窗口开启（2011 年起）· 菱形 = K &lt; 1 信号（2020 年起）· 点任意标记看当次结果</div>
+            <div class="sub">纳指 100（对数坐标）· 圆点 = LEAPS 窗口开启（2011 年起）· 菱形 = K &lt; 1 信号（2011 年起）· 点任意标记看当次结果</div>
             <div class="chart short" id="ch-ledger-map"></div></div>
           <div class="card"><h3>如果每次窗口都跟，这本账长这样</h3>
             <div class="sub">净值 = 1 元照规则操作后变成几元，尾标 ×N 即 1 元变 N 元。窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；两条虚线为同期一直持有纳指与标普</div>

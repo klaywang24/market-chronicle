@@ -83,7 +83,7 @@ def build_kindex(ndx_close: pd.Series, spx_close: pd.Series, vix_close: pd.Serie
     print("== K 指数")
     fng, live_note = fetch_fng()
     df = pd.DataFrame({"cnn": fng, "vix": vix_close, "ndx": ndx_close, "spx": spx_close}).dropna()
-    df = df[df.index >= "2019-06-01"]  # 多留半年做图表前置缓冲
+    df = df[df.index >= "2011-01-01"]  # 恐贪存档 2011 起 → KAPX 回溯至此（历史回填，非事前记录）
     df["k"] = df["cnn"] / df["vix"]
 
     # K<1 信号分段：连续 K<1 的交易日聚成一个 episode，间隔 >10 个交易日算新信号
@@ -110,7 +110,7 @@ def build_kindex(ndx_close: pd.Series, spx_close: pd.Series, vix_close: pd.Serie
     spx_full = spx_close.dropna()
     sig_rows = []
     for ep in episodes:
-        if ep["start"] < pd.Timestamp("2020-01-01"):
+        if ep["start"] < pd.Timestamp("2011-01-01"):
             continue
         p0 = int(ndx_full.index.get_indexer([ep["start"]], method="backfill")[0])
         entry = ndx_full.iloc[p0]
@@ -150,7 +150,7 @@ def build_kindex(ndx_close: pd.Series, spx_close: pd.Series, vix_close: pd.Serie
             "rating": live_note,
         },
     })
-    write_json("kindex_signals.json", {"signals": sig_rows, "since": "2020-01-01"})
+    write_json("kindex_signals.json", {"signals": sig_rows, "since": "2011-01-01"})
     return sig_rows
 
 
