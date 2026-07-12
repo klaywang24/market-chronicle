@@ -4,7 +4,7 @@
     {
       "name": "chronicle",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8137", "--directory", "/Users/klay/Documents/个人 Agent/美股编年史：market-chronicle/market-chronicle 公开 git 仓库"],
+      "runtimeArgs": ["-m", "http.server", "8137", "--directory", "/Users/klay/Documents/个人 Agent/美股编年史：market-chronicle/KAPX/market-chronicle 公开 git 仓库"],
       "port": 8137
     }
   ]
