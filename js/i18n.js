@@ -6,7 +6,7 @@
   // 词条格式："简体原文": [EN, FR, DE, ES]
   const D = {
     // ---- 页脚 ----
-    "每个交易日自动更新的美股百年图表档案与信号台账": ["A self-updating archive of a century of US market charts, plus a public signal ledger", "", "", ""],
+    "每个交易日自动更新的美股百年图表档案与读数台账": ["A self-updating archive of a century of US market charts, plus a public ledger of daily readings", "", "", ""],
     "关于": ["About", "À propos", "Über", "Acerca de"],
     "联系": ["Contact", "Contact", "Kontakt", "Contacto"],
     "定价": ["Pricing", "Tarifs", "Preise", "Precios"],
@@ -182,6 +182,7 @@
     "2011 年来极端恐惧": ["Extreme fear since 2011", "", "", ""], "最近一次": ["Most recent", "", "", ""],
     "连续交易日聚为一段": ["consecutive days grouped into one segment", "", "", ""],
     "常态（≥ 25）": ["Normal (≥ 25)", "", "", ""],
+    "读数越过你设定阈值时邮件通知": ["Email notice when a reading crosses your threshold", "", "", ""],
     // ---- 页脚新栏目 ----
     "关于我们": ["About us", "", "", ""],
     "联系我们": ["Contact us", "", "", ""],

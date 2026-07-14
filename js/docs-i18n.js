@@ -396,7 +396,7 @@
     <ul class="ptier-list">
       <li>Everything in Standard</li>
       <li>CSV / data export + full-history downloads</li>
-      <li>Custom threshold alerts</li>
+      <li>Email notice when a reading crosses your threshold</li>
       <li>API (later)</li>
     </ul>
     <div class="ptier-soon">Opens 3–6 months after Standard launches</div>
