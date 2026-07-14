@@ -377,17 +377,18 @@
     </ul>
   </div>
   <div class="ptier featured">
-    <div class="ptier-badge">Founding price · first 100</div>
+    <div class="ptier-badge">Founding $9.9 · by email</div>
     <div class="ptier-name">Standard</div>
     <div class="ptier-price"><span class="p-m">$29<i class="u">/ mo</i></span><span class="p-y">$290<i class="u">/ yr</i></span></div>
-    <div class="ptier-tag"><span class="p-m">Founding subscribers <b>$9.9 / mo</b> locked for life (first 100)</span><span class="p-y">≈ $24 / mo · annual = 10 months' price</span></div>
+    <div class="ptier-tag"><span class="p-m">Founding price <b>$9.9 / mo</b> locked for life (first 100) · by email only</span><span class="p-y">≈ $24 / mo · annual = 10 months' price</span></div>
     <ul class="ptier-list">
       <li>Everything in Free</li>
       <li><b>Pre-market digest email</b>, delivered before every open</li>
-      <li>All indicators' current values + full historical percentile charts on the web</li>
-      <li>Watchlist data table (SPY / QQQ / M7 / AVGO)</li>
+      <li>Coverage data table (SPY / QQQ / M7 / AVGO), included in the digest</li>
     </ul>
-    <a class="ptier-cta" href="mailto:${EMAIL}?subject=Founding">Email "Founding" to reserve →</a>
+    <div class="ptier-soon">The first digest goes out on 2026-07-15. Subscribing before then is prepayment; full refund on request any time before sending starts.</div>
+    <a class="ptier-cta" href="#" id="pay-btn"><span class="p-m">Subscribe $29 / mo</span><span class="p-y">Subscribe $290 / yr</span></a>
+    <a class="ptier-alt" href="mailto:${EMAIL}?subject=Founding">Founding $9.9 — email to reserve →</a>
   </div>
   <div class="ptier t-pro">
     <div class="ptier-name">Pro</div>
@@ -404,7 +405,7 @@
 </div>
 <p class="pricing-inst"><strong>Institutional / data licensing</strong> (series licensing, index licensing, redistribution) — <a href="#contact">contact us</a>; unpriced.</p>
 <p>Annual = 10 months' price ($290 / $990) · 14-day no-questions refund, no trial (the free tier is the trial) · cancel anytime via the manage link in your subscription email. Orders and payments are handled by a Merchant of Record, whose name will appear on your statement. <strong>Data and information only; not investment advice; no buy or sell recommendations.</strong></p>
-<p class="doc-fineprint">Planning information, not a final commitment; Standard launch date TBD, Pro and API to follow.</p>` },
+<p class="doc-fineprint">Pro and API are later plans, not a final commitment; launch dates TBD.</p>` },
       fr: { kicker: "TARIFS", h1: "Tarifs", dek: "Pour l'instant : tout le site est gratuit.",
         body: `<h3>Gratuit</h3>
 <p>Tous les graphiques historiques, la Une du jour (température du marché), l'indice KAPX, la fenêtre LEAPS et la carte thermique sectorielle sont <strong>gratuits et ouverts</strong> — sans publicité, sans péage, sans inscription.</p>

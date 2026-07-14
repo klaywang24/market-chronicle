@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260714q">
+<link rel="stylesheet" href="css/style.css?v=20260714r">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -832,17 +832,21 @@
           </ul>
         </div>
         <div class="ptier featured">
-          <div class="ptier-badge">创始价 · 前 100 名</div>
+          <div class="ptier-badge">创始价 $9.9 · 邮件预约</div>
           <div class="ptier-name">Standard</div>
           <div class="ptier-price"><span class="p-m">$29<i class="u">/ 月</i></span><span class="p-y">$290<i class="u">/ 年</i></span></div>
-          <div class="ptier-tag"><span class="p-m">创始订户 <b>$9.9 / 月</b> 永久锁定（前 100 名）</span><span class="p-y">≈ $24 / 月 · 年付 = 10 个月价</span></div>
+          <div class="ptier-tag"><span class="p-m">创始价 <b>$9.9 / 月</b> 永久锁定（前 100 名）· 需邮件预约</span><span class="p-y">≈ $24 / 月 · 年付 = 10 个月价</span></div>
           <ul class="ptier-list">
             <li>免费层全部内容</li>
             <li><b>盘前 digest 邮件</b>，每交易日开盘前送达</li>
-            <li>网页平台全指标当日值 + 完整历史百分位图表</li>
-            <li>Watchlist 数据表（SPY / QQQ / M7 / AVGO）</li>
+            <li>覆盖标的数据表（SPY / QQQ / M7 / AVGO），随 digest 一同送达</li>
           </ul>
-          <a class="ptier-cta" href="mailto:klaywang24+marketchronicle@gmail.com?subject=Founding">邮件「Founding」预约 →</a>
+          <div class="ptier-soon">首期 digest 于 2026-07-15 发出。在此之前订阅等于预付；开始发送前可随时全额退款。</div>
+          <!-- 标签整串放进 p-m/p-y，不留裸文本节点：i18n 的 applyTo 按整节点精确匹配 D 字典，
+               而 D 里已有 "订阅"→"Subscribe"（i18n.js:49）。留 "订阅 " 单独成节点会被译成 Subscribe，
+               在「以 EN 加载→切回 ZH」这条路径上产生「Subscribe $29 / 月」混搭。整串不是 D 的 key，故安全。 -->
+          <a class="ptier-cta" href="#" id="pay-btn"><span class="p-m">订阅 $29 / 月</span><span class="p-y">订阅 $290 / 年</span></a>
+          <a class="ptier-alt" href="mailto:klaywang24+marketchronicle@gmail.com?subject=Founding">创始价 $9.9 · 邮件预约 →</a>
         </div>
         <div class="ptier t-pro">
           <div class="ptier-name">Pro</div>
@@ -859,7 +863,7 @@
       </div>
       <p class="pricing-inst"><strong>机构 / 数据授权</strong>（序列授权、指数授权、再分发）— <a href="#contact">联系我们</a>，不标价。</p>
       <p>年付 = 10 个月价（$290 / $990）· 14 天无条件退款、无试用（免费层即试用）· 通过订阅邮件中的管理链接随时取消。订单与支付由 Merchant of Record 处理，账单上会显示其名称。<strong>仅为数据与信息，不构成投资建议，不含任何买卖推荐。</strong></p>
-      <p class="doc-fineprint">以上为规划信息，非最终承诺；Standard 上线时间待定，Pro 与 API 为后续。</p>
+      <p class="doc-fineprint">Pro 与 API 为后续规划，非最终承诺，上线时间待定。</p>
     </div>
   </div>
 </section>
@@ -900,9 +904,34 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260714q"></script>
-<script src="js/app.js?v=20260714q"></script>
-<script src="js/docs-i18n.js?v=20260714q"></script>
+<script src="js/i18n.js?v=20260714r"></script>
+<script src="js/app.js?v=20260714r"></script>
+<script src="js/docs-i18n.js?v=20260714r"></script>
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+<script>
+// Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。
+// 三条设计依据，改动前先读：
+//  1) 用 Paddle.Checkout.open() 而非 class="paddle_button"+data-items —— 后者的属性读取时机
+//     官方文档零表述，且 cdn 路径不带版本号会静默升级；万一改成 init 时快照，症状是
+//     「用户选年付却被按月付收款」，静默且本站无 webhook 可发现。open() 的签名是文档化契约。
+//  2) 必须事件委托 —— 切到 EN 时 docs-i18n.js 会整块换掉 #panel-pricing 的 HTML，
+//     按钮是新节点；而 Paddle 只在 Initialize 的 DOM-ready 扫一次、无任何重扫方法。
+//  3) if (window.Paddle) 兜底 —— cdn.paddle.com 不可达时静默降级，不拖垮下面的 sw 注册。
+if (window.Paddle) {
+  Paddle.Initialize({ token: "live_9a38df12cfaaa8645cc6c4ee404" }); // client-side token=公开凭证，非 API key
+  const PADDLE_PRICES = {
+    m: "pri_01kxgfsayca5nv3re1103pzvew", // Standard $29 / Monthly
+    y: "pri_01kxgg3h87b5e9rzd9gmky685g", // Standard $290 / Yearly
+  };
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("#pay-btn")) return;
+    e.preventDefault();
+    // 点击瞬间现读 .annual，复用既有的按月/按年切换，不另存一份状态
+    const y = document.getElementById("pricing-tiers")?.classList.contains("annual");
+    Paddle.Checkout.open({ items: [{ priceId: PADDLE_PRICES[y ? "y" : "m"], quantity: 1 }] });
+  });
+}
+</script>
 <script>
 // PWA：注册 service worker（离线外壳 + 静态资源缓存；data/*.json 网络优先不影响每日更新）
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
