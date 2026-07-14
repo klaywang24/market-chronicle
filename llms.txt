@@ -17,6 +17,7 @@ Key facts (as of July 2026; the JSON files below are always current):
 - [KAPX Index daily series](https://chronicle.klay-wang.com/data/kindex.json): dates, CNN Fear & Greed, VIX, Nasdaq-100, K values, current reading
 - [KAPX Index signal ledger](https://chronicle.klay-wang.com/data/kindex_signals.json): every K < 1 signal since 2011 with 20/40/60-trading-day and to-date forward Nasdaq-100 returns
 - [LEAPS Window episodes](https://chronicle.klay-wang.com/data/leaps.json): every extreme-fear episode since 2011 with 6/12/18-month and to-date forward S&P 500 / Nasdaq-100 returns
+- [Fear's Price Tag — LEAPS cost gauge](https://chronicle.klay-wang.com/data/leaps_gauge.json): a descriptive cost thermometer — the percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years (higher = options historically more expensive), plus VRP, the VIX9D→VIX1Y term ladder, SKEW, and the 10-year real rate. Backfilled to 2007; forward ledger timestamped daily since 2026-07-13. Descriptive only, never return-tested.
 - [Today's market pulse](https://chronicle.klay-wang.com/data/pulse.json): market temperature (valuation + breadth percentiles), index quotes, sector moves
 
 ## Datasets (KAPX Index history, CC BY 4.0, refreshed quarterly)
@@ -28,7 +29,7 @@ Key facts (as of July 2026; the JSON files below are always current):
 
 - [Methodology](https://chronicle.klay-wang.com/#methodology): definitions, formulas, statistical rules, honest disclosure, verifiability
 - [KAPX Index](https://chronicle.klay-wang.com/#kindex): chart and signal-by-signal reconciliation table
-- [LEAPS Window](https://chronicle.klay-wang.com/#leaps): chart and episode-by-episode reconciliation table
+- [Fear's Price Tag / 恐惧的标价](https://chronicle.klay-wang.com/#leaps): today's LEAPS cost gauge (VIX1Y expensiveness, high=expensive) as the headline, plus a historical reference to what followed each fear extreme (the former LEAPS Window, reframed as descriptive record)
 - [Today's Front Page](https://chronicle.klay-wang.com/): market temperature, signal ledger, breadth, sector heatmap
 - [Pricing](https://chronicle.klay-wang.com/#pricing): the site is free; a paid daily pre-market data brief (Chronicle Pro) is in preparation
 - [GitHub repository](https://github.com/klaywang24/market-chronicle): source code and the timestamped commit history that makes the ledger verifiable

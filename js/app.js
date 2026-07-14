@@ -2122,7 +2122,7 @@
   const SRC_BY_PANEL = {
     pulse: "Yahoo Finance + CNN Fear & Greed", spy: "Yahoo Finance", qqq: "Yahoo Finance",
     tech: "Yahoo Finance", fin: "Yahoo Finance", consumer: "Yahoo Finance", luxury: "Yahoo Finance",
-    macro: "FRED", kindex: "CNN Fear & Greed + Yahoo Finance", leaps: "CNN Fear & Greed + Yahoo Finance",
+    macro: "FRED", kindex: "CNN Fear & Greed + Yahoo Finance", leaps: "Cboe (VIX/VIX1Y/SKEW) + FRED + CNN Fear & Greed + Yahoo Finance",
   };
   const SRC_OVERRIDES = [
     ["ch-spy-cape", "multpl / Robert Shiller"], ["ch-spy-pettm", "multpl"],
@@ -2190,13 +2190,13 @@
     const last = d.episodes[d.episodes.length - 1];
     document.getElementById("leaps-status").innerHTML = `
       <div class="stat ${cur.window_open ? "signal-on" : ""}">
-        <div class="label">今日恐贪（${cur.date}）</div>
+        <div class="label">今日 CNN 恐贪（${cur.date}）</div>
         <div class="value">${cur.fng.toFixed(0)}</div>
-        <div class="note">${cur.window_open ? "★ 窗口开启 — 极端恐惧" : "窗口关闭（≥ 25）"}</div>
+        <div class="note">${cur.window_open ? "极端恐惧区（&lt; 25）" : "常态（≥ 25）"}</div>
       </div>
-      <div class="stat"><div class="label">开仓阈值</div><div class="value">&lt; ${d.threshold}</div><div class="note">${cur.rating || ""}</div></div>
-      <div class="stat"><div class="label">2011 年以来窗口</div><div class="value">${d.episodes.length} 次</div><div class="note">连续交易日聚为一次</div></div>
-      <div class="stat"><div class="label">最近一次窗口</div><div class="value" style="font-size:18px">${last.start}</div><div class="note">NDX 至今 ${last.ndx_to_date > 0 ? "+" : ""}${last.ndx_to_date}%</div></div>`;
+      <div class="stat"><div class="label">极端恐惧线</div><div class="value">&lt; ${d.threshold}</div><div class="note">${cur.rating || "历史参照"}</div></div>
+      <div class="stat"><div class="label">2011 年来极端恐惧</div><div class="value">${d.episodes.length} 段</div><div class="note">连续交易日聚为一段</div></div>
+      <div class="stat"><div class="label">最近一次</div><div class="value" style="font-size:18px">${last.start}</div><div class="note">NDX 至今 ${last.ndx_to_date > 0 ? "+" : ""}${last.ndx_to_date}%</div></div>`;
 
     const cell = (v) => v == null ? "<td>--</td>" :
       `<td class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(1)}%</td>`;
@@ -2214,9 +2214,109 @@
     const spxDone = d.episodes.filter((e) => e.spx_m12 != null);
     const spxWin = spxDone.filter((e) => e.spx_m12 > 0).length;
     document.getElementById("leaps-verdict").textContent =
-      `实证结论：${d.episodes.length} 次窗口中，12 个月视界 NDX 胜率 ${win}/${done.length}、SPX 胜率 ${spxWin}/${spxDone.length}。` +
-      `注意 2021 年下半年的几个窗口：高位回落途中的"极端恐惧"并非底部，12 个月后仍为负——恐惧指标标记的是情绪极值，不是估值底。` +
-      `与 K 指数（CNN÷VIX）互为印证：两个信号同时触发时，窗口质量历史上更高。历史规律不保证未来。`;
+      `历史记录：${d.episodes.length} 段极端恐惧中，12 个月后 NDX 上行 ${win}/${done.length}、SPX 上行 ${spxWin}/${spxDone.length}。` +
+      `注意 2021 年下半年的几段：高位回落途中的"极端恐惧"并非底部，12 个月后仍为负——恐惧标记的是情绪极值，不是估值底。` +
+      `与 K 指数（CNN÷VIX）参照观察即可。以上为历史事实记录，非买卖建议，历史规律不保证未来。`;
+  }
+
+  // ---------------- 恐惧的标价指数（LEAPS 贵贱温度计） ----------------
+  chart("leaps", "ch-leaps-gauge", async (p) => {
+    const d = await load("leaps_gauge");
+    const fs = d.meta.forward_start;
+    const bt = d.dates.map((dt, i) => [dt, dt < fs ? d.expensiveness_3y[i] : null]);
+    const fw = d.dates.map((dt, i) => [dt, dt >= fs ? d.expensiveness_3y[i] : null]);
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(0)) }),
+      grid: { left: 48, right: 24, top: 26, bottom: 64 },
+      xAxis: timeX(p),
+      yAxis: Object.assign({ type: "value", name: "贵贱百分位", min: 0, max: 100 }, baseAxis(p)),
+      dataZoom: [{ type: "inside" }, { type: "slider", bottom: 6, height: 18,
+        borderColor: p.border, fillerColor: "rgba(160,57,47,0.08)",
+        handleStyle: { color: p.accent }, textStyle: { color: p.muted, fontSize: 10 } }],
+      series: [
+        { name: "回测（可复现）", type: "line", showSymbol: false, connectNulls: false,
+          data: bt, lineStyle: { color: p.muted, width: 1.4 }, itemStyle: { color: p.muted },
+          markLine: { silent: true, symbol: "none",
+            lineStyle: { color: p.ink, type: "dashed", width: 1 },
+            label: { color: p.ink, formatter: "50 中性", fontFamily: "JetBrains Mono", fontSize: 10 },
+            data: [{ yAxis: 50 }] } },
+        { name: "前向台账（发布后逐日）", type: "line", showSymbol: true, symbolSize: 7, connectNulls: false,
+          data: fw, lineStyle: { color: p.accent, width: 1.8 }, itemStyle: { color: p.accent } },
+      ],
+    };
+  });
+
+  async function renderLeapsGauge() {
+    let d;
+    try { d = await load("leaps_gauge"); }
+    catch (e) {
+      document.getElementById("lg-hero").innerHTML =
+        '<div class="card"><p style="color:var(--ink-muted);font-size:13px">数据更新中，稍后自动出现 · data updating</p></div>';
+      return;
+    }
+    const c = d.current, e = c.expensiveness, x = c.context, t = x.term_ladder;
+    const p3 = Math.round(e.p3y);
+    const col = p3 >= 60 ? "var(--danger)" : p3 <= 40 ? "var(--moss)" : "var(--gold)";
+    const verdict = p3 >= 66 ? "偏贵" : p3 >= 55 ? "略偏贵" : p3 >= 45 ? "中性" : p3 >= 34 ? "略偏便宜" : "偏便宜";
+    const inv = t.ratio_vix_vix1y < 1;
+    const sign = (v) => (v > 0 ? "+" : "") + v.toFixed(1);
+    // 柱高用相对刻度：把 5 档间的差值放大（绝对刻度下 15→23 只差三成，视觉上像一样高）
+    const ladderVals = [t.vix9d, t.vix, t.vix3m, t.vix6m, t.vix1y];
+    const ladderHi = Math.max(...ladderVals), ladderLo = Math.min(...ladderVals);
+    const barH = (v) => Math.round(16 + 84 * (v - ladderLo + 0.6) / (ladderHi - ladderLo + 0.6));
+    document.getElementById("lg-hero").innerHTML = `
+      <div class="card">
+        <div class="lg-top">
+          <div class="lg-num">
+            <div class="lg-big" style="color:${col}">${p3}<span>/100</span></div>
+            <div class="lg-verdict" style="background:${col}">${verdict}</div>
+            <div class="lg-numsub">VIX1Y 在过去 <b>3 年</b>的百分位（高=贵）</div>
+          </div>
+          <div class="lg-right">
+            <div class="lg-spectrum"><div class="lg-mark" style="left:${e.p3y}%"><span>${p3}</span></div></div>
+            <div class="lg-scale"><span>0 · 便宜</span><span>贵 · 100</span></div>
+            <div class="lg-windows">
+              <div><span>近 3 年</span><b>${p3}</b><i>主看</i></div>
+              <div><span>近 5 年</span><b>${Math.round(e.p5y)}</b><i>中期</i></div>
+              <div><span>全 史</span><b>${Math.round(e.pfull)}</b><i>长期</i></div>
+            </div>
+            <div class="lg-wnote">同一天，近 3 年偏贵、拉长看只是中性——最近三年太平静。三窗并陈，不藏选择。</div>
+          </div>
+        </div>
+      </div>
+      <div class="card lg-ladder">
+        <div class="lc-name">期限阶梯 <span>短端平静 → 长端（你买的那截）最贵</span></div>
+        <div class="lg-bars">
+          <div class="lg-bar"><div class="lg-col" style="height:${barH(t.vix9d)}%"></div><b>${t.vix9d.toFixed(1)}</b><span>9 天</span></div>
+          <div class="lg-bar"><div class="lg-col" style="height:${barH(t.vix)}%"></div><b>${t.vix.toFixed(1)}</b><span>VIX 30 天</span></div>
+          <div class="lg-bar"><div class="lg-col" style="height:${barH(t.vix3m)}%"></div><b>${t.vix3m.toFixed(1)}</b><span>3 月</span></div>
+          <div class="lg-bar"><div class="lg-col" style="height:${barH(t.vix6m)}%"></div><b>${t.vix6m.toFixed(1)}</b><span>6 月</span></div>
+          <div class="lg-bar hi"><div class="lg-col" style="height:${barH(t.vix1y)}%"></div><b>${t.vix1y.toFixed(1)}</b><span>1 年 ★</span></div>
+        </div>
+      </div>
+      <div class="senti-cards lg-ctx4">
+        <div class="senti-card">
+          <div class="lc-name">VRP 波动税 <span>你多付的"冤枉钱"</span></div>
+          <div class="lc-val">${sign(x.vrp.main)}</div>
+          <div class="lc-meta"><span>vol 点 · 近 3 月 ${sign(x.vrp.small)}</span></div>
+        </div>
+        <div class="senti-card">
+          <div class="lc-name">期限结构 <span>VIX ÷ VIX1Y</span></div>
+          <div class="lc-val">${t.ratio_vix_vix1y.toFixed(2)}</div>
+          <div class="lc-meta"><span>${inv ? "陡 contango · 长端更贵" : "倒挂 · 近端恐慌"}</span></div>
+        </div>
+        <div class="senti-card">
+          <div class="lc-name">Call 偏斜 SKEW <span>看涨相对看跌</span></div>
+          <div class="lc-val">${Math.round(x.call_skew.pctile_full)}</div>
+          <div class="lc-meta"><span>分位 · 全史 · 值 ${x.call_skew.value.toFixed(0)}</span></div>
+        </div>
+        <div class="senti-card">
+          <div class="lc-name">实际利率 <span>10 年期</span></div>
+          <div class="lc-val">${Math.round(x.real_rate.pctile_full)}</div>
+          <div class="lc-meta"><span>分位 · 全史 · ${x.real_rate.value.toFixed(2)}%</span></div>
+        </div>
+      </div>
+      <p class="footnote src-note"><span>VIX1Y = ${c.vix1y}</span> · <span>4 context 只展示，不平均进头条</span> · <span>数据截至</span> ${c.date}（<span>${c.segment === "forward" ? "前向台账" : "回测"}</span>）· <span>描述性数据，非投资建议</span></p>`;
   }
 
   // ---------------- 注册 SPY / QQQ ----------------
@@ -2267,10 +2367,21 @@
   chart("consumer", "ch-consumer-etf-annual", annualChart("s_xlp_annual"));
   chart("consumer", "ch-consumer-etf2-annual", annualChart("s_xly_annual"));
 
+  // ---------------- 定价：月 / 年切换 ----------------
+  // 事件委托：docs-i18n 切换语言时会整块替换 #panel-pricing 的 innerHTML，直接绑按钮的监听会被销毁
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest(".pbill-btn");
+    if (!b) return;
+    document.querySelectorAll(".pbill-btn").forEach((x) => x.classList.toggle("active", x === b));
+    const tiers = document.getElementById("pricing-tiers");
+    if (tiers) tiers.classList.toggle("annual", b.dataset.bill === "y");
+  });
+
   // ---------------- 启动 ----------------
   renderKStatus();
   renderValCards();
   renderLeaps();
+  renderLeapsGauge();
   renderPulse();
   renderDDTable("sp500_drawdowns", "spy-dd-table");
   renderDDTable("ndx_drawdowns", "qqq-dd-table");

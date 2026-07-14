@@ -1106,3 +1106,197 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 @media (min-width: 1100px) {
   .footer-tag { text-wrap: unset; white-space: nowrap; }
 }
+
+/* ===== 恐惧的标价指数 hero（LEAPS 贵贱温度计） ===== */
+.lg-top { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+.lg-num { text-align: center; min-width: 132px; flex: 0 0 auto; }
+.lg-big { font-size: 62px; font-weight: 800; line-height: 1; font-family: 'JetBrains Mono', monospace; }
+.lg-big span { font-size: 22px; color: var(--ink-muted); font-weight: 600; }
+.lg-verdict { display: inline-block; margin-top: 9px; font-size: 13px; font-weight: 700; color: #fff; border-radius: 20px; padding: 3px 15px; }
+.lg-numsub { font-size: 11.5px; color: var(--ink-muted); margin-top: 11px; max-width: 150px; margin-left: auto; margin-right: auto; }
+.lg-right { flex: 1; min-width: 300px; }
+.lg-spectrum { position: relative; height: 14px; border-radius: 8px; background: linear-gradient(90deg, var(--moss) 0%, var(--gold) 52%, var(--danger) 100%); }
+.lg-mark { position: absolute; top: -4px; transform: translateX(-50%); width: 3px; height: 22px; background: var(--ink); border-radius: 2px; }
+.lg-mark span { position: absolute; top: -17px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 800; color: var(--ink); font-family: 'JetBrains Mono', monospace; }
+.lg-scale { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--ink-muted); margin-top: 8px; }
+.lg-windows { display: flex; gap: 10px; margin-top: 13px; }
+.lg-windows > div { flex: 1; text-align: center; border: 1px solid var(--border); border-radius: 8px; padding: 7px 4px; background: var(--bg); }
+.lg-windows > div:first-child { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.lg-windows span { display: block; font-size: 10.5px; color: var(--ink-muted); }
+.lg-windows b { display: block; font-size: 20px; font-family: 'JetBrains Mono', monospace; font-weight: 700; margin: 1px 0; color: var(--ink); }
+.lg-windows i { font-size: 9.5px; color: var(--ink-muted); font-style: normal; }
+.lg-wnote { font-size: 11.5px; color: var(--ink-muted); margin-top: 11px; line-height: 1.5; }
+.lg-ladder { margin-top: 14px; }
+.lg-ladder .lc-name { margin-bottom: 4px; }
+.lg-bars { display: flex; gap: 12px; align-items: flex-end; height: 128px; margin-top: 10px; }
+.lg-bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+.lg-bar .lg-col { width: 100%; max-width: 62px; background: var(--accent-soft); border: 1px solid var(--border); border-radius: 7px 7px 0 0; }
+.lg-bar.hi .lg-col { background: var(--accent); border-color: var(--accent); }
+.lg-bar b { font-size: 15px; font-weight: 700; font-family: 'JetBrains Mono', monospace; margin-top: 7px; }
+.lg-bar span { font-size: 10.5px; color: var(--ink-muted); margin-top: 2px; }
+.senti-cards.lg-ctx4 { grid-template-columns: repeat(4, 1fr); margin-top: 14px; }
+@media (max-width: 760px) { .senti-cards.lg-ctx4 { grid-template-columns: repeat(2, 1fr); } .lg-bars { height: 100px; gap: 8px; } .lg-windows { gap: 6px; } }
+.lg-divider { margin: 44px 0 6px; padding-top: 20px; border-top: 2px solid var(--ink); display: flex; flex-direction: column; gap: 2px; }
+.lg-divider span { font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 700; color: var(--ink); }
+.lg-divider em { font-style: normal; font-size: 12px; color: var(--ink-muted); }
+
+/* ===== 定价三档 ===== */
+.pricing-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 26px 0 18px; }
+.ptier { border: 1px solid var(--border); border-radius: 12px; padding: 22px 20px; background: var(--bg-card); display: flex; flex-direction: column; position: relative; }
+.ptier.featured { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.ptier-badge { position: absolute; top: -11px; left: 20px; font-size: 11px; font-weight: 700; color: #fff; background: var(--accent); border-radius: 20px; padding: 3px 12px; }
+.ptier-name { font-size: 15px; font-weight: 700; font-family: 'Noto Serif SC', serif; color: var(--ink); }
+.ptier-price { font-size: 38px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--ink); margin: 6px 0 2px; }
+.ptier-price .u { font-size: 14px; font-weight: 500; color: var(--ink-muted); margin-left: 4px; font-style: normal; }
+.ptier-tag { font-size: 12px; color: var(--ink-muted); margin-bottom: 14px; min-height: 32px; }
+.ptier-tag b { color: var(--accent); }
+.ptier-list { list-style: none; padding: 0; margin: 0 0 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.ptier-list li { font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; padding-left: 18px; position: relative; }
+.ptier-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+.ptier-list li b { color: var(--ink); }
+.ptier-cta { display: block; text-align: center; font-size: 13px; font-weight: 700; color: #fff; background: var(--accent); border-radius: 8px; padding: 9px 12px; text-decoration: none; }
+.ptier-cta:hover { background: var(--accent-deep); }
+.ptier-soon { font-size: 11.5px; color: var(--ink-muted); text-align: center; border: 1px dashed var(--border); border-radius: 8px; padding: 8px; }
+.pricing-inst { font-size: 13px; color: var(--ink-soft); }
+@media (max-width: 820px) { .pricing-tiers { grid-template-columns: 1fr; } }
+
+/* ===== 底部（专业多列） ===== */
+.footer-main { display: flex; gap: 48px; flex-wrap: wrap; justify-content: space-between; margin-bottom: 26px; }
+.footer-brand-col { flex: 1 1 300px; max-width: 380px; }
+.footer-brand span { font-family: 'Fraunces', serif; font-style: italic; font-size: 14px; color: var(--ink-muted); margin-left: 8px; font-weight: 500; }
+.footer-social { display: flex; gap: 13px; margin-top: 15px; }
+.footer-social a { color: var(--ink-muted); display: inline-flex; }
+.footer-social a:hover { color: var(--accent); }
+.footer-social svg { width: 19px; height: 19px; fill: currentColor; }
+.footer-colgroup { display: flex; gap: 46px; flex-wrap: wrap; }
+.footer-col { display: flex; flex-direction: column; gap: 9px; }
+.footer-col-h { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); margin-bottom: 5px; font-family: 'JetBrains Mono', monospace; }
+.footer-col a { font-size: 13px; color: var(--ink-muted); text-decoration: none; }
+.footer-col a:hover { color: var(--accent); }
+@media (max-width: 720px) { .footer-main { gap: 28px; } .footer-colgroup { gap: 30px; } }
+
+/* ================= C · 用色纪律（装饰层收敛到 墨 + 铁锈红；数据色不动） ================= */
+/* 金句块：底色块 → 编辑部 pull-quote（安静、更高级） */
+.poem {
+  background: transparent;
+  border-left: 2px solid var(--accent);
+  padding: 4px 0 4px 20px;
+  font-size: 15.5px;
+  line-height: 1.75;
+  color: var(--ink-soft);
+}
+
+/* ================= B · 材质与深度（Apple materials） ================= */
+/* 顶栏：更强的毛玻璃 + 去硬分割线（用极软阴影做滚动边缘） */
+.topbar {
+  background: color-mix(in srgb, var(--bg) 76%, transparent);
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+}
+.dark-mode .topbar { box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22); }
+
+/* 卡片：保留边框（用户定），只加一层极浅的材质深度（顶边内高光 + 极浅落影） */
+.card, .stat, .senti-card, .ledger-card, .lg-ladder {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 3px rgba(26, 20, 16, 0.05);
+}
+.dark-mode .card, .dark-mode .stat, .dark-mode .senti-card, .dark-mode .ledger-card, .dark-mode .lg-ladder {
+  box-shadow: inset 0 1px 0 rgba(244, 239, 230, 0.05), 0 2px 6px rgba(0, 0, 0, 0.22);
+}
+
+/* hero 大数字区：一层极淡的光晕（呼吸感，深色下才可感知） */
+.dark-mode #lg-hero > .card:first-child {
+  background: radial-gradient(640px 320px at 18% 20%, var(--accent-soft), transparent 70%), var(--bg-card);
+}
+
+/* 面板切换：轻微上浮渐入（spring 味的贝塞尔；非交互卡片不动） */
+@keyframes panelIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+.panel.active { animation: panelIn 0.38s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .panel.active { animation: none; }
+  .pulse-base > * { animation: none !important; }
+}
+
+/* ================= 浅色底 v2：暖底 + 白卡（Stripe/Apple 式层级：暖纸面退后，白卡片上浮） ================= */
+/* Apple 式低饱和暖灰：AI 味来自"黄的饱和度"，不是"暖"本身——纸感=近灰+一口气暖 */
+:root:not(.dark-mode) {
+  --bg: #F6F5F1;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FAFAF6;
+  --bg-deep: #EFEEE8;
+  --border: #E5E3DB;
+  --ink-soft: #3F3A33;
+  --ink-muted: #6E675E;
+}
+
+/* 定价 月/年 切换：两键等宽单行，「省 2 个月」放整个切换框下方 */
+.pbill { flex-direction: column; align-items: center; gap: 8px; }
+.pbill-inner { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
+.pbill-btn { white-space: nowrap; padding: 7px 0; min-width: 108px; text-align: center; border-radius: 999px; }
+.pbill-note { font-size: 11.5px; font-weight: 600; color: var(--moss); }
+
+/* 期限阶梯：柱高按数值差放大（相对刻度）、柱更修长；4 context 标题居中 */
+.lg-bars { height: 150px; gap: 18px; }
+.lg-bar .lg-col { max-width: 42px; transition: height 0.4s cubic-bezier(0.2, 0.7, 0.3, 1); }
+.lg-ctx4 .senti-card { text-align: center; }
+.lg-ctx4 .lc-name span { display: block; margin-top: 2px; }
+
+/* ================= 设计精修 · Apple / Revolut 取向 ================= */
+/* 深色调色板精修：更深更纯的暖底 + 更高文字对比（保留羊皮纸暖调身份，去"AI 味"的软糯感） */
+.dark-mode {
+  --bg: #14100C;
+  --bg-card: #1D1813;
+  --bg-card-hover: #262019;
+  --bg-deep: #0F0C08;
+  --ink: #F4EFE6;
+  --ink-soft: #DAD2C2;
+  --ink-muted: #A99B87;
+  --border: #322A22;
+  --grid: rgba(244, 239, 230, 0.07);
+  --grid-strong: rgba(244, 239, 230, 0.15);
+}
+/* 标题：大字负字距 + 更紧行高（Apple 尺寸相关 tracking / leading） */
+.hero h1, .pulse-title h1, .stock-hero h1 { letter-spacing: -0.022em; line-height: 1.12; }
+.hero h1 { font-size: 40px; }
+.chapter-head h2 { letter-spacing: -0.012em; }
+.brand { letter-spacing: -0.01em; }
+.doc-page h1 { letter-spacing: -0.02em; }
+/* 分割线更克制：章节头 2px 实心 → 细线（Apple：hairline，不是重边） */
+.chapter-head { border-bottom-width: 1px; border-bottom-color: var(--border); padding-bottom: 12px; }
+/* 更多留白（呼吸感） */
+.chapter { margin: 58px 0; }
+.card { padding: 22px 22px 14px; }
+.hero { margin-bottom: 40px; }
+.hero .dek { line-height: 1.65; margin-top: 12px; }
+.chapter-q { margin-bottom: 20px; }
+/* Craft：按下即时反馈（Apple §1 Response） */
+.tab, .theme-toggle, .ptier-cta, .lcta, .pill { transition: transform .12s ease, color .15s ease, background-color .15s ease, border-color .15s ease; }
+.tab:active, .theme-toggle:active, .ptier-cta:active { transform: scale(.97); }
+/* 顶栏底色随新深底 */
+.dark-mode .topbar { background: color-mix(in srgb, var(--bg) 88%, transparent); }
+/* 今日头版去外框：头版直接铺在纸面上（overflow:hidden 保留给揭示层） */
+.pulse-hero { border: none; border-radius: 0; }
+.pulse-layer { padding-left: 0; padding-right: 0; }
+/* 期限阶梯柱：紫色系（沿用站内 --purple，浅紫柱 + 1年高亮实紫） */
+.lg-bar .lg-col { background: color-mix(in srgb, var(--purple) 26%, transparent); border: none; border-radius: 8px 8px 0 0; }
+.lg-bar.hi .lg-col { background: var(--purple); }
+.lg-bar b { color: var(--ink); }
+/* 定价：月/年切换 + 三档各自着色 */
+.pbill { display: flex; justify-content: center; margin: 20px 0 4px; }
+.pbill-inner { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; padding: 3px; gap: 2px; background: var(--bg-card); }
+.pbill-btn { border: none; background: none; font: inherit; font-size: 13px; color: var(--ink-muted); padding: 6px 16px; border-radius: 999px; cursor: pointer; }
+.pbill-btn.active { background: var(--ink); color: var(--bg); font-weight: 600; }
+.pbill-btn em { font-style: normal; font-size: 11px; color: var(--moss); margin-left: 5px; font-weight: 600; }
+.pbill-btn.active em { color: var(--bg); opacity: .8; }
+.ptier .p-y { display: none; }
+.pricing-tiers.annual .p-m { display: none; }
+.pricing-tiers.annual .p-y { display: inline; }
+.ptier-tag .p-y { display: none; }
+/* 三档着色：Free=moss / Standard=accent(已有) / Pro=gold */
+.ptier.t-free { border-color: color-mix(in srgb, var(--moss) 42%, var(--border)); }
+.ptier.t-free .ptier-name { color: var(--moss); }
+.ptier.t-free .ptier-list li::before { color: var(--moss); }
+.ptier.t-pro { border-color: color-mix(in srgb, var(--gold) 52%, var(--border)); }
+.ptier.t-pro .ptier-name { color: var(--gold); }
+.ptier.t-pro .ptier-list li::before { color: var(--gold); }
+.ptier.featured .ptier-name { color: var(--accent); }

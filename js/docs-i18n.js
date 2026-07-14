@@ -332,8 +332,11 @@
 <p>Definition: <strong>K = CNN Fear &amp; Greed Index ÷ VIX</strong>. When fear (CNN falling) and volatility (VIX rising) meet, K drops below 1 — that is one signal. Clustering rule: consecutive trading days with K &lt; 1 count as one signal; a gap of more than 10 trading days starts a new one. Return horizon: Nasdaq-100 change 20 / 40 / 60 trading days after the signal's first close.</p>
 <p><strong>Canonical definition:</strong> The KAPX Index is a daily U.S. equity fear-pricing gauge published by Market Chronicle, computed as the CNN Fear &amp; Greed reading divided by the VIX. The K stands for kǒng (恐), the Chinese character for fear; readings, methodology, and the complete signal ledger are permanently free and verifiable via Git timestamps. (Previously cited in English as the K-Index; the Chinese name K 指数 is unchanged.)</p>
 <p>As of July 2026: 39 signals since 2011; at the 60-trading-day horizon, 26 up and 13 down — strong in V-shaped corrections, negative repeatedly through sustained stress like 2011, 2015, late 2018 and 2022; every signal is positive held to date. The signal-by-signal ledger is on the <a href="#kindex">KAPX Index</a> page; raw data at <a href="https://chronicle.klay-wang.com/data/kindex_signals.json" target="_blank" rel="noopener">kindex_signals.json</a>.</p>
-<h3>The LEAPS Window</h3>
-<p>Definition: a window opens when CNN's Fear &amp; Greed Index closes <strong>below 25 (extreme fear)</strong>; consecutive days below 25 count as one window. Return horizon: S&amp;P 500 and Nasdaq-100 change 6 / 12 / 18 months after the window's first day.</p>
+<h3>Fear's Price Tag — the LEAPS Cost Gauge (恐惧的标价指数)</h3>
+<p>Definition: the headline is the <strong>percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years</strong> — 0 = historically cheapest, 100 = priciest. It answers one question: is buying long-dated options (LEAPS, 12–18 months) historically expensive or cheap today? Alongside it sit two more coordinates (5-year / full history) and four context readings (shown, never averaged into the headline): the volatility risk premium (VIX1Y − 1-year realized vol), the VIX9D→VIX1Y term ladder, SKEW (full-history percentile), and the 10-year real rate (full-history percentile). Why VIX1Y: LEAPS are long-dated, so the headline must use the volatility closest in tenor — VIX1Y is the longest, closest tenor in Cboe's free family.</p>
+<p><strong>It is a descriptive thermometer, not a trading signal and not a forecast.</strong> It only describes "expensive or cheap," never "buy or not" — like a fuel-price sign that tells you whether gas is dear today without deciding whether you should drive. So this index is <strong>never marketed as a timing/entry tool and is never return-tested</strong>. The formula is frozen on registration (VIX1Y headline / high=expensive / three windows / four context); any iteration becomes a separate sibling. Data is backfilled to 2007 and independently reproducible; readings from the July 2026 launch carry GitHub commit timestamps as ex-ante records. Raw data at <a href="https://chronicle.klay-wang.com/data/leaps_gauge.json" target="_blank" rel="noopener">leaps_gauge.json</a>.</p>
+<h3>The LEAPS Window (historical reference)</h3>
+<p>Definition: a segment forms when CNN's Fear &amp; Greed Index closes <strong>below 25 (extreme fear)</strong>; consecutive days below 25 count as one segment. Horizon: S&amp;P 500 and Nasdaq-100 change 6 / 12 / 18 months after the segment's first day. This is a <strong>descriptive historical record</strong> of what followed fear extremes — not advice.</p>
 <p>As of July 2026: 45 windows since 2011; at the 12-month horizon the Nasdaq-100 was up 34 times and down 7 (the rest are not yet 12 months old). Several windows in late 2021 were negative 12 months on — <strong>sentiment extremes are not valuation bottoms</strong>. The episode-by-episode ledger is on the <a href="#leaps">LEAPS Window</a> page; raw data at <a href="https://chronicle.klay-wang.com/data/leaps.json" target="_blank" rel="noopener">leaps.json</a>.</p>
 <h3>The "follow every signal" rules — and an honest disclosure</h3>
 <p>In plain words first: <strong>the equity curve is simply "what $1 becomes"</strong> — a curve ending at ×9.5 means the initial $1 grew to $9.5. The rules: enter at the Nasdaq-100 close on the signal's first day; hold 12 months for LEAPS windows, 60 trading days for K signals; new signals during a holding period are skipped — no adding, no resetting; cash periods earn zero; no costs, slippage or taxes.</p>
@@ -354,15 +357,54 @@
 
     pricing: {
       en: { kicker: "PRICING", h1: "Pricing", dek: "The website is free forever. What you pay for is the brief that lands in your inbox before every open.",
-        body: `<h3>Free · forever</h3>
-<p>All historical charts, Today's Front Page (market temperature), the full signal ledgers of the KAPX Index and the LEAPS Window, and the sector heatmap are <strong>free and open</strong> — no ads, no paywall, no sign-up. The ledger updates automatically every trading day; readings since the site's July 2026 launch can be verified day by day in the public GitHub commit log, and the earlier history back to 2011 is reproducible from public data.</p>
-<h3>Coming soon: Chronicle Pro (daily pre-market signal &amp; data brief)</h3>
-<p><strong>$29 / month</strong>. Delivered to your inbox before the open every trading day — objective data and statistics: the day's KAPX Index and LEAPS Window readings, status and historical percentiles; market temperature and key valuation / sentiment readings; and the reconciliation entry on days a signal triggers or closes. Options-market data statistics (LEAPS share of volume, most-active contracts, market-wide rankings) will be added over time. <strong>Data and information only; not investment advice; no buy or sell recommendations.</strong> Launch date to be determined.</p>
-<h3>Founding-subscriber price: $9.9 / month · first 100 only</h3>
-<p>The first 100 subscribers who reserve before launch <strong>lock in $9.9 / month for life</strong> — the price never changes as long as the subscription stays active. To reserve: email <a href="mailto:${EMAIL}">${EMAIL}</a> with "Founding" and we'll notify you in order when it launches.</p>
-<h3>Subscription terms (once live)</h3>
-<p>Billed monthly and <strong>renews automatically each month</strong>; <strong>cancel anytime</strong> — self-serve via the manage link in your subscription confirmation email, or by emailing us. After cancellation, access continues to the end of the current billing period; see the <a href="#refunds">Refund Policy</a> for refunds. Orders and payments will be handled by our payments partner (Merchant of Record), whose name will appear on your statement.</p>
-<p class="doc-fineprint">The "coming soon" items above are planning information, not a final commitment; the official launch prevails.</p>` },
+        body: `<div class="pbill">
+  <div class="pbill-inner">
+    <button class="pbill-btn active" data-bill="m">Monthly</button>
+    <button class="pbill-btn" data-bill="y">Annual</button>
+  </div>
+  <div class="pbill-note">Annual = 10 months' price · save 2 months</div>
+</div>
+<div class="pricing-tiers" id="pricing-tiers">
+  <div class="ptier t-free">
+    <div class="ptier-name">Free</div>
+    <div class="ptier-price">$0<i class="u">forever</i></div>
+    <div class="ptier-tag">The website is free, always</div>
+    <ul class="ptier-list">
+      <li>All index ledgers + today's readings (Fear's Price Tag / KAPX / market temperature)</li>
+      <li>A century of charts + methodology + sector heatmap</li>
+      <li>Verifiable day by day in the public GitHub commit log</li>
+      <li>No ads · no paywall · no sign-up</li>
+    </ul>
+  </div>
+  <div class="ptier featured">
+    <div class="ptier-badge">Founding price · first 100</div>
+    <div class="ptier-name">Standard</div>
+    <div class="ptier-price"><span class="p-m">$29<i class="u">/ mo</i></span><span class="p-y">$290<i class="u">/ yr</i></span></div>
+    <div class="ptier-tag"><span class="p-m">Founding subscribers <b>$9.9 / mo</b> locked for life (first 100)</span><span class="p-y">≈ $24 / mo · annual = 10 months' price</span></div>
+    <ul class="ptier-list">
+      <li>Everything in Free</li>
+      <li><b>Pre-market digest email</b>, delivered before every open</li>
+      <li>All indicators' current values + full historical percentile charts on the web</li>
+      <li>Watchlist data table (SPY / QQQ / M7 / AVGO)</li>
+    </ul>
+    <a class="ptier-cta" href="mailto:${EMAIL}?subject=Founding">Email "Founding" to reserve →</a>
+  </div>
+  <div class="ptier t-pro">
+    <div class="ptier-name">Pro</div>
+    <div class="ptier-price"><span class="p-m">$99<i class="u">/ mo</i></span><span class="p-y">$990<i class="u">/ yr</i></span></div>
+    <div class="ptier-tag"><span class="p-m">Heavy individual · data autonomy</span><span class="p-y">≈ $82.5 / mo · annual = 10 months' price</span></div>
+    <ul class="ptier-list">
+      <li>Everything in Standard</li>
+      <li>CSV / data export + full-history downloads</li>
+      <li>Custom threshold alerts</li>
+      <li>API (later)</li>
+    </ul>
+    <div class="ptier-soon">Opens 3–6 months after Standard launches</div>
+  </div>
+</div>
+<p class="pricing-inst"><strong>Institutional / data licensing</strong> (series licensing, index licensing, redistribution) — <a href="#contact">contact us</a>; unpriced.</p>
+<p>Annual = 10 months' price ($290 / $990) · 14-day no-questions refund, no trial (the free tier is the trial) · cancel anytime via the manage link in your subscription email. Orders and payments are handled by a Merchant of Record, whose name will appear on your statement. <strong>Data and information only; not investment advice; no buy or sell recommendations.</strong></p>
+<p class="doc-fineprint">Planning information, not a final commitment; Standard launch date TBD, Pro and API to follow.</p>` },
       fr: { kicker: "TARIFS", h1: "Tarifs", dek: "Pour l'instant : tout le site est gratuit.",
         body: `<h3>Gratuit</h3>
 <p>Tous les graphiques historiques, la Une du jour (température du marché), l'indice KAPX, la fenêtre LEAPS et la carte thermique sectorielle sont <strong>gratuits et ouverts</strong> — sans publicité, sans péage, sans inscription.</p>
