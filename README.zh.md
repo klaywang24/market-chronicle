@@ -1,7 +1,7 @@
 # 美股编年史 · Market Chronicle
 
 > 一个每日自动更新的美股历史数据档案站：把标普 500 的一个世纪、纳斯达克的半个世纪、
-> 22 只行业龙头的完整履历，以及两个自研择时信号（K 指数——英文官方名 **KAPX Index**——与 LEAPS 窗口），
+> 22 只行业龙头的完整履历，以及两个自研市场指标（K 指数——英文官方名 **KAPX Index**——与 LEAPS 窗口），
 > 放进一份"金融报刊"式的静态网页。**纯静态、零服务器、零运行成本。**
 
 [![每日行情更新](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml)

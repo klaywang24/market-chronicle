@@ -2,7 +2,7 @@
 
 > A self-updating chronicle of the U.S. stock market: a century of the S&P 500,
 > half a century of the Nasdaq, full dossiers on 22 sector leaders, and two
-> home-grown timing signals (KAPX Index & LEAPS Window) — packaged as an
+> home-grown market indicators (KAPX Index & LEAPS Window) — packaged as an
 > editorial-style static site. **No server, no build step, zero running cost.**
 
 [![daily-update](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml)

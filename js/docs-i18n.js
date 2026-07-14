@@ -214,7 +214,7 @@
 <h3>Intellectual property &amp; third parties</h3>
 <p>The site's code is source-available under PolyForm Noncommercial 1.0.0 (see the GitHub repo) — free for noncommercial use, commercial use requires a separate license; charts and copy are for personal, non-commercial reference. Embedded third-party components (such as TradingView) are governed by their own terms.</p>
 <h3>Paid products &amp; billing</h3>
-<p>When paid subscriptions (such as Chronicle Pro) launch, checkout, invoicing and taxes will be handled by <strong>Paddle as the Merchant of Record</strong> — meaning your payment contract is with Paddle, and its terms and privacy policy also apply. Purchasers must be 18 or the age of majority in their jurisdiction. Refunds follow our Refund Policy.</p>
+<p>Checkout, invoicing and taxes for this site's paid subscriptions are handled by <strong>Paddle as the Merchant of Record</strong> — meaning your payment contract is with Paddle, and its terms and privacy policy also apply. Purchasers must be 18 or the age of majority in their jurisdiction. Refunds follow our Refund Policy.</p>
 <h3>Governing law &amp; severability</h3>
 <p>These terms are governed by the law of the operator's jurisdiction (to be specified as operations formalize). If any provision is held invalid, the rest remain in effect. These terms are the entire agreement between you and us regarding use of the site.</p>
 <h3>Changes</h3>
@@ -279,17 +279,17 @@
     },
 
     refunds: {
-      en: { kicker: "REFUNDS", h1: "Refund Policy", dek: "Last updated: 2026-07-05",
-        body: `<h3>Current status</h3>
-<p>The site is currently <strong>entirely free</strong> with nothing for sale, so no refunds apply.</p>
-<h3>Future paid products</h3>
-<p>When paid subscriptions (such as the Chronicle Pro daily pre-market brief) launch, the following applies:</p>
+      en: { kicker: "REFUNDS", h1: "Refund Policy", dek: "Last updated: 2026-07-14",
+        body: `<h3>Scope</h3>
+<p>This policy covers the site's paid subscription: <strong>Standard — the daily pre-market data digest</strong> ($29 / month, or $290 / year). Everything on the website itself — all charts, ledgers and methodology — is <strong>free, permanently</strong>, and no refunds apply to it.</p>
+<h3>Terms</h3>
 <ul>
 <li><strong>14-day no-questions refund</strong>: if you're not satisfied within 14 days of subscribing, you get a full refund, no reason needed;</li>
+<li>if you subscribe <strong>before the first digest goes out (2026-07-15)</strong>, you can request a full refund at any time before sending starts;</li>
 <li>refunds are processed by the payment provider Paddle, returned via the original method;</li>
 <li>how to request: email <a href="mailto:${EMAIL}">${EMAIL}</a> with your order details.</li>
 </ul>
-<p>This policy will be expanded when paid products formally launch.</p>` },
+<p>This policy is effective from 2026-07-14. Where your local consumer protection law grants stronger rights (such as a longer unconditional withdrawal period), those rights apply.</p>` },
       fr: { kicker: "REMBOURSEMENTS", h1: "Politique de remboursement", dek: "Dernière mise à jour : 2026-07-05",
         body: `<h3>Statut actuel</h3>
 <p>Le site est actuellement <strong>entièrement gratuit</strong>, sans rien à vendre ; aucun remboursement ne s'applique.</p>
@@ -326,7 +326,7 @@
     },
 
     methodology: {
-      en: { kicker: "METHODOLOGY", h1: "Methodology: Two Signals, One Ledger",
+      en: { kicker: "METHODOLOGY", h1: "Methodology: Two Gauges, One Ledger",
         dek: "Definitions, formulas, statistical rules and the complete historical record — including the times the signals failed. Every number on this page is backed by public JSON files updated daily by the pipeline; readings since the site's July 2026 launch are timestamped ex-ante in the commit log, and the ledger back to 2011 is reproducible from public data.",
         body: `<h3>The KAPX Index (K 指数)</h3>
 <p>Definition: <strong>K = CNN Fear &amp; Greed Index ÷ VIX</strong>. When fear (CNN falling) and volatility (VIX rising) meet, K drops below 1 — that is one signal. Clustering rule: consecutive trading days with K &lt; 1 count as one signal; a gap of more than 10 trading days starts a new one. Return horizon: Nasdaq-100 change 20 / 40 / 60 trading days after the signal's first close.</p>
@@ -346,7 +346,7 @@
 <h3>Verifiability</h3>
 <p>The site is pure static architecture: after every trading day's close, a GitHub Actions pipeline pulls data, computes the indicators and commits to the public repository. <strong>From the site's launch (July 2026) onward</strong>, every day's readings carry that day's Git timestamp — the <a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">commit history</a> is public, so anyone can verify they were recorded ex-ante. <strong>The historical ledger before launch, back to 2011</strong>, is backfilled from public data (the CNN Fear &amp; Greed archive + VIX) using the same published formula: independently reproducible by anyone, but historical backfill rather than an ex-ante record. We label the two plainly.</p>
 <h3>Known characteristics &amp; limitations</h3>
-<p>VIX is itself one of the seven components of the CNN Fear &amp; Greed Index (its "market volatility" component measures VIX against its 50-day average). Since K = CNN Fear &amp; Greed ÷ VIX, VIX influences K through two aligned channels — directly in the denominator, and as roughly one-seventh of the numerator's volatility component — so volatility is partially double-counted. KAPX is therefore more sensitive to volatility than a fully independent fear-over-volatility ratio would be, and describing it as "two independent signals divided" is not strictly accurate (about six-sevenths of the fear reading is independent of VIX). This is not a flaw: KAPX can be read as a volatility-stress-weighted fear gauge, and for its purpose — locating add-to-position windows when fear and volatility are extreme together — that sensitivity is a feature. We disclose the overlap plainly rather than quietly removing it: once published, the formula is never changed silently; any revision would launch a new versioned index.</p>
+<p>VIX is itself one of the seven components of the CNN Fear &amp; Greed Index (its "market volatility" component measures VIX against its 50-day average). Since K = CNN Fear &amp; Greed ÷ VIX, VIX influences K through two aligned channels — directly in the denominator, and as roughly one-seventh of the numerator's volatility component — so volatility is partially double-counted. KAPX is therefore more sensitive to volatility than a fully independent fear-over-volatility ratio would be, and describing it as "two independent signals divided" is not strictly accurate (about six-sevenths of the fear reading is independent of VIX). This is not a flaw: KAPX can be read as a volatility-stress-weighted fear gauge, and for its purpose — locating where today sits in history when fear and volatility are extreme together — that sensitivity is a feature. We disclose the overlap plainly rather than quietly removing it: once published, the formula is never changed silently; any revision would launch a new versioned index.</p>
 <h3>Data sources</h3>
 <p>CNN Fear &amp; Greed (whit3rabbit daily archive + CNN's official endpoint for the current day); prices and VIX from Yahoo Finance (adjusted close approximates total return); the VIX term structure (VIX9D / VIX3M / VIX6M) from Cboe's official historical data; the put/call ratio is CNN's all-market 5-day average; long-history valuation from multpl / Robert Shiller. Machine-readable entry point: <a href="https://chronicle.klay-wang.com/llms.txt" target="_blank" rel="noopener">llms.txt</a>. The KAPX Index historical readings are also published as open datasets on <a href="https://www.kaggle.com/datasets/klaywong/kapx-index-daily-fear-pricing-gauge" target="_blank" rel="noopener">Kaggle</a> and <a href="https://huggingface.co/datasets/klay24/kapx-index" target="_blank" rel="noopener">Hugging Face</a> (CC BY 4.0, refreshed quarterly).</p>
 <p>A note on revisions: the CNN Fear &amp; Greed archive may revise the last few days' readings by ±1–2 points after the fact (the intraday snapshot gets replaced by the official historical value); the ledger absorbs revisions automatically with each daily pipeline run. Return horizons are always measured in trading days on the gap-free price calendar.</p>
