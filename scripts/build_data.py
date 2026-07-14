@@ -14,6 +14,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import requests
 import yfinance as yf
@@ -674,6 +675,120 @@ def build_sentiment(vix_close: pd.Series, vxn_close: pd.Series = None):
     })
 
 
+# ------------------------------------------------- 恐惧的标价指数（LEAPS 温度计）
+# 头条 = VIX1Y 在过去 3 年的百分位，高=贵（0-100）；4 项 context 只算不平均进头条。
+# 设计锁定见 KAPX-恐惧标价指数/REGISTRATION.md（v2）——改动=另立新兄弟，绝不追溯改。
+# 云原生：VIX 家族取自 CBOE 官方 CSV，实际利率取自 FRED，SPX 用管线已有 ^GSPC。零本地依赖。
+LEAPS_FORWARD_START = "2026-07-13"  # 首次上线日：此日(含)起=前向台账，之前=可复现回测。锁定常量，勿随每日运行改动。
+
+
+def _cboe_close(name: str) -> pd.Series:
+    """CBOE 官方历史 CSV → 日频收盘 Series（VIX 家族取 CLOSE，SKEW 取末列）。"""
+    from io import StringIO
+    r = requests.get(CBOE_HIST.format(name), headers=UA, timeout=30)
+    r.raise_for_status()
+    df = pd.read_csv(StringIO(r.text))
+    df["DATE"] = pd.to_datetime(df["DATE"])
+    col = "CLOSE" if "CLOSE" in df.columns else df.columns[-1]
+    return pd.Series(pd.to_numeric(df[col], errors="coerce").values,
+                     index=df["DATE"]).dropna().sort_index()
+
+
+def _roll_pctile(s: pd.Series, window: int, min_periods: int = 250) -> pd.Series:
+    """滚动百分位：当前值在过去 window 交易日内的分位（0-1，高值=高分位=贵）。"""
+    return s.rolling(window, min_periods=min_periods).apply(
+        lambda x: (x <= x[-1]).mean(), raw=True)
+
+
+def _pctile_now(s: pd.Series, window: int | None = None):
+    """当前值在（全史或末 window 观测）中的百分位 ×100。空序列返回 None。"""
+    w = s.dropna()
+    if window:
+        w = w.iloc[-window:]
+    if len(w) == 0:
+        return None
+    return round(float((w <= w.iloc[-1]).mean() * 100), 1)
+
+
+def compute_leaps_index(vix1y, gspc, vix, vix9d, vix3m, vix6m, skew, dfii):
+    """把已取好的各序列合成「恐惧的标价指数」台账 dict。纯函数（无网络），便于 dry-run。
+    头条 = VIX1Y 3 年滚动百分位（高=贵）；4 context（VRP/期限阶梯/SKEW/实际利率）只算不平均进头条。"""
+    idx = vix1y.dropna().index                        # 主日历 = VIX1Y 交易日（2007+）
+    v = vix1y.reindex(idx).ffill()
+
+    exp3y = _roll_pctile(v, 756) * 100                # 头条序列：高=贵（0-100）
+
+    # VRP（波动税）：VIX1Y − SPX 已实现波动率（同标的、期限对齐）。主=252日(1年)，小字=63日(3月)。
+    logret = np.log(gspc / gspc.shift(1))
+    rv = lambda n: (logret.rolling(n).std() * np.sqrt(252) * 100).reindex(idx).ffill()
+    rv252, rv63 = rv(252), rv(63)
+    vrp_main, vrp_small = v - rv252, v - rv63
+
+    def last(s):
+        s = s.dropna()
+        return None if s.empty else round(float(s.iloc[-1]), 2)
+
+    cur_v = round(float(v.iloc[-1]), 2)
+    cur_date = idx[-1].strftime("%Y-%m-%d")
+    return {
+        "meta": {
+            "name": "恐惧的标价指数",
+            "question": "今天买长期期权（LEAPS）在历史上算贵还是便宜？",
+            "headline": "VIX1Y 在过去 3 年的百分位，高=贵（0=历史最便宜，100=历史最贵）",
+            "nature": "描述性温度计，非交易信号/非预测；仅为数据，非投资建议。",
+            "design": "描述性成本刻度 v2；方法论与口径详见本站 LEAPS 页",
+            "forward_start": LEAPS_FORWARD_START,
+            "segment_note": "dates < forward_start = 可复现回测(backtest)；>= forward_start = 前向台账(forward)，逐日 commit 记录。",
+            "windows": {  # 各项口径分别标清——头条与 context 不是同一把尺，口径透明=诚实的一部分
+                "headline_expensiveness": "VIX1Y 百分位；主看=近 3 年(756td)，小字坐标=近 5 年(1260td) / 全史(2007+)",
+                "vrp": "值(非百分位)：VIX1Y − SPX 已实现波动率；主=252td(1 年) / 小字=63td(3 月)",
+                "term_ladder": "当前值快照 + VIX/VIX1Y 比（非百分位）",
+                "call_skew": "SKEW 的全史百分位",
+                "real_rate": "DFII10(10 年期实际利率) 的全史百分位（慢变量，故用全史）",
+            },
+            "caveats": {
+                "warmup": "早期(2007–2009)百分位在不足 756 交易日的窗口上计算(min_periods=250)，随历史积累趋于满 3 年基数。",
+                "context_asof": "context 各值 as-of 其数据源各自最新印次；FRED 实际利率(DFII10)可能比头条日期滞后约 1 交易日。",
+            },
+        },
+        "dates": dates(idx),
+        "vix1y": rnd(v, 2),
+        "expensiveness_3y": rnd(exp3y, 1),            # 头条：高=贵
+        "vrp_main": rnd(vrp_main, 2),                 # VIX1Y − 252 日已实现
+        "vrp_small": rnd(vrp_small, 2),               # VIX1Y − 63 日已实现
+        "current": {
+            "date": cur_date,
+            "segment": "forward" if cur_date >= LEAPS_FORWARD_START else "backtest",
+            "vix1y": cur_v,
+            "expensiveness": {                        # 头条读数 + 三窗口坐标（主看 3 年，小字 5 年/全史）
+                "p3y": _pctile_now(v, 756),
+                "p5y": _pctile_now(v, 1260),
+                "pfull": _pctile_now(v),
+            },
+            "context": {                              # 4 项，展示不平均进头条（每项独立经济论点）
+                "vrp": {"main": last(vrp_main), "small": last(vrp_small),
+                        "rv252": last(rv252), "rv63": last(rv63)},
+                "term_ladder": {"vix9d": last(vix9d), "vix": last(vix), "vix3m": last(vix3m),
+                                "vix6m": last(vix6m), "vix1y": cur_v,
+                                "ratio_vix_vix1y": round(float(vix.dropna().iloc[-1] / cur_v), 3)},
+                "call_skew": {"value": last(skew), "pctile_full": _pctile_now(skew)},
+                "real_rate": {"value": last(dfii), "pctile_full": _pctile_now(dfii)},
+            },
+        },
+    }
+
+
+def build_leaps_index(gspc_close: pd.Series, vix_close: pd.Series):
+    """恐惧的标价指数旗舰台账 → data/leaps_index.json（kindex.json 隔壁）。拉失败抛异常，留旧文件不覆盖。"""
+    print("== 恐惧的标价指数（LEAPS 温度计）")
+    out = compute_leaps_index(
+        _cboe_close("VIX1Y"), gspc_close.dropna(), vix_close.dropna(),
+        _cboe_close("VIX9D"), _cboe_close("VIX3M"), _cboe_close("VIX6M"),
+        _cboe_close("SKEW"), _fred("DFII10", start="2003-01-01"),
+    )
+    write_json("leaps_gauge.json", out)
+
+
 def build_index_val():
     """SPY/QQQ ETF 口径的估值快照（yfinance；指数级 Forward PE 无免费长史，只取当前值）。"""
     print("== 指数估值快照")
@@ -1089,6 +1204,10 @@ def main():
         build_naaim()
     except Exception as e:
         print(f"  NAAIM 失败（留旧文件）: {e}")
+    try:
+        build_leaps_index(gspc, vix)
+    except Exception as e:
+        print(f"  恐惧的标价指数失败（留旧文件）: {e}")
     build_index_val()
     build_macro()
     build_index_panels("sp500", gspc, vix, "VIX")
