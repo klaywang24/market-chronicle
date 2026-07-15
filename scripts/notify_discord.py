@@ -2,6 +2,7 @@
 """每交易日收盘后，把「今日头版」数据卡片推送到 Discord #每日头版。
 Webhook URL 从环境变量 DISCORD_WEBHOOK_URL 读取（GitHub Actions secret）；
 未配置则静默跳过，不影响主管线。"""
+import datetime as dt
 import json
 import os
 import sys
@@ -22,16 +23,51 @@ def pct(v):
     return ("+" if v > 0 else "") + f"{v:.2f}%"
 
 
+def post(url, payload):
+    req = urllib.request.Request(
+        url, data=json.dumps(payload).encode(), method="POST",
+        headers={"Content-Type": "application/json",
+                 # Cloudflare 会 403 掉默认的 python-urllib UA
+                 "User-Agent": "Mozilla/5.0 (market-chronicle daily bot)"})
+    urllib.request.urlopen(req, timeout=20)
+
+
+def alert(url, title, desc):
+    """管线出事时发红色告警。宁可吵，也不要静默——2026-07-12→14 就是被静默掉的。"""
+    post(url, {"embeds": [{"title": title, "description": desc, "color": 0xD93025}]})
+    print(f"已发告警: {title}")
+
+
 def main():
     url = os.environ.get("DISCORD_WEBHOOK_URL")
     if not url:
         print("DISCORD_WEBHOOK_URL 未配置，跳过 Discord 推送")
         return
 
+    run_url = os.environ.get("RUN_URL", "")
+    status = (os.environ.get("JOB_STATUS") or "").lower()
+
+    # ① job 本身失败 → 立刻红色告警，绝不发正常播报（旧 JSON 会让它看起来一切正常）
+    if status and status != "success":
+        alert(url, f"🔴 daily-update 失败（{status}）",
+              f"站上数据**没有更新**，仍是上一次成功时的值。\n请查日志：{run_url}")
+        sys.exit(0)
+
     d = load("pulse")
     if not d:
-        print("pulse.json 缺失，跳过")
+        alert(url, "🔴 daily-update 异常：pulse.json 缺失", f"日志：{run_url}")
         return
+
+    # ② job 成功但数据没动（上游静默返回旧值/被限流）→ 同样告警
+    asof = d.get("date")
+    if asof:
+        try:
+            age = (dt.date.today() - dt.date.fromisoformat(asof)).days
+            if age > 4:   # 容忍周末 + 假日；超过就不正常
+                alert(url, f"🟠 数据陈旧：pulse.json 停在 {asof}（{age} 天前）",
+                      f"job 报成功但数据没前进，检查上游取数。\n日志：{run_url}")
+        except Exception:
+            pass
     leaps = load("leaps") or {}
     q = d.get("quotes", {})
 

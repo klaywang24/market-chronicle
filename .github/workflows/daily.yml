@@ -25,8 +25,13 @@ jobs:
           git commit -m "data: daily update $(date -u +%F)" || echo "no changes"
           git pull --rebase origin main
           git push
+      # ⚠️ if: always() 是故意的——失败时也要发通知。但必须把 job 状态传进去，
+      # 否则脚本会读到磁盘上的旧 pulse.json，发出一条「看起来一切正常」的播报，
+      # 把失败静默掉。2026-07-12→14 管线死了 4 天没人发现，就是栽在这里。
       - name: notify Discord
         if: always()
         run: python scripts/notify_discord.py
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

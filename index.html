@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260714u">
+<link rel="stylesheet" href="css/style.css?v=20260714v">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -793,8 +793,9 @@
       <p>为什么 K 策略的净值远低于一直持有？因为它约有六成时间空仓：只在 K &lt; 1 后持有 60 个交易日，其余时间收益记零。在一个长期上行的市场里，空仓越久，总收益就越难追上一直满仓——这是仓位暴露的结构性差异，不是信号失效。同一个原因也解释了它更浅的回撤（2011 年以来最大回撤约 <strong>−26.7%</strong>，浅于纳指 100 的 −35.6% 与标普 500 的 −33.9%）：一半时间不在场，下跌自然也躲过一半——这是低暴露的机械结果，并非择时技巧。<strong>净值垫底与回撤最浅，是同一枚硬币的两面。</strong>宜把 K 当作定位「现在有多恐慌」的刻度、恐慌时部署现金的纪律锚，而非用来跑赢大盘的策略。</p>
       <p>基准说明：对账一律双锚——纳指 100（策略实际交易标的）与标普 500（主流市场锚）并列展示。情绪输入端为标普 / 全市场口径（VIX 期限结构仅标普体系有官方指数，恐贪指数本身以标普为中心），属数据现实而非选择。</p>
       <h3>可验证性</h3>
-      <p>本站为纯静态架构：每个交易日收盘后，GitHub Actions 数据管线自动拉取数据、计算指标并提交至公开仓库。<strong>自本站上线（2026 年 7 月）起</strong>，每一天的信号读数都带有当天的 Git 提交时间戳——<a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">提交历史</a>公开可查，属事前记录。<strong>上线之前、回溯至 2011 年的历史台账</strong>，则是按公开公式、用公开历史数据（CNN 恐贪存档 + VIX）回填而成：任何人都能用同样的公开数据独立复现，但属历史回填、并非事前提交。两段口径分开标注，不混为一谈。</p>
+      <p>本站为纯静态架构：每个交易日收盘后，GitHub Actions 数据管线自动拉取数据、计算指标并提交至公开仓库。<strong>自本站上线（2026 年 7 月）起</strong>，每一天的读数都带有 Git 提交时间戳——<a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">提交历史</a>公开可查，属事前记录。<strong>管线偶尔会因技术故障漏跑</strong>：发生时读数于修复后补录，<strong>Git 历史里能清楚看到哪天是当日提交、哪天是补录，我们不抹平这个差别</strong>；已发生的故障逐次记录在下方「已知特性与局限」。<strong>上线之前、回溯至 2011 年的历史台账</strong>，则是按公开公式、用公开历史数据（CNN 恐贪存档 + VIX）回填而成：任何人都能用同样的公开数据独立复现，但属历史回填、并非事前提交。两段口径分开标注，不混为一谈。</p>
       <h3>已知特性与局限</h3>
+      <p><strong>2026-07-12 → 07-14 管线故障（已修复）</strong>：<code>scripts/build_data.py</code> 中一个仍被下游使用的变量，在 2026-07-12 的一次改动里被误删，导致 daily-update 连续失败；<strong>07-13、07-14 两个交易日未能当日提交</strong>，读数于 07-15 补录（commit <code>569e047</code>）。数据本身由公开数据源重算得到、可独立复现，受影响的只是这两天的<strong>提交时间戳</strong>——按本站口径，它们属「补录」而非「事前」。故障已修复（commit <code>82f5822</code>），并补上了失败告警：此前的通知脚本在管线失败时仍会读取旧数据、发出一条看起来正常的播报，把故障静默掉了。</p>
       <p>VIX 本身是 CNN 恐惧贪婪指数七个分量之一（其「市场波动」分量以 VIX 相对 50 日均线衡量）。而 K = CNN 恐贪 ÷ VIX，因此 VIX 通过两条同向通道影响 K——分母直接除以 VIX，分子里还占约七分之一的波动分量——波动率被部分双重计重。这意味着 KAPX 对波动率的敏感度，高于一个「完全独立的恐惧 ÷ 波动率」比值，「两个独立信号相除」的说法并不严格（约七分之六的恐贪独立于 VIX）。这不是缺陷：可把 KAPX 理解为一个「偏重波动率应激的恐惧指标」，对本指标「在恐慌与波动同时极端时定位历史坐标」的用途而言，这份灵敏度正是想要的。我们如实披露这一重叠，而非悄悄剔除——公式一经公开即不静默更改，任何口径迭代都会另立新版本。</p>
       <h3>数据源</h3>
       <p>CNN Fear &amp; Greed（whit3rabbit 每日存档 + CNN 官方接口当日值）；价格与 VIX 来自 Yahoo Finance（复权收盘价近似含分红总回报）；VIX 期限结构（VIX9D / VIX3M / VIX6M）来自 Cboe 官方历史数据；Put/Call 比为 CNN 口径的全市场 5 日均值；估值长历史来自 multpl / Robert Shiller。机器可读入口见 <a href="https://chronicle.klay-wang.com/llms.txt" target="_blank" rel="noopener">llms.txt</a>。KAPX 指数历史读数亦以公开数据集形式发布于 <a href="https://www.kaggle.com/datasets/klaywong/kapx-index-daily-fear-pricing-gauge" target="_blank" rel="noopener">Kaggle</a> 与 <a href="https://huggingface.co/datasets/klay24/kapx-index" target="_blank" rel="noopener">Hugging Face</a>（CC BY 4.0，季度更新）。</p>
@@ -904,9 +905,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260714u"></script>
-<script src="js/app.js?v=20260714u"></script>
-<script src="js/docs-i18n.js?v=20260714u"></script>
+<script src="js/i18n.js?v=20260714v"></script>
+<script src="js/app.js?v=20260714v"></script>
+<script src="js/docs-i18n.js?v=20260714v"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。
