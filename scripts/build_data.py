@@ -208,6 +208,12 @@ def build_index_panels(prefix: str, close: pd.Series, vol_index: pd.Series | Non
     daily_c = close.dropna()
     write_json(f"{prefix}_century.json", {"dates": dates(daily_c.index), "close": rnd(daily_c, 2)})
 
+    # 月频序列：世纪图已改日频不再用它，但下面的「滚动 5 年年化」与「月度季节性」仍依赖。
+    # ⚠️ bd24343 把世纪图改日频时连这行定义一起删了，导致本函数抛
+    #    NameError: name 'monthly' is not defined —— daily-update 自 2026-07-12 起连续失败，
+    #    站上数据一直冻结在 2026-07-10。改动本行前先确认 :239/:258/:267 是否还在用。
+    monthly = close.resample("ME").last()
+
     # 年度回报 + 分桶
     annual = close.resample("YE").last().pct_change().dropna() * 100
     # 首年用年内首尾补（yfinance 首年不完整就跳过）
