@@ -385,7 +385,7 @@
       <li><b>The daily reading</b> — never published on the site</li>
       <li><b>The reading archive</b> — filed daily, compounding</li>
       <li><b>One piece of market folklore killed per week</b> — subscribers first, public after 30 days</li>
-      <li>Options-structure data table (SPY / QQQ / M7 / AVGO)</li>
+      <li>Options-structure data table — the dozen-odd names carrying the most US options volume; the list follows liquidity</li>
     </ul>
     <div class="ptier-soon">Access is enabled within 24 hours of subscribing (I do this by hand), then the digest arrives before every open. Full refund within 14 days if you're not satisfied.</div>
     <a class="ptier-cta" href="#" id="pay-btn"><span class="p-m">Subscribe $29 / mo</span><span class="p-y">Subscribe $290 / yr</span></a>
