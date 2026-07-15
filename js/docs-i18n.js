@@ -285,7 +285,6 @@
 <h3>Terms</h3>
 <ul>
 <li><strong>14-day no-questions refund</strong>: if you're not satisfied within 14 days of subscribing, you get a full refund, no reason needed;</li>
-<li>if you subscribe <strong>before the first digest goes out (2026-07-15)</strong>, you can request a full refund at any time before sending starts;</li>
 <li>refunds are processed by the payment provider Paddle, returned via the original method;</li>
 <li>how to request: email <a href="mailto:${EMAIL}">${EMAIL}</a> with your order details.</li>
 </ul>
@@ -387,7 +386,7 @@
       <li><b>Pre-market digest email</b>, delivered before every open</li>
       <li>Coverage data table (SPY / QQQ / M7 / AVGO), included in the digest</li>
     </ul>
-    <div class="ptier-soon">The first digest goes out on 2026-07-15. Subscribing before then is prepayment; full refund on request any time before sending starts.</div>
+    <div class="ptier-soon">Access is enabled within 24 hours of subscribing (I do this by hand), then the digest arrives before every open. Full refund within 14 days if you're not satisfied.</div>
     <a class="ptier-cta" href="#" id="pay-btn"><span class="p-m">Subscribe $29 / mo</span><span class="p-y">Subscribe $290 / yr</span></a>
     <a class="ptier-alt" href="mailto:${EMAIL}?subject=Founding">Founding $9.9 — email to reserve →</a>
   </div>
