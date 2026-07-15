@@ -356,7 +356,7 @@
     },
 
     pricing: {
-      en: { kicker: "PRICING", h1: "Pricing", dek: "The website is free forever. What you pay for is the brief that lands in your inbox before every open.",
+      en: { kicker: "PRICING", h1: "Pricing", dek: "No stock picks, no predictions, no performance claims — and when we're wrong, it stays on the record. One job: reading today's market \"weather\" — how expensive, how afraid, where it sits in history — into three minutes of plain language before every open.",
         body: `<div class="pbill">
   <div class="pbill-inner">
     <button class="pbill-btn active" data-bill="m">Monthly</button>
@@ -380,11 +380,12 @@
     <div class="ptier-badge">Founding $9.9 · by email</div>
     <div class="ptier-name">Standard</div>
     <div class="ptier-price"><span class="p-m">$29<i class="u">/ mo</i></span><span class="p-y">$290<i class="u">/ yr</i></span></div>
-    <div class="ptier-tag"><span class="p-m">Founding price <b>$9.9 / mo</b> locked for life (first 100) · by email only</span><span class="p-y">≈ $24 / mo · annual = 10 months' price</span></div>
+    <div class="ptier-tag"><span class="p-m">Founding <b>$9.9 / mo, billed $99 / yr</b> — locked for life (first 100) · by email</span><span class="p-y">≈ $24 / mo · annual = 10 months' price</span></div>
     <ul class="ptier-list">
-      <li>Everything in Free</li>
-      <li><b>Pre-market digest email</b>, delivered before every open</li>
-      <li>Coverage data table (SPY / QQQ / M7 / AVGO), included in the digest</li>
+      <li><b>The daily reading</b> — never published on the site</li>
+      <li><b>The reading archive</b> — filed daily, compounding</li>
+      <li><b>One piece of market folklore killed per week</b> — subscribers first, public after 30 days</li>
+      <li>Options-structure data table (SPY / QQQ / M7 / AVGO)</li>
     </ul>
     <div class="ptier-soon">Access is enabled within 24 hours of subscribing (I do this by hand), then the digest arrives before every open. Full refund within 14 days if you're not satisfied.</div>
     <a class="ptier-cta" href="#" id="pay-btn"><span class="p-m">Subscribe $29 / mo</span><span class="p-y">Subscribe $290 / yr</span></a>
@@ -403,6 +404,7 @@
     <div class="ptier-soon">Opens 3–6 months after Standard launches</div>
   </div>
 </div>
+<p><strong>The numbers are everywhere, free forever.</strong> The archive earns its keep on every selloff that comes after — that morning, you are already holding a reading whose method has not changed in fifteen years.</p>
 <p class="pricing-inst"><strong>Institutional / data licensing</strong> (series licensing, index licensing, redistribution) — <a href="#contact">contact us</a>; unpriced.</p>
 <p>Annual = 10 months' price ($290 / $990) · 14-day no-questions refund, no trial (the free tier is the trial) · cancel anytime via the manage link in your subscription email. Orders and payments are handled by a Merchant of Record, whose name will appear on your statement. <strong>Data and information only; not investment advice; no buy or sell recommendations.</strong></p>
 <p class="doc-fineprint">Pro and API are later plans, not a final commitment; launch dates TBD.</p>` },

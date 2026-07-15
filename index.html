@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260715b">
+<link rel="stylesheet" href="css/style.css?v=20260715c">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -810,7 +810,7 @@
 <section class="panel" id="panel-pricing">
   <div class="doc-page">
     <div class="hero"><div class="kicker">PRICING · 定价</div><h1>定价</h1>
-      <p class="dek">网站永久免费。付费的，是每个交易日盘前送达你邮箱的那份简报。</p></div>
+      <p class="dek">不荐股、不预测、不晒收益、错了不删。只做一件事：把市场今天的「天气」——贵不贵、怕不怕、在历史第几——在每个开盘前读成三分钟人话。</p></div>
     <div class="doc-body">
       <div class="pbill">
         <div class="pbill-inner">
@@ -835,11 +835,12 @@
           <div class="ptier-badge">创始价 $9.9 · 邮件预约</div>
           <div class="ptier-name">Standard</div>
           <div class="ptier-price"><span class="p-m">$29<i class="u">/ 月</i></span><span class="p-y">$290<i class="u">/ 年</i></span></div>
-          <div class="ptier-tag"><span class="p-m">创始价 <b>$9.9 / 月</b> 永久锁定（前 100 名）· 需邮件预约</span><span class="p-y">≈ $24 / 月 · 年付 = 10 个月价</span></div>
+          <div class="ptier-tag"><span class="p-m">创始价 <b>$9.9 / 月 · 按年 $99</b> 永久锁定（前 100 名）· 邮件预约</span><span class="p-y">≈ $24 / 月 · 年付 = 10 个月价</span></div>
           <ul class="ptier-list">
-            <li>免费层全部内容</li>
-            <li><b>盘前 digest 邮件</b>，每交易日开盘前送达</li>
-            <li>覆盖标的数据表（SPY / QQQ / M7 / AVGO），随 digest 一同送达</li>
+            <li><b>每日判读正文</b>——站上永不公开</li>
+            <li><b>判读档案</b>——逐日归档，越攒越厚</li>
+            <li><b>每周一期传说处决</b>——付费先看，30 天后公开</li>
+            <li>期权结构数据表（SPY / QQQ / M7 / AVGO）</li>
           </ul>
           <div class="ptier-soon">订阅后 24 小时内开通（这一步由我手动完成），之后每个交易日开盘前送达。14 天内不满意可全额退款。</div>
           <!-- 标签整串放进 p-m/p-y，不留裸文本节点：i18n 的 applyTo 按整节点精确匹配 D 字典，
@@ -861,6 +862,7 @@
           <div class="ptier-soon">Standard 上线 3–6 个月后开放</div>
         </div>
       </div>
+      <p><strong>数字，随处可见，永远免费。</strong>档案真正的用处在之后每次大跌的那天——你手里已经有一个 15 年没换过口径的读数。</p>
       <p class="pricing-inst"><strong>机构 / 数据授权</strong>（序列授权、指数授权、再分发）— <a href="#contact">联系我们</a>，不标价。</p>
       <p>年付 = 10 个月价（$290 / $990）· 14 天无条件退款、无试用（免费层即试用）· 通过订阅邮件中的管理链接随时取消。订单与支付由 Merchant of Record 处理，账单上会显示其名称。<strong>仅为数据与信息，不构成投资建议，不含任何买卖推荐。</strong></p>
       <p class="doc-fineprint">Pro 与 API 为后续规划，非最终承诺，上线时间待定。</p>
@@ -904,9 +906,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260715b"></script>
-<script src="js/app.js?v=20260715b"></script>
-<script src="js/docs-i18n.js?v=20260715b"></script>
+<script src="js/i18n.js?v=20260715c"></script>
+<script src="js/app.js?v=20260715c"></script>
+<script src="js/docs-i18n.js?v=20260715c"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。
