@@ -1154,12 +1154,17 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 .ptier-list li { font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; padding-left: 18px; position: relative; }
 .ptier-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
 .ptier-list li b { color: var(--ink); }
-.ptier-cta { display: block; text-align: center; font-size: 13px; font-weight: 700; color: #fff; background: var(--accent); border-radius: 8px; padding: 9px 12px; text-decoration: none; }
-.ptier-cta:hover { background: var(--accent-deep); }
+/* ⚠️ 必须带 .doc-body 前缀：定价面板在 .doc-body 里，而 :796 的 `.doc-body a` 特异性 (0,1,1)
+   高于裸 `.ptier-cta` (0,1,0)，会把 color:#fff 盖成 --accent-deep（深砖红压砖红=看不清）
+   并强加 border-bottom。这里用 (0,2,1) 拿回控制权。改这两条前先看 :796。 */
+.doc-body a.ptier-cta { display: block; text-align: center; font-size: 13px; font-weight: 700; color: #fff; background: var(--accent); border-radius: 8px; padding: 9px 12px; text-decoration: none; border-bottom: none; }
+.doc-body a.ptier-cta:hover { background: var(--accent-deep); color: #fff; border-bottom: none; }
 .ptier-soon { font-size: 11.5px; color: var(--ink-muted); text-align: center; border: 1px dashed var(--border); border-radius: 8px; padding: 8px; }
 /* 次级 CTA：创始价走邮件预约（$9.9 不在 Paddle 自助结账里，故与主按钮分开、不同视觉层级） */
-.ptier-alt { display: block; text-align: center; font-size: 12px; font-weight: 600; color: var(--accent); text-decoration: none; margin-top: 10px; padding: 4px 0; }
-.ptier-alt:hover { text-decoration: underline; }
+/* 次级 CTA：创始价走邮件预约（$9.9 不在 Paddle 自助结账里，故与主按钮分开、不同视觉层级）。
+   同样要 .doc-body 前缀压过 :796，否则会被强加 border-bottom。 */
+.doc-body a.ptier-alt { display: block; text-align: center; font-size: 12px; font-weight: 600; color: var(--accent); text-decoration: none; border-bottom: none; margin-top: 10px; padding: 4px 0; }
+.doc-body a.ptier-alt:hover { text-decoration: underline; color: var(--accent-deep); }
 .pricing-inst { font-size: 13px; color: var(--ink-soft); }
 @media (max-width: 820px) { .pricing-tiers { grid-template-columns: 1fr; } }
 
