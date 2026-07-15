@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260714s">
+<link rel="stylesheet" href="css/style.css?v=20260714t">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -904,9 +904,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260714s"></script>
-<script src="js/app.js?v=20260714s"></script>
-<script src="js/docs-i18n.js?v=20260714s"></script>
+<script src="js/i18n.js?v=20260714t"></script>
+<script src="js/app.js?v=20260714t"></script>
+<script src="js/docs-i18n.js?v=20260714t"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。
@@ -928,7 +928,12 @@ if (window.Paddle) {
     e.preventDefault();
     // 点击瞬间现读 .annual，复用既有的按月/按年切换，不另存一份状态
     const y = document.getElementById("pricing-tiers")?.classList.contains("annual");
-    Paddle.Checkout.open({ items: [{ priceId: PADDLE_PRICES[y ? "y" : "m"], quantity: 1 }] });
+    Paddle.Checkout.open({
+      items: [{ priceId: PADDLE_PRICES[y ? "y" : "m"], quantity: 1 }],
+      // 付完钱落到自己的页面：Paddle 自带成功页不会说「首期 07-15 发出、24 小时内手动开通」，
+      // 而本站是一个人手动把付费者加进邮件列表的——不设这个，买家付完钱会以为没下文。
+      settings: { successUrl: "https://chronicle.klay-wang.com/welcome/" },
+    });
   });
 }
 </script>

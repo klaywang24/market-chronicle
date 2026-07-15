@@ -1906,12 +1906,12 @@
           <a class="lcta" href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">在 GitHub 验证台账</a>
         </div>
         <form class="ledger-sub" action="https://buttondown.com/api/emails/embed-subscribe/klay24" method="post" target="_blank">
-          <div class="sub-title">每周一封：台账读数与信号战报（免费）</div>
+          <div class="sub-title">免费邮件列表：每周一封台账读数（不收费，与付费简报不同）</div>
           <div class="sub-row">
             <input class="sub-input" type="email" name="email" required placeholder="you@email.com" aria-label="Email">
-            <button class="sub-btn" type="submit">订阅</button>
+            <button class="sub-btn" type="submit">免费订阅</button>
           </div>
-          <div class="sub-note">信号触发日加发一封。随时退订，不发广告。</div>
+          <div class="sub-note">极端读数出现时加发一封。随时退订，不发广告。</div>
         </form>
       </div>`;
     }
