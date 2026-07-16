@@ -1349,7 +1349,7 @@
     const d = await load(dsName);
     const tbl = document.getElementById(tableId);
     tbl.innerHTML =
-      '<tr><th>#</th><th>代码</th><th class="left">公司</th><th class="left">行业</th><th>市值 ($B)</th><th>权重</th></tr>' +
+      '<tr><th>#</th><th>代码</th><th class="left has-logo">公司</th><th class="left">行业</th><th>市值 ($B)</th><th>权重</th></tr>' +
       d.rows.map((r, i) =>
         `<tr><td>${i + 1}</td><td>${r.ticker}</td>` +
         `<td style="text-align:left">${tblLogo(r.ticker)}${r.name}</td>` +
@@ -1363,7 +1363,7 @@
     const d = await load(dsName);
     const hasAdded = d.rows[0] && d.rows[0].added !== undefined;
     document.getElementById(tableId).innerHTML =
-      `<tr><th>#</th><th>代码</th><th class="left">公司</th><th class="left">${hasAdded ? "GICS 行业" : "行业"}</th>${hasAdded ? "<th>纳入日期</th>" : ""}</tr>` +
+      `<tr><th>#</th><th>代码</th><th class="left has-logo">公司</th><th class="left">${hasAdded ? "GICS 行业" : "行业"}</th>${hasAdded ? "<th>纳入日期</th>" : ""}</tr>` +
       d.rows.map((r, i) =>
         `<tr><td>${i + 1}</td><td>${r.ticker}</td><td style="text-align:left">${tblLogo(r.ticker)}${r.name}</td>` +
         `<td style="text-align:left;font-family:'Noto Sans SC',sans-serif">${r.sector}</td>` +

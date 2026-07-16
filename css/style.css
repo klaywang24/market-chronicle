@@ -736,15 +736,21 @@ html:not([lang^="zh"]) .toc a { font-size: 11.5px; }
 /* ---------- 长表格 / 个股 logo / 数据条 ---------- */
 .table-scroll { max-height: 440px; overflow-y: auto; }
 th.left { text-align: left; }
+/* 2026-07-16：表 logo 尺寸提成变量——「公司」表头要跟着它缩进同样的量，
+   写死 26px 的话将来改 logo 尺寸表头就又错位了（实测：18+8=26px，与错位量分毫不差）。 */
+:root { --tbl-logo-size: 18px; --tbl-logo-gap: 8px; }
 .tbl-logo {
-  width: 18px;
-  height: 18px;
+  width: var(--tbl-logo-size);
+  height: var(--tbl-logo-size);
   border-radius: 4px;
   background: #fff;
   object-fit: contain;
   vertical-align: -4px;
-  margin-right: 8px;
+  margin-right: var(--tbl-logo-gap);
 }
+/* 「公司」列内容是 [logo]名称，文字被 logo 顶开 → 表头贴着列左边就比内容左 26px。
+   给带 logo 的那列表头同量缩进。⚠️ 只作用于 .has-logo，别误伤「行业」（无 logo，本来就是齐的）。 */
+th.left.has-logo { padding-left: calc(var(--tbl-logo-size) + var(--tbl-logo-gap) + 10px); }
 .table-scroll th { position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
 .stock-logo {
   width: 46px;
@@ -1193,7 +1199,12 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 .footer-colgroup { display: flex; gap: 46px; flex-wrap: wrap; }
 .footer-col { display: flex; flex-direction: column; gap: 9px; }
 .footer-col-h { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); margin-bottom: 5px; font-family: 'JetBrains Mono', monospace; }
-.footer-col a { font-size: 13px; color: var(--ink-soft); text-decoration: none; }  /* 2026-07-16：页脚是全站通往定价页的唯一入口=次级导航不是装饰，muted→soft */
+/* 2026-07-16：用户三次报「页脚不够黑」。实测：色已是 --ink-soft 13.3:1（AAA 上游），
+   再深就是纯黑、纸感没了。真因是字号+字重——13px/400 的细笔画对比 48px/700 的「46」，
+   同样墨色看起来就是不一样黑，那是字体的物理特性不是颜色问题。故加字重不加墨。
+   ⚠️ 也别把页脚底改纯白：#2E2822 从 #F6F5F1 换到 #FFF 只有 13.3→14.6（+10%，肉眼看不出），
+   代价却是页面底部横一条白带子把纸感切断。 */
+.footer-col a { font-size: 13.5px; font-weight: 500; color: var(--ink-soft); text-decoration: none; }
 .footer-col a:hover { color: var(--accent); }
 @media (max-width: 720px) { .footer-main { gap: 28px; } .footer-colgroup { gap: 30px; } }
 
