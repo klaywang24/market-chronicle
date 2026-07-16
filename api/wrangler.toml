@@ -1,0 +1,8 @@
+name = "mc-api"
+main = "worker.js"
+compatibility_date = "2026-07-01"
+# 部署前：npx wrangler kv namespace create API_KEYS → 把 id 填到下面
+[[kv_namespaces]]
+binding = "API_KEYS"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+# 自定义域（可选）：Cloudflare 后台 Workers → 域名路由 api.klay-wang.com/*
