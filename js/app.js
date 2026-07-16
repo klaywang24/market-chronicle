@@ -2301,7 +2301,7 @@
         { name: "1 年期 · VIX1Y", type: "line", showSymbol: false, connectNulls: false,
           data: long, lineStyle: { color: p.accent, width: 1.8 }, itemStyle: { color: p.accent } },
         { name: "9 天期 · VIX9D", type: "line", showSymbol: false, connectNulls: false,
-          data: front, lineStyle: { color: p.muted, width: 1.2 }, itemStyle: { color: p.muted } },
+          data: front, lineStyle: { color: p.moss, width: 1.2 }, itemStyle: { color: p.moss } },
       ],
     };
   });
