@@ -2274,6 +2274,38 @@
     };
   });
 
+  // 短端 vs 长端（2026-07-16 用户定）：把「斜率故事」从文案搬上站——两条原始序列自己说话。
+  // 展示层，非指数成分（斜率进不进分类器走注册流程，见 digest README「分类器的已知盲区」）。图注只写事实。
+  chart("leaps", "ch-leaps-ends", async (p) => {
+    const [lg, sent] = await Promise.all([load("leaps_gauge"), load("sentiment")]);
+    const t = sent.term;
+    const v1y = Object.create(null);
+    lg.dates.forEach((dt, i) => { v1y[dt] = lg.vix1y[i]; });
+    const long = [], front = [];
+    t.dates.forEach((dt, i) => {
+      if (v1y[dt] != null && t.vix9d[i] != null) {
+        long.push([dt, v1y[dt]]);
+        front.push([dt, t.vix9d[i]]);
+      }
+    });
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(2)) }),
+      legend: { top: 0, textStyle: { color: p.ink, fontSize: 11 }, itemWidth: 18 },
+      grid: { left: 48, right: 24, top: 34, bottom: 64 },
+      xAxis: timeX(p),
+      yAxis: Object.assign({ type: "value", name: "波动率点" }, baseAxis(p)),
+      dataZoom: [{ type: "inside" }, { type: "slider", bottom: 6, height: 18,
+        borderColor: p.border, fillerColor: "rgba(160,57,47,0.08)",
+        handleStyle: { color: p.accent }, textStyle: { color: p.muted, fontSize: 10 } }],
+      series: [
+        { name: "1 年期 · VIX1Y", type: "line", showSymbol: false, connectNulls: false,
+          data: long, lineStyle: { color: p.accent, width: 1.8 }, itemStyle: { color: p.accent } },
+        { name: "9 天期 · VIX9D", type: "line", showSymbol: false, connectNulls: false,
+          data: front, lineStyle: { color: p.muted, width: 1.2 }, itemStyle: { color: p.muted } },
+      ],
+    };
+  });
+
   async function renderLeapsGauge() {
     let d;
     try { d = await load("leaps_gauge"); }

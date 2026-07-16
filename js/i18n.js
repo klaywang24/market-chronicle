@@ -565,6 +565,11 @@
 
     // ---- 图表 series / 轴名 / 图例（进 ECharts option）----
     "等权组合": ["Equal-weight basket", "Panier équipondéré", "Gleichgew. Korb", "Cesta equiponderada"],
+    "1 年期 · VIX1Y": ["1-year · VIX1Y", "", "", ""],
+    "9 天期 · VIX9D": ["9-day · VIX9D", "", "", ""],
+    "波动率点": ["Vol points", "", "", ""],
+    "短端 vs 长端 · 同一个市场给两种时间开的价（2011 年至今）": ["Front vs long end — what one market charges for two horizons (2011→)", "", "", ""],
+    "红线 = 1 年期（VIX1Y，LEAPS 对应的那截）；灰线 = 9 天期（VIX9D）。两线的间距 = 期限斜率；短端的波动远大于长端。": ["Red = 1-year (VIX1Y, the tenor LEAPS pay for); grey = 9-day (VIX9D). The gap between them is the term slope; the front end moves far more than the long end.", "", "", ""],
     "CNN 恐贪": ["CNN F&G", "CNN F&G", "CNN F&G", "CNN F&G"],
     "已实现波动率(20d)": ["Realized vol (20d)", "Vol réalisée (20 j)", "Real. Vol (20T)", "Vol realizada (20d)"],
     "已实现波动率(60d)": ["Realized vol (60d)", "Vol réalisée (60 j)", "Real. Vol (60T)", "Vol realizada (60d)"],

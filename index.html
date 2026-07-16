@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260716m">
+<link rel="stylesheet" href="css/style.css?v=20260716n">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -580,6 +580,11 @@
       <div class="sub">纵轴越高越贵（0–100），50 为中性；灰色为可复现回测段，铁锈红为发布后逐日记录的前向台账（自 2026-07-13）；底部滑块可拖拽缩放</div>
       <div class="chart tall" id="ch-leaps-gauge"></div>
     </div>
+    <div class="card">
+      <h3>短端 vs 长端 · 同一个市场给两种时间开的价（2011 年至今）</h3>
+      <div class="sub">红线 = 1 年期（VIX1Y，LEAPS 对应的那截）；灰线 = 9 天期（VIX9D）。两线的间距 = 期限斜率；短端的波动远大于长端。</div>
+      <div class="chart tall" id="ch-leaps-ends"></div>
+    </div>
     <div class="poem">这是温度计，不是策略。它只回答"贵还是便宜"，不回答"该不该买"——买不买还需要你自己对方向的判断。每个读数带 Git 时间戳，事前记录、改不了。</div>
   </div>
 
@@ -910,9 +915,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260716m"></script>
-<script src="js/app.js?v=20260716m"></script>
-<script src="js/docs-i18n.js?v=20260716m"></script>
+<script src="js/i18n.js?v=20260716n"></script>
+<script src="js/app.js?v=20260716n"></script>
+<script src="js/docs-i18n.js?v=20260716n"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。
