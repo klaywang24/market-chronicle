@@ -1070,3 +1070,9 @@ pulse 页 EN 的 canonical 定义里含「恐」字 = 品牌解释（K 取自恐
 - 账户净值 $5 < $500 行情最低维持线 → snapshot 资格已停（07-16 邮件）；**流式行情实测仍通**（SPY 快照时间戳 63 秒新鲜）
 - 不是风控不是用量惩罚，纯余额规则；**下个账单周期付费行情订阅（OPRA 等）可能被一并取消 = 管线 IBKR 主源整条断**，且按惯例大概率静默降级不报错
 - 待办（用户）：注资 $600–1,000（留每月行情费缓冲）→ Client Portal「交易平台 → 市场数据订阅」确认各订阅仍 Active
+
+### 23.5 数据集与平台身份面校正 + 明日方案（2026-07-16 下半场补录）
+- **HF 数据卡曾带 `timing-signals` 标签 = `1776102` 自打脸大扫除的漏网面**（当时站与 GitHub profile 都改了、没人查 HF）→ 已删换 `market-indicators`；HF/Kaggle 全部 github.io 链接 → chronicle 正式域名；refresh.sh 跑至 07-15（3,882 行 / 39 信号未变）。⚠️ README 手写「39 signals / 26 涨 13 跌」= 快照类，refresh 只推 CSV 不动数据卡，**第 40 个信号出现时须手更两平台 README**
+- Kaggle bio 曾写 KAPX =「a daily U.S.-equity **timing signal**」→ 用户已改「fear-pricing gauge」（meta 已线上验证）；HF profile bio 已贴 canonical 句。**四面（站/Git/HF/Kaggle）首次全对齐**
+- 订阅漏斗补完：`/check-inbox/`（538786e）+ `/confirmed/`（09012c8）两页上线并 200 验证；Buttondown Redirects 两框由用户填；双重确认 = Buttondown 平台强制无开关（官方文档核实）；付费侧走 API `type:regular` 直进、无确认信（既定设计）
+- **明日（发送日 07-17）方案已定**：主图 = 卡1 一卡两版（处决系列周更、明日不发）；主帖 券商 = V9「问到头了吗」换框版 + 卡1纯中文，X = 恐慌日主体文案（情景句由今晚读数三选一）+ 卡1英文主放第 1 条；⭐坐标句「同一天第一大权重创历史新高、存储双雄两日约 -16%」进 digest 材料区（纯分布陈述零归因）；15 版回复弹药 + MU/SNDK 模板等明早落库终版数填空
