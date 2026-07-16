@@ -1053,9 +1053,12 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 
 /* 情绪仪表盘二轮：数字居中放大 + 期限结构四值网格 */
 /* 2026-07-16：原来只有 lc-val 居中，标题左对齐 → 一张卡里两套轴，视觉是歪的。三处统一居中。 */
-.senti-card { display: flex; flex-direction: column; text-align: center; }
-.senti-card .lc-name { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.senti-card .lc-name span { margin-left: 0; }
+.senti-card, .ledger-card { display: flex; flex-direction: column; text-align: center; }
+.senti-card .lc-name, .ledger-card .lc-name { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.senti-card .lc-name span, .ledger-card .lc-name span { margin-left: 0; }
+/* 2026-07-16：lc-meta 里每个「短语」不许内部折行——只准在「·」两侧断。
+   中文短、一行放得下；英文长，不加这条就会折成 "…since / 2025-04-25" 这种半截。 */
+.lc-meta .nw { white-space: nowrap; }
 .senti-card .lc-val { text-align: center; font-size: 38px; margin: 10px 0 4px; }
 .senti-card .lc-state { text-align: center; }
 .senti-card .lc-meta { margin-top: auto; }   /* 脚注吸底：同行卡被最高的那张拉高时，空白落在数字与脚注之间而不是卡底 */

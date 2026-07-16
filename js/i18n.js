@@ -47,7 +47,7 @@
     "免费订阅": ["Subscribe free", "", "", ""],
     "免费 · 极端读数出现时加发一封 · 随时退订，不发广告": ["Free · an extra issue when readings hit extremes · unsubscribe anytime, no ads", "", "", ""],
     "在 GitHub 验证台账": ["Verify the ledger on GitHub", "", "", ""],
-    "每个交易日的读数由管线自动提交，带时间戳，事后不可改写 —— 不用信我，去查": ["Every trading day's reading is committed automatically with a timestamp, never rewritten — don't take my word for it, go check", "", "", ""],
+    "每个交易日的读数，每日收盘自动更新提交，带 GitHub 时间戳，事后不可改写，GitHub 精确可查": ["Every trading day's reading is committed automatically at the close, with a GitHub timestamp, never rewritten — verifiable commit by commit", "", "", ""],
     "LEAPS 窗口开启": ["LEAPS window opens", "", "", ""],
     "K < 1 信号": ["K < 1 signal", "", "", ""],
     "每次窗口都跟（持有 12 个月）": ["Follow every window (12-month hold)", "", "", ""],

@@ -1938,7 +1938,7 @@
         </form>
         <a class="ledger-verify" href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">
           <div class="lv-title">在 GitHub 验证台账</div>
-          <div class="lv-note">每个交易日的读数由管线自动提交，带时间戳，事后不可改写 —— 不用信我，去查</div>
+          <div class="lv-note">每个交易日的读数，每日收盘自动更新提交，带 GitHub 时间戳，事后不可改写，GitHub 精确可查</div>
         </a>
         </div>
       </div>`;
@@ -1977,7 +1977,7 @@
           <div class="senti-card">
             <div class="lc-name">纳指恐慌溢价 <span>VXN ÷ VIX</span></div>
             <div class="lc-val">${senti.vxn.current.toFixed(2)}</div>
-            <div class="lc-meta"><span>当前 VXN</span> <b>${senti.vxn.vxn.toFixed(1)}</b> · <span>全史百分位</span> <b>${senti.vxn.pctile.toFixed(0)}</b><br><span>越高 = 市场为纳指波动付的保费越贵</span></div>
+            <div class="lc-meta"><span class="nw"><span>当前 VXN</span> <b>${senti.vxn.vxn.toFixed(1)}</b></span> · <span class="nw"><span>全史百分位</span> <b>${senti.vxn.pctile.toFixed(0)}</b></span><br><span>越高 = 市场为纳指波动付的保费越贵</span></div>
           </div>` : ""}
           ${senti.skew ? `
           <div class="senti-card">
@@ -1989,7 +1989,7 @@
           <div class="senti-card">
             <div class="lc-name">市场广度 <span>标普成分股在 200 日均线上的占比</span></div>
             <div class="lc-val">${breadth.current.toFixed(0)}%</div>
-            <div class="lc-meta"><span>累积史百分位</span> <b>${breadth.pctile.toFixed(0)}</b> · <span>自</span> ${breadth.since}<br><span>越低 = 超卖越深，历史底部常见个位数</span></div>
+            <div class="lc-meta"><span class="nw"><span>累积史百分位</span> <b>${breadth.pctile.toFixed(0)}</b></span> · <span class="nw"><span>自</span> ${breadth.since}</span><br><span>越低 = 超卖越深，历史底部常见个位数</span></div>
           </div>` : ""}
           <div class="senti-card">
             <div class="lc-name">VIX 期限结构 <span>VIX ÷ VIX3M</span></div>
