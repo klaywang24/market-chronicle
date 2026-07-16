@@ -756,7 +756,11 @@ th.left { text-align: left; }
 }
 /* 「公司」列内容是 [logo]名称，文字被 logo 顶开 → 表头贴着列左边就比内容左 26px。
    给带 logo 的那列表头同量缩进。⚠️ 只作用于 .has-logo，别误伤「行业」（无 logo，本来就是齐的）。 */
-th.left.has-logo { padding-left: calc(var(--tbl-logo-size) + var(--tbl-logo-gap) + 10px); }
+/* 2026-07-16（用户定）：表头「公司」与 logo 共一条左边线——此前表头缩进 26px 去对齐"名字"，
+   结果 logo 凸在表头左边，左缘不齐。现在表头和 logo 同一 x（都比基础位置右移 8px 透气），
+   名字跟在 logo 后面向右展开。 */
+th.left.has-logo { padding-left: 18px; }
+td.left-col { padding-left: 18px; }
 /* 2026-07-16：持仓表「公司」「行业」两列改居中（用户要的是居中，不是「表头与内容对齐」——
    此前一轮把需求读成后者、改了 padding，所以他说「还是居左」）。
    居中后 has-logo 那条缩进反而会把表头推偏，故一并归零。 */
@@ -1104,6 +1108,8 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 .ledger-actions .ledger-sub {
   margin-top: 0; max-width: none;
   display: flex; flex-direction: column;
+  /* 2026-07-16（用户定）：与右侧验证框同款边框——此前左边裸着右边有框，一对盒子只有一半。 */
+  padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px;
 }
 .ledger-actions .ledger-sub .sub-note { margin-top: auto; }
 /* 验证框：跟随「轻量化」的语言——不做实心卡，只用边框圈出一个可点区域 */

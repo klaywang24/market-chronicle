@@ -1929,12 +1929,12 @@
              挪进页脚 = 从「我请你查」变成「你想查自己找」，那是两种人格。 -->
         <div class="ledger-actions">
         <form class="ledger-sub" action="https://buttondown.com/api/emails/embed-subscribe/klay24" method="post" target="_blank">
-          <div class="sub-title">每周一封：台账读数与市场状态</div>
+          <div class="sub-title">极端读数那天：台账读数与市场状态</div>
           <div class="sub-row">
             <input class="sub-input" type="email" name="email" required placeholder="you@email.com" aria-label="Email">
             <button class="sub-btn" type="submit">免费订阅</button>
           </div>
-          <div class="sub-note">免费 · 极端读数出现时加发一封 · 随时退订，不发广告</div>
+          <div class="sub-note">免费 · 由读数触发，不按日历 · 随时退订，不发广告</div>
         </form>
         <a class="ledger-verify" href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">
           <div class="lv-title">在 GitHub 验证台账</div>
