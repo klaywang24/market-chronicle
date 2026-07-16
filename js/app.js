@@ -1349,10 +1349,10 @@
     const d = await load(dsName);
     const tbl = document.getElementById(tableId);
     tbl.innerHTML =
-      '<tr><th>#</th><th>代码</th><th class="left has-logo">公司</th><th class="left center-col">行业</th><th>市值 ($B)</th><th>权重</th></tr>' +
+      '<tr><th>#</th><th>代码</th><th class="left center-col">公司</th><th class="left center-col">行业</th><th>市值 ($B)</th><th>权重</th></tr>' +
       d.rows.map((r, i) =>
         `<tr><td>${i + 1}</td><td>${r.ticker}</td>` +
-        `<td class="left-col">${tblLogo(r.ticker)}${r.name}</td>` +
+        `<td class="center-col"><span class="co-wrap">${tblLogo(r.ticker)}${r.name}</span></td>` +
         `<td class="center-col" style="font-family:'Noto Sans SC',sans-serif">${r.sector || "--"}</td>` +
         `<td>${r.mcap ? Math.round(r.mcap).toLocaleString("en-US") : "--"}</td>` +
         `<td class="k-min">${r.weight.toFixed(2)}%</td></tr>`).join("") +
@@ -1363,9 +1363,9 @@
     const d = await load(dsName);
     const hasAdded = d.rows[0] && d.rows[0].added !== undefined;
     document.getElementById(tableId).innerHTML =
-      `<tr><th>#</th><th>代码</th><th class="left has-logo">公司</th><th class="left center-col">${hasAdded ? "GICS 行业" : "行业"}</th>${hasAdded ? "<th>纳入日期</th>" : ""}</tr>` +
+      `<tr><th>#</th><th>代码</th><th class="left center-col">公司</th><th class="left center-col">${hasAdded ? "GICS 行业" : "行业"}</th>${hasAdded ? "<th>纳入日期</th>" : ""}</tr>` +
       d.rows.map((r, i) =>
-        `<tr><td>${i + 1}</td><td>${r.ticker}</td><td class="left-col">${tblLogo(r.ticker)}${r.name}</td>` +
+        `<tr><td>${i + 1}</td><td>${r.ticker}</td><td class="center-col"><span class="co-wrap">${tblLogo(r.ticker)}${r.name}</span></td>` +
         `<td class="center-col" style="font-family:'Noto Sans SC',sans-serif">${r.sector}</td>` +
         (hasAdded ? `<td>${r.added || "--"}</td>` : "") + "</tr>").join("");
   }
