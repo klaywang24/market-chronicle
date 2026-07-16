@@ -120,7 +120,7 @@
   // ---------------- 篮子板块配置（与 build_data.py 的 BASKETS 保持一致） ----------------
   const BASKET_CFG = {
     tech: {
-      anchorLabel: "QQQ 总览",
+      anchorLabel: "科技总览",   // 2026-07-16：原「QQQ 总览」名实不符——TSM 挂 NYSE，进不了纳斯达克 100，用站上自己那张 103 只成分股表一对就穿帮。这一栏的用途是「我盯的这些票」不是复刻指数，故改标题、留台积电（AI 硬件链最要紧的一环）。
       // ⚠️ 与 scripts/build_data.py 的 BASKETS["tech"] 必须同步；分组标签保持 ≤5 字
       //（.pill-group:only-child .pill-group-label 的 min-width:5.4em 按 5 字量的，超了就不对齐了）
       rows: [
@@ -1903,7 +1903,7 @@
             <div class="lc-name">最近战报 <span>按信号首日纳指 100 收盘价计</span></div>
             <div class="lc-row"><span class="lc-tag">K</span> <span class="lc-date">${lastK.start}</span> <span>至今</span> <b class="${lastK.fwd_to_date >= 0 ? "pos" : "neg"}">${fmt(lastK.fwd_to_date)}</b></div>
             <div class="lc-row"><span class="lc-tag">LEAPS</span> <span class="lc-date">${lastL.start}</span> <span>至今</span> <b class="${lastLRet >= 0 ? "pos" : "neg"}">${fmt(lastLRet)}</b></div>
-            <div class="lc-meta"><span>完整对账表见 K 指数与 LEAPS 窗口两页</span></div>
+            <div class="lc-meta"><span>每一次的逐条结果，见上方「K 指数 · 台账」与「恐惧的标价 · 台账」</span></div>
           </div>
         </div>
         <div class="ledger-charts">

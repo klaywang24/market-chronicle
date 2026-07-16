@@ -36,7 +36,7 @@
     "跌": ["down", "", "", ""],
     "最近战报": ["Latest entries", "", "", ""],
     "按信号首日纳指 100 收盘价计": ["returns from the Nasdaq-100 close on day one", "", "", ""],
-    "完整对账表见 K 指数与 LEAPS 窗口两页": ["Full ledgers on the KAPX Index and LEAPS Window pages", "", "", ""],
+    "每一次的逐条结果，见上方「K 指数 · 台账」与「恐惧的标价 · 台账」": ["Every entry, one by one — see the KAPX · Ledger and The Price of Fear · Ledger tabs above", "", "", ""],
     "官方定义：KAPX 指数（K 取自「恐」字拼音首字母）是 Market Chronicle 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。读数、方法论与完整信号台账永久免费公开，Git 时间戳可验证。": ["Canonical definition: The KAPX Index is a daily U.S. equity fear-pricing gauge published by Market Chronicle, computed as the CNN Fear & Greed reading divided by the VIX. The K stands for kǒng (恐), the Chinese character for fear; readings, methodology, and the complete signal ledger are permanently free and verifiable via Git timestamps.", "", "", ""],
     "十五年，每一次入场都标在这条线上": ["Fifteen years — every entry marked on this line", "", "", ""],
     "纳指 100（对数坐标）· 圆点 = LEAPS 窗口开启（2011 年起）· 菱形 = K < 1 信号（2011 年起）· 点任意标记看当次结果": ["Nasdaq-100 (log scale) · dots = LEAPS windows since 2011 · diamonds = K < 1 signals since 2011 · tap any marker for its outcome", "", "", ""],
@@ -289,7 +289,7 @@
     "QQQ 走势（月线 · 对数坐标）": ["QQQ (monthly · log scale)", "QQQ (mensuel · échelle log)", "QQQ (monatlich · log)", "QQQ (mensual · escala log)"],
     "QQQ 年度回报": ["QQQ annual returns", "QQQ — rendements annuels", "QQQ Jahresrenditen", "QQQ rendimientos anuales"],
     "QQQ 回撤曲线": ["QQQ drawdown curve", "QQQ — courbe de drawdown", "QQQ Drawdown-Kurve", "QQQ curva de caídas"],
-    "QQQ 总览": ["QQQ Overview", "Vue QQQ", "QQQ Übersicht", "Resumen QQQ"],
+    "科技总览": ["Tech Overview", "Vue tech", "Tech-Übersicht", "Resumen tecnología"],
     "QQQ 纳指 100": ["QQQ Nasdaq 100", "QQQ Nasdaq 100", "QQQ Nasdaq 100", "QQQ Nasdaq 100"],
     "九只成员自最晚上市者同一起跑线（Meta 2012 上市）；墨色粗线为等权组合。": [
       "All nine from the same start line, set by the latest IPO (Meta, 2012); the bold ink line is the equal-weight portfolio.",

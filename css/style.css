@@ -1242,8 +1242,11 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
   --bg-card-hover: #FAFAF6;
   --bg-deep: #EFEEE8;
   --border: #E5E3DB;
-  --ink-soft: #3F3A33;
-  --ink-muted: #6E675E;
+  /* 2026-07-16 加深一档：用户实测「不够黑」。基准 = --ink #1A1410（「46」那个大数）。
+     往 ink 靠但保住暖褐色相——纸感来自暖，不是来自淡（AI 味来自黄的饱和度，不是「暖」本身）。
+     浅色小字原 5.1:1（AA 刚过线，而它承载的是「示意口径」这类诚实声明）→ 现 ~7:1 追平暗色 */
+  --ink-soft: #2E2822;
+  --ink-muted: #554E45;
 }
 
 /* 定价 月/年 切换：两键等宽单行，「省 2 个月」放整个切换框下方 */
@@ -1265,9 +1268,9 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
   --bg-card: #1D1813;
   --bg-card-hover: #262019;
   --bg-deep: #0F0C08;
-  --ink: #F4EFE6;
-  --ink-soft: #DAD2C2;
-  --ink-muted: #A99B87;
+  --ink: #FAF7F1;
+  --ink-soft: #E8E2D4;
+  --ink-muted: #BDB09B;
   --border: #322A22;
   --grid: rgba(244, 239, 230, 0.07);
   --grid-strong: rgba(244, 239, 230, 0.15);
