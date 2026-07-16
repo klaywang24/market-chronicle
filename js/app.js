@@ -891,7 +891,7 @@
         <div class="note">${on ? "★ 金风玉露相逢 — 信号触发" : "未触发（K ≥ 1）"}</div>
       </div>
       <div class="stat"><div class="label">CNN 恐惧贪婪</div><div class="value">${cur.cnn.toFixed(0)}</div><div class="note">${cur.rating || ""}</div></div>
-      <div class="stat"><div class="label">VIX</div><div class="value">${cur.vix.toFixed(1)}</div><div class="note">K = CNN ÷ VIX</div></div>
+      <div class="stat"><div class="label">VIX</div><div class="value">${cur.vix.toFixed(1)}</div><div class="note">恐慌保险的价格 · K = CNN ÷ VIX</div></div>
       <div class="stat"><div class="label">最近一次信号</div><div class="value" style="font-size:18px">${last.start.replace(/-/g, "\u2011")}</div><div class="note">至今 ${pct(last.fwd_to_date)}</div></div>`;
 
     const tbl = document.getElementById("k-table");
@@ -2331,6 +2331,7 @@
             <div class="lg-big" style="color:${col}">${p3}<span>/100</span></div>
             <div class="lg-verdict" style="background:${col}">${verdict}</div>
             <div class="lg-numsub">VIX1Y 在过去 <b>3 年</b>的百分位（高=贵）</div>
+            <div class="lg-numsub">即：比过去三年 ${p3}% 的交易日都贵</div>
           </div>
           <div class="lg-right">
             <div class="lg-spectrum"><div class="lg-mark" style="left:${e.p3y}%"><span>${p3}</span></div></div>
@@ -2353,6 +2354,7 @@
           <div class="lg-bar"><div class="lg-col" style="height:${barH(t.vix6m)}%"></div><b>${t.vix6m.toFixed(1)}</b><span>6 月</span></div>
           <div class="lg-bar hi"><div class="lg-col" style="height:${barH(t.vix1y)}%"></div><b>${t.vix1y.toFixed(1)}</b><span>1 年 ★</span></div>
         </div>
+        <div class="lg-wnote">五根柱 = 给 5 个期限各开一份"保费"；买 LEAPS，付的是最右那根的价。</div>
       </div>
       <div class="senti-cards lg-ctx4">
         <div class="senti-card">
@@ -2363,7 +2365,7 @@
         <div class="senti-card">
           <div class="lc-name">期限结构 <span>VIX ÷ VIX1Y</span></div>
           <div class="lc-val">${t.ratio_vix_vix1y.toFixed(2)}</div>
-          <div class="lc-meta"><span>${inv ? "陡 contango · 长端更贵" : "倒挂 · 近端恐慌"}</span></div>
+          <div class="lc-meta"><span>${inv ? "越远越贵 · 保得久，保费高" : "倒挂 · 眼下比一年后还贵"}</span></div>
         </div>
         <div class="senti-card">
           <div class="lc-name">Call 偏斜 SKEW <span>看涨相对看跌</span></div>
@@ -2371,7 +2373,7 @@
           <div class="lc-meta"><span>分位 · 全史 · 值 ${x.call_skew.value.toFixed(0)}</span></div>
         </div>
         <div class="senti-card">
-          <div class="lc-name">实际利率 <span>10 年期</span></div>
+          <div class="lc-name">实际利率 <span>10 年期 · 资金压在仓里的成本</span></div>
           <div class="lc-val">${Math.round(x.real_rate.pctile_full)}</div>
           <div class="lc-meta"><span>分位 · 全史 · ${x.real_rate.value.toFixed(2)}%</span></div>
         </div>
