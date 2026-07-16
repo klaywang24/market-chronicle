@@ -198,7 +198,6 @@
     "关于我们": ["About us", "", "", ""],
     "联系我们": ["Contact us", "", "", ""],
     "定价与套餐": ["Pricing & plans", "", "", ""],
-    "上手指南": ["Getting started", "", "", ""],
     "数据 & API": ["Data & API", "", "", ""],
     // ---- 温度计 hero 新版式碎片 ----
     "VIX1Y 在过去": ["VIX1Y over the past", "", "", ""],
