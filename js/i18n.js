@@ -43,7 +43,6 @@
     "如果每次窗口都跟，这本账长这样": ["If you had followed every window, the ledger reads like this", "", "", ""],
     "窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；虚线为同期一直持有": ["Buy the Nasdaq-100 at each window's first close, hold 12 months, skip windows inside a holding period; dashed = buy and hold", "", "", ""],
     "示意口径：信号首日按收盘价入场，空仓期收益记零，不计成本与滑点。本站不宣称信号能跑赢买入持有：右图如实呈现了这一点；台账的价值在于告诉你「现在处于历史的哪个位置」。完整口径与如实披露见方法论。历史表现不预示未来，不构成投资建议。": ["Illustrative rules: enter at the close on a signal's first day; cash periods earn zero; no costs or slippage. This site does not claim the signals beat buy-and-hold: the right-hand chart shows exactly that. The ledger's value is telling you where today stands in history. Full rules and honest disclosure in the Methodology. Past performance does not predict future results; not investment advice.", "", "", ""],
-    "盘前数据简报 · 创始价 $9.9": ["Pre-market data digest · founding $9.9", "", "", ""],
     "方法论全文": ["Full methodology", "", "", ""],
     "每周一封：台账读数与市场状态": ["One email a week: ledger readings and market state", "", "", ""],
     "免费订阅": ["Subscribe free", "", "", ""],
@@ -136,6 +135,10 @@
     "消费": ["Consumer", "Consommation", "Konsum", "Consumo"],
     "奢侈品": ["Luxury", "Luxe", "Luxus", "Lujo"],
     "K 指数": ["KAPX", "KAPX", "KAPX", "KAPX"],
+    // 2026-07-16 顶栏改名（对外一直说「台账」，站上却没一处入口用这个词 = 命名不一致）。
+    // ⚠️ applyTo 按整节点精确匹配 D：改了 index.html 的 tab 文字就必须在这加新 key，否则 EN 下 fallback 成中文。
+    "K 指数 · 台账": ["KAPX · Ledger", "KAPX · Registre", "KAPX · Journal", "KAPX · Registro"],
+    "恐惧的标价 · 台账": ["The Price of Fear · Ledger", "Le prix de la peur · Registre", "Der Preis der Angst · Journal", "El precio del miedo · Registro"],
     "LEAPS 窗口": ["LEAPS Window", "Fenêtre LEAPS", "LEAPS-Fenster", "Ventana LEAPS"],
     "行情": ["Quotes", "Cours", "Kurse", "Cotización"],
     // ---- 恐惧的标价指数（LEAPS 贵贱温度计） ----

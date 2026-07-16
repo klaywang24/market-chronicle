@@ -1915,8 +1915,14 @@
             <div class="chart short" id="ch-ledger-eq"></div></div>
         </div>
         <p class="ledger-note">示意口径：信号首日按收盘价入场，空仓期收益记零，不计成本与滑点。本站不宣称信号能跑赢买入持有：右图如实呈现了这一点；台账的价值在于告诉你「现在处于历史的哪个位置」。完整口径与如实披露见方法论。历史表现不预示未来，不构成投资建议。</p>
+        <!-- 2026-07-16：删掉这里的付费 primary（原「盘前数据简报 · 创始价 $9.9」）。三个理由：
+             ① $9.9 是邮件预约制（方案 C 两扇门：陌生人自助 $29 / 信任者预约），在头版对所有人喊 9.9 = 那扇门不存在了；
+                且数字本身已过期（创始码 dsc_01kxjqmtb40e8bsy2zqtkqxk0e 是 $99/年 不是 $9.9/月）。
+             ② 净值曲线正上方挂付费 CTA = 观感就是「看我多准→掏钱」，而台账写着 K 策略跑输纳指。
+                改动词治不了，那是相邻性的问题（此前一直挂着的未决项，本次解决）。
+             ③ 读完台账的自然下一步是「验证」与「继续跟着看」，不是掏钱。掏钱的位置在定价页（页脚有入口）。
+             订阅框就在下方 145px，是这个位置唯一该有的动作，不需要再加锚点（且 #pulse-base 不是面板名，会打乱 hash 路由）。 -->
         <div class="ledger-cta">
-          <a class="lcta lcta-primary" href="#pricing">盘前数据简报 · 创始价 $9.9</a>
           <a class="lcta" href="#methodology">方法论全文</a>
           <a class="lcta" href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">在 GitHub 验证台账</a>
         </div>
