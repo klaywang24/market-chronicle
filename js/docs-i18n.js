@@ -380,7 +380,7 @@
     <div class="ptier-badge">Founding $9.9 · by email</div>
     <div class="ptier-name">Standard</div>
     <div class="ptier-price"><span class="p-m">$29<i class="u">/ mo</i></span><span class="p-y">$290<i class="u">/ yr</i></span></div>
-    <div class="ptier-tag"><span class="p-m">Founding <b>$9.9 / mo, billed $99 / yr</b> — locked for life (first 100) · by email</span><span class="p-y">≈ $24 / mo · annual = 10 months' price</span></div>
+    <div class="ptier-tag"><span class="p-m">Founding <b>$9.9 / mo, billed $99 / yr</b> — locked for life (first 50) · by email</span><span class="p-y">≈ $24 / mo · annual = 10 months' price</span></div>
     <ul class="ptier-list">
       <li><b>The daily reading</b> — never published on the site</li>
       <li><b>The reading archive</b> — filed daily, compounding</li>
