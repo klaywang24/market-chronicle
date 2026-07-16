@@ -320,7 +320,10 @@
     const nameOf = Object.fromEntries(cfg.members);
     const pill = (t) => {
       const s = safeTicker(t);
-      return `<a class="pill ${cur === s ? "active" : ""}" href="#${basket}/${s}">${t.split(".")[0]} <span class="zh">${nameOf[t]}</span></a>`;
+      const code = t.split(".")[0];
+      // 中文名与代码相同时（AMD / TJX 这类没有通行中文名的）不重复渲染，否则胶囊显示成「AMD AMD」
+      const zh = nameOf[t] === code ? "" : ` <span class="zh">${nameOf[t]}</span>`;
+      return `<a class="pill ${cur === s ? "active" : ""}" href="#${basket}/${s}">${code}${zh}</a>`;
     };
     const group = ([label, ticks]) =>
       `<span class="pill-group"><span class="pill-group-label">${label}</span>${ticks.map(pill).join("")}</span>`;
@@ -362,7 +365,8 @@
       <div class="stock-hero">
         <div class="kicker">${basket.toUpperCase()} · ${ticker}</div>
         <h1><img class="stock-logo" data-t="${ticker}" src="logos/${safeTicker(ticker)}.png"
-             referrerpolicy="no-referrer" onerror="__logoErr(this)" alt="">${name}<span class="ticker">${ticker}</span></h1>
+             referrerpolicy="no-referrer" onerror="__logoErr(this)" alt="">${name}${
+             name === ticker.split(".")[0] ? "" : `<span class="ticker">${ticker}</span>`}</h1>
         <div class="stat-strip" id="${basket}-sd-stats"></div>
       </div>
       <div class="chapter">
@@ -449,7 +453,14 @@
     // 关键数据条
     load(basket + "_table").then((d) => {
       const r = d.rows.find((x) => x.ticker === ticker);
-      if (!r) return;
+      // 新成员上线当天：app.js 带 ?v= 会立刻更新、data JSON 不带（sw 是 stale-while-revalidate），
+      // 于是回访者第一次点新票时表里还没有它的行。别静默留白——说清楚，下次刷新就好了。
+      if (!r) {
+        document.getElementById(basket + "-sd-stats").innerHTML =
+          '<div class="stat"><div class="label">关键数据</div><div class="value" style="font-size:14px">' +
+          '数据更新中，刷新后出现 · data updating</div></div>';
+        return;
+      }
       const f = (v) => v == null ? "--" : (v > 0 ? "+" : "") + v.toFixed(1) + "%";
       const cls = (v) => v == null ? "" : v >= 0 ? "pos" : "neg";
       const totalPct = r.total_mult ? ((r.total_mult - 1) * 100).toLocaleString("en-US", { maximumFractionDigits: 0 }) : null;
