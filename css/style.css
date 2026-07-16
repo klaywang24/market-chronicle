@@ -1003,10 +1003,15 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 }
 
 /* 台账订阅框（Buttondown） */
-.ledger-sub {
-  margin-top: 18px; padding: 16px 18px; max-width: 520px;
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+/* 2026-07-16：台账区收尾 = 两个等宽同高的框并排。左=订阅（该位置唯一该有的动作），
+   右=验证（净值曲线的解药，不能挪进页脚——它的价值不是被点击，是它存在）。
+   ⚠️ 样式定义放在 :1093「订阅框轻量化」之后（见下），否则会被那条既有设计盖掉——
+      那条是刻意去卡片感的，不该推翻，所以两个框都跟着它走：透明底 + 只用边框区分。 */
+.ledger-actions {
+  margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr;
+  gap: 14px; align-items: stretch;
 }
+@media (max-width: 900px) { .ledger-actions { grid-template-columns: 1fr; } }
 .sub-title { font-size: 13.5px; font-weight: 600; color: var(--ink-soft); margin-bottom: 10px; }
 .sub-row { display: flex; gap: 8px; }
 .sub-input {
@@ -1076,6 +1081,24 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 .ledger-sub .sub-input { padding: 7px 10px; font-size: 12px; }
 .ledger-sub .sub-btn { padding: 7px 14px; font-size: 12.5px; }
 .ledger-sub .sub-note { margin-top: 6px; font-size: 10.5px; }
+
+/* 2026-07-16：并排后订阅框不能再限宽 400（那是它独占一行时的宽度）；两框等高靠 flex 吸底。
+   ⚠️ 必须写在上面那组「轻量化」之后 —— 同特异性下后者胜，写在前面会被静默盖掉（今天踩过一次）。 */
+.ledger-actions .ledger-sub {
+  margin-top: 0; max-width: none;
+  display: flex; flex-direction: column;
+}
+.ledger-actions .ledger-sub .sub-note { margin-top: auto; }
+/* 验证框：跟随「轻量化」的语言——不做实心卡，只用边框圈出一个可点区域 */
+.ledger-verify {
+  padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px;
+  background: transparent; text-decoration: none;
+  display: flex; flex-direction: column; transition: border-color .18s ease;
+}
+.ledger-verify:hover { border-color: var(--accent); }
+.lv-title { font-size: 12.5px; font-weight: 500; color: var(--ink-soft); margin-bottom: 7px; }
+.ledger-verify:hover .lv-title { color: var(--accent); }
+.lv-note { font-size: 10.5px; color: var(--ink-muted); line-height: 1.65; margin-top: auto; }
 
 /* 头版顶部再收紧一档 */
 #panel-pulse .pulse-layer { padding-top: 14px; }

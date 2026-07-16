@@ -1922,10 +1922,12 @@
                 改动词治不了，那是相邻性的问题（此前一直挂着的未决项，本次解决）。
              ③ 读完台账的自然下一步是「验证」与「继续跟着看」，不是掏钱。掏钱的位置在定价页（页脚有入口）。
              订阅框就在下方 145px，是这个位置唯一该有的动作，不需要再加锚点（且 #pulse-base 不是面板名，会打乱 hash 路由）。 -->
-        <div class="ledger-cta">
-          <a class="lcta" href="#methodology">方法论全文</a>
-          <a class="lcta" href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">在 GitHub 验证台账</a>
-        </div>
+        <!-- 「方法论全文」已删：正上方 .ledger-note 那句已经写着「完整口径与如实披露见方法论」，
+             隔 20px 再放个按钮是同一件事说两遍；页脚也有。
+             「在 GitHub 验证台账」留下且不进页脚：它是净值曲线的解药——上面那句「本站不宣称信号能跑赢买入持有」
+             之后，把可验证的链接就摆在这里，本身就是可信度。它的价值不是被点击，是它存在。
+             挪进页脚 = 从「我请你查」变成「你想查自己找」，那是两种人格。 -->
+        <div class="ledger-actions">
         <form class="ledger-sub" action="https://buttondown.com/api/emails/embed-subscribe/klay24" method="post" target="_blank">
           <div class="sub-title">每周一封：台账读数与市场状态</div>
           <div class="sub-row">
@@ -1934,6 +1936,11 @@
           </div>
           <div class="sub-note">免费 · 极端读数出现时加发一封 · 随时退订，不发广告</div>
         </form>
+        <a class="ledger-verify" href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">
+          <div class="lv-title">在 GitHub 验证台账</div>
+          <div class="lv-note">每个交易日的读数由管线自动提交，带时间戳，事后不可改写 —— 不用信我，去查</div>
+        </a>
+        </div>
       </div>`;
     }
 
@@ -1994,7 +2001,7 @@
               <div><span>3月</span><b>${t.vix3m.toFixed(1)}</b></div>
               <div><span>6月</span><b>${t.vix6m.toFixed(1)}</b></div>
             </div>
-            <div class="lc-meta"><span>比值 2011 年来百分位</span> <b>${t.pctile.toFixed(0)}</b> · <span>大于 1 = 倒挂 = 历史级恐慌</span></div>
+            <div class="lc-meta"><span>比值 2011 年来百分位</span> <b>${t.pctile.toFixed(0)}</b><br><span>大于 1 = 倒挂 = 历史级恐慌</span></div>
           </div>
           <div class="senti-card">
             <div class="lc-name">恐贪指数的七个分量 <span>CNN 官方口径</span></div>
