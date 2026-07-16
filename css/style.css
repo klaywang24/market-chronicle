@@ -1019,7 +1019,7 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 
 /* 情绪仪表盘 */
 .pulse-senti { margin: 26px 0 6px; }
-.senti-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.senti-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: start; }  /* align-items:start：别把矮卡(市场广度)拉到和期限结构/恐贪七分量一样高 */
 .senti-card {
   padding: 16px 18px; background: var(--bg-card);
   border: 1px solid var(--border); border-radius: 10px;
@@ -1041,8 +1041,13 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 @media (max-width: 900px) { .ledger-card .lc-val { font-size: 36px; } }
 
 /* 情绪仪表盘二轮：数字居中放大 + 期限结构四值网格 */
+/* 2026-07-16：原来只有 lc-val 居中，标题左对齐 → 一张卡里两套轴，视觉是歪的。三处统一居中。 */
+.senti-card { display: flex; flex-direction: column; text-align: center; }
+.senti-card .lc-name { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.senti-card .lc-name span { margin-left: 0; }
 .senti-card .lc-val { text-align: center; font-size: 38px; margin: 10px 0 4px; }
 .senti-card .lc-state { text-align: center; }
+.senti-card .lc-meta { margin-top: auto; }   /* 脚注吸底：同行卡被最高的那张拉高时，空白落在数字与脚注之间而不是卡底 */
 .term-grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
   margin: 10px 0 10px; text-align: center;
@@ -1188,7 +1193,7 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 .footer-colgroup { display: flex; gap: 46px; flex-wrap: wrap; }
 .footer-col { display: flex; flex-direction: column; gap: 9px; }
 .footer-col-h { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); margin-bottom: 5px; font-family: 'JetBrains Mono', monospace; }
-.footer-col a { font-size: 13px; color: var(--ink-muted); text-decoration: none; }
+.footer-col a { font-size: 13px; color: var(--ink-soft); text-decoration: none; }  /* 2026-07-16：页脚是全站通往定价页的唯一入口=次级导航不是装饰，muted→soft */
 .footer-col a:hover { color: var(--accent); }
 @media (max-width: 720px) { .footer-main { gap: 28px; } .footer-colgroup { gap: 30px; } }
 
