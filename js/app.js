@@ -1172,10 +1172,10 @@
       `<td class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(1)}${suffix}</td>`;
     const tbl = document.getElementById(tableId);
     tbl.innerHTML =
-      '<tr><th>代码</th><th class="left">名称</th><th>市值 ($B)</th><th>YTD</th><th>1年</th><th>3年年化</th><th>5年年化</th><th>10年年化</th><th>共同起点年化</th><th>最大回撤</th></tr>' +
+      '<tr><th>代码</th><th class="left center-col">名称</th><th>市值 ($B)</th><th>YTD</th><th>1年</th><th>3年年化</th><th>5年年化</th><th>10年年化</th><th>共同起点年化</th><th>最大回撤</th></tr>' +
       d.rows.map((r) =>
         `<tr class="clickable" data-hash="#${prefix}/${r.safe}"><td>${r.ticker}</td>` +
-        `<td style="text-align:left">${tblLogo(r.ticker)}${r.name}</td>` +
+        `<td class="center-col">${tblLogo(r.ticker)}${r.name}</td>` +
         `<td>${r.mcap ? Math.round(r.mcap).toLocaleString("en-US") : "--"}</td>` +
         c(r.ytd, "%") + c(r.y1, "%") + c(r.y3, "%") + c(r.y5, "%") + c(r.y10, "%") + c(r.since, "%") +
         `<td class="neg">${r.max_dd}%</td></tr>`
@@ -1349,11 +1349,11 @@
     const d = await load(dsName);
     const tbl = document.getElementById(tableId);
     tbl.innerHTML =
-      '<tr><th>#</th><th>代码</th><th class="left has-logo">公司</th><th class="left">行业</th><th>市值 ($B)</th><th>权重</th></tr>' +
+      '<tr><th>#</th><th>代码</th><th class="left has-logo center-col">公司</th><th class="left center-col">行业</th><th>市值 ($B)</th><th>权重</th></tr>' +
       d.rows.map((r, i) =>
         `<tr><td>${i + 1}</td><td>${r.ticker}</td>` +
-        `<td style="text-align:left">${tblLogo(r.ticker)}${r.name}</td>` +
-        `<td style="text-align:left;font-family:'Noto Sans SC',sans-serif">${r.sector || "--"}</td>` +
+        `<td class="center-col">${tblLogo(r.ticker)}${r.name}</td>` +
+        `<td class="center-col" style="font-family:'Noto Sans SC',sans-serif">${r.sector || "--"}</td>` +
         `<td>${r.mcap ? Math.round(r.mcap).toLocaleString("en-US") : "--"}</td>` +
         `<td class="k-min">${r.weight.toFixed(2)}%</td></tr>`).join("") +
       (d.asof ? `<tr><td colspan="6" style="text-align:left;color:var(--ink-muted)">数据截至 ${d.asof} · ${d.source}</td></tr>` : "");
@@ -1363,10 +1363,10 @@
     const d = await load(dsName);
     const hasAdded = d.rows[0] && d.rows[0].added !== undefined;
     document.getElementById(tableId).innerHTML =
-      `<tr><th>#</th><th>代码</th><th class="left has-logo">公司</th><th class="left">${hasAdded ? "GICS 行业" : "行业"}</th>${hasAdded ? "<th>纳入日期</th>" : ""}</tr>` +
+      `<tr><th>#</th><th>代码</th><th class="left has-logo center-col">公司</th><th class="left center-col">${hasAdded ? "GICS 行业" : "行业"}</th>${hasAdded ? "<th>纳入日期</th>" : ""}</tr>` +
       d.rows.map((r, i) =>
-        `<tr><td>${i + 1}</td><td>${r.ticker}</td><td style="text-align:left">${tblLogo(r.ticker)}${r.name}</td>` +
-        `<td style="text-align:left;font-family:'Noto Sans SC',sans-serif">${r.sector}</td>` +
+        `<tr><td>${i + 1}</td><td>${r.ticker}</td><td class="center-col">${tblLogo(r.ticker)}${r.name}</td>` +
+        `<td class="center-col" style="font-family:'Noto Sans SC',sans-serif">${r.sector}</td>` +
         (hasAdded ? `<td>${r.added || "--"}</td>` : "") + "</tr>").join("");
   }
 
@@ -1428,7 +1428,7 @@
         ["远期 PE (SPY 口径)", fwd ? fwd.toFixed(1) : "--", fwd ? "" : "免费源暂缺，参考 TTM", false],
         ["三条中位数锚", `${st.medAll.toFixed(0)} / ${st.med50.toFixed(0)} / ${st.med2010.toFixed(1)}`, "全历史 / 近50年 / 2010→", false],
       ].map(([l, v, n, hot]) =>
-        `<div class="stat ${hot ? "signal-on" : ""}"><div class="label">${l}</div><div class="value">${v}</div><div class="note">${n}</div></div>`).join("");
+        `<div class="stat ${hot ? "signal-on" : ""} ${String(v).length > 8 ? "compact" : ""}"><div class="label">${l}</div><div class="value">${v}</div><div class="note">${n}</div></div>`).join("");
       document.getElementById("spy-val-note").textContent =
         `口径说明：PE(TTM) 与 CAPE 来自 multpl/席勒月度数据（${st.since} 年起），百分位为当前值在全部历史读数中的位置；` +
         `三条中位数是三个不同时代的"估值重力"——离哪条锚越远，弹性拉得越满。数据截至 ${st.asof}。`;

@@ -253,6 +253,9 @@ html:not([lang^="zh"]) .lang-switch { font-size: 11.5px; padding: 3px 8px; }
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 14px 18px;
+  /* 2026-07-16：与 .senti-card / .ledger-card 对齐——此前 .stat 三行左对齐，
+     而隔壁卡片已居中 = 同一页两套轴。居中后标题/数字/副注同一条中线。 */
+  text-align: center;
 }
 .stat .label { font-size: 12px; color: var(--ink-muted); letter-spacing: 0.06em; }
 .stat .value {
@@ -261,6 +264,9 @@ html:not([lang^="zh"]) .lang-switch { font-size: 11.5px; padding: 3px 8px; }
   font-weight: 700;
   margin-top: 2px;
 }
+/* 2026-07-16：多段读数（如三条中位数锚「15 / 19 / 22.4」）在 26px 下会折成两行，
+   把一个读数劈成两半。宁可小一号也不折：缩到 20px + nowrap。用在 app.js 里给该卡加 .compact。 */
+.stat.compact .value { font-size: 20px; white-space: nowrap; }
 .stat .note { font-size: 12px; color: var(--ink-muted); }
 .stat.signal-on { border-color: var(--accent); background: var(--accent-soft); }
 .stat.signal-on .value { color: var(--accent-deep); }
@@ -751,6 +757,11 @@ th.left { text-align: left; }
 /* 「公司」列内容是 [logo]名称，文字被 logo 顶开 → 表头贴着列左边就比内容左 26px。
    给带 logo 的那列表头同量缩进。⚠️ 只作用于 .has-logo，别误伤「行业」（无 logo，本来就是齐的）。 */
 th.left.has-logo { padding-left: calc(var(--tbl-logo-size) + var(--tbl-logo-gap) + 10px); }
+/* 2026-07-16：持仓表「公司」「行业」两列改居中（用户要的是居中，不是「表头与内容对齐」——
+   此前一轮把需求读成后者、改了 padding，所以他说「还是居左」）。
+   居中后 has-logo 那条缩进反而会把表头推偏，故一并归零。 */
+th.left.center-col, td.center-col { text-align: center; }
+th.left.has-logo.center-col { padding-left: 0; }
 .table-scroll th { position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
 .stock-logo {
   width: 46px;
@@ -1101,7 +1112,10 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 .ledger-verify:hover { border-color: var(--accent); }
 .lv-title { font-size: 12.5px; font-weight: 500; color: var(--ink-soft); margin-bottom: 7px; }
 .ledger-verify:hover .lv-title { color: var(--accent); }
-.lv-note { font-size: 10.5px; color: var(--ink-muted); line-height: 1.65; margin-top: auto; }
+/* keep-all：中文默认可在任意字之间断行，「GitHub 精确可查」被拆成「…精确可」/「查」。
+   不用 <span class="nw"> 包——applyTo 按整文本节点精确匹配 i18n 的 D key，插标签即失配、EN 会 fallback 成中文。
+   keep-all 让中文串整体不可断，只在「，」与空格处换行：零 HTML 改动、零 i18n 风险。 */
+.lv-note { font-size: 10.5px; color: var(--ink-muted); line-height: 1.65; margin-top: auto; word-break: keep-all; }
 
 /* 头版顶部再收紧一档 */
 #panel-pulse .pulse-layer { padding-top: 14px; }
@@ -1301,6 +1315,18 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 .lg-bars { height: 150px; gap: 18px; }
 .lg-bar .lg-col { max-width: 42px; transition: height 0.4s cubic-bezier(0.2, 0.7, 0.3, 1); }
 .lg-ctx4 .senti-card { text-align: center; }
+/* 2026-07-16：四个 context 读数原为默认墨色，视觉上像四段死数字。
+   改为猩红家族由浅到深（左→右）。⚠️ 这是纯视觉层级，不编码任何含义——
+   四项单位互不相同、方向也不同向（注册文档：相关 −0.47，故「只展示、不平均进头条」），
+   深浅绝不可被读成「越右越危险」。 */
+.lg-ctx4 .senti-card:nth-child(1) .lc-val { color: #E8735A; }
+.lg-ctx4 .senti-card:nth-child(2) .lc-val { color: #E04E2E; }
+.lg-ctx4 .senti-card:nth-child(3) .lc-val { color: #C8341A; }
+.lg-ctx4 .senti-card:nth-child(4) .lc-val { color: #A0392F; }
+.dark-mode .lg-ctx4 .senti-card:nth-child(1) .lc-val { color: #FF9A82; }
+.dark-mode .lg-ctx4 .senti-card:nth-child(2) .lc-val { color: #FF7052; }
+.dark-mode .lg-ctx4 .senti-card:nth-child(3) .lc-val { color: #F2503A; }
+.dark-mode .lg-ctx4 .senti-card:nth-child(4) .lc-val { color: #D45D4F; }
 .lg-ctx4 .lc-name span { display: block; margin-top: 2px; }
 
 /* ================= 设计精修 · Apple / Revolut 取向 ================= */

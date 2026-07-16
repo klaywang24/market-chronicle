@@ -677,7 +677,7 @@
       "Jours consécutifs < 25 = une fenêtre. Rendements S&P 500 et NDX à 6/12/18 mois.",
       "Folgetage < 25 = ein Fenster. S&P-500- und NDX-Renditen nach 6/12/18 Monaten.",
       "Días consecutivos < 25 = una ventana. Rendimientos del S&P 500 y NDX a 6/12/18 meses."],
-    "K 指数 = CNN 恐惧贪婪指数 ÷ VIX。当恐惧（CNN 走低）与波动（VIX 走高）交叉，K 跌破 1 —— 多是纳指 100 深度回调、情绪触底的时刻。2011 年以来逐次对账，赢的和输的都在账上。": [
+    "K 指数 = CNN 恐惧贪婪指数 ÷ VIX。当恐惧（CNN 走低）与波动（VIX 走高）交叉，K 跌破 1：多是纳指 100 深度回调、情绪触底的时刻。2011 年以来逐次对账，赢的和输的都在账上。": [
       "KAPX Index = CNN Fear & Greed ÷ VIX. When fear (CNN falling) crosses volatility (VIX rising), K breaks below 1 — most often at moments of deep NDX correction and capitulation. Audited signal by signal since 2011, wins and losses alike.",
       "Indice KAPX = CNN ÷ VIX. Quand K passe sous 1 — le plus souvent lors de fortes corrections du NDX. Audité un par un depuis 2011, gains comme pertes.",
       "KAPX Index = CNN ÷ VIX. Fällt K unter 1 — meist bei tiefen NDX-Korrekturen. Signal für Signal seit 2011 geprüft, Gewinne wie Verluste.",
