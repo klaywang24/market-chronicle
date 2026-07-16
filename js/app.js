@@ -892,7 +892,7 @@
       </div>
       <div class="stat"><div class="label">CNN 恐惧贪婪</div><div class="value">${cur.cnn.toFixed(0)}</div><div class="note">${cur.rating || ""}</div></div>
       <div class="stat"><div class="label">VIX</div><div class="value">${cur.vix.toFixed(1)}</div><div class="note">K = CNN ÷ VIX</div></div>
-      <div class="stat"><div class="label">最近一次信号</div><div class="value" style="font-size:18px">${last.start}</div><div class="note">至今 ${pct(last.fwd_to_date)}</div></div>`;
+      <div class="stat"><div class="label">最近一次信号</div><div class="value" style="font-size:18px">${last.start.replace(/-/g, "\u2011")}</div><div class="note">至今 ${pct(last.fwd_to_date)}</div></div>`;
 
     const tbl = document.getElementById("k-table");
     const cell = (v) => v == null ? "<td>--</td>" :
@@ -2218,13 +2218,13 @@
     const last = d.episodes[d.episodes.length - 1];
     document.getElementById("leaps-status").innerHTML = `
       <div class="stat ${cur.window_open ? "signal-on" : ""}">
-        <div class="label">今日 CNN 恐贪（${cur.date}）</div>
+        <div class="label">今日 CNN 恐贪（${cur.date.replace(/-/g, "\u2011")}）</div>
         <div class="value">${cur.fng.toFixed(0)}</div>
         <div class="note">${cur.window_open ? "极端恐惧区（&lt; 25）" : "常态（≥ 25）"}</div>
       </div>
       <div class="stat"><div class="label">极端恐惧线</div><div class="value">&lt; ${d.threshold}</div><div class="note">${cur.rating || "历史参照"}</div></div>
       <div class="stat"><div class="label">2011 年来极端恐惧</div><div class="value">${d.episodes.length} 段</div><div class="note">连续交易日聚为一段</div></div>
-      <div class="stat"><div class="label">最近一次</div><div class="value" style="font-size:18px">${last.start}</div><div class="note">NDX 至今 ${last.ndx_to_date > 0 ? "+" : ""}${last.ndx_to_date}%</div></div>`;
+      <div class="stat"><div class="label">最近一次</div><div class="value" style="font-size:18px">${last.start.replace(/-/g, "\u2011")}</div><div class="note">NDX 至今 ${last.ndx_to_date > 0 ? "+" : ""}${last.ndx_to_date}%</div></div>`;
 
     const cell = (v) => v == null ? "<td>--</td>" :
       `<td class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(1)}%</td>`;
