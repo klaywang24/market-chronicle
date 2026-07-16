@@ -568,6 +568,15 @@ html:not([lang^="zh"]) .breadth-bar div { min-width: 62px; }
   letter-spacing: 0.08em;
   white-space: nowrap;
 }
+/* 单组行（科技=半导体/平台·软件/硬件·终端）：标签字数不等（3 字 38.88px vs 5 字 64.8px），
+   胶囊紧跟标签排 → 各行首个胶囊左边缘差 25.92px，肉眼可见的错位。给标签一个最小宽度对齐。
+   用 em 而非 px：手机端 font-size 降到 11px 时按比例缩，不写死。
+   :only-child 精确限定到单组行——金融前三行是双组（第二组本就无法对齐，加了只是白填空隙），
+   金融第四行「加密·稳定币」77.77px 已超过此值、自动无效。改标签字数前先量一次宽度。
+   ⚠️ flex-shrink:0 必须留着：flex 项默认 min-width:auto(=不小于内容)本来在防压缩，
+   一旦写死 min-width 就顶掉了这层保护，长标签会被压到 5.4em 把字挤出去
+   （手机端「加密·稳定币」实测 clientW 59 < scrollW 71 = 已溢出，加此行才修好）。 */
+.pill-group:only-child .pill-group-label { min-width: 5.4em; flex-shrink: 0; }
 .subnav .pill { font-size: 12.5px; padding: 3px 12px; }
 /* 两行分组布局：锚胶囊纵跨两行 + 右侧行容器 */
 .subnav .pill-anchor {
