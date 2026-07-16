@@ -761,7 +761,10 @@ th.left.has-logo { padding-left: calc(var(--tbl-logo-size) + var(--tbl-logo-gap)
    此前一轮把需求读成后者、改了 padding，所以他说「还是居左」）。
    居中后 has-logo 那条缩进反而会把表头推偏，故一并归零。 */
 th.left.center-col, td.center-col { text-align: center; }
-th.left.has-logo.center-col { padding-left: 0; }
+/* 2026-07-16：带 logo 的列不能居中——名字长短不一会让 logo 上下参差。
+   左对齐让 logo 排成一条竖线、名字向右展开；表头靠 th.left.has-logo 的同量缩进与名字对齐。
+   只有「行业」这种等长文本的列才用 center-col。 */
+td.left-col { text-align: left; }
 .table-scroll th { position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
 .stock-logo {
   width: 46px;

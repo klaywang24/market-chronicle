@@ -394,7 +394,7 @@
   <div class="ptier t-pro">
     <div class="ptier-name">Pro</div>
     <div class="ptier-price"><span class="p-m">$99<i class="u">/ mo</i></span><span class="p-y">$990<i class="u">/ yr</i></span></div>
-    <div class="ptier-tag"><span class="p-m">Heavy individual · data autonomy</span><span class="p-y">≈ $82.5 / mo · annual = 10 months' price</span></div>
+    <div class="ptier-tag"><span class="p-m">For professionals · data autonomy</span><span class="p-y">≈ $82.5 / mo · annual = 10 months' price</span></div>
     <ul class="ptier-list">
       <li>Everything in Standard</li>
       <li>CSV / data export + full-history downloads</li>

@@ -886,7 +886,7 @@
     const el = document.getElementById("k-status");
     el.innerHTML = `
       <div class="stat ${on ? "signal-on" : ""}">
-        <div class="label">今日 K 指数（${cur.date}）</div>
+        <div class="label">今日 K 指数（${cur.date.replace(/-/g, "\u2011")}）</div>
         <div class="value">${cur.k.toFixed(2)}</div>
         <div class="note">${on ? "★ 金风玉露相逢 — 信号触发" : "未触发（K ≥ 1）"}</div>
       </div>
@@ -1172,10 +1172,10 @@
       `<td class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(1)}${suffix}</td>`;
     const tbl = document.getElementById(tableId);
     tbl.innerHTML =
-      '<tr><th>代码</th><th class="left center-col">名称</th><th>市值 ($B)</th><th>YTD</th><th>1年</th><th>3年年化</th><th>5年年化</th><th>10年年化</th><th>共同起点年化</th><th>最大回撤</th></tr>' +
+      '<tr><th>代码</th><th class="left has-logo">名称</th><th>市值 ($B)</th><th>YTD</th><th>1年</th><th>3年年化</th><th>5年年化</th><th>10年年化</th><th>共同起点年化</th><th>最大回撤</th></tr>' +
       d.rows.map((r) =>
         `<tr class="clickable" data-hash="#${prefix}/${r.safe}"><td>${r.ticker}</td>` +
-        `<td class="center-col">${tblLogo(r.ticker)}${r.name}</td>` +
+        `<td class="left-col">${tblLogo(r.ticker)}${r.name}</td>` +
         `<td>${r.mcap ? Math.round(r.mcap).toLocaleString("en-US") : "--"}</td>` +
         c(r.ytd, "%") + c(r.y1, "%") + c(r.y3, "%") + c(r.y5, "%") + c(r.y10, "%") + c(r.since, "%") +
         `<td class="neg">${r.max_dd}%</td></tr>`
@@ -1349,10 +1349,10 @@
     const d = await load(dsName);
     const tbl = document.getElementById(tableId);
     tbl.innerHTML =
-      '<tr><th>#</th><th>代码</th><th class="left has-logo center-col">公司</th><th class="left center-col">行业</th><th>市值 ($B)</th><th>权重</th></tr>' +
+      '<tr><th>#</th><th>代码</th><th class="left has-logo">公司</th><th class="left center-col">行业</th><th>市值 ($B)</th><th>权重</th></tr>' +
       d.rows.map((r, i) =>
         `<tr><td>${i + 1}</td><td>${r.ticker}</td>` +
-        `<td class="center-col">${tblLogo(r.ticker)}${r.name}</td>` +
+        `<td class="left-col">${tblLogo(r.ticker)}${r.name}</td>` +
         `<td class="center-col" style="font-family:'Noto Sans SC',sans-serif">${r.sector || "--"}</td>` +
         `<td>${r.mcap ? Math.round(r.mcap).toLocaleString("en-US") : "--"}</td>` +
         `<td class="k-min">${r.weight.toFixed(2)}%</td></tr>`).join("") +
@@ -1363,9 +1363,9 @@
     const d = await load(dsName);
     const hasAdded = d.rows[0] && d.rows[0].added !== undefined;
     document.getElementById(tableId).innerHTML =
-      `<tr><th>#</th><th>代码</th><th class="left has-logo center-col">公司</th><th class="left center-col">${hasAdded ? "GICS 行业" : "行业"}</th>${hasAdded ? "<th>纳入日期</th>" : ""}</tr>` +
+      `<tr><th>#</th><th>代码</th><th class="left has-logo">公司</th><th class="left center-col">${hasAdded ? "GICS 行业" : "行业"}</th>${hasAdded ? "<th>纳入日期</th>" : ""}</tr>` +
       d.rows.map((r, i) =>
-        `<tr><td>${i + 1}</td><td>${r.ticker}</td><td class="center-col">${tblLogo(r.ticker)}${r.name}</td>` +
+        `<tr><td>${i + 1}</td><td>${r.ticker}</td><td class="left-col">${tblLogo(r.ticker)}${r.name}</td>` +
         `<td class="center-col" style="font-family:'Noto Sans SC',sans-serif">${r.sector}</td>` +
         (hasAdded ? `<td>${r.added || "--"}</td>` : "") + "</tr>").join("");
   }
