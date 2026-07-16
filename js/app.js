@@ -121,12 +121,16 @@
   const BASKET_CFG = {
     tech: {
       anchorLabel: "QQQ 总览",
+      // ⚠️ 与 scripts/build_data.py 的 BASKETS["tech"] 必须同步；分组标签保持 ≤5 字
+      //（.pill-group:only-child .pill-group-label 的 min-width:5.4em 按 5 字量的，超了就不对齐了）
       rows: [
-        [["半导体", ["NVDA", "AVGO", "TSM"]]],
+        [["半导体", ["NVDA", "AVGO", "TSM", "AMD"]]],
+        [["存储", ["MU", "SNDK"]]],
         [["平台·软件", ["MSFT", "GOOGL", "META", "AMZN"]]],
         [["硬件·终端", ["AAPL", "TSLA"]]],
       ],
-      members: [["NVDA", "英伟达"], ["AVGO", "博通"], ["TSM", "台积电"],
+      members: [["NVDA", "英伟达"], ["AVGO", "博通"], ["TSM", "台积电"], ["AMD", "AMD"],
+                ["MU", "美光"], ["SNDK", "闪迪"],
                 ["MSFT", "微软"], ["GOOGL", "谷歌"], ["META", "Meta"], ["AMZN", "亚马逊"],
                 ["AAPL", "苹果"], ["TSLA", "特斯拉"]],
     },
