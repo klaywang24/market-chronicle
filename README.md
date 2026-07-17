@@ -75,9 +75,7 @@ python3 -m http.server 8137           # open http://localhost:8137
 
 ## Credits
 
-Chapter-style catalog inspired by [historyofmarket.com](https://historyofmarket.com/);
-static-JSON architecture inspired by [Big Picture](https://laoqianritan-create.github.io/us-market/);
-LEAPS window concept via [feargreedindex.vercel.app](https://feargreedindex.vercel.app/).
+Static-JSON architecture inspired by [Big Picture](https://laoqianritan-create.github.io/us-market/).
 
 ## Disclaimer
 
