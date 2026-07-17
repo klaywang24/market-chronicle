@@ -1133,3 +1133,12 @@ pulse 页 EN 的 canonical 定义里含「恐」字 = 品牌解释（K 取自恐
 - 勘误实体化 /errata（backlog 靠前——定价 dek「错了不删」在它落地前是半空承诺）
 - Buttondown welcome + footer「勿转发」句仍待用户后台粘贴
 - IC36 商标评估（用户拍板项，概念搬运是真威胁）
+
+### 26.6 订阅动线唯一化——表单搬家 + /check-inbox/ 快捷键（v=20260717c，2026-07-17 凌晨，接推送线补充 spec 两份）
+- **Buttondown 表单从主页台账区搬进 #pricing 免费档**（ZH=index.html + EN=docs-i18n pricing body 各一份——EN 整块替换机制决定必须两份，少一份=英文用户丢免费漏斗）；Free 档补权益 li「极端读数出现的那天，一封免费邮件（由读数触发，不按日历）」（EN 同）
+- **`target="_blank"` 已去掉**（券商 App webview 吞新标签→用户提交后无反馈→Unactivated 的最可能路径）；同页跳 Buttondown redirect → /check-inbox/（用户已配）
+- 主页 ledger-actions 只剩「在 GitHub 验证台账」框，不补替代 CTA（观感失衡留白=spec 原话）；app.js 内注释同步改（原「订阅框就在下方 145px」已失效）
+- 孤儿 CSS 清净：`.ledger-actions .ledger-sub` 两条删，`.sub-title` 两条删（全站已无使用者）；新增 `.ptier .ledger-sub { margin-top:auto }` 吸底对齐相邻卡 CTA
+- **/check-inbox/ 加「打开 Gmail / 打开 QQ 邮箱」两按钮**（砖红描边、暗夜适配）——把「去邮箱确认」降为一次点击
+- 验收全绿：embed-subscribe 分布 = index.html:1 / docs-i18n:1 / app.js:0；主页表单无、验证框在；ZH/EN 定价页表单+li 双在场、无 target；pay-btn 在场；console 零错误
+- 漏斗口径（推送线定）：双重确认=Buttondown 强制无开关，流失属结构损耗；KPI=提交→确认率，周五起记基线；中文确认信（Standard 档）=最大付费杠杆，触发条件=确认率连续一月 <50%

@@ -1036,7 +1036,6 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
   gap: 14px; align-items: stretch;
 }
 @media (max-width: 900px) { .ledger-actions { grid-template-columns: 1fr; } }
-.sub-title { font-size: 13.5px; font-weight: 600; color: var(--ink-soft); margin-bottom: 10px; }
 .sub-row { display: flex; gap: 8px; }
 .sub-input {
   flex: 1; min-width: 0; padding: 9px 12px;
@@ -1104,20 +1103,13 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
   margin-top: 14px; padding: 0; max-width: 400px;
   background: transparent; border: none; border-radius: 0;
 }
-.ledger-sub .sub-title { font-size: 12.5px; font-weight: 500; color: var(--ink-soft); margin-bottom: 7px; }
 .ledger-sub .sub-input { padding: 7px 10px; font-size: 12px; }
 .ledger-sub .sub-btn { padding: 7px 14px; font-size: 12.5px; }
 .ledger-sub .sub-note { margin-top: 6px; font-size: 10.5px; }
 
-/* 2026-07-16：并排后订阅框不能再限宽 400（那是它独占一行时的宽度）；两框等高靠 flex 吸底。
-   ⚠️ 必须写在上面那组「轻量化」之后 —— 同特异性下后者胜，写在前面会被静默盖掉（今天踩过一次）。 */
-.ledger-actions .ledger-sub {
-  margin-top: 0; max-width: none;
-  display: flex; flex-direction: column;
-  /* 2026-07-16（用户定）：与右侧验证框同款边框——此前左边裸着右边有框，一对盒子只有一半。 */
-  padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px;
-}
-.ledger-actions .ledger-sub .sub-note { margin-top: auto; }
+/* 2026-07-17：订阅表单搬进定价页免费档（原 .ledger-actions 内的并排样式随之删除）。
+   .ptier 是 flex column，吸底让表单与相邻卡的 CTA 对齐。 */
+.ptier .ledger-sub { margin-top: auto; padding-top: 14px; max-width: none; }
 /* 验证框：跟随「轻量化」的语言——不做实心卡，只用边框圈出一个可点区域 */
 .ledger-verify {
   padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px;

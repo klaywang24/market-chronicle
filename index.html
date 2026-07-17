@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260717b">
+<link rel="stylesheet" href="css/style.css?v=20260717c">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -836,8 +836,18 @@
             <li>全部指数台账 + 当日读数（恐惧的标价指数 / K 指数 / 市场温度）</li>
             <li>百年历史图表 + 方法论 + 板块热力图</li>
             <li>GitHub 提交历史逐日可验证</li>
+            <li>极端读数出现的那天，一封免费邮件（由读数触发，不按日历）</li>
             <li>无广告 · 无墙 · 无需注册</li>
           </ul>
+          <!-- 不带 target="_blank"：券商 App 内置浏览器会吞新标签，用户提交后看不到任何反馈；
+               Buttondown 后台已配 redirect → /check-inbox/，同页跳转全环境稳 -->
+          <form class="ledger-sub" action="https://buttondown.com/api/emails/embed-subscribe/klay24" method="post">
+            <div class="sub-row">
+              <input class="sub-input" type="email" name="email" required placeholder="you@email.com" aria-label="Email">
+              <button class="sub-btn" type="submit">免费订阅</button>
+            </div>
+            <div class="sub-note">由读数触发，不按日历 · 随时退订，不发广告</div>
+          </form>
         </div>
         <div class="ptier featured">
           <div class="ptier-badge">创始价 $9.9 · 邮件预约</div>
@@ -918,9 +928,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260717b"></script>
-<script src="js/app.js?v=20260717b"></script>
-<script src="js/docs-i18n.js?v=20260717b"></script>
+<script src="js/i18n.js?v=20260717c"></script>
+<script src="js/app.js?v=20260717c"></script>
+<script src="js/docs-i18n.js?v=20260717c"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。

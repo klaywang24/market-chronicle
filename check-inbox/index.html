@@ -19,11 +19,15 @@
   .hint strong { color: #A0392F; }
   a { color: #A0392F; }
   .back { margin-top: 20px; font-size: 13.5px; }
+  .mail-btns { display: flex; gap: 10px; margin: 18px 0 4px; }
+  .mail-btns a { flex: 1; text-align: center; padding: 10px 12px; border: 1px solid #A0392F;
+                 border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; }
   @media (prefers-color-scheme: dark) {
     body { background: #12131a; color: #e8e8ea; }
     main { background: #1a1c25; border-color: rgba(255,255,255,.08); }
     .hint { background: #12131a; }
     .hint strong, a { color: #D45D4F; }
+    .mail-btns a { border-color: #D45D4F; }
     .en { color: #9a9aa2; }
   }
 </style>
@@ -32,6 +36,10 @@
 <main>
   <h1>还差一步：去邮箱点一下确认</h1>
   <p>确认信已发出。点开信里的按钮，订阅才会生效——不点的话，收不到任何邮件。</p>
+  <div class="mail-btns">
+    <a href="https://mail.google.com" rel="noopener">打开 Gmail</a>
+    <a href="https://mail.qq.com" rel="noopener">打开 QQ 邮箱</a>
+  </div>
   <div class="hint">
     <p style="margin:0">没看到？Gmail 用户请重点翻 <strong>Promotions（推广）</strong> 标签页或垃圾箱——系统信最常被分拣到那里。发件人是 Buttondown。</p>
   </div>

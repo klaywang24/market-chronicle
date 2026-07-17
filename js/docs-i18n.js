@@ -160,8 +160,16 @@
       <li>All index ledgers + today's readings (Fear's Price Tag / KAPX / market temperature)</li>
       <li>A century of charts + methodology + sector heatmap</li>
       <li>Verifiable day by day in the public GitHub commit log</li>
+      <li>On days of extreme readings, one free email (triggered by the reading, not the calendar)</li>
       <li>No ads · no paywall · no sign-up</li>
     </ul>
+    <form class="ledger-sub" action="https://buttondown.com/api/emails/embed-subscribe/klay24" method="post">
+      <div class="sub-row">
+        <input class="sub-input" type="email" name="email" required placeholder="you@email.com" aria-label="Email">
+        <button class="sub-btn" type="submit">Subscribe free</button>
+      </div>
+      <div class="sub-note">Triggered by readings, not the calendar · unsubscribe anytime · no ads</div>
+    </form>
   </div>
   <div class="ptier featured">
     <div class="ptier-badge">Founding $9.9 · by email</div>
