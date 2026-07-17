@@ -1149,3 +1149,11 @@ pulse 页 EN 的 canonical 定义里含「恐」字 = 品牌解释（K 取自恐
 - **现状=站上没有任何邮箱采集入口**。免费报名唯一残存通道=Buttondown 托管页 buttondown.com/klay24（digest 外链用）；Free 卡保留为免费/付费对照锚（4 条 li）；顶栏胶囊→定价页动线不变
 - 连锁作废：26.6 的漏斗 KPI（提交→确认率·周五基线）失去分子来源；/check-inbox/ 与 redirect 配置保留（托管页报名仍会走确认流）；恢复表单直接翻 `f081ea0`
 - 验证：ZH/EN 双语言 `document.querySelector('form')` 全站=null、Free 卡各 4 li、pay-btn/dek/验证框完好、console 零错误
+
+### 26.8 头版重构上线（v=20260717e，2026-07-17，推送线 spec·用户预览过目后拍板推送）
+- **首个「先预览后上线」流程**：改动全部做完→本地 server+真浏览器截图（ZH/EN×桌面/手机 六张）→用户过目→点头→bump+push。此前常规=改完即上线
+- 裁决表执行：世纪带/温度hero/行情芯片/台账三卡/热力图全留；**落点图+净值曲线两张15年图撤除**，原位一行文字链「15 年台账与全部输赢（包括跑输的那部分）→ K 指数 · 恐惧的标价」分链两 tab；**情绪仪表盘六卡迁「恐惧的标价」页**：SKEW/期限结构两张与 4 context 重复已删，其余四张（P/C·VXN纳指溢价·广度%>200DMA·恐贪七分量）成新章「恐惧的分解」（app.js renderFearDecomp 填 #leaps-decomp，文案逐字沿用旧卡=D key 原样命中）；**页脚免费订阅行获批一并上线**（「极端读数出现的那天，一封免费邮件 → 免费订阅」指 buttondown.com/klay24，恢复了 26.7 之后站上唯一的免费邮件入口，形态=安静文字链非表单）
+- 🎉 **「头版净值曲线与付费 CTA 相邻」悬案正式结案**（自 7·14 挂起的未决项）——净值曲线撤离头版，问题随载体消失
+- 技术销账：buildLedgerMap/Eq 保留（K 页/恐惧标价页仍用），registry.pulse 注册与 buildOne 调用删；stampSources 改无条件调用；.ledger-charts/.pulse-senti 孤儿 CSS 清净；侧边目录自动长出 Ⅲ·恐惧的分解、renumberChapters 自动重排至六章（零手工编号）；新增 i18n D key 四个；#panel-leaps 不走 docs-i18n 整块替换=新章 D key 翻译，EN 实测零 CJK 泄漏
+- 📐 量尺补遗：Browser 面板 window.scrollTo 首次调用常被懒加载图表布局位移吞掉——**scrollTo 两次+中间等 800ms** 才可靠；`document.documentElement.style.scrollBehavior='auto'` 先关平滑滚动再读 scrollY
+- 遗留观察（用户过目时已提示）：恐惧的标价页尾「盘前数据简报→#pricing」与页脚「免费订阅→Buttondown」两个安静入口距离不远（一付费一免费），用户未表态=默认共存

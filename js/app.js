@@ -1854,9 +1854,6 @@
     }
     try { leaps = await load("leaps"); } catch (e) {}
     try { kd = await load("kindex"); ks = await load("kindex_signals"); } catch (e) { kd = ks = null; }
-    let senti = null, breadth = null;
-    try { senti = await load("sentiment"); } catch (e) {}
-    try { breadth = await load("breadth"); } catch (e) {}
 
     const chg = (v) => `<span class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(2)}%</span>`;
     const tempColor = d.temp >= 75 ? "#B8421E" : d.temp >= 50 ? "#C9882E" : d.temp >= 25 ? "#14A63E" : "#2B5F8F";
@@ -1906,15 +1903,9 @@
             <div class="lc-meta"><span>每一次的逐条结果，见上方「K 指数 · 台账」与「恐惧的标价 · 台账」</span></div>
           </div>
         </div>
-        <div class="ledger-charts">
-          <div class="card"><h3>十五年，每一次入场都标在这条线上</h3>
-            <div class="sub">纳指 100（对数坐标）· 圆点 = LEAPS 窗口开启（2011 年起）· 菱形 = K &lt; 1 信号（2011 年起）· 点任意标记看当次结果</div>
-            <div class="chart short" id="ch-ledger-map"></div></div>
-          <div class="card"><h3>如果每次窗口都跟，这本账长这样</h3>
-            <div class="sub">净值 = 1 元照规则操作后变成几元，尾标 ×N 即 1 元变 N 元。窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；两条虚线为同期一直持有纳指与标普</div>
-            <div class="chart short" id="ch-ledger-eq"></div></div>
-        </div>
-        <p class="ledger-note">示意口径：信号首日按收盘价入场，空仓期收益记零，不计成本与滑点。本站不宣称信号能跑赢买入持有：右图如实呈现了这一点；台账的价值在于告诉你「现在处于历史的哪个位置」。完整口径与如实披露见方法论。历史表现不预示未来，不构成投资建议。</p>
+        <!-- 2026-07-17 头版瘦身（用户裁）：落点图+净值曲线两张 15 年图撤回各自的家（K 页/恐惧的标价页），
+             原位只留一行文字链。「净值曲线与付费 CTA 相邻」悬案随撤图自动结案。 -->
+        <p class="ledger-note">15 年台账与全部输赢（包括跑输的那部分）→ <a href="#kindex">K 指数</a> · <a href="#leaps">恐惧的标价</a></p>
         <!-- 2026-07-16：删掉这里的付费 primary（原「盘前数据简报 · 创始价 $9.9」）。三个理由：
              ① $9.9 是邮件预约制（方案 C 两扇门：陌生人自助 $29 / 信任者预约），在头版对所有人喊 9.9 = 那扇门不存在了；
                 且数字本身已过期（创始码 dsc_01kxjqmtb40e8bsy2zqtkqxk0e 是 $99/年 不是 $9.9/月）。
@@ -1938,73 +1929,8 @@
       </div>`;
     }
 
-    // 情绪仪表盘（sentiment.json 缺失时整块跳过）
-    let sentiHTML = "";
-    if (senti && senti.pc && senti.term && senti.term.current) {
-      const SUB_NAMES = {
-        market_momentum_sp500: "市场动能", stock_price_strength: "股价强度",
-        stock_price_breadth: "股价广度", put_call_options: "期权 Put/Call",
-        market_volatility_vix: "波动率 VIX", junk_bond_demand: "垃圾债需求",
-        safe_haven_demand: "避险需求",
-      };
-      const subColor = (s) => (s < 45 ? "var(--danger)" : s > 55 ? "var(--moss)" : "var(--ink-muted)");
-      const subRows = Object.entries(SUB_NAMES).map(([k, name]) => {
-        const v = senti.subs && senti.subs[k];
-        if (!v) return "";
-        return `<div class="senti-row"><span class="senti-name">${name}</span>
-          <span class="senti-bar"><i style="width:${Math.max(3, Math.min(100, v.score))}%;background:${subColor(v.score)}"></i></span>
-          <b style="color:${subColor(v.score)}">${v.score.toFixed(0)}</b></div>`;
-      }).join("");
-      const t = senti.term.current;
-      const inverted = t.ratio_3m > 1;
-      // 布局：第一行 = 三张单数字卡（P/C · 纳指溢价 · SKEW），第二行 = 广度 · 期限结构 · 七分量
-      sentiHTML = `
-      <div class="pulse-senti">
-        <div class="pulse-section-label">情绪仪表盘 · 恐惧的分解</div>
-        <div class="senti-cards">
-          <div class="senti-card">
-            <div class="lc-name">Put/Call 比 <span>全市场 · 5 日均值</span></div>
-            <div class="lc-val">${senti.pc.current == null ? "--" : senti.pc.current.toFixed(2)}</div>
-            <div class="lc-meta"><span>近一年百分位</span> <b>${senti.pc.pctile == null ? "--" : senti.pc.pctile.toFixed(0)}</b><br><span>越高 = 买保护的人越多 = 越恐慌</span></div>
-          </div>
-          ${senti.vxn ? `
-          <div class="senti-card">
-            <div class="lc-name">纳指恐慌溢价 <span>VXN ÷ VIX</span></div>
-            <div class="lc-val">${senti.vxn.current.toFixed(2)}</div>
-            <div class="lc-meta"><span class="nw"><span>当前 VXN</span> <b>${senti.vxn.vxn.toFixed(1)}</b></span> · <span class="nw"><span>全史百分位</span> <b>${senti.vxn.pctile.toFixed(0)}</b></span><br><span>越高 = 市场为纳指波动付的保费越贵</span></div>
-          </div>` : ""}
-          ${senti.skew ? `
-          <div class="senti-card">
-            <div class="lc-name">黑天鹅指数 SKEW <span>尾部保险的价格</span></div>
-            <div class="lc-val">${senti.skew.current.toFixed(1)}</div>
-            <div class="lc-meta"><span>1990 年来百分位</span> <b>${senti.skew.pctile.toFixed(0)}</b><br><span>越高 = 深度崩盘保护越贵</span></div>
-          </div>` : ""}
-          ${breadth && breadth.current != null ? `
-          <div class="senti-card">
-            <div class="lc-name">市场广度 <span>标普成分股在 200 日均线上的占比</span></div>
-            <div class="lc-val">${breadth.current.toFixed(0)}%</div>
-            <div class="lc-meta"><span class="nw"><span>累积史百分位</span> <b>${breadth.pctile.toFixed(0)}</b></span> · <span class="nw"><span>自</span> ${breadth.since}</span><br><span>越低 = 超卖越深，历史底部常见个位数</span></div>
-          </div>` : ""}
-          <div class="senti-card">
-            <div class="lc-name">VIX 期限结构 <span>VIX ÷ VIX3M</span></div>
-            <div class="lc-val">${t.ratio_3m.toFixed(2)}</div>
-            <div class="lc-state ${inverted ? "neg" : "pos"}">${inverted ? "倒挂（近端恐慌）" : "升水（结构正常）"}</div>
-            <div class="term-grid">
-              <div><span>9天</span><b>${t.vix9d.toFixed(1)}</b></div>
-              <div><span>30天</span><b>${t.vix.toFixed(1)}</b></div>
-              <div><span>3月</span><b>${t.vix3m.toFixed(1)}</b></div>
-              <div><span>6月</span><b>${t.vix6m.toFixed(1)}</b></div>
-            </div>
-            <div class="lc-meta"><span>比值 2011 年来百分位</span> <b>${t.pctile.toFixed(0)}</b><br><span>大于 1 = 倒挂 = 历史级恐慌</span></div>
-          </div>
-          <div class="senti-card">
-            <div class="lc-name">恐贪指数的七个分量 <span>CNN 官方口径</span></div>
-            ${subRows}
-          </div>
-        </div>
-        <p class="footnote senti-note"><span>数据截至</span> ${senti.date} · CNN Fear & Greed + Cboe + Yahoo Finance · <span>每交易日收盘后自动更新</span></p>
-      </div>`;
-    }
+    // 情绪仪表盘六卡已于 2026-07-17 迁往「恐惧的标价」页（renderFearDecomp）：
+    // 与该页既有 4 context 去重后剩四卡（SKEW/期限结构两张删），头版不再渲染。
 
     document.getElementById("pulse-base").innerHTML = `
       <div class="pulse-kicker">TODAY'S FRONT PAGE · ${d.date}</div>
@@ -2034,7 +1960,6 @@
         </div>
       </div>
       ${ledgerHTML}
-      ${sentiHTML}
       <div>
         <div class="pulse-section-label">涨跌分布 · 标普 500 成分股</div>
         <div class="breadth-bar">
@@ -2104,16 +2029,9 @@
     // 聚光灯只掀开顶部时间线，热图区不会被揭示，无需第二个 widget）
     mountHeatmap();
 
-    // 台账两张图：DOM 就位后初始化；注册进 registry 让主题/语言切换时随 rebuildAll 重建
-    if (ledgerHTML) {
-      if (!registry.pulse.some((r) => r.elId === "ch-ledger-map")) {
-        chart("pulse", "ch-ledger-map", buildLedgerMap);
-        chart("pulse", "ch-ledger-eq", buildLedgerEq);
-      }
-      await buildOne("ch-ledger-map", buildLedgerMap);
-      await buildOne("ch-ledger-eq", buildLedgerEq);
-      stampSources();
-    }
+    // 台账两张图已随头版瘦身撤除（buildLedgerMap/Eq 仍服务 K 页与恐惧的标价页）；
+    // stampSources 保留：它统一给全站 .card 补数据源行，与头版是否有图无关
+    stampSources();
 
     // 聚光灯：只在悬停/点击世纪时间线上的六个危机点时亮起，定位在该点；离开即熄灭
     const hero = document.getElementById("pulse-hero");
@@ -2375,6 +2293,60 @@
       <p class="footnote src-note"><span>VIX1Y = ${c.vix1y}</span> · <span>4 context 只展示，不平均进头条</span> · <span>数据截至</span> ${c.date}（<span>${c.segment === "forward" ? "前向台账" : "回测"}</span>）· <span>描述性数据，非投资建议</span></p>`;
   }
 
+  // 恐惧的分解（2026-07-17 自头版迁入）：与本页 4 context 去重后剩四卡——
+  // P/C、VXN 纳指溢价、广度 %>200DMA、恐贪七分量（SKEW/期限结构两张与 4 context 重复，已删）。
+  // 文案逐字沿用头版旧卡，i18n D key 原样命中；语言切换由文本节点翻译器接管，无需重渲。
+  async function renderFearDecomp() {
+    const host = document.getElementById("leaps-decomp");
+    if (!host) return;
+    let senti = null, breadth = null;
+    try { senti = await load("sentiment"); } catch (e) {}
+    try { breadth = await load("breadth"); } catch (e) {}
+    if (!senti || !senti.pc) {
+      host.innerHTML = '<div class="card"><p style="color:var(--ink-muted);font-size:13px">数据更新中，稍后自动出现 · data updating</p></div>';
+      return;
+    }
+    const SUB_NAMES = {
+      market_momentum_sp500: "市场动能", stock_price_strength: "股价强度",
+      stock_price_breadth: "股价广度", put_call_options: "期权 Put/Call",
+      market_volatility_vix: "波动率 VIX", junk_bond_demand: "垃圾债需求",
+      safe_haven_demand: "避险需求",
+    };
+    const subColor = (s) => (s < 45 ? "var(--danger)" : s > 55 ? "var(--moss)" : "var(--ink-muted)");
+    const subRows = Object.entries(SUB_NAMES).map(([k, name]) => {
+      const v = senti.subs && senti.subs[k];
+      if (!v) return "";
+      return `<div class="senti-row"><span class="senti-name">${name}</span>
+        <span class="senti-bar"><i style="width:${Math.max(3, Math.min(100, v.score))}%;background:${subColor(v.score)}"></i></span>
+        <b style="color:${subColor(v.score)}">${v.score.toFixed(0)}</b></div>`;
+    }).join("");
+    host.innerHTML = `
+      <div class="senti-cards">
+        <div class="senti-card">
+          <div class="lc-name">Put/Call 比 <span>全市场 · 5 日均值</span></div>
+          <div class="lc-val">${senti.pc.current == null ? "--" : senti.pc.current.toFixed(2)}</div>
+          <div class="lc-meta"><span>近一年百分位</span> <b>${senti.pc.pctile == null ? "--" : senti.pc.pctile.toFixed(0)}</b><br><span>越高 = 买保护的人越多 = 越恐慌</span></div>
+        </div>
+        ${senti.vxn ? `
+        <div class="senti-card">
+          <div class="lc-name">纳指恐慌溢价 <span>VXN ÷ VIX</span></div>
+          <div class="lc-val">${senti.vxn.current.toFixed(2)}</div>
+          <div class="lc-meta"><span class="nw"><span>当前 VXN</span> <b>${senti.vxn.vxn.toFixed(1)}</b></span> · <span class="nw"><span>全史百分位</span> <b>${senti.vxn.pctile.toFixed(0)}</b></span><br><span>越高 = 市场为纳指波动付的保费越贵</span></div>
+        </div>` : ""}
+        ${breadth && breadth.current != null ? `
+        <div class="senti-card">
+          <div class="lc-name">市场广度 <span>标普成分股在 200 日均线上的占比</span></div>
+          <div class="lc-val">${breadth.current.toFixed(0)}%</div>
+          <div class="lc-meta"><span class="nw"><span>累积史百分位</span> <b>${breadth.pctile.toFixed(0)}</b></span> · <span class="nw"><span>自</span> ${breadth.since}</span><br><span>越低 = 超卖越深，历史底部常见个位数</span></div>
+        </div>` : ""}
+        <div class="senti-card">
+          <div class="lc-name">恐贪指数的七个分量 <span>CNN 官方口径</span></div>
+          ${subRows}
+        </div>
+      </div>
+      <p class="footnote senti-note"><span>数据截至</span> ${senti.date} · CNN Fear & Greed + Cboe + Yahoo Finance · <span>每交易日收盘后自动更新</span></p>`;
+  }
+
   // ---------------- 注册 SPY / QQQ ----------------
   chart("spy", "ch-spy-century", centuryChart("sp500_century", [{ ds: "sp500_century", name: "标普 500" }]));
   chart("spy", "ch-spy-annual", annualChart("sp500_annual"));
@@ -2438,6 +2410,7 @@
   renderValCards();
   renderLeaps();
   renderLeapsGauge();
+  renderFearDecomp();
   renderPulse();
   renderDDTable("sp500_drawdowns", "spy-dd-table");
   renderDDTable("ndx_drawdowns", "qqq-dd-table");

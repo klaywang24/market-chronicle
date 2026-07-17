@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260717d">
+<link rel="stylesheet" href="css/style.css?v=20260717e">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -589,6 +589,13 @@
     <div class="poem">这是温度计，不是策略。它只回答"贵还是便宜"，不回答"该不该买"。每个读数带 Git 时间戳，事前记录、公开可查。</div>
   </div>
 
+  <!-- ===== 恐惧的分解（2026-07-17 自头版搬入；与上方 4 context 去重后剩四卡，JS 填充 #leaps-decomp） ===== -->
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>恐惧的分解</h2></div>
+    <p class="chapter-q">怕，是能拆开读的：有多少人在买保护、纳指比大盘多付多少保费、多少只股票还站在自己的长期均线上、恐贪指数的七个零件各指向哪。</p>
+    <div id="leaps-decomp"></div>
+  </div>
+
   <!-- ===== 历史参照：恐惧极值之后（描述性记录，非建议） ===== -->
   <div class="lg-divider"><span>历史参照 · 恐惧极值之后</span><em>以下为描述性历史记录，不是买卖建议</em></div>
   <div class="chapter">
@@ -891,6 +898,8 @@
     <div class="footer-brand-col">
       <div class="footer-brand">美股编年史<span>Market Chronicle</span></div>
       <div class="footer-tag">每个交易日自动更新的美股百年图表档案与读数台账</div>
+      <!-- 【预览项·待用户点头】免费订阅唯一入口=Buttondown 托管页；不加 target（券商 webview 吞新标签之鉴） -->
+      <div class="footer-free">极端读数出现的那天，一封免费邮件 → <a href="https://buttondown.com/klay24" rel="noopener">免费订阅</a></div>
     </div>
     <div class="footer-colgroup">
       <div class="footer-col">
@@ -921,9 +930,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260717d"></script>
-<script src="js/app.js?v=20260717d"></script>
-<script src="js/docs-i18n.js?v=20260717d"></script>
+<script src="js/i18n.js?v=20260717e"></script>
+<script src="js/app.js?v=20260717e"></script>
+<script src="js/docs-i18n.js?v=20260717e"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。

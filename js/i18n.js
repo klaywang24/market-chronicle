@@ -101,6 +101,10 @@
     "净值 = 1 元照规则操作后变成几元，尾标 ×N 即 1 元变 N 元。窗口首日买入纳指 100、持有 12 个月，持有期内新窗口跳过；两条虚线为同期一直持有纳指与标普": ["The curve is simply what $1 becomes under the rules — an end label of ×N means $1 grew to $N. Buy the Nasdaq-100 at each window's first close, hold 12 months, skip windows inside a holding period; the two dashed lines are buy-and-hold Nasdaq and S&P", "", "", ""],
     // ---- 头版 · 情绪仪表盘 ----
     "情绪仪表盘 · 恐惧的分解": ["Sentiment Dashboard · fear, decomposed", "", "", ""],
+    "恐惧的分解": ["Fear, Decomposed", "", "", ""],
+    "怕，是能拆开读的：有多少人在买保护、纳指比大盘多付多少保费、多少只股票还站在自己的长期均线上、恐贪指数的七个零件各指向哪。": ["Fear can be read in parts: how many are buying protection, how much extra premium the Nasdaq pays over the broad market, how many stocks still stand above their own long-term average, and where each of the seven parts of the Fear & Greed machine is pointing.", "", "", ""],
+    "15 年台账与全部输赢（包括跑输的那部分）→": ["The full 15-year ledger, every win and loss (including where it trailed) →", "", "", ""],
+    "极端读数出现的那天，一封免费邮件 →": ["On days of extreme readings, one free email →", "", "", ""],
     "全市场 · 5 日均值": ["all-market · 5-day average", "", "", ""],
     "近一年百分位": ["1-year percentile", "", "", ""],
     "越高 = 买保护的人越多 = 越恐慌": ["higher = more protection buying = more fear", "", "", ""],
