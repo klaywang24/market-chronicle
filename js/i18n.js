@@ -45,6 +45,7 @@
     "示意口径：信号首日按收盘价入场，空仓期收益记零，不计成本与滑点。本站不宣称信号能跑赢买入持有：右图如实呈现了这一点；台账的价值在于告诉你「现在处于历史的哪个位置」。完整口径与如实披露见方法论。历史表现不预示未来，不构成投资建议。": ["Illustrative rules: enter at the close on a signal's first day; cash periods earn zero; no costs or slippage. This site does not claim the signals beat buy-and-hold: the right-hand chart shows exactly that. The ledger's value is telling you where today stands in history. Full rules and honest disclosure in the Methodology. Past performance does not predict future results; not investment advice.", "", "", ""],
     "极端读数那天：台账读数与市场状态": ["On extreme-reading days: ledger readings and market state", "", "", ""],
     "免费订阅": ["Subscribe free", "", "", ""],
+    "订阅": ["Subscribe", "", "", ""],
     "免费 · 由读数触发，不按日历 · 随时退订，不发广告": ["Free · triggered by readings, not the calendar · unsubscribe anytime, no ads", "", "", ""],
     "关键数据": ["Key data", "", "", ""],
     "数据更新中，刷新后出现 · data updating": ["Data updating — refresh to see it", "", "", ""],

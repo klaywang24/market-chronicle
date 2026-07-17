@@ -1403,3 +1403,13 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 .ptier.t-pro .ptier-name { color: var(--gold); }
 .ptier.t-pro .ptier-list li::before { color: var(--gold); }
 .ptier.featured .ptier-name { color: var(--accent); }
+
+/* ── 顶栏订阅入口（2026-07-17：付费入口可发现性修复——朋友反馈「找不到付费的地方」）── */
+.topbar-sub{display:inline-block;font-size:13px;font-weight:600;color:#A0392F;border:1.5px solid #A0392F;
+ border-radius:999px;padding:2.5px 13px;text-decoration:none;letter-spacing:.02em;white-space:nowrap;line-height:1.5}
+.topbar-sub:hover{background:rgba(160,57,47,.08)}
+html.dark-mode .topbar-sub{color:#D45D4F;border-color:#D45D4F}
+html.dark-mode .topbar-sub:hover{background:rgba(212,93,79,.12)}
+html:not([lang^="zh"]) .topbar-sub{font-size:12px;padding:2.5px 11px}
+/* EN 11 tab 在 900-1379px 已满：该区间隐藏胶囊保「零溢出」定案；≤899 顶栏换行后有空间恢复显示 */
+@media (min-width:900px) and (max-width:1379px){ html:not([lang^="zh"]) .topbar-sub{display:none} }
