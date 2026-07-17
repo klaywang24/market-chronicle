@@ -1142,3 +1142,10 @@ pulse 页 EN 的 canonical 定义里含「恐」字 = 品牌解释（K 取自恐
 - **/check-inbox/ 加「打开 Gmail / 打开 QQ 邮箱」两按钮**（砖红描边、暗夜适配）——把「去邮箱确认」降为一次点击
 - 验收全绿：embed-subscribe 分布 = index.html:1 / docs-i18n:1 / app.js:0；主页表单无、验证框在；ZH/EN 定价页表单+li 双在场、无 target；pay-btn 在场；console 零错误
 - 漏斗口径（推送线定）：双重确认=Buttondown 强制无开关，流失属结构损耗；KPI=提交→确认率，周五起记基线；中文确认信（Standard 档）=最大付费杠杆，触发条件=确认率连续一月 <50%
+
+### 26.7 🔄 用户裁：免费订阅表单全站移除（v=20260717d，2026-07-17，推翻 26.6 的搬家与「0粉丝阶段不删店面」旧定案）
+- 理由（用户原话）：付费卡旁边放免费订阅输入框「很违和」+「目前看来 free 没有任何用处」。设计诊断留档：违和根源=三卡动作不同构（Standard=决策按钮/Pro=状态行/Free=要人填的表单）；曾给渐进披露方案 A（details/summary 零 JS），用户选择直接删
+- 删净四件套：ZH 表单+「免费邮件」li（index.html）/ EN 表单+li（docs-i18n）/ 全部 sub-* 与 ledger-sub CSS（含 26.6 刚加的吸底规则）/ 主页 .ledger-actions 注释重写。全站 grep `embed-subscribe|ledger-sub|sub-row|sub-btn` = 0
+- **现状=站上没有任何邮箱采集入口**。免费报名唯一残存通道=Buttondown 托管页 buttondown.com/klay24（digest 外链用）；Free 卡保留为免费/付费对照锚（4 条 li）；顶栏胶囊→定价页动线不变
+- 连锁作废：26.6 的漏斗 KPI（提交→确认率·周五基线）失去分子来源；/check-inbox/ 与 redirect 配置保留（托管页报名仍会走确认流）；恢复表单直接翻 `f081ea0`
+- 验证：ZH/EN 双语言 `document.querySelector('form')` 全站=null、Free 卡各 4 li、pay-btn/dek/验证框完好、console 零错误
