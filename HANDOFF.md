@@ -1186,3 +1186,36 @@ pulse 页 EN 的 canonical 定义里含「恐」字 = 品牌解释（K 取自恐
 - 实现：`index.html` 结账脚本读 `?code=` → `Checkout.open` 传 `discountCode` 并**强制按年价**（创始价定义=按年 $99；且 $191 flat 折扣绝不能落在 $29 月价上——负价/清零边界）。发放姿势升级：**链接自带价，收礼者连码都不用输**（chronicle.klay-wang.com/?code=XXX#pricing），成为 50 席创始发放的标准动作
 - 验证：本地拦截 Checkout.open 实测——带码时 priceId=年价+discountCode 在场；无码时月/年各归其位、无码字段=**ALL_MATCH 不变量保持**；console 零错误
 - ⚠️ 待用户后台确认一件安全事：折扣的 Limit to specific products 里**只应勾 Standard — Annual**（若月价也在列，去掉——防有人用码撞月价出 $0 订阅）
+
+## 二十七、2026-07-17 夜：Paddle LIVE 端到端首次实弹验证（$0 折扣法，全绿）＋银联之墙实测定形
+
+### 27.1 测试法与结论
+- **零成本实弹**：用 100% 折扣（`LIVETEST0715`，7/15 建）走真实结账，真卡、真事件、真订阅，总额 $0——**测完无需退款**（退款伤 seller reputation，这条路避开了）
+- **全部通过**：pre-flight（无 sandbox 残留 / live token ee404 / live pri_ 双价 / `/pay`+`/welcome` 200）→ 结账 → `txn_01kxr3q746fddbvxem1bjewmwk` completed $0 → `sub_01kxr43bwqp4rqtjpm3zbhhjak` active → successUrl 落 `/welcome/` → scheduled cancel → immediate cancel → 清理
+- **裁剪掉的两项**（本站架构里按设计不存在，不是漏测）：升级测试（catalog 只有 Standard 一个 product，Pro 从未建）／数据库与 webhook 端点校验（零后端，Email destination 就是"webhook"，mcpaid 邮箱就是"2xx"）
+
+### 27.2 🔑 三封事件邮件实弹送达 mcpaid（此前只有 customer.created 验过，webhook 模拟器测不了邮件路）
+| 事件 | 关键字段 | 判定 |
+|---|---|---|
+| `subscription.created` 21:26 | status=active, next_billed_at=2027-07-17, **Discount=`-`** | ✅ Discount 空是**正确**的——LIVETEST0715 的 recurring 关（只免首期），故不挂到订阅上 |
+| `subscription.updated` 21:35 | **status 仍 active** + `scheduled_change={action:cancel, effective_at:2027-07-17}` + next_billed_at 转 `-` | ✅ 计划性取消=状态还在、访问还给、到期才断 |
+| `subscription.canceled` 21:50 ×2 | status=canceled, canceled_at 有值, scheduled_change 清空 | ✅ **这封是将来"到期移出名单"的扳机**，今晚实弹响过 |
+
+### 27.3 🇨🇳 银联之墙：实测定形（今晚最贵的信息）
+- **银联信用卡 = 通**（中信 5498）：BIN 层过、授权层过、**且被保存为订阅支付方式**（订阅详情显示"银联 5498 exp. 2/31"）→ 理论上明年能自动续费
+- **银联借记卡 = 物理不通**：大陆借记卡多无 CVV2 → **表单都填不完**，与银行放不放行无关
+- **摩擦=风控电话**：中信当场来电核实（跨境线上支付标准风控）——每个大陆用户可能都要接这一通
+- **£1 验证 33 秒自动退**：21:26:19 消费 ¥9.17（GBP 1.00，商户 PADDLE.NET LONDON GBR）→ 21:26:52 退款 ¥-9.17，净额 ¥0.00。**对客户可明说"会有 1 英镑验证，半分钟自动退"**（Paddle 英国主体故走 GBP）
+- **`Paddle fee = $0.00`**（交易详情白纸黑字）→ 零元交易零手续费实证
+- 结论修正：大陆池**不是零**，是"有信用卡 + 愿意为 $29 接一通风控电话"的窄漏斗；海外池仍是唯一顺畅通道，渠道权重不变
+
+### 27.4 forever99 的界面验证点（比"查订阅 Discount 字段"更早更直接）
+Discounts 列表里 forever99 = `$191.00` / **`Applies to: All billing periods`** / `Uses left: 50` / `Expires: -` / Active。
+**「Applies to: All billing periods」就是"$99 永久锁定"的人话版**（recurring=true 的界面表述）；Uses left 已由用户改为 50，与站上"前 50 席"承诺对齐。将来创始成员下单后复核：订阅详情 Discount 应显示 forever99 且 Next payment=$99 不是 $290。
+
+### 27.5 两条教训
+- 🐛 **测试遗留物要当场清**：7/15 那次 live 测试建的月付订阅（PayPal，`sub_01kxj8ceqgnq0a16zqczqn2zrg`）**active 了整整两天没人管**——今晚才连带清掉。$0 订阅也是真订阅，测完即取消，别过夜
+- 🐛 **备注不是配置（我又踩了"把文档当事实"）**：我从两个 price 的 internal description（"创始码 restrict_to 指向此 price"）推断 forever99 勾了月价、判为"$191 砸 $29 出负数"的漏洞——**用户澄清实际没勾**。price description 是自己写的备注，与 restrict_to 实际状态无关；月价那行备注措辞会误导（建议改成"不含此 price"）。同族于当日落库线抓到的"主源锁定读起来像通用规矩"——**两次都是文档在骗人，且骗的都是自己人**
+
+### 27.6 现状：可以对陌生人开门了
+支付链路全部实弹验证完毕（此前只是"建好未实测"）。**仍未发生**：真实收款（$0 不触发）→ payout 验证与 final review 的扳机，仍是**第一笔真金白银**（首个走 Paddle 的陌生人）。
