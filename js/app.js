@@ -2175,14 +2175,15 @@
         borderColor: p.border, fillerColor: "rgba(160,57,47,0.08)",
         handleStyle: { color: p.accent }, textStyle: { color: p.muted, fontSize: 10 } }],
       series: [
+        // 2026-07-17 统一色调（用户定）：数据色只留猩红(danger)与绿(moss)，灰色退场——回测段绿、前向段猩红
         { name: "回测（可复现）", type: "line", showSymbol: false, connectNulls: false,
-          data: bt, lineStyle: { color: p.muted, width: 1.4 }, itemStyle: { color: p.muted },
+          data: bt, lineStyle: { color: p.moss, width: 1.4 }, itemStyle: { color: p.moss },
           markLine: { silent: true, symbol: "none",
             lineStyle: { color: p.ink, type: "dashed", width: 1 },
             label: { color: p.ink, formatter: "50 中性", fontFamily: "JetBrains Mono", fontSize: 10 },
             data: [{ yAxis: 50 }] } },
         { name: "前向台账（发布后逐日）", type: "line", showSymbol: true, symbolSize: 7, connectNulls: false,
-          data: fw, lineStyle: { color: p.accent, width: 1.8 }, itemStyle: { color: p.accent } },
+          data: fw, lineStyle: { color: p.danger, width: 1.8 }, itemStyle: { color: p.danger } },
       ],
     };
   });
@@ -2234,12 +2235,13 @@
       xAxis: Object.assign({ type: "category", data: cats }, baseAxis(p)),
       yAxis: Object.assign({ type: "value", name: "波动率点", scale: true }, baseAxis(p)),
       series: [
+        // 统一色调：最新=猩红、一周前=绿虚线（数据色只留 danger/moss 两色）
         { name: "最新结算", type: "line", data: today, symbolSize: 5,
-          lineStyle: { color: p.accent, width: 2 }, itemStyle: { color: p.accent },
+          lineStyle: { color: p.danger, width: 2 }, itemStyle: { color: p.danger },
           label: { show: true, position: "top", color: p.muted, fontSize: 10,
             fontFamily: "JetBrains Mono", formatter: (o) => (o.value == null ? "" : (+o.value).toFixed(1)) } },
         { name: "一周前", type: "line", data: wk, symbolSize: 3,
-          lineStyle: { color: p.muted, width: 1.2, type: "dashed" }, itemStyle: { color: p.muted } },
+          lineStyle: { color: p.moss, width: 1.2, type: "dashed" }, itemStyle: { color: p.moss } },
       ],
     };
   });
@@ -2363,7 +2365,8 @@
       market_volatility_vix: "波动率 VIX", junk_bond_demand: "垃圾债需求",
       safe_haven_demand: "避险需求",
     };
-    const subColor = (s) => (s < 45 ? "var(--danger)" : s > 55 ? "var(--moss)" : "var(--ink-muted)");
+    // 2026-07-17 统一色调（用户定）：中性灰退场，两色制——恐惧侧(<45)猩红，其余绿
+    const subColor = (s) => (s < 45 ? "var(--danger)" : "var(--moss)");
     const subRows = Object.entries(SUB_NAMES).map(([k, name]) => {
       const v = senti.subs && senti.subs[k];
       if (!v) return "";
