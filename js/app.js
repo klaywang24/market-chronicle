@@ -2070,6 +2070,7 @@
     ["spy-constituents", "Wikipedia"], ["qqq-constituents", "Wikipedia"],
     ["ch-spy-sectors", "Wikipedia"], ["ch-qqq-sectors", "Wikipedia"],
     ["spy-top-table", "SSGA (SPDR)"], ["qqq-top-table", "stockanalysis"],
+    ["ch-leaps-vx", "Cboe CFE daily settlement"], ["ch-leaps-cot", "CFTC · Traders in Financial Futures"],
   ];
   let metaDate = "";
 
@@ -2214,6 +2215,56 @@
           data: long, lineStyle: { color: p.accent, width: 1.8 }, itemStyle: { color: p.accent } },
         { name: "9 天期 · VIX9D", type: "line", showSymbol: false, connectNulls: false,
           data: front, lineStyle: { color: p.moss, width: 1.2 }, itemStyle: { color: p.moss } },
+      ],
+    };
+  });
+
+  // 恐惧的远期价目表：VX 期货逐月结算曲线（真钱轨，与指数轨互证；2026-07-17 期货双源上线）
+  chart("leaps", "ch-leaps-vx", async (p) => {
+    const d = await load("vx_curve");
+    const cats = ["VIX 现值", ...d.curve.map((c) => c[0].slice(5).replace("-", "/"))];
+    const today = [d.spot_vix, ...d.curve.map((c) => c[1])];
+    const wkMap = Object.create(null);
+    ((d.week_ago && d.week_ago.curve) || []).forEach((w) => { wkMap[w[0]] = w[1]; });
+    const wk = [null, ...d.curve.map((c) => (wkMap[c[0]] != null ? wkMap[c[0]] : null))];
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(2)) }),
+      legend: { top: 0, textStyle: { color: p.ink, fontSize: 11 }, itemWidth: 18 },
+      grid: { left: 48, right: 24, top: 34, bottom: 30 },
+      xAxis: Object.assign({ type: "category", data: cats }, baseAxis(p)),
+      yAxis: Object.assign({ type: "value", name: "波动率点", scale: true }, baseAxis(p)),
+      series: [
+        { name: "最新结算", type: "line", data: today, symbolSize: 5,
+          lineStyle: { color: p.accent, width: 2 }, itemStyle: { color: p.accent },
+          label: { show: true, position: "top", color: p.muted, fontSize: 10,
+            fontFamily: "JetBrains Mono", formatter: (o) => (o.value == null ? "" : (+o.value).toFixed(1)) } },
+        { name: "一周前", type: "line", data: wk, symbolSize: 3,
+          lineStyle: { color: p.muted, width: 1.2, type: "dashed" }, itemStyle: { color: p.muted } },
+      ],
+    };
+  });
+
+  // 谁在押注恐惧：CFTC TFF 里杠杆基金在 VIX 期货的净头寸（周频，2006→）
+  chart("leaps", "ch-leaps-cot", async (p) => {
+    const d = await load("cot_vix");
+    const lev = d.series.map((s) => [s.date, s.lev_net]);
+    const am = d.series.map((s) => [s.date, s.am_net]);
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toLocaleString("en-US")) }),
+      legend: { top: 0, textStyle: { color: p.ink, fontSize: 11 }, itemWidth: 18 },
+      grid: { left: 64, right: 24, top: 34, bottom: 64 },
+      xAxis: timeX(p),
+      yAxis: Object.assign({ type: "value", name: "净头寸（手）" }, baseAxis(p)),
+      dataZoom: [{ type: "inside" }, { type: "slider", bottom: 6, height: 18,
+        borderColor: p.border, fillerColor: "rgba(160,57,47,0.08)",
+        handleStyle: { color: p.accent }, textStyle: { color: p.muted, fontSize: 10 } }],
+      series: [
+        { name: "杠杆基金", type: "line", showSymbol: false, connectNulls: false, data: lev,
+          lineStyle: { color: p.accent, width: 1.6 }, itemStyle: { color: p.accent },
+          markLine: { silent: true, symbol: "none", label: { show: false },
+            lineStyle: { color: p.muted, type: "dashed", width: 1 }, data: [{ yAxis: 0 }] } },
+        { name: "资管机构", type: "line", showSymbol: false, connectNulls: false, data: am,
+          lineStyle: { color: p.moss, width: 1.1, type: "dashed" }, itemStyle: { color: p.moss } },
       ],
     };
   });

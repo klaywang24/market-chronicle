@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260717e">
+<link rel="stylesheet" href="css/style.css?v=20260717f">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -571,6 +571,11 @@
     <div class="chapter-head"><span class="chapter-no">第一章</span><h2>今天贵不贵</h2></div>
     <p class="chapter-q">此刻买 LEAPS，价格在历史上处于什么位置？</p>
     <div id="lg-hero"></div>
+    <div class="card">
+      <h3>恐惧的远期价目表 · VIX 期货逐月结算价</h3>
+      <div class="sub">真金白银交易出来的恐惧曲线，与上方指数轨互证：实线 = 最新结算，向右上倾斜 = 越远越贵；虚线 = 一周前对照；首点 = VIX 现值。期货接近 24 小时交易，官方账本每天只记这一笔结算价。</div>
+      <div class="chart" id="ch-leaps-vx"></div>
+    </div>
   </div>
 
   <div class="chapter">
@@ -594,6 +599,11 @@
     <div class="chapter-head"><span class="chapter-no">第三章</span><h2>恐惧的分解</h2></div>
     <p class="chapter-q">怕，是能拆开读的：有多少人在买保护、纳指比大盘多付多少保费、多少只股票还站在自己的长期均线上、恐贪指数的七个零件各指向哪。</p>
     <div id="leaps-decomp"></div>
+    <div class="card">
+      <h3>谁在押注恐惧 · 杠杆基金在 VIX 期货的净头寸</h3>
+      <div class="sub">CFTC 官方持仓（2006 年至今）：每周二数据、周五发布，滞后三天；零线以下 = 净做空恐惧（历史常态），以上 = 净做多；虚线 = 资管机构对照 · 底部滑块可拖拽缩放</div>
+      <div class="chart tall" id="ch-leaps-cot"></div>
+    </div>
   </div>
 
   <!-- ===== 历史参照：恐惧极值之后（描述性记录，非建议） ===== -->
@@ -930,9 +940,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260717e"></script>
-<script src="js/app.js?v=20260717e"></script>
-<script src="js/docs-i18n.js?v=20260717e"></script>
+<script src="js/i18n.js?v=20260717f"></script>
+<script src="js/app.js?v=20260717f"></script>
+<script src="js/docs-i18n.js?v=20260717f"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。

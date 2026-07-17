@@ -11,7 +11,7 @@ import json
 import re
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import numpy as np
@@ -801,6 +801,102 @@ def build_leaps_index(gspc_close: pd.Series, vix_close: pd.Series):
     write_json("leaps_gauge.json", out)
 
 
+# ---------------- 期货维度两源（2026-07-17）：VX 期限结构 + CFTC COT ----------------
+# 官方免费源、不依赖任何券商（期权侧的断粮备份）。拉挂了只留旧文件，绝不拖死主管线。
+
+VX_SETTLE = "https://www.cboe.com/us/futures/market_statistics/settlement/csv"
+
+
+def _vx_curve_on(day) -> list:
+    """该日 VX 标准月结算曲线 [[到期日, 结算价], ...]；无数据（周末/未发布）返回 []。"""
+    r = requests.get(VX_SETTLE, params={"dt": day.strftime("%Y-%m-%d")}, headers=UA, timeout=30)
+    if r.status_code != 200:
+        return []
+    rows = []
+    for line in r.text.strip().splitlines()[1:]:
+        p = line.split(",")
+        # 只取标准月（符号形如 VX/N6）；周链（VX30/N6）与父月同值，画曲线只会重复
+        if len(p) >= 4 and p[0] == "VX" and p[1].startswith("VX/"):
+            try:
+                rows.append([p[2], round(float(p[3]), 4)])
+            except ValueError:
+                pass
+    rows.sort()
+    return rows
+
+
+def build_vx_curve(vix_close: pd.Series):
+    """VIX 期货逐月结算曲线（真钱轨，与指数轨互证）→ data/vx_curve.json。历史逐日累积。"""
+    print("== VX 期货期限结构")
+    today = datetime.now(timezone.utc).date()
+    asof, curve = None, []
+    for back in range(6):  # 当晚结算未发布/周末则回退到最近有数的交易日
+        d = today - timedelta(days=back)
+        curve = _vx_curve_on(d)
+        if curve:
+            asof = d
+            break
+    if not curve:
+        raise RuntimeError("Cboe VX settlement 连续 6 日无数据")
+    wk_asof, wk_curve = None, []
+    for back in range(7, 13):
+        d = today - timedelta(days=back)
+        wk_curve = _vx_curve_on(d)
+        if wk_curve:
+            wk_asof = d
+            break
+    hist = {}
+    try:
+        hist = json.loads((DATA / "vx_curve.json").read_text()).get("history", {})
+    except Exception:
+        pass
+    hist[asof.isoformat()] = curve
+    write_json("vx_curve.json", {
+        "asof": asof.isoformat(),
+        "spot_vix": round(float(vix_close.dropna().iloc[-1]), 2),
+        "curve": curve,
+        "week_ago": {"asof": wk_asof.isoformat() if wk_asof else None, "curve": wk_curve},
+        "history": hist,
+    })
+
+
+COT_TFF = "https://publicreporting.cftc.gov/resource/gpe5-46if.json"
+
+
+def build_cot_vix():
+    """CFTC TFF（金融期货持仓）里 VIX 期货的机构站位，全史一次回填（2006→）→ data/cot_vix.json。
+    ⚠️ 该数据集列名没有 _all 后缀（lev_money_positions_long，不是 …_long_all）。
+    周五 15:30 ET 发布周二数据：每日拉最新即可（幂等），周五自动出新。"""
+    print("== CFTC COT（VIX 期货站位）")
+    r = requests.get(COT_TFF, params={
+        "$where": "starts_with(market_and_exchange_names,'VIX')",
+        "$order": "report_date_as_yyyy_mm_dd ASC",
+        "$limit": "5000",
+        "$select": ("report_date_as_yyyy_mm_dd,lev_money_positions_long,lev_money_positions_short,"
+                    "asset_mgr_positions_long,asset_mgr_positions_short,open_interest_all"),
+    }, headers=UA, timeout=60)
+    r.raise_for_status()
+    series = []
+    for row in r.json():
+        try:
+            series.append({
+                "date": row["report_date_as_yyyy_mm_dd"][:10],
+                "lev_net": int(row["lev_money_positions_long"]) - int(row["lev_money_positions_short"]),
+                "am_net": int(row["asset_mgr_positions_long"]) - int(row["asset_mgr_positions_short"]),
+                "oi": int(row["open_interest_all"]),
+            })
+        except (KeyError, ValueError):
+            pass
+    if not series:
+        raise RuntimeError("CFTC TFF 返回空")
+    series.sort(key=lambda x: x["date"])
+    write_json("cot_vix.json", {
+        "latest": series[-1],
+        "short_weeks_52": sum(1 for s in series[-52:] if s["lev_net"] < 0),
+        "series": series,
+    })
+
+
 def build_index_val():
     """SPY/QQQ ETF 口径的估值快照（yfinance；指数级 Forward PE 无免费长史，只取当前值）。"""
     print("== 指数估值快照")
@@ -1226,6 +1322,14 @@ def main():
         build_leaps_index(gspc, vix)
     except Exception as e:
         print(f"  恐惧的标价指数失败（留旧文件）: {e}")
+    try:
+        build_vx_curve(vix)
+    except Exception as e:
+        print(f"  VX 期限结构失败（留旧文件）: {e}")
+    try:
+        build_cot_vix()
+    except Exception as e:
+        print(f"  COT 持仓失败（留旧文件）: {e}")
     build_index_val()
     build_macro()
     build_index_panels("sp500", gspc, vix, "VIX")
