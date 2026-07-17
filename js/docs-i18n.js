@@ -34,7 +34,7 @@
 <h3>Data &amp; methodology</h3>
 <p>Prices and returns approximate total return using adjusted close; CAPE / PE(TTM) come from multpl / Robert Shiller's long series; the Fear &amp; Greed reading is from CNN; company fundamentals from macrotrends and Yahoo Finance; the daily sector heatmap is TradingView's live data. Long-history charts mostly use a log scale so that century-scale moves read honestly — 1929 fell far more than 2000 or 2008, so it should look steeper. That is the data being truthful.</p>
 <h3>How it's built</h3>
-<p>This site was built by one person + AI, hosted as pure static files — no server, no database. The data pipeline (Python, yfinance / pandas + GitHub Actions) pulls data, computes metrics, commits and redeploys automatically after each trading day's close. The code is source-available under PolyForm Noncommercial 1.0.0 — free for noncommercial use; commercial use requires a separate license.</p>
+<p>This site was built by one person and hosted as pure static files — no server, no database; the data is just a few hundred JSON files sitting in a public repo, open for anyone to inspect. The data pipeline (Python, yfinance / pandas + GitHub Actions) pulls data, computes metrics, commits and redeploys automatically after each trading day's close. The code is source-available under PolyForm Noncommercial 1.0.0 — free for noncommercial use; commercial use requires a separate license.</p>
 <h3>Disclaimer, in one line</h3>
 <p>Everything here is for information and education only and <strong>does not constitute investment advice</strong>. Markets carry risk; make your own decisions.</p>` },
       fr: { kicker: "À PROPOS", h1: "À propos de Market Chronicle",
@@ -356,7 +356,7 @@
     },
 
     pricing: {
-      en: { kicker: "PRICING", h1: "Pricing", dek: "No stock picks, no predictions, no performance claims — and when we're wrong, it stays on the record. One job: reading today's market \"weather\" — how expensive, how afraid, where it sits in history — into three minutes of plain language before every open.",
+      en: { kicker: "PRICING", h1: "Pricing", dek: "No stock picks, no predictions, no performance bragging — if that's the service you want, the door is that way. Before every open we answer three questions: how expensive is today, how afraid is the market, and where this spot ranks in history. Three minutes of plain words; when we're wrong, it stays on the record.",
         body: `<div class="pbill">
   <div class="pbill-inner">
     <button class="pbill-btn active" data-bill="m">Monthly</button>
