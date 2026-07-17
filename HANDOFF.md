@@ -1176,3 +1176,7 @@ pulse 页 EN 的 canonical 定义里含「恐」字 = 品牌解释（K 取自恐
 - 原则留档:**坐标轴/标注文字是家具不是数据，保持灰系不动**；数据色两色制=danger(#FF2400 通用)+moss(浅 #14A63E/暗 #34D96C 自动切换)，暗夜实测两色俱佳
 - ⚠️ 未动（不在点名范围，待用户裁）：短端vs长端图（VIX1Y=accent 砖红+VIX9D=moss）与 COT 阵型图（杠杆基金=accent+资管=moss 虚线）仍是砖红系——**同页现存猩红/砖红两套红**，要不要全站数据红统一成猩红属品牌决策
 - 🐛 自纠：往 JS 数组里塞了 HTML 注释（`<!-- -->`）——node --check 前就该发现，JS 注释一律 `//`
+
+### 26.12 cot_vix.json 补四条腿（`3bd561b`，2026-07-17，落库线跨会话提出）
+- 26.10 的任务书给落库线列了 lev_long/lev_short/am_long/am_short，但 JSON 只存了净额=任务书与数据自相矛盾；落库线 agent 没破「禁打原始端点」的规矩、开对话框来问=规矩起效的样子。修法=根治：Socrata 拉取本来就 SELECT 了四条腿，写进 series 每行（8 字段），131KB，站上图不受影响（只读 net）。净额看不出「空头平了还是多头加了」——四条腿是叙事素材（例：翻多那周是 long 加了 1.2 万还是 short 砍了？现在能答）
+- 📌 顺手核实：chronicle.klay-wang.com **已在 Cloudflare 橙云代理后**（server: cloudflare + cf-ray），且 index.html:981 已埋 CF Web Analytics beacon（无 cookie）——代理层+beacon 两层指标现成可看；已知盲区=hash 路由无独立 pageview（§25 记过）+ beacon 被拦截器挡=下限、代理层含爬虫=上限；隐私政策未提 CF 分析，待下次改版补一句（进队列）
