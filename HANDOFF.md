@@ -1180,3 +1180,9 @@ pulse 页 EN 的 canonical 定义里含「恐」字 = 品牌解释（K 取自恐
 ### 26.12 cot_vix.json 补四条腿（`3bd561b`，2026-07-17，落库线跨会话提出）
 - 26.10 的任务书给落库线列了 lev_long/lev_short/am_long/am_short，但 JSON 只存了净额=任务书与数据自相矛盾；落库线 agent 没破「禁打原始端点」的规矩、开对话框来问=规矩起效的样子。修法=根治：Socrata 拉取本来就 SELECT 了四条腿，写进 series 每行（8 字段），131KB，站上图不受影响（只读 net）。净额看不出「空头平了还是多头加了」——四条腿是叙事素材（例：翻多那周是 long 加了 1.2 万还是 short 砍了？现在能答）
 - 📌 顺手核实：chronicle.klay-wang.com **已在 Cloudflare 橙云代理后**（server: cloudflare + cf-ray），且 index.html:981 已埋 CF Web Analytics beacon（无 cookie）——代理层+beacon 两层指标现成可看；已知盲区=hash 路由无独立 pageview（§25 记过）+ beacon 被拦截器挡=下限、代理层含爬虫=上限；隐私政策未提 CF 分析，待下次改版补一句（进队列）
+
+### 26.13 创始价带码链接上线（`?code=`，2026-07-17 晚，绕过 Paddle 浮层「添加折扣码」不渲染的谜）
+- 背景：创始码开了 enabled_for_checkout 后，结账浮层仍不出现「添加折扣码」入口（Save 已确认、硬刷已试）——不再猜 Paddle 的条件渲染，绕过
+- 实现：`index.html` 结账脚本读 `?code=` → `Checkout.open` 传 `discountCode` 并**强制按年价**（创始价定义=按年 $99；且 $191 flat 折扣绝不能落在 $29 月价上——负价/清零边界）。发放姿势升级：**链接自带价，收礼者连码都不用输**（chronicle.klay-wang.com/?code=XXX#pricing），成为 50 席创始发放的标准动作
+- 验证：本地拦截 Checkout.open 实测——带码时 priceId=年价+discountCode 在场；无码时月/年各归其位、无码字段=**ALL_MATCH 不变量保持**；console 零错误
+- ⚠️ 待用户后台确认一件安全事：折扣的 Limit to specific products 里**只应勾 Standard — Annual**（若月价也在列，去掉——防有人用码撞月价出 $0 订阅）

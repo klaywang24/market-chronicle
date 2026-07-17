@@ -959,17 +959,23 @@ if (window.Paddle) {
     m: "pri_01kxgfsayca5nv3re1103pzvew", // Standard $29 / Monthly
     y: "pri_01kxgg3h87b5e9rzd9gmky685g", // Standard $290 / Yearly
   };
+  // 创始价带码链接（2026-07-17）：?code=XXX 时结账自动挂码——「我亲手给你开的价」，
+  // 收礼的人连码都不用输。有码时强制按年价：创始价定义就是按年 $99（$290−$191），
+  // 且 $191 的 flat 折扣绝不能落在 $29 月价上（负价/清零边界）。
+  const FOUNDING_CODE = new URLSearchParams(location.search).get("code");
   document.addEventListener("click", (e) => {
     if (!e.target.closest("#pay-btn")) return;
     e.preventDefault();
     // 点击瞬间现读 .annual，复用既有的按月/按年切换，不另存一份状态
     const y = document.getElementById("pricing-tiers")?.classList.contains("annual");
-    Paddle.Checkout.open({
-      items: [{ priceId: PADDLE_PRICES[y ? "y" : "m"], quantity: 1 }],
+    const open = {
+      items: [{ priceId: PADDLE_PRICES[(FOUNDING_CODE || y) ? "y" : "m"], quantity: 1 }],
       // 付完钱落到自己的页面：Paddle 自带成功页不会说「24 小时内手动开通」，
       // 而本站是一个人手动把付费者加进邮件列表的——不设这个，买家付完钱会以为没下文。
       settings: { successUrl: "https://chronicle.klay-wang.com/welcome/" },
-    });
+    };
+    if (FOUNDING_CODE) open.discountCode = FOUNDING_CODE;
+    Paddle.Checkout.open(open);
   });
 }
 </script>
