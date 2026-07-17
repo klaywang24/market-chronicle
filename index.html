@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260717a">
+<link rel="stylesheet" href="css/style.css?v=20260717b">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -586,7 +586,7 @@
       <div class="sub">红线 = 1 年期（VIX1Y，LEAPS 对应的那截）；绿线 = 9 天期（VIX9D）。两线的间距 = 期限斜率；短端的波动远大于长端。</div>
       <div class="chart tall" id="ch-leaps-ends"></div>
     </div>
-    <div class="poem">这是温度计，不是策略。它只回答"贵还是便宜"，不回答"该不该买"——买不买还需要你自己对方向的判断。每个读数带 Git 时间戳，事前记录、改不了。</div>
+    <div class="poem">这是温度计，不是策略。它只回答"贵还是便宜"，不回答"该不该买"。每个读数带 Git 时间戳，事前记录、公开可查。</div>
   </div>
 
   <!-- ===== 历史参照：恐惧极值之后（描述性记录，非建议） ===== -->
@@ -637,6 +637,8 @@
       <div class="sub">任一时点回看三年的年化收益率；实线为机械跟随、虚线为满仓两个锚——纯历史对照，说明"低暴露≠更优"，非策略推荐 · 底部滑块可拖拽缩放</div>
       <div class="chart" id="ch-leaps-roll"></div>
     </div>
+    <!-- 辅助入口只说送达，不提价格，不做按钮：与上方历史对照图保持文案与形态上的距离（相邻性定案） -->
+    <div class="poem">这一页的读数，每个交易日盘前送进邮箱 → <a href="#pricing">盘前数据简报</a></div>
   </div>
 </section>
 
@@ -916,9 +918,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260717a"></script>
-<script src="js/app.js?v=20260717a"></script>
-<script src="js/docs-i18n.js?v=20260717a"></script>
+<script src="js/i18n.js?v=20260717b"></script>
+<script src="js/app.js?v=20260717b"></script>
+<script src="js/docs-i18n.js?v=20260717b"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。

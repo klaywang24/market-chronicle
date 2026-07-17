@@ -25,6 +25,21 @@ jobs:
           git commit -m "data: daily update $(date -u +%F)" || echo "no changes"
           git pull --rebase origin main
           git push
+      # 锚定：把「公开可查」做成机制——git 日期本地可伪造，第三方存档不能。
+      # 存当日 commit 的 GitHub 页（见证提交历史状态）+ 站点 + 两个台账 JSON。
+      # Wayback 不稳定属常态：任何失败都不许影响管线与告警（continue-on-error + 逐条 || true）。
+      - name: anchor to Wayback
+        continue-on-error: true
+        run: |
+          SHA=$(git rev-parse HEAD)
+          for u in \
+            "https://github.com/${{ github.repository }}/commit/$SHA" \
+            "https://chronicle.klay-wang.com/" \
+            "https://chronicle.klay-wang.com/data/kindex.json" \
+            "https://chronicle.klay-wang.com/data/leaps_gauge.json"; do
+            curl -sS -m 60 "https://web.archive.org/save/$u" -o /dev/null || true
+            sleep 5
+          done
       # ⚠️ if: always() 是故意的——失败时也要发通知。但必须把 job 状态传进去，
       # 否则脚本会读到磁盘上的旧 pulse.json，发出一条「看起来一切正常」的播报，
       # 把失败静默掉。2026-07-12→14 管线死了 4 天没人发现，就是栽在这里。

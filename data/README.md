@@ -40,7 +40,7 @@
 - 而你**无法证明自己没有编** —— 因为证明在这个仓库的 [commit 历史](https://github.com/klaywang24/market-chronicle/commits/main)里。
 - **一份被复制的时间戳台账，没有时间戳。**
 
-我们卖的从来不是数字，是「这个数字是那天记下的，而且改不了」。
+我们卖的从来不是数字，是「这个数字是那天记下的，公开可查」。
 
 **A copy of a timestamped ledger has no timestamps. That's the whole point.**
 
