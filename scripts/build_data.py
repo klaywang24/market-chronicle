@@ -879,10 +879,13 @@ def build_cot_vix():
     series = []
     for row in r.json():
         try:
+            ll, ls = int(row["lev_money_positions_long"]), int(row["lev_money_positions_short"])
+            al, am = int(row["asset_mgr_positions_long"]), int(row["asset_mgr_positions_short"])
+            # 四条腿原样保留（2026-07-17 落库线提出：净额看不出「空头平了还是多头加了」）
             series.append({
                 "date": row["report_date_as_yyyy_mm_dd"][:10],
-                "lev_net": int(row["lev_money_positions_long"]) - int(row["lev_money_positions_short"]),
-                "am_net": int(row["asset_mgr_positions_long"]) - int(row["asset_mgr_positions_short"]),
+                "lev_long": ll, "lev_short": ls, "lev_net": ll - ls,
+                "am_long": al, "am_short": am, "am_net": al - am,
                 "oi": int(row["open_interest_all"]),
             })
         except (KeyError, ValueError):
