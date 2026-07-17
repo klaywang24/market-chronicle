@@ -30,9 +30,15 @@ FNG_LIVE = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
 MULTPL_CAPE = "https://www.multpl.com/shiller-pe/table/by-month"
 
 
+# 许可标记：文件被单独拷走/热链时声明跟着走；改这句必须同步重写存量文件，否则新旧不一致
+NOTICE = "PolyForm Noncommercial 1.0.0 · © Klay Wang · https://chronicle.klay-wang.com · free for noncommercial use; commercial use requires a license (klaywang24+marketchronicle@gmail.com)"
+
+
 def write_json(name: str, obj):
     path = DATA / name
     # 拉失败时上游函数会抛异常走到不了这里，留旧文件不覆盖
+    if isinstance(obj, dict):
+        obj = {"_notice": NOTICE, **{k: v for k, v in obj.items() if k != "_notice"}}
     path.write_text(json.dumps(obj, ensure_ascii=False, separators=(",", ":")))
     print(f"  wrote {name} ({path.stat().st_size/1024:.0f} KB)")
 

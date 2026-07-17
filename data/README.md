@@ -13,6 +13,7 @@
 - ✅ **随便用**：自己看、研究、复算、教学、写文章引用
 - ❌ **不可以**：用于任何商业目的（包括拿它做付费产品、再分发、训练用于商业变现的模型）
 - 商业授权：[klaywang24+marketchronicle@gmail.com](mailto:klaywang24+marketchronicle@gmail.com)
+- 每个 JSON 文件顶部带 `_notice` 许可标记（管线写库时自动注入）——文件被单独拷走或热链时，声明跟着文件走
 
 **Noncommercial use is free. Commercial use requires a license — contact the address above.**
 

@@ -1076,3 +1076,11 @@ pulse 页 EN 的 canonical 定义里含「恐」字 = 品牌解释（K 取自恐
 - Kaggle bio 曾写 KAPX =「a daily U.S.-equity **timing signal**」→ 用户已改「fear-pricing gauge」（meta 已线上验证）；HF profile bio 已贴 canonical 句。**四面（站/Git/HF/Kaggle）首次全对齐**
 - 订阅漏斗补完：`/check-inbox/`（538786e）+ `/confirmed/`（09012c8）两页上线并 200 验证；Buttondown Redirects 两框由用户填；双重确认 = Buttondown 平台强制无开关（官方文档核实）；付费侧走 API `type:regular` 直进、无确认信（既定设计）
 - **明日（发送日 07-17）方案已定**：主图 = 卡1 一卡两版（处决系列周更、明日不发）；主帖 券商 = V9「问到头了吗」换框版 + 卡1纯中文，X = 恐慌日主体文案（情景句由今晚读数三选一）+ 卡1英文主放第 1 条；⭐坐标句「同一天第一大权重创历史新高、存储双雄两日约 -16%」进 digest 材料区（纯分布陈述零归因）；15 版回复弹药 + MU/SNDK 模板等明早落库终版数填空
+
+### 23.6 数据 JSON 嵌 `_notice` 许可标记 + license 完整性核查（2026-07-16 深夜）
+- **核查结论：license 五处齐**（LICENSE 全文 / 双语 README License 段+徽章+Required Notice / data/README 许可+商业授权邮箱 / llms.txt / 站脚声明），口径一致。GitHub API 显示 license=Other/NOASSERTION **属正常**（PolyForm 不在 GitHub 自动识别列表，不影响效力），勿当 bug 修
+- 缺口 = 单个 JSON 被拷走/热链时不带任何声明 → `build_data.py::write_json` 注入顶位 `_notice` 键（build_fundamentals 同用此口，一处改动覆盖两条管线）；存量 375 个 data/*.json 已回填（顶层全 dict 已验证）。⚠️ 字符串常量 = build_data.py 的 `NOTICE`，**改这句必须同步重写存量文件，否则新旧不一致**
+- 前端安全性验证过：`Object.keys` 遍历只发生在 ECharts option 的 i18n 翻译（app.js:66），没有任何地方把数据 JSON 的键枚举成序列；本地起站首页 + KAPX 面板全渲染、console 零错误
+- 认知留痕（用户问"如何防止商用"的答案）：**数字=事实，美国法下不受版权（Feist）**；license 真实作用 = 挡正规玩家（法务不碰 NC 仓库）+ 给 DMCA/索偿依据（护的是代码/文案/编排，不是数字）；真护城河 = 时间戳台账（data/README「抄走=快照」段已写透）。**别用改动数据当反抄袭指纹**——违反事实铁律与「事后不可改写」承诺，字段式声明就够
+- 订阅条款去向已定：**合同本体在站上**（Paddle 是 MoR，结账页链接站上条款/退款页，Paddle 后台不用动）；**Buttondown 是送达通道**（welcome 邮件 + footer Snippet 各加一句「仅限订阅者个人非商业使用，不得转发/转售/再分发」，由用户在 Buttondown 后台粘贴，未做）
+- 同日顺手：README Credits 修剪至只留 Big Picture（`0aa186f`）
