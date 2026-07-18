@@ -23,6 +23,8 @@
 
 全部来自公开免费源。**这里没有任何一个数字是私有的** —— 你完全可以从这些源头自己重算一遍，我们鼓励你这么做。
 
+**修订政策 · Revision policy**：本站对数字只做忠实转录——按官方源当日发布的值原样入账，绝不修改。官方源日后修订数据时，台账既有行保持原样（它如实记录了「当时官方说什么」），修订以新行或备注标注，绝不悄悄覆盖历史。*Numbers enter the ledger as the sources published them that day. If a source later revises, the original row stays as recorded and the revision is annotated separately — history is never silently overwritten.*
+
 | 来源 | 用途 |
 |---|---|
 | [Cboe](https://www.cboe.com/tradable_products/vix/vix_historical_data/) | VIX9D / VIX / VIX3M / VIX6M / VIX1Y / VXN / SKEW（官方日收盘） |

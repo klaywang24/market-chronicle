@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260717g">
+<link rel="stylesheet" href="css/style.css?v=20260717h">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -685,7 +685,7 @@
       <h3>这是什么</h3>
       <p>美股编年史（Market Chronicle）把标普 500、纳斯达克，以及金融、消费、奢侈品等个股篮子的历史，整理成章节式的可视化：回报的形状、危机的节奏、估值的锚、波动的纹理、时间的复利。除了长历史图表，还有三个自研视角——「今日头版」的市场温度、「K 指数」、「LEAPS 窗口」。</p>
       <h3>数据与口径</h3>
-      <p>价格与回报以复权收盘价（Adj Close）近似含分红总回报；估值 CAPE / PE(TTM) 来自 multpl / Robert Shiller 的长历史序列；恐惧贪婪指数来自 CNN；个股基本面来自 macrotrends 与 Yahoo Finance；今日板块热力图为 TradingView 实时数据。长历史图表多采用对数坐标，以如实呈现百年尺度上的涨跌——1929 年跌得比 2000、2008 深得多，图上就应当更陡，这是数据本身的诚实。</p>
+      <p>价格与回报以复权收盘价（Adj Close）近似含分红总回报；估值 CAPE / PE(TTM) 来自 multpl / Robert Shiller 的长历史序列；恐惧贪婪指数来自 CNN；个股基本面来自 macrotrends 与 Yahoo Finance；今日板块热力图为 TradingView 实时数据。长历史图表多采用对数坐标，以如实呈现百年尺度上的涨跌——1929 年跌得比 2000、2008 深得多，图上就应当更陡，这是数据本身的诚实。本站对数字只做忠实转录：按官方源当日发布的值原样入账，绝不修改；源头日后修订时，旧记录保持原样——它记录的是「官方当时说了什么」——修订另行注明，绝不悄悄覆盖。</p>
       <h3>怎么建的</h3>
       <p>本站由一人搭建，纯静态托管——没有服务器，也没有数据库，站上的数据就是公开仓库里那几百个 JSON 文件，谁都能翻。数据管线用 Python（yfinance / pandas）+ GitHub Actions，每个交易日收盘后自动拉数、算指标、提交、重新部署。代码以 PolyForm Noncommercial 1.0.0 许可公开：非商业使用免费，商业使用需另行授权。</p>
       <h3>一句话免责</h3>
@@ -940,9 +940,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260717g"></script>
-<script src="js/app.js?v=20260717g"></script>
-<script src="js/docs-i18n.js?v=20260717g"></script>
+<script src="js/i18n.js?v=20260717h"></script>
+<script src="js/app.js?v=20260717h"></script>
+<script src="js/docs-i18n.js?v=20260717h"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。
