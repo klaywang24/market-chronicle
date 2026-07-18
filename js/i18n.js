@@ -153,7 +153,6 @@
     "K 指数 · 台账": ["KAPX · Ledger", "KAPX · Registre", "KAPX · Journal", "KAPX · Registro"],
     "恐惧的标价 · 台账": ["The Price of Fear · Ledger", "Le prix de la peur · Registre", "Der Preis der Angst · Journal", "El precio del miedo · Registro"],
     "LEAPS 窗口": ["LEAPS Window", "Fenêtre LEAPS", "LEAPS-Fenster", "Ventana LEAPS"],
-    "行情": ["Quotes", "Cours", "Kurse", "Cotización"],
     // ---- 恐惧的标价指数（LEAPS 贵贱温度计） ----
     "恐惧的标价": ["Fear's Price Tag", "", "", ""],
     "LEAPS · 贵贱温度计": ["LEAPS · COST THERMOMETER", "", "", ""],
@@ -242,7 +241,6 @@
     "每个点是一次极端恐惧段：横轴 = 当日 VIX（恐慌的保费水位），纵轴 = 12 个月后纳指涨跌幅；绿 = 涨、红 = 跌 · 点任意点看当次 · 历史描述，非建议": ["Each dot is one extreme-fear segment: x = VIX that day (the panic premium level), y = Nasdaq-100 change 12 months later; green = up, red = down · click any dot for that instance · historical description, not advice.", "", "", ""],
     "任一时点回看三年的年化收益率；实线为机械跟随、虚线为满仓两个锚——纯历史对照，说明\"低暴露≠更优\"，非策略推荐 · 底部滑块可拖拽缩放": ["Annualized return looking back three years at any point; the solid line is mechanical follow, the dashed lines are two fully-invested anchors — a pure historical comparison showing \"lower exposure ≠ better,\" not a strategy recommendation · drag the slider below to zoom.", "", "", ""],
     "指数 ETF": ["Index ETFs", "ETF indiciels", "Index-ETFs", "ETF de índice"],
-    "行情图表暂时加载不出来": ["Live chart can't load right now", "", "", ""],
     "图表由 TradingView 提供，当前网络连不上它的服务器（中国大陆地区需要国际网络）。站内其他板块的历史数据不受影响，可正常浏览。": [
       "Charts are served by TradingView, which is unreachable on the current network (mainland China requires an international connection). All other sections of this site work normally.", "", "", ""],
     "重试": ["Retry", "", "", ""],
