@@ -2211,7 +2211,7 @@
           <div class="lc-meta"><span>分位 · 全史 · ${x.real_rate.value.toFixed(2)}%</span></div>
         </div>
       </div>
-      <p class="footnote src-note"><span>VIX1Y = ${c.vix1y}</span> · <span>4 context 只展示，不平均进头条</span> · <span>数据截至</span> ${c.date}（<span>${c.segment === "forward" ? "前向台账" : "回测"}</span>）· <span>描述性数据，非投资建议</span></p>`;
+      <p class="footnote src-note"><span>VIX1Y = ${c.vix1y}</span> · <span>4 context 只展示，不平均进头条</span> · <span>数据截至</span> ${c.date} (<span>${c.segment === "forward" ? "前向台账" : "回测"}</span>) · <span>描述性数据，非投资建议</span></p>`;
   }
 
   // 恐惧的分解（2026-07-17 自头版迁入）：与本页 4 context 去重后剩四卡——
