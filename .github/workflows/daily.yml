@@ -17,6 +17,13 @@ jobs:
       - run: python scripts/build_data.py
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      # 台账自核：把 data/README「修订政策」从一句断言变成每日机器核验。
+      # 必须在 commit 之前跑——此刻 git 历史里还是「昨天之前发布过的值」，
+      # 拿它跟刚重算出来的文件对，才能看出本次重算有没有改写已发布的历史。
+      # 产物 data/ledger_audit.json 随下一步 git add data 一起提交、公开可查。
+      - name: verify ledger
+        id: verify
+        run: python scripts/verify_ledger.py
       - name: commit data
         run: |
           git config user.name "klaywang24"
@@ -50,3 +57,6 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           JOB_STATUS: ${{ job.status }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          # 空值（verify 步骤没跑成）→ 脚本不会谎报「台账无异常」，只是不发这条告警；
+          # 真出事时 JOB_STATUS 那道闸会先响。
+          LEDGER_DELTA: ${{ steps.verify.outputs.delta }}

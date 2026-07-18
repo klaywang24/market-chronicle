@@ -68,6 +68,26 @@ def main():
                       f"job 报成功但数据没前进，检查上游取数。\n日志：{run_url}")
         except Exception:
             pass
+
+    # ③ 台账自核：已发布过的值被改写、或交易日消失 → 告警。
+    #    ⚠️ 触发判据取自 verify_ledger 步骤的 env 输出，不取磁盘文件——文件可能是上一次的，
+    #    「读旧文件发平安播报」正是 2026-07-12 那次故障被静默掉的形态。
+    #    按「相比上次的新增」响，不按绝对数：存量分歧天天叫 = 狼来了。
+    delta_raw = os.environ.get("LEDGER_DELTA", "")
+    if delta_raw not in ("", "0"):
+        au = load("ledger_audit") or {}
+        total = au.get("total_divergences", "?")
+        lines = []
+        for r in au.get("reports", []):
+            c = r.get("counts") or {}
+            if c.get("total"):
+                lines.append(f'· {r.get("file")}：消失 {c.get("missing", 0)} / '
+                             f'当场记录被改 {c.get("revised_live", 0)} / '
+                             f'回填段被改 {c.get("revised_backfill", 0)}')
+        alert(url, f"🔴 台账自核：分歧数较上次变化 {delta_raw}（现共 {total} 处）",
+              "**已发布过的数值被改写，或有交易日消失。**\n" + "\n".join(lines)
+              + f"\n\n逐条明细：data/ledger_audit.json\n日志：{run_url}")
+
     leaps = load("leaps") or {}
     q = d.get("quotes", {})
 

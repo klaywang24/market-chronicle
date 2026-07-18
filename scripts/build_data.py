@@ -70,19 +70,31 @@ def rnd(s, n=2) -> list:
 # ---------------------------------------------------------------- K 指数
 
 def fetch_fng():
-    """CNN 恐贪：whit3rabbit 存档（2011→）+ 官方接口当天值。返回 (Series, rating)。"""
+    """CNN 恐贪：whit3rabbit 存档（2011→）+ CNN 官方逐日定稿序列（滚动一年，权威）。
+    返回 (Series, 末日 rating)。
+
+    🚨 绝不取 fear_and_greed.score —— 那是「此刻」的实时读数，不是当日定稿值。
+    2026-07-18 台账自核查出：管线曾把它当收盘值入账，7 个交易日的值事后被定稿值
+    系统性下修 1.6–3.6 分（7/7 同向，不是源头重述是取数错），且 2026-07-15 因
+    只存在于实时快照、从未进过任何定稿序列，事后整天消失。
+    fear_and_greed_historical 才是官方逐日定稿序列，且每条自带 rating。
+    口径：官方定稿序列优先；它只覆盖滚动一年，更早的历史仍由 whit3rabbit 存档提供。
+    """
     csv = requests.get(FNG_ARCHIVE, headers=UA, timeout=30)
     csv.raise_for_status()
     from io import StringIO
     fng = pd.read_csv(StringIO(csv.text), parse_dates=["Date"]).set_index("Date")["Fear Greed"]
     live_note = ""
     try:
-        live = requests.get(FNG_LIVE, headers=UA, timeout=30).json()["fear_and_greed"]
-        ts = pd.Timestamp(live["timestamp"][:10])
-        fng.loc[ts] = float(live["score"])
-        live_note = live["rating"]
+        hist = requests.get(FNG_LIVE, headers=UA, timeout=30).json()["fear_and_greed_historical"]["data"]
+        off = pd.DataFrame(hist)
+        # 同一天可能有两条（00:00 定稿 + 当日尾盘刷新），normalize 后取最后一条
+        off["d"] = pd.to_datetime(off["x"], unit="ms").dt.normalize()
+        off = off.drop_duplicates("d", keep="last").set_index("d").sort_index()
+        fng = pd.concat([fng[~fng.index.isin(off.index)], off["y"].astype(float)])
+        live_note = str(off["rating"].iloc[-1])
     except Exception as e:
-        print(f"  CNN live endpoint unavailable, archive only: {e}")
+        print(f"  CNN official daily series unavailable, archive only: {e}")
     return fng[~fng.index.duplicated(keep="last")].sort_index(), live_note
 
 
