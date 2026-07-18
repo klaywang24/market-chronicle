@@ -225,6 +225,7 @@
     "0 · 个股与大盘同调": ["0 · names move with the index", "", "", ""],
     "各走各的 · 100": ["each on its own · 100", "", "", ""],
     "历史中位": ["historical median", "", "", ""],
+    "标普500成分股": ["S&P 500 constituents", "", "", ""],
     "百分位": ["percentile", "", "", ""],
     "当前": ["current", "", "", ""],
     // 「VIXEQ ÷ VIX」故意不建键：中英同形无需翻译，且它无汉字、÷ 是 U+00F7

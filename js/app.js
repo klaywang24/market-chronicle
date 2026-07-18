@@ -58,7 +58,19 @@
   // ECharts option 内的中文（series 名/轴名/图例/标注）按当前语言翻译
   function i18nOption(o) {
     if (!window.MC_I18N || MC_I18N.lang() === "zh" || o == null) return o;
-    if (Array.isArray(o)) { o.forEach(i18nOption); return o; }
+    // ⚠️ 数组元素若是字符串，必须在这里翻译——不能只 forEach(i18nOption)，
+    // 因为 i18nOption 对字符串是空操作（它只处理对象/数组），于是「类目轴的
+    // data 数组」「legend 的 data 数组」这类纯字符串数组永远不会被翻译。
+    // 2026-07-18 由波动率家族横条图暴露：EN 下 y 轴仍是「高盛/苹果/谷歌/亚马逊」，
+    // 而同图的 xAxis.name 与 markLine.formatter（对象上的字符串属性）却翻对了。
+    // 这是通用漏洞，不限于该图；修在此处，所有类目轴图表一并受益。
+    if (Array.isArray(o)) {
+      o.forEach((v, i) => {
+        if (typeof v === "string" && /[一-鿿]/.test(v)) o[i] = MC_I18N.translate(v);
+        else i18nOption(v);
+      });
+      return o;
+    }
     if (typeof o === "object") {
       for (const k of Object.keys(o)) {
         const v = o[k];
