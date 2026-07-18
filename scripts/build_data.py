@@ -995,6 +995,123 @@ def build_vol_family(vix_close: pd.Series):
     })
 
 
+# ---------------- 做空成交结构（2026-07-18 新建）：FINRA 逐日 RegSHO ----------------
+# 🚨 口径警告（必须与读数同时出现，勿弱化）：做空占比高 ≠ 有人看空。
+#    做市商对冲、ETF 申赎套利、可转债对冲全部计入做空量。它量的是**卖方向成交的
+#    结构占比**，不是情绪、不是持仓、更不是"谁在赌跌"。CFTC COT 能说"谁在押注恐惧"
+#    是因为它按交易者类别拆分了；FINRA 这份没有拆，所以那句话这里说不得。
+# 因此本模块只做一件事：把当日占比放进它自己的历史里给一个位置（百分位）。
+#    ——同「恐惧的标价」的逻辑：报位置，不报判断。
+FINRA_SHVOL = "https://cdn.finra.org/equity/regsho/daily/CNMSshvol{}.txt"
+SHORT_FLOW_TICKERS = ["SPY", "QQQ", "AAPL", "AMZN", "GOOGL", "META", "MSFT",
+                      "NVDA", "TSLA", "AVGO", "MU", "SNDK", "SPCX"]
+SHORT_FLOW_WINDOW = 756     # 3 年，与站上其余百分位同口径
+SHORT_FLOW_MIN = 250        # 不足则不给百分位，绝不用短窗口冒充
+
+
+def _finra_day(day: str) -> dict:
+    """某交易日的 {ticker: 做空占比%}。非交易日/未发布返回 {}。"""
+    try:
+        r = requests.get(FINRA_SHVOL.format(day), headers=UA, timeout=30)
+        if r.status_code != 200 or len(r.text) < 1000:
+            return {}
+    except Exception:
+        return {}
+    out, want = {}, set(SHORT_FLOW_TICKERS)
+    for line in r.text.splitlines()[1:]:
+        p = line.split("|")
+        if len(p) >= 5 and p[1] in want:
+            try:
+                sv, tv = float(p[2]), float(p[4])
+            except ValueError:
+                continue
+            if tv > 0:
+                out[p[1]] = round(sv / tv * 100, 2)
+    return out
+
+
+def build_short_flow(max_backfill: int = 3):
+    """FINRA 逐日做空成交占比 → data/short_flow.json。
+
+    **增量追加**：读回已有文件，只拉缺的交易日。日常只缺 1 天（≈2 秒）；
+    首次回填用 max_backfill 调大（1.88 秒/文件，756 天约 24 分钟）。
+    已写入的日期永不重取、永不覆盖——FINRA 不修订历史，且这也让本表天然
+    具备前向台账属性（与 verify_ledger 的诉求同向）。
+    """
+    print("== 做空成交结构（FINRA RegSHO）")
+    path = DATA / "short_flow.json"          # DATA 是模块里既有的 pathlib 路径
+    old = {}
+    if path.exists():
+        try:
+            old = json.loads(path.read_text(encoding="utf-8")).get("by_date", {})
+        except Exception:
+            old = {}
+
+    today = datetime.now(timezone.utc).date()
+    added, tried = 0, 0
+    d = today
+    while tried < max_backfill * 2 and added < max_backfill:
+        key = d.strftime("%Y%m%d")
+        if d.weekday() < 5 and key not in old:
+            row = _finra_day(key)
+            tried += 1
+            if row:
+                old[key] = row
+                added += 1
+        d -= timedelta(days=1)
+        if (today - d).days > max_backfill * 3 + 10:
+            break
+    print(f"   新增 {added} 个交易日，累计 {len(old)}")
+
+    dates = sorted(old)
+    series, current = {}, {}
+    for tk in SHORT_FLOW_TICKERS:
+        vals = [old[dt].get(tk) for dt in dates]
+        series[tk] = vals
+
+        # 🚨 代码复用检测：交易所会把退市公司的代码分配给新公司，两段历史必须切断。
+        # 实测 SPCX——旧 SPCX（SPAC 主题 ETF）到 2026-04-06，断 47 个交易日后
+        # 2026-06-12 变成 SpaceX。不切的话就是拿 SpaceX 的读数去跟一只 ETF 的历史
+        # 排百分位，数字看着正常、含义完全是假的。
+        # 判据=最后一个 >10 交易日的断口；实测 12 只正常票断口均为 0，零误伤。
+        idx = [i for i, v in enumerate(vals) if v is not None]
+        cut = 0
+        for a, b in zip(idx, idx[1:]):
+            if b - a - 1 > 10:
+                cut = b
+        if cut:
+            print(f"   ⚠️ {tk} 在 {dates[cut]} 前有 {cut} 天疑似属于同代码的前任标的，已切断")
+        seen = [vals[i] for i in idx if i >= cut]
+        if not seen:
+            continue
+        cur = seen[-1]
+        win = seen[-SHORT_FLOW_WINDOW:]
+        enough = len(win) >= SHORT_FLOW_MIN
+        current[tk] = {
+            "ratio": cur,
+            "pctile": round(sum(1 for v in win if v <= cur) / len(win) * 100, 1) if enough else None,
+            "days": len(win),
+            "note": None if enough else f"历史仅 {len(win)} 交易日，不足 {SHORT_FLOW_MIN} 日，百分位不计算",
+        }
+
+    write_json("short_flow.json", {
+        "meta": {
+            "name": "做空成交结构",
+            "source": "FINRA RegSHO 每日合并文件（官方）",
+            "headline": "当日做空成交占总成交的比例，及其在过去 3 年（756 交易日）的百分位",
+            "caveat": "做空占比高 ≠ 有人看空：做市商对冲、ETF 申赎套利、可转债对冲均计入做空量。"
+                      "本读数量的是卖方向成交的结构占比，不是情绪、不是持仓、不是方向判断。",
+            "nature": "描述性数据，非交易信号/非预测；仅为数据，非投资建议。",
+            "window": f"{SHORT_FLOW_WINDOW} 交易日；不足 {SHORT_FLOW_MIN} 日不给百分位",
+            "asof": dates[-1] if dates else None,
+        },
+        "dates": dates,
+        "by_date": old,          # 原样留存，只追加不覆盖
+        "series": series,
+        "current": current,
+    })
+
+
 def build_index_val():
     """SPY/QQQ ETF 口径的估值快照（yfinance；指数级 Forward PE 无免费长史，只取当前值）。"""
     print("== 指数估值快照")
@@ -1432,6 +1549,10 @@ def main():
         build_vol_family(vix)
     except Exception as e:
         print(f"  波动率家族失败（留旧文件）: {e}")
+    try:
+        build_short_flow()      # 增量：日常只补 1 天；回填另用大 max_backfill 手动跑
+    except Exception as e:
+        print(f"  做空成交结构失败（留旧文件）: {e}")
     build_index_val()
     build_macro()
     build_index_panels("sp500", gspc, vix, "VIX")

@@ -1951,6 +1951,10 @@
     ["ch-spy-sectors", "Wikipedia"], ["ch-qqq-sectors", "Wikipedia"],
     ["spy-top-table", "SSGA (SPDR)"], ["qqq-top-table", "stockanalysis"],
     ["ch-leaps-vx", "Cboe CFE daily settlement"], ["ch-leaps-cot", "CFTC · Traders in Financial Futures"],
+    // 2026-07-18：这两张图不吃页面默认的 Cboe+FRED+CNN+Yahoo 那串——写错出处比不写更糟。
+    // ⚠️ 源名必须纯英文（本串不走 i18n，中文会在 EN 下泄漏）。
+    ["ch-vol-family", "Cboe equity & sector volatility indices"],
+    ["ch-short-flow", "FINRA RegSHO daily short volume"],
   ];
   let metaDate = "";
 
@@ -2406,6 +2410,48 @@
         },
         label: { show: true, position: "right", color: p.muted, fontSize: 11,
           fontFamily: "JetBrains Mono", formatter: (x) => x.value.toFixed(1) },
+        markLine: { silent: true, symbol: "none",
+          lineStyle: { color: p.ink, type: "dashed", width: 1 },
+          label: { color: p.ink, formatter: "50 中性", fontSize: 10, fontFamily: "JetBrains Mono" },
+          data: [{ xAxis: 50 }] },
+      }],
+    };
+  });
+
+  // 做空成交结构（2026-07-18）：只报位置，不报方向。
+  // 🚨 做空占比高 ≠ 看空（做市商对冲/ETF 套利/可转债对冲均计入），故这张图画的是
+  // 「当日占比在自己三年历史中的百分位」，而不是占比本身——占比只作 tooltip 里的原值。
+  chart("leaps", "ch-short-flow", async (p) => {
+    const d = await load("short_flow");
+    const rows = Object.entries(d.current)
+      .filter(([, v]) => v.pctile != null)
+      .map(([tk, v]) => ({ tk, ...v }))
+      .sort((a, b) => a.pctile - b.pctile);
+    if (!rows.length) {
+      return { title: { text: "历史积累中，满 250 个交易日后显示", left: "center", top: "middle",
+        textStyle: { color: p.muted, fontSize: 13, fontWeight: "normal" } } };
+    }
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(1) + " 分位") }),
+      grid: { left: 78, right: 44, top: 22, bottom: 34 },
+      xAxis: Object.assign({ type: "value", min: 0, max: 100, name: "三年百分位" }, baseAxis(p)),
+      yAxis: Object.assign({ type: "category", data: rows.map((r) => r.tk) },
+        baseAxis(p), { axisLabel: { color: p.muted, fontSize: 11 } }),
+      series: [{
+        type: "bar", data: rows.map((r) => r.pctile), barMaxWidth: 18,
+        // 同 VRP 定案：由浅到深猩红，纯视觉层级；此处不设红绿语义——
+        // 因为「占比高」本身没有好坏，绿色会被误读成「安全」。
+        itemStyle: {
+          color: (x) => {
+            const t = rows.length > 1 ? x.dataIndex / (rows.length - 1) : 1;
+            const mix = (a, b) => Math.round(a + (b - a) * t);
+            return `rgb(${mix(232, 160)},${mix(115, 57)},${mix(90, 47)})`;
+          },
+          borderRadius: [0, 4, 4, 0],
+        },
+        label: { show: true, position: "right", color: p.muted, fontSize: 11,
+          fontFamily: "JetBrains Mono",
+          formatter: (x) => x.value.toFixed(0) + "（" + rows[x.dataIndex].ratio.toFixed(0) + "%）" },
         markLine: { silent: true, symbol: "none",
           lineStyle: { color: p.ink, type: "dashed", width: 1 },
           label: { color: p.ink, formatter: "50 中性", fontSize: 10, fontFamily: "JetBrains Mono" },

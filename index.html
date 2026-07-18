@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260718e">
+<link rel="stylesheet" href="css/style.css?v=20260718g">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -616,7 +616,12 @@
       <div class="sub">越高越贵（0–100），50 为中性；标普500成分股一行为成分股波动率的加权几何平均。<b>横向可比的是百分位、不是波动率本身</b>——个股波动天然高于指数，但百分位是各自跟自己的历史比，所以能放在一起看。历史不足 250 个交易日的标的不计算百分位，留空。</div>
       <div class="chart" id="ch-vol-family"></div>
     </div>
-    <div class="poem">这一段量的是 30 天，上面那些量的是 1 年。同一个市场的两截时间，不能相减，也不能混着说。</div>
+    <div class="card">
+      <h3>做空成交结构 · 当日占比在自己三年历史中的位置</h3>
+      <div class="sub"><b>做空占比高 ≠ 有人看空。</b>做市商对冲、ETF 申赎套利、可转债对冲都会计入做空量——这里量的是卖方向成交的结构占比，不是情绪、不是持仓、更不是方向判断。所以本卡只报一件事：今天这个占比，放进这只票自己过去三年里排第几。历史不足 250 个交易日的不给百分位，留空。</div>
+      <div class="chart" id="ch-short-flow"></div>
+    </div>
+    <div class="poem">这一段量的是 30 天，上面那些量的是 1 年。同一个市场的两截时间，不能相减，也不能混着说。保费和成交结构，更是两件事。</div>
   </div>
 
   <!-- ===== 历史参照：恐惧极值之后（描述性记录，非建议） ===== -->
@@ -936,9 +941,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260718e"></script>
-<script src="js/app.js?v=20260718e"></script>
-<script src="js/docs-i18n.js?v=20260718e"></script>
+<script src="js/i18n.js?v=20260718g"></script>
+<script src="js/app.js?v=20260718g"></script>
+<script src="js/docs-i18n.js?v=20260718g"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。

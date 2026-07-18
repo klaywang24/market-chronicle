@@ -220,7 +220,7 @@
     "越高越贵（0–100），50 为中性；标普500成分股一行为成分股波动率的加权几何平均。": ["Higher = more expensive (0–100); 50 is neutral. The S&P 500 constituents row is a weighted geometric average of member volatilities.", "", "", ""],
     "横向可比的是百分位、不是波动率本身": ["What compares across names is the percentile, not the volatility itself", "", "", ""],
     "——个股波动天然高于指数，但百分位是各自跟自己的历史比，所以能放在一起看。历史不足 250 个交易日的标的不计算百分位，留空。": [" — single stocks are inherently more volatile than an index, but each percentile is measured against that name's own history, which is what makes them comparable. Names with fewer than 250 trading days of history are left blank rather than scored on a shorter window.", "", "", ""],
-    "这一段量的是 30 天，上面那些量的是 1 年。同一个市场的两截时间，不能相减，也不能混着说。": ["This section measures 30 days; everything above measures one year. Two different stretches of time in the same market — they cannot be subtracted from one another, nor spoken of interchangeably.", "", "", ""],
+    "这一段量的是 30 天，上面那些量的是 1 年。同一个市场的两截时间，不能相减，也不能混着说。保费和成交结构，更是两件事。": ["This section measures 30 days; everything above measures one year. Two different stretches of time in the same market — they cannot be subtracted from one another, nor spoken of interchangeably. And the price of protection and the structure of trading are two different things again.", "", "", ""],
     "个股平均 ÷ 大盘": ["single-stock average ÷ index", "", "", ""],
     "0 · 个股与大盘同调": ["0 · names move with the index", "", "", ""],
     "各走各的 · 100": ["each on its own · 100", "", "", ""],
@@ -228,6 +228,12 @@
     "标普500成分股": ["S&P 500 constituents", "", "", ""],
     "百分位": ["percentile", "", "", ""],
     "当前": ["current", "", "", ""],
+    // ---- 做空成交结构（2026-07-18）----
+    "做空成交结构 · 当日占比在自己三年历史中的位置": ["Short-sale flow · where today's share sits in this name's own three-year history", "", "", ""],
+    "做空占比高 ≠ 有人看空。": ["A high short share does NOT mean someone is bearish.", "", "", ""],
+    "做市商对冲、ETF 申赎套利、可转债对冲都会计入做空量——这里量的是卖方向成交的结构占比，不是情绪、不是持仓、更不是方向判断。所以本卡只报一件事：今天这个占比，放进这只票自己过去三年里排第几。历史不足 250 个交易日的不给百分位，留空。": ["Market-maker hedging, ETF create/redeem arbitrage and convertible hedging all count toward short volume — what this measures is the structural share of sell-side trading, not sentiment, not positioning, and certainly not a directional call. So this card reports one thing only: where today's share ranks within this name's own past three years. Names with fewer than 250 trading days of history are left blank.", "", "", ""],
+    "三年百分位": ["3-year percentile", "", "", ""],
+    "历史积累中，满 250 个交易日后显示": ["Accumulating history — shown once 250 trading days are on record", "", "", ""],
     // 「VIXEQ ÷ VIX」故意不建键：中英同形无需翻译，且它无汉字、÷ 是 U+00F7
     // 不在守卫的三段范围内（一-鿿 / ＀-￯ / 　-〿）→ 建了也是死键（见 f336af0）
     "同一天，近 3 年偏贵、拉长看只是中性——最近三年太平静。三窗并陈，不藏选择。": ["Same day: rich versus the past 3 years, merely neutral over longer windows — the last three years were unusually calm. All three windows shown; nothing hidden.", "", "", ""],
