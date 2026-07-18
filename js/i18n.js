@@ -396,6 +396,7 @@
     "营业收入（近四财年 · 十亿美元）": ["Revenue (last 4 FY, $bn)", "Chiffre d'affaires (4 ex., Md$)", "Umsatz (4 GJ, Mrd. $)", "Ingresos (4 ej., $mm)"],
     "净利润（近四财年 · 十亿美元）": ["Net income (last 4 FY, $bn)", "Résultat net (4 ex., Md$)", "Nettogewinn (4 GJ, Mrd. $)", "Beneficio neto (4 ej., $mm)"],
     "ROE × ROIC（TTM）": ["ROE × ROIC (TTM)", "ROE × ROIC (TTM)", "ROE × ROIC (TTM)", "ROE × ROIC (TTM)"],
+    "PS（TTM）": ["PS (TTM)", "PS (TTM)", "PS (TTM)", "PS (TTM)"],
     "自由现金流（年度 · 十亿美元）": ["Free cash flow (annual, $bn)", "Flux de trésorerie libre (Md$)", "Freier Cashflow (Mrd. $)", "Flujo de caja libre ($mm)"],
     "PE（TTM · 含历史中位数）": ["P/E (TTM, with historical median)", "PER (avec médiane historique)", "KGV (mit historischem Median)", "PER (con mediana histórica)"],
     "年度回报分解": ["Annual return decomposition", "Décomposition du rendement annuel", "Zerlegung der Jahresrendite", "Descomposición del rendimiento anual"],
@@ -930,7 +931,9 @@
   function translate(src) {
     if (cur === "zh") return src;
     const t = src.trim();
-    if (!t || !/[一-鿿]/.test(t)) return src; // 无中文不处理
+    // 守卫需同时认全角标点：像 "ROE × ROIC（TTM）" 这类无汉字、只有全角括号的
+    // 字符串，若只测汉字区会被短路返回，字典里即使有键也永远查不到（曾致英文态泄漏）。
+    if (!t || !/[一-鿿＀-￯　-〿]/.test(t)) return src; // 无中文字符/全角标点则不处理
     if (cur === "tw") return twConv ? twConv(src) : src;
     const ch = t.match(/^第(.+)章$/); // "第N章" 动态编号（中文数字或阿拉伯数字）
     if (ch) {
