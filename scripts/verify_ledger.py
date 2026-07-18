@@ -125,7 +125,20 @@ def previous_total() -> int | None:
         return None
 
 
+def is_shallow() -> bool:
+    """浅克隆下本脚本是瞎的：只看得见 1 个 commit，对不出任何历史改写，
+    却会报出一个看起来很干净的小数字。检查器看不见的时候必须承认看不见，
+    不能给平安播报——这与 notify_discord 那条「告警器必须知道 job 状态」同源。"""
+    try:
+        return git("rev-parse", "--is-shallow-repository").strip() == "true"
+    except Exception:
+        return False
+
+
 def main() -> int:
+    shallow = is_shallow()
+    if shallow:
+        print("🔴 仓库是浅克隆，历史不全 —— 本次自核结果不可信（需 fetch-depth: 0）")
     reports = [audit_file(p, k) for p, k in TARGETS.items()]
     total = sum(r["counts"]["total"] for r in reports)
     prev = previous_total()
@@ -135,6 +148,7 @@ def main() -> int:
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "what": "台账自核：git 里当日发布过的值 vs 今天重算的值。0 分歧=从未悄悄改写历史。",
         "policy": "data/README.md「修订政策」的机器核验；分歧不隐藏，逐条公开在此。",
+        "reliable": not shallow,   # false = 历史不全，下面的数字不作数
         "total_divergences": total,
         "previous_total": prev,
         "delta": delta,
@@ -159,6 +173,7 @@ def main() -> int:
         with open(gh, "a") as f:
             f.write(f"divergences={total}\n")
             f.write(f"delta={'' if delta is None else delta}\n")
+            f.write(f"reliable={'false' if shallow else 'true'}\n")
     return 0
 
 

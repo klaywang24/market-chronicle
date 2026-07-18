@@ -73,6 +73,12 @@ def main():
     #    ⚠️ 触发判据取自 verify_ledger 步骤的 env 输出，不取磁盘文件——文件可能是上一次的，
     #    「读旧文件发平安播报」正是 2026-07-12 那次故障被静默掉的形态。
     #    按「相比上次的新增」响，不按绝对数：存量分歧天天叫 = 狼来了。
+    #    检查器看不见的时候必须承认看不见（浅克隆=历史不全=数字不作数），绝不发平安播报。
+    if os.environ.get("LEDGER_RELIABLE") == "false":
+        alert(url, "🔴 台账自核失效：仓库历史不全",
+              "verify_ledger 跑在浅克隆上，看不到历史 commit，**本次自核数字不作数**。\n"
+              f"检查 daily.yml 的 checkout 是否有 `fetch-depth: 0`。\n日志：{run_url}")
+
     delta_raw = os.environ.get("LEDGER_DELTA", "")
     if delta_raw not in ("", "0"):
         au = load("ledger_audit") or {}

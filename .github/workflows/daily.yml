@@ -9,7 +9,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # ⚠️ fetch-depth: 0 不可删——checkout 默认浅克隆(depth=1)，
+      # 那样 verify_ledger 只能看见 1 个 commit，对不出任何历史改写，
+      # 却会若无其事地报「总分歧=2」。2026-07-18 首次接线当场踩到：
+      # 检查器不是不跑，是瞎着跑还给出一个看起来很干净的数字。
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -60,3 +66,4 @@ jobs:
           # 空值（verify 步骤没跑成）→ 脚本不会谎报「台账无异常」，只是不发这条告警；
           # 真出事时 JOB_STATUS 那道闸会先响。
           LEDGER_DELTA: ${{ steps.verify.outputs.delta }}
+          LEDGER_RELIABLE: ${{ steps.verify.outputs.reliable }}
