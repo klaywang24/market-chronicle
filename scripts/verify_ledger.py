@@ -27,10 +27,23 @@ from datetime import datetime, timezone
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# 审计对象：文件 → 要逐日对账的点值型序列字段
+# 审计对象。两种形态，因为数据文件的结构本来就有两类：
+#   series   顶层有 dates[] + 与之等长的值数组 → 逐日对账（原有形态）
+#   nested   同上，但值数组藏在某个子对象里（如 short_flow 的 series.{ticker}）
+#   snapshot 每次只发布"当日一个读数"、不存历史序列（如 vol_family）
+#            → 对账的是「某个 as-of 日期发布过的值，事后有没有被改」，
+#              历史由 git 提供，这正是本脚本存在的意义。
 TARGETS = {
-    "data/leaps_gauge.json": ["vix1y", "expensiveness_3y", "vrp_main", "vrp_small"],
-    "data/kindex.json": ["cnn", "vix", "k", "ndx", "spx"],
+    "data/leaps_gauge.json": {"mode": "series",
+                              "fields": ["vix1y", "expensiveness_3y", "vrp_main", "vrp_small"]},
+    "data/kindex.json": {"mode": "series",
+                         "fields": ["cnn", "vix", "k", "ndx", "spx"]},
+    "data/short_flow.json": {"mode": "nested", "container": "series",
+                             "fields": ["SPY", "QQQ", "AAPL", "AMZN", "GOOGL", "META", "MSFT",
+                                        "NVDA", "TSLA", "AVGO", "MU", "SNDK", "SPCX"]},
+    "data/vol_family.json": {"mode": "snapshot", "container": "members",
+                             "key": "symbol", "date_field": "date",
+                             "fields": ["current", "p3y", "p5y", "pfull"]},
 }
 
 
@@ -53,43 +66,80 @@ def blob(sha: str, path: str) -> dict | None:
         return None
 
 
-def first_published(path: str, keys: list[str]) -> dict:
+def normalize(d: dict, spec: dict) -> tuple[dict, str | None]:
+    """把一份 JSON 快照归一化成 ({日期: {字段: 值}}, 该快照的最新日期)。
+
+    三种形态分开解析，是因为数据文件的结构本来就分三类——硬套一种会让某些文件
+    悄悄漏审（2026-07-18 实测：vol_family / short_flow 就因为不合原形态而根本没被审）。
+    """
+    mode = spec["mode"]
+    if mode in ("series", "nested"):
+        dates = d.get("dates")
+        if not isinstance(dates, list) or not dates:
+            return {}, None
+        src = d if mode == "series" else (d.get(spec["container"]) or {})
+        out = {}
+        for i, dt in enumerate(dates):
+            row = {}
+            for f in spec["fields"]:
+                col = src.get(f)
+                if isinstance(col, list) and i < len(col) and col[i] is not None:
+                    row[f] = col[i]
+            if row:
+                out[dt] = row
+        return out, dates[-1]
+    if mode == "snapshot":
+        out = {}
+        for m in (d.get(spec["container"]) or []):
+            dt, k = m.get(spec["date_field"]), m.get(spec["key"])
+            if not dt or not k:
+                continue
+            row = {f"{k}.{f}": m[f] for f in spec["fields"] if m.get(f) is not None}
+            if row:
+                out.setdefault(dt, {}).update(row)
+        return out, (max(out) if out else None)
+    return {}, None
+
+
+def first_published(path: str, spec: dict) -> dict:
     """每个日期「首次发布」的值 + 出处。字段各自独立记首发，容忍 schema 后加字段。"""
     seen: dict[str, dict] = {}
     for sha, cdate in commits(path):
         d = blob(sha, path)
-        if not d or "dates" not in d:
+        if not d:
             continue
-        dates, newest = d["dates"], d["dates"][-1]
-        for i, dt in enumerate(dates):
+        rows, newest = normalize(d, spec)
+        for dt, vals in rows.items():
             rec = seen.setdefault(dt, {
                 "commit": sha, "committed_at": cdate,
-                "live": dt == newest,          # 发布时它就是最新点 = 当场记的账
+                # 发布时它就是最新点 = 当场记的账。snapshot 形态每次只发当日，恒为 live。
+                "live": (spec["mode"] == "snapshot") or (dt == newest),
                 "values": {},
             })
-            for k in keys:
-                col = d.get(k)
-                if isinstance(col, list) and i < len(col):
-                    rec["values"].setdefault(k, col[i])
+            for k, v in vals.items():
+                rec["values"].setdefault(k, v)
     return seen
 
 
-def audit_file(path: str, keys: list[str]) -> dict:
+def audit_file(path: str, spec: dict) -> dict:
     full = os.path.join(REPO, path)
-    cur = json.load(open(full, encoding="utf-8"))
-    cols = {k: dict(zip(cur["dates"], cur[k])) for k in keys if k in cur}
-    today = set(cur["dates"])
+    if not os.path.exists(full):
+        return {"file": path, "fields": spec.get("fields", []), "commits_scanned": 0,
+                "dates_covered": 0, "live_recorded_days": 0, "live_range": None,
+                "divergences": [], "skipped": "文件不存在",
+                "counts": {"total": 0, "missing": 0, "revised_live": 0, "revised_backfill": 0}}
+    cur, _ = normalize(json.load(open(full, encoding="utf-8")), spec)
 
-    hist = first_published(path, keys)
+    hist = first_published(path, spec)
     divergences = []
     for dt, rec in sorted(hist.items()):
-        if dt not in today:
+        if dt not in cur:
             divergences.append({"date": dt, "field": "*", "kind": "missing",
                                 "first_published": None, "now": None,
                                 "commit": rec["commit"], "committed_at": rec["committed_at"]})
             continue
         for k, was in rec["values"].items():
-            now = cols.get(k, {}).get(dt)
+            now = cur[dt].get(k)
             if now != was:
                 divergences.append({
                     "date": dt, "field": k,
@@ -101,7 +151,8 @@ def audit_file(path: str, keys: list[str]) -> dict:
     live_days = sorted(dt for dt, r in hist.items() if r["live"])
     return {
         "file": path,
-        "fields": keys,
+        "mode": spec["mode"],
+        "fields": spec.get("fields", []),
         "commits_scanned": len(commits(path)),
         "dates_covered": len(hist),
         "live_recorded_days": len(live_days),
@@ -139,7 +190,7 @@ def main() -> int:
     shallow = is_shallow()
     if shallow:
         print("🔴 仓库是浅克隆，历史不全 —— 本次自核结果不可信（需 fetch-depth: 0）")
-    reports = [audit_file(p, k) for p, k in TARGETS.items()]
+    reports = [audit_file(p, spec) for p, spec in TARGETS.items()]
     total = sum(r["counts"]["total"] for r in reports)
     prev = previous_total()
     delta = None if prev is None else total - prev
@@ -160,8 +211,10 @@ def main() -> int:
 
     for r in reports:
         c = r["counts"]
-        rng = f' live {r["live_range"][0]}→{r["live_range"][1]}' if r["live_range"] else ""
-        print(f'{r["file"]}: commit={r["commits_scanned"]} 日期={r["dates_covered"]}'
+        rng = f' live {r["live_range"][0]}→{r["live_range"][1]}' if r.get("live_range") else ""
+        if r.get("skipped"):
+            print(f'{r["file"]}: 跳过（{r["skipped"]}）'); continue
+        print(f'{r["file"]} [{r.get("mode")}]: commit={r["commits_scanned"]} 日期={r["dates_covered"]}'
               f' 当场记录={r["live_recorded_days"]}{rng}')
         print(f'   分歧 {c["total"]}（消失 {c["missing"]} / live改写 {c["revised_live"]}'
               f' / 回填段改写 {c["revised_backfill"]}）')
