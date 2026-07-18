@@ -912,6 +912,86 @@ def build_cot_vix():
     })
 
 
+# ---------------- 波动率家族（2026-07-18 新建）：个股与板块的恐惧标价 ----------------
+# 旗舰「恐惧的标价」量的是标普 500 的 1 年期保护，它天生看不见个体的极值——
+# 2026-07-17 实测：大盘 30 天分位 75.4，而 5 只个股全在 86–96。分散化把个股抹平了。
+# 本模块把同一把尺（756 交易日滚动百分位）换个输入，量个股与板块。
+#
+# ⚠️ 口径警告（写进 meta，前端引用时必须一起显示）：本家族全部是 **30 天**，
+#    旗舰是 **1 年**。两者不是一把尺，绝不可混在同一张图或同一句话里比较。
+# ⚠️ 绝对 IV 不可横向比（个股天然高于指数）；可横向比的只有百分位——
+#    因为百分位是各自跟自己的历史比，自归一化。
+VOL_FAMILY = {
+    "VIXEQ": "标普500成分股（加权几何平均）",
+    "VXSMH": "半导体 ETF",
+    "VXAPL": "苹果", "VXAZN": "亚马逊", "VXGOG": "谷歌",
+    "VXIBM": "IBM", "VXGS": "高盛",
+}
+# Cboe 个股 VIX 只有这 5 只，且全部 2011-01-07 同批上市后再没扩过——
+# 它是「2010–2011 年期权流量王」的时间胶囊：NVDA 当年还小、TSLA 刚 IPO、
+# META 2012 才上市。名单没变，市场变了。别期待 NVDA/TSLA 出现。
+MIN_PCTILE_DAYS = 250   # 与 _roll_pctile 的 min_periods 一致；不足就报 null，绝不用短窗口冒充
+
+
+def build_vol_family(vix_close: pd.Series):
+    """个股/板块 30 天波动率的贵贱百分位 → data/vol_family.json。拉挂了留旧文件。"""
+    print("== 波动率家族（个股与板块）")
+    members, series_cache = [], {}
+    for sym, label in VOL_FAMILY.items():
+        try:
+            s = _cboe_close(sym).dropna()
+        except Exception as e:
+            print(f"  {sym} 拉取失败，跳过: {e}")
+            continue
+        series_cache[sym] = s
+        enough = len(s) >= MIN_PCTILE_DAYS
+        members.append({
+            "symbol": sym, "label": label,
+            "current": round(float(s.iloc[-1]), 2),
+            "date": s.index[-1].strftime("%Y-%m-%d"),
+            "start": s.index[0].strftime("%Y-%m-%d"),
+            "days": len(s),
+            # 历史不够就明说不够，不用短窗口凑一个看起来像样的数字
+            "p3y": _pctile_now(s, 756) if enough else None,
+            "p5y": _pctile_now(s, 1260) if enough else None,
+            "pfull": _pctile_now(s) if enough else None,
+            "pctile_available": enough,
+            "pctile_note": None if enough else f"历史仅 {len(s)} 交易日，不足 {MIN_PCTILE_DAYS} 日，百分位不计算",
+        })
+
+    # 个股÷大盘 = 分散化的价格。VIXEQ 量个股平均、VIX 量指数，两者之比即隐含分散度。
+    dispersion = None
+    if "VIXEQ" in series_cache:
+        eq = series_cache["VIXEQ"]
+        idx = eq.index.intersection(vix_close.dropna().index)
+        if len(idx) >= MIN_PCTILE_DAYS:
+            ratio = (eq[idx] / vix_close[idx]).dropna()
+            dispersion = {
+                "what": "VIXEQ ÷ VIX：个股平均波动率相对大盘波动率。高=个股被单独定价得远比指数贵。",
+                "current": round(float(ratio.iloc[-1]), 3),
+                "date": ratio.index[-1].strftime("%Y-%m-%d"),
+                "p3y": _pctile_now(ratio, 756),
+                "pfull": _pctile_now(ratio),
+                "median_full": round(float(ratio.median()), 3),
+                "start": ratio.index[0].strftime("%Y-%m-%d"),
+                "days": len(ratio),
+            }
+
+    write_json("vol_family.json", {
+        "meta": {
+            "name": "波动率家族（个股与板块）",
+            "tenor": "30 天",
+            "tenor_warning": "本家族全部为 30 天口径；旗舰「恐惧的标价」为 1 年口径。两者不是一把尺，不可混比。",
+            "headline": "各标的 30 天隐含波动率在过去 3 年（756 交易日）的百分位，高=贵",
+            "nature": "描述性温度计，非交易信号/非预测；仅为数据，非投资建议。",
+            "comparability": "绝对 IV 不可横向比（个股天然高于指数）；可横向比的只有百分位——它是各自跟自己的历史比。",
+            "roster_note": "Cboe 个股 VIX 仅 5 只，2011-01-07 同批上市后未再扩容，是当年期权流量王的名单，不含 NVDA/TSLA/META。",
+        },
+        "members": members,
+        "dispersion": dispersion,
+    })
+
+
 def build_index_val():
     """SPY/QQQ ETF 口径的估值快照（yfinance；指数级 Forward PE 无免费长史，只取当前值）。"""
     print("== 指数估值快照")
@@ -1345,6 +1425,10 @@ def main():
         build_cot_vix()
     except Exception as e:
         print(f"  COT 持仓失败（留旧文件）: {e}")
+    try:
+        build_vol_family(vix)
+    except Exception as e:
+        print(f"  波动率家族失败（留旧文件）: {e}")
     build_index_val()
     build_macro()
     build_index_panels("sp500", gspc, vix, "VIX")
