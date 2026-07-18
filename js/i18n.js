@@ -209,6 +209,26 @@
     "的百分位（高=贵）": ["percentile (high = expensive)", "", "", ""],
     "0 · 便宜": ["0 · cheap", "", "", ""],
     "贵 · 100": ["expensive · 100", "", "", ""],
+    // ---- 个股与板块（30 天口径，2026-07-18 新增）----
+    // ⚠️ sub 那段被 <b> 劈成三个文本节点，故逐片建 key（同「净值句被 strong 劈成 5 节点」教训）
+    "个股与板块": ["Single names & sectors", "", "", ""],
+    "以下为 30 天口径，与上方 1 年口径不是同一把尺": ["30-day tenor below — not the same ruler as the 1-year measure above", "", "", ""],
+    "个股 · 30 天": ["Single names · 30-day", "", "", ""],
+    "个股的怕，与大盘的怕": ["Fear in one name, fear in the whole market", "", "", ""],
+    "大盘看着平静的时候，单只股票被标价成什么样？": ["When the index looks calm, how are single stocks being priced?", "", "", ""],
+    "各标的的贵贱百分位 · 30 天隐含波动率在过去 3 年的位置": ["Cost percentile by name · where 30-day implied volatility sits within the past 3 years", "", "", ""],
+    "越高越贵（0–100），50 为中性；标普500成分股一行为成分股波动率的加权几何平均。": ["Higher = more expensive (0–100); 50 is neutral. The S&P 500 constituents row is a weighted geometric average of member volatilities.", "", "", ""],
+    "横向可比的是百分位、不是波动率本身": ["What compares across names is the percentile, not the volatility itself", "", "", ""],
+    "——个股波动天然高于指数，但百分位是各自跟自己的历史比，所以能放在一起看。历史不足 250 个交易日的标的不计算百分位，留空。": [" — single stocks are inherently more volatile than an index, but each percentile is measured against that name's own history, which is what makes them comparable. Names with fewer than 250 trading days of history are left blank rather than scored on a shorter window.", "", "", ""],
+    "这一段量的是 30 天，上面那些量的是 1 年。同一个市场的两截时间，不能相减，也不能混着说。": ["This section measures 30 days; everything above measures one year. Two different stretches of time in the same market — they cannot be subtracted from one another, nor spoken of interchangeably.", "", "", ""],
+    "个股平均 ÷ 大盘": ["single-stock average ÷ index", "", "", ""],
+    "0 · 个股与大盘同调": ["0 · names move with the index", "", "", ""],
+    "各走各的 · 100": ["each on its own · 100", "", "", ""],
+    "历史中位": ["historical median", "", "", ""],
+    "百分位": ["percentile", "", "", ""],
+    "当前": ["current", "", "", ""],
+    // 「VIXEQ ÷ VIX」故意不建键：中英同形无需翻译，且它无汉字、÷ 是 U+00F7
+    // 不在守卫的三段范围内（一-鿿 / ＀-￯ / 　-〿）→ 建了也是死键（见 f336af0）
     "同一天，近 3 年偏贵、拉长看只是中性——最近三年太平静。三窗并陈，不藏选择。": ["Same day: rich versus the past 3 years, merely neutral over longer windows — the last three years were unusually calm. All three windows shown; nothing hidden.", "", "", ""],
     "短端平静 → 长端（你买的那截）最贵": ["calm near end → the long end (the part you buy) is priciest", "", "", ""],
     "9 天": ["9d", "", "", ""],
@@ -830,6 +850,11 @@
     [/^今日 K 指数（(.+)）$/, ["KAPX Index today ($1)", "Indice KAPX aujourd'hui ($1)", "KAPX Index heute ($1)", "Índice KAPX hoy ($1)"]],
     [/^今日 CNN 恐贪（(.+)）$/, ["CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)"]],
     [/^即：比过去三年 (\d+)% 的交易日都贵$/, ["i.e. pricier than $1% of all trading days in the past three years", "", "", ""]],
+    // 个股与板块（30 天口径，2026-07-18）：动态串走正则，特殊排通用前
+    [/^单只股票的保费 = 大盘的 ([\d.]+) 倍$/, ["a single stock's premium = $1× the index's", "", "", ""]],
+    [/^第 (\d+) 百分位$/, ["$1th percentile", "", "", ""]],
+    [/^(\d{4}) 年至今$/, ["since $1", "", "", ""]],
+    [/^样本 (\d+) 个交易日$/, ["$1 trading days sampled", "", "", ""]],
     [/^(\d+) 段$/, ["$1", "$1", "$1", "$1"]],
     [/^vol 点 · 近 3 月 (.+)$/, ["vol pts · 3m $1", "vol pts · 3m $1", "vol pts · 3m $1", "vol pts · 3m $1"]],
     [/^分位 · 全史 · 值 (.+)$/, ["pctile · full history · $1", "pctile · full history · $1", "pctile · full history · $1", "pctile · full history · $1"]],

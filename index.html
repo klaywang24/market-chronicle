@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260718c">
+<link rel="stylesheet" href="css/style.css?v=20260718d">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -605,6 +605,20 @@
     </div>
   </div>
 
+  <!-- ===== 个股与板块（2026-07-18 新增；30 天口径，与上方 1 年口径不是一把尺，故用分隔带隔开） ===== -->
+  <div class="lg-divider"><span>个股与板块</span><em>以下为 30 天口径，与上方 1 年口径不是同一把尺</em></div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">个股 · 30 天</span><h2>个股的怕，与大盘的怕</h2></div>
+    <p class="chapter-q">大盘看着平静的时候，单只股票被标价成什么样？</p>
+    <div id="vf-hero"></div>
+    <div class="card">
+      <h3>各标的的贵贱百分位 · 30 天隐含波动率在过去 3 年的位置</h3>
+      <div class="sub">越高越贵（0–100），50 为中性；标普500成分股一行为成分股波动率的加权几何平均。<b>横向可比的是百分位、不是波动率本身</b>——个股波动天然高于指数，但百分位是各自跟自己的历史比，所以能放在一起看。历史不足 250 个交易日的标的不计算百分位，留空。</div>
+      <div class="chart" id="ch-vol-family"></div>
+    </div>
+    <div class="poem">这一段量的是 30 天，上面那些量的是 1 年。同一个市场的两截时间，不能相减，也不能混着说。</div>
+  </div>
+
   <!-- ===== 历史参照：恐惧极值之后（描述性记录，非建议） ===== -->
   <div class="lg-divider"><span>历史参照 · 恐惧极值之后</span><em>以下为描述性历史记录，不是买卖建议</em></div>
   <div class="chapter">
@@ -922,9 +936,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260718c"></script>
-<script src="js/app.js?v=20260718c"></script>
-<script src="js/docs-i18n.js?v=20260718c"></script>
+<script src="js/i18n.js?v=20260718d"></script>
+<script src="js/app.js?v=20260718d"></script>
+<script src="js/docs-i18n.js?v=20260718d"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。

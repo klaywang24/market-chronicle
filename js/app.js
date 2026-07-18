@@ -2327,12 +2327,88 @@
     if (tiers) tiers.classList.toggle("annual", b.dataset.bill === "y");
   });
 
+  // ---------------- 个股与板块（30 天口径；2026-07-18） ----------------
+  // ⚠️ 本段全部 30 天，与旗舰的 1 年不是一把尺——文案里已写死，改动时勿弱化。
+  async function renderVolFamily() {
+    const host = document.getElementById("vf-hero");
+    if (!host) return;
+    let d;
+    try { d = await load("vol_family"); }
+    catch (e) {
+      host.innerHTML = '<div class="card"><p style="color:var(--ink-muted);font-size:13px">数据更新中，稍后自动出现 · data updating</p></div>';
+      return;
+    }
+    const s = d.dispersion;
+    if (!s) { host.innerHTML = ""; return; }
+    const p = Math.round(s.pfull);
+    const col = p >= 60 ? "var(--danger)" : p <= 40 ? "var(--moss)" : "var(--gold)";
+    host.innerHTML = `
+      <div class="card">
+        <div class="lg-top">
+          <div class="lg-num">
+            <div class="lg-big" style="color:${col}">${s.current.toFixed(2)}<span>×</span></div>
+            <div class="lg-verdict" style="background:${col}">第 ${p} 百分位</div>
+            <div class="lg-numsub">个股平均 ÷ 大盘</div>
+            <div class="lg-numsub">单只股票的保费 = 大盘的 ${s.current.toFixed(2)} 倍</div>
+          </div>
+          <div class="lg-right">
+            <div class="lg-spectrum"><div class="lg-mark" style="left:${s.pfull}%"><span>${p}</span></div></div>
+            <div class="lg-scale"><span>0 · 个股与大盘同调</span><span>各走各的 · 100</span></div>
+            <div class="lg-windows">
+              <div><span>当前</span><b>${s.current.toFixed(2)}×</b><i>今日</i></div>
+              <div><span>历史中位</span><b>${s.median_full.toFixed(2)}×</b><i>${s.start.slice(0, 4)} 年至今</i></div>
+              <div><span>近 3 年</span><b>${Math.round(s.p3y)}</b><i>百分位</i></div>
+            </div>
+          </div>
+        </div>
+        <p class="footnote src-note"><span>VIXEQ ÷ VIX</span> · <span>数据截至</span> ${s.date} · <span>样本 ${s.days} 个交易日</span> · <span>描述性数据，非投资建议</span></p>
+      </div>`;
+  }
+
+  chart("leaps", "ch-vol-family", async (p) => {
+    const d = await load("vol_family");
+    // 只画算得出百分位的（历史不足的留空，不用短窗口冒充）；按贵贱排序，最贵在上
+    const rows = d.members.filter((m) => m.pctile_available && m.p3y != null)
+      .sort((a, b) => a.p3y - b.p3y);
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(1) + " 分位") }),
+      grid: { left: 118, right: 44, top: 22, bottom: 34 },
+      xAxis: Object.assign({ type: "value", min: 0, max: 100, name: "贵贱百分位" }, baseAxis(p)),
+      yAxis: Object.assign({ type: "category", data: rows.map((r) => r.label) },
+        baseAxis(p), { axisLabel: { color: p.muted, fontSize: 11 } }),
+      // 配色沿用 VRP 四格的定案：由浅到深猩红（#E8735A→#A0392F），纯视觉层级、不编码含义。
+      // 全都 ≥60 时若一律用 danger，六根同色的墙会让 86.6 和 98.7 除了长度毫无区别。
+      // 低于 50（真便宜）仍走绿 moss——红/绿的语义边界不动，只在红这一侧补层级。
+      series: [{
+        type: "bar", data: rows.map((r) => r.p3y), barMaxWidth: 18,
+        itemStyle: {
+          color: (x) => {
+            if (x.value < 50) return p.moss;
+            const hot = rows.filter((r) => r.p3y >= 50);
+            const i = hot.findIndex((r) => r.p3y === x.value);
+            const t = hot.length > 1 ? Math.max(0, i) / (hot.length - 1) : 1;
+            const mix = (a, b) => Math.round(a + (b - a) * t);
+            return `rgb(${mix(232, 160)},${mix(115, 57)},${mix(90, 47)})`;
+          },
+          borderRadius: [0, 4, 4, 0],
+        },
+        label: { show: true, position: "right", color: p.muted, fontSize: 11,
+          fontFamily: "JetBrains Mono", formatter: (x) => x.value.toFixed(1) },
+        markLine: { silent: true, symbol: "none",
+          lineStyle: { color: p.ink, type: "dashed", width: 1 },
+          label: { color: p.ink, formatter: "50 中性", fontSize: 10, fontFamily: "JetBrains Mono" },
+          data: [{ xAxis: 50 }] },
+      }],
+    };
+  });
+
   // ---------------- 启动 ----------------
   renderKStatus();
   renderValCards();
   renderLeaps();
   renderLeapsGauge();
   renderFearDecomp();
+  renderVolFamily();
   renderPulse();
   renderDDTable("sp500_drawdowns", "spy-dd-table");
   renderDDTable("ndx_drawdowns", "qqq-dd-table");
