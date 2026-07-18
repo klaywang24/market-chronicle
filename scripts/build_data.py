@@ -1112,6 +1112,183 @@ def build_short_flow(max_backfill: int = 3):
     })
 
 
+# ---------------- 做空持仓（2026-07-18 新建）：FINRA 双月合并短仓 ----------------
+# 与上面的 short_flow 是**两样东西**，勿混：
+#   short_flow  = 流量。每日做空成交占比。当天的卖单结构。
+#   short_int   = 存量。此刻有多少股仍在被做空。每月两次，滞后约 2 周。
+#
+# 🚨 滞后是本表的第一属性，必须与读数同时出现：结算日之后约 8 个交易日才发布。
+#    实测 2026-07-18 当天，最新可得的是 2026-06-30 结算期 = 18 天前的世界。
+#    因此它**永远不能当"今天"的读数用**，只能当缓慢变动的背景变量。
+#
+# 🚨 2026-07-18 实测过、写下来免得后人重做：把"每日做空占比"与"持仓变化"配对，
+#    水平对变化 Spearman = -0.006（零）；变化对变化 = +0.168，且分票看只有
+#    AAPL/GOOGL/META/MSFT 四只 p<0.05，Bonferroni 校正后一只不剩；ETF（SPY/QQQ）
+#    精确为零——与"ETF 申赎套利主导做空量"的理论预期一致。
+#    ∴ **"流量与存量背离"不足以当头条**，本模块只发布存量自身的位置，不发布背离判读。
+FINRA_SI_API = "https://api.finra.org/data/group/otcMarket/name/consolidatedShortInterest"
+SHORT_INT_TICKERS = SHORT_FLOW_TICKERS      # 与流量表同一批，便于并排
+SI_WINDOW = 48          # 48 期 ≈ 2 年（双月）
+SI_MIN = 24             # 不足 24 期不给百分位，绝不用短窗口冒充
+SI_NAME_SIM = 0.45      # 名称归一化后相似度低于此 → 判为换了标的
+
+
+def _si_norm_name(s: str) -> str:
+    """归一化发行人名称。只用相似度、不用字面相等——2026-07-18 实测：字面比较会把
+    'Apple Inc. - Common Stock' → 'Apple Inc. Common Stock'（去了个连字符）当成换公司，
+    也会把 SPY 的品牌改名（SPDR S&P 500 ETF Trust → State Street SPDR S&P 500）当成
+    换公司，一刀砍掉 194 期真历史。"""
+    s = s.lower().replace("&", "and")
+    s = re.sub(r"[^a-z0-9 ]", " ", s)
+    s = re.sub(r"\b(common stock|ordinary shares?|class [a-c]|inc|corp|corporation|"
+               r"ltd|limited|co|company|trust|series \d+|the)\b", " ", s)
+    return " ".join(s.split())
+
+
+def _si_fetch(sym: str) -> tuple[list, tuple | None]:
+    """某代码的全部结算期（最早在前）。返回 (记录, 切断信息)。"""
+    import csv as _csv, io as _io, difflib as _difflib
+    r = requests.post(FINRA_SI_API,
+                      json={"limit": 500, "compareFilters": [
+                          {"fieldName": "symbolCode", "fieldValue": sym, "compareType": "EQUAL"}]},
+                      headers={"Accept": "text/plain"}, timeout=60)
+    r.raise_for_status()
+    rows = sorted(_csv.DictReader(_io.StringIO(r.text)), key=lambda x: x["settlementDate"])
+    if not rows:
+        return [], None
+    # 🚨 代码复用切断（与 short_flow 同一个坑，判据不同：那边看断口，这边看发行人名称）
+    last = _si_norm_name(rows[-1]["issueName"])
+    for i in range(len(rows) - 1, 0, -1):
+        sim = _difflib.SequenceMatcher(None, _si_norm_name(rows[i - 1]["issueName"]), last).ratio()
+        if sim < SI_NAME_SIM:
+            return rows[i:], (rows[i]["settlementDate"], rows[i - 1]["issueName"].strip(),
+                              rows[i]["issueName"].strip(), round(sim, 2), i)
+    return rows, None
+
+
+def build_short_interest():
+    """FINRA 双月合并短仓 → data/short_interest.json。
+
+    **只追加、不覆盖**：已发布过的结算期永不改写。FINRA 会修订历史（实测 NVDA 205 期
+    里 11 期带 revisionFlag），修订**另记一行**到 revisions[]，旧值原样留着——这正是
+    data/README.md「修订政策」承诺的做法：官方改了口径，我们不悄悄跟着改。
+    """
+    print("== 做空持仓（FINRA 双月短仓）")
+    path = DATA / "short_interest.json"
+    old_by, old_rev = {}, []
+    if path.exists():
+        try:
+            prev = json.loads(path.read_text(encoding="utf-8"))
+            old_by, old_rev = prev.get("by_settle", {}), prev.get("revisions", [])
+        except Exception:
+            old_by, old_rev = {}, []
+
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    cuts, added, revised = {}, 0, 0
+    for tk in SHORT_INT_TICKERS:
+        try:
+            rows, cut = _si_fetch(tk)
+        except Exception as e:
+            print(f"   {tk} 拉取失败，跳过（旧值保留）: {e}")
+            continue
+        if cut:
+            cuts[tk] = {"from": cut[0], "was": cut[1], "now": cut[2], "similarity": cut[3],
+                        "dropped_periods": cut[4]}
+            print(f"   ⚠️ {tk} 代码复用切断于 {cut[0]}：{cut[1][:28]} → {cut[2][:28]}"
+                  f"（相似度 {cut[3]}，弃 {cut[4]} 期）")
+        for r in rows:
+            d = r["settlementDate"]
+            try:
+                si = int(r["currentShortPositionQuantity"])
+            except (ValueError, TypeError):
+                continue
+            slot = old_by.setdefault(d, {})
+            rec = {"si": si,
+                   "dtc": _f(r.get("daysToCoverQuantity")),
+                   "adv": _i(r.get("averageDailyVolumeQuantity")),
+                   "chg": _f(r.get("changePercent"))}
+            if tk not in slot:
+                slot[tk] = rec
+                added += 1
+            elif slot[tk].get("si") != si:
+                # 官方修订：旧行不动，另注一行（承诺与机制冲突时改机制，不改承诺）
+                old_rev.append({"settle": d, "ticker": tk, "field": "si",
+                                "first_published": slot[tk]["si"], "now": si, "detected": today})
+                revised += 1
+    print(f"   新增 {added} 条，检出官方修订 {revised} 条，累计 {len(old_by)} 个结算期")
+
+    settles = sorted(old_by)
+    series, dtc_s, chg_s, current = {}, {}, {}, {}
+    for tk in SHORT_INT_TICKERS:
+        cut_from = cuts.get(tk, {}).get("from")
+        vals, dtcs, chgs = [], [], []
+        for d in settles:
+            rec = old_by.get(d, {}).get(tk)
+            drop = bool(cut_from) and d < cut_from      # 切断前的历史不进序列
+            vals.append(None if (rec is None or drop) else rec["si"])
+            dtcs.append(None if (rec is None or drop) else rec["dtc"])
+            chgs.append(None if (rec is None or drop) else rec["chg"])
+        series[tk], dtc_s[tk], chg_s[tk] = vals, dtcs, chgs
+
+        seen = [v for v in vals if v is not None]
+        seen_d = [v for v in dtcs if v is not None]
+        if not seen:
+            continue
+        win, win_d = seen[-SI_WINDOW:], seen_d[-SI_WINDOW:]
+        enough = len(win) >= SI_MIN
+        cur_i = next(i for i in range(len(vals) - 1, -1, -1) if vals[i] is not None)
+        current[tk] = {
+            "settle": settles[cur_i],
+            "si": vals[cur_i],
+            "dtc": dtcs[cur_i],
+            "chg": chgs[cur_i],
+            "pctile_si": round(sum(1 for v in win if v <= seen[-1]) / len(win) * 100, 1) if enough else None,
+            "pctile_dtc": (round(sum(1 for v in win_d if v <= seen_d[-1]) / len(win_d) * 100, 1)
+                           if enough and win_d else None),
+            "periods": len(win),
+            "note": None if enough else f"历史仅 {len(win)} 期，不足 {SI_MIN} 期，百分位不计算",
+        }
+
+    write_json("short_interest.json", {
+        "meta": {
+            "name": "做空持仓",
+            "source": "FINRA 合并短仓（consolidatedShortInterest，官方 API，无需认证）",
+            "headline": "每月两次结算的做空持仓股数与补仓天数，及其在自身近 48 期中的位置",
+            "caveat": "① 与「做空成交结构」不是一回事：那是当日流量，这是存量。"
+                      "② 做空持仓高 ≠ 有人看空：做市商对冲、ETF 申赎套利、可转债与并购套利均留下空头持仓。"
+                      "③ 本表只报位置，不报方向、不作预测。",
+            "lag": "结算日后约 8 个交易日发布；实测 2026-07-18 当天最新可得为 2026-06-30 期，"
+                   "滞后 18 天。**它不是今天的读数**，只能当缓慢变动的背景变量。",
+            "revision_policy": "已发布的结算期永不覆盖；官方修订另记于 revisions[]，旧值原样保留。",
+            "nature": "描述性数据，非交易信号/非预测；仅为数据，非投资建议。",
+            "window": f"{SI_WINDOW} 期（≈2 年）；不足 {SI_MIN} 期不给百分位",
+            "asof": settles[-1] if settles else None,
+        },
+        "dates": settles,
+        "by_settle": old_by,        # 原样留存，只追加不覆盖
+        "series": series,
+        "days_to_cover": dtc_s,
+        "change_pct": chg_s,
+        "current": current,
+        "cuts": cuts,
+        "revisions": old_rev,
+    })
+
+
+def _f(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def _i(v):
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return None
+
+
 def build_index_val():
     """SPY/QQQ ETF 口径的估值快照（yfinance；指数级 Forward PE 无免费长史，只取当前值）。"""
     print("== 指数估值快照")
@@ -1553,6 +1730,10 @@ def main():
         build_short_flow()      # 增量：日常只补 1 天；回填另用大 max_backfill 手动跑
     except Exception as e:
         print(f"  做空成交结构失败（留旧文件）: {e}")
+    try:
+        build_short_interest()   # 双月，滞后约 2 周；只追加、修订另注
+    except Exception as e:
+        print(f"  做空持仓失败（留旧文件）: {e}")
     build_index_val()
     build_macro()
     build_index_panels("sp500", gspc, vix, "VIX")
