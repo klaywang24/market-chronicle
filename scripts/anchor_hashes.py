@@ -20,10 +20,24 @@
 真正改不了的是「公开推送后被 Wayback 存档」这个社会事实。∴ daily.yml 里锚定步
 必须把本文件也存进 Wayback，缺了那一步，这条链只是自己给自己盖章。
 
-只追加、绝不重写历史行：JSONL 每天一行，主键 date。改动本文件的口径 = 另起新链，
-绝不追溯重算（重算 = 把「证据」变成「说法」）。
+只追加、绝不重写历史行：JSONL 每天一行，主键 date。
+
+━━ 🔴 一处已被推翻的旧判断（2026-07-19 改正，别退回去）━━
+本文件初版写着「绝不追溯补链，补出来的链是说法不是证据」。**那是把两种不同的保护
+混成了一种**：
+
+    向后：证明旧数据在当年是什么   → 补链**确实做不到**，这点没错
+    向前：检测**未来**有人改旧数据 → 补链**做得到**，而旧判断把它免费放弃了
+
+一条事后生成的哈希，一旦公开并锚定，**从那一刻起**任何对历史语料的改动都变得可检测。
+它证明不了过去，但能**冻结现在**。而站上承诺「旧行不动、绝不悄悄覆盖」——
+**承诺了却没有机制能证明它没被覆盖**，这是自相矛盾。
+
+∴ 真正该绝不做的是「**把事后生成的东西当成当时的证据**」，而不是「绝不生成」。
+区别在于**有没有标清楚它是什么** → 见 --genesis：记录自带 proves / does_not_prove 两栏。
 
 用法：python3 scripts/anchor_hashes.py            # 每日：追加一行
+      python3 scripts/anchor_hashes.py --genesis  # 一次性：冻结既有全部语料
       python3 scripts/anchor_hashes.py --verify   # 买家/自己：全链核验
 """
 import hashlib
@@ -90,9 +104,45 @@ def verify() -> int:
     return 1 if bad else 0
 
 
+def genesis() -> int:
+    """一次性创世快照：把**当前 data/ 下全部 JSON** 哈希一次，进链。
+
+    ⚠️ 它 **不证明** 这些值在本日之前是什么——那需要当时就锚定，事后无法补。
+    它 **只使此后的任何改动可被检测**。两栏 proves / does_not_prove 随记录一起走，
+    因为用的人看得到数据、未必看得到文档（同 --verify 自带局限声明的道理）。
+    """
+    rows = read_chain()
+    if any(r.get("kind") == "genesis_snapshot" for r in rows):
+        print("创世快照已存在，不重做（重做 = 重写历史）")
+        return 0
+    files = {p.name: sha256_file(p) for p in sorted(DATA.glob("*.json"))}
+    if not files:
+        print("data/ 下没有 JSON")
+        return 1
+    prev = rows[-1]["chain"] if rows else GENESIS
+    rec = {
+        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "kind": "genesis_snapshot",
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "proves": "自本记录被公开锚定之时起，对以下任一文件的任何改动都可被检测。",
+        "does_not_prove": "不证明这些值在本日之前是什么。事后生成的哈希无法回溯证明历史；"
+                          "早于本记录的数据其可信度依赖 git 历史与 Wayback，不依赖本快照。",
+        "files": files,
+        "prev": prev,
+        "chain": chain_value(prev, files),
+    }
+    with open(CHAIN, "a", encoding="utf-8") as f:
+        f.write(json.dumps(rec, ensure_ascii=False, separators=(",", ":")) + "\n")
+    print(f"→ 创世快照：{len(files)} 个文件，链头 {rec['chain'][:16]}…")
+    print("  ⚠️ 它冻结现在，不证明过去——两栏 proves/does_not_prove 已随记录落盘")
+    return 0
+
+
 def main() -> int:
     if "--verify" in sys.argv:
         return verify()
+    if "--genesis" in sys.argv:
+        return genesis()
 
     rows = read_chain()
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")

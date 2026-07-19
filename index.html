@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260719r">
+<link rel="stylesheet" href="css/style.css?v=20260719s">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -100,7 +100,7 @@
   <div class="hero">
     <div class="kicker">K-INDEX · CNN ÷ VIX</div>
     <h1>金风玉露一相逢</h1>
-    <p class="dek">K 指数 = CNN 恐惧贪婪指数 ÷ VIX——分子是人心（恐贪 0–100），分母是保费（VIX，恐慌保险的价格）：人越怕、保费越贵，K 越小。当恐惧（CNN 走低）与波动（VIX 走高）交叉，K 跌破 1：多是纳指 100 深度回调、情绪触底的时刻。2011 年以来逐次对账，赢的和输的都在账上。</p>
+    <p class="dek">K 指数 = CNN 恐惧贪婪指数 ÷ VIX：分子是人心（恐贪 0–100），分母是保费（VIX，恐慌保险的价格）：人越怕、保费越贵，K 越小。当恐惧（CNN 走低）与波动（VIX 走高）交叉，K 跌破 1：多是纳指 100 深度回调、情绪触底的时刻。2011 年以来逐次对账，赢的和输的都在账上。</p>
   </div>
 
   <div class="chapter">
@@ -140,7 +140,7 @@
     </div>
     <div class="card">
       <h3>如果每次信号都跟（持有 60 个交易日）</h3>
-      <div class="sub">净值 = 1 元照规则操作后变成几元，尾标 ×N 即 1 元变 N 元。信号首日买入纳指 100、持有 60 个交易日后离场，持有期内新信号跳过；两条虚线为同期一直持有纳指与标普。空仓期记零、不计成本与滑点，完整口径见方法论。K 约六成时间空仓：总收益因此结构性低于一路满仓（并非信号失效），回撤也因此更浅——同一枚硬币的两面。台账的价值在历史定位，不在总累计收益</div>
+      <div class="sub">净值 = 1 元照规则操作后变成几元，尾标 ×N 即 1 元变 N 元。信号首日买入纳指 100、持有 60 个交易日后离场，持有期内新信号跳过；两条虚线为同期一直持有纳指与标普。空仓期记零、不计成本与滑点，完整口径见方法论。K 约六成时间空仓：总收益因此结构性低于一路满仓（并非信号失效），回撤也因此更浅：同一枚硬币的两面。台账的价值在历史定位，不在总累计收益</div>
       <div class="chart" id="ch-k-eq"></div>
     </div>
   </div>
@@ -150,7 +150,7 @@
     <p class="chapter-q">在人群最恐慌的那些日子之后，1 到 12 个月里市场走了哪里？</p>
     <div class="card">
       <h3>持有期矩阵：五个视界的胜率、平均与中位收益</h3>
-      <div class="sub">牛市里无人在意恐惧，潮水退去时刻度才显形。以每次信号首日为起点，之后 20 / 40 / 60 / 120 / 250 个交易日（约 1 / 2 / 3 / 6 / 12 个月）的胜率、平均与中位涨跌幅（纳指 / 标普双锚）；较新的信号尚未走完长视界，不计入该列。这不是跑赢满仓持有的证据（总收益见第三章与方法论）——它回答的是恐慌中手握现金的人最关心的问题：这些时点之后，市场大多走向了哪里</div>
+      <div class="sub">牛市里无人在意恐惧，潮水退去时刻度才显形。以每次信号首日为起点，之后 20 / 40 / 60 / 120 / 250 个交易日（约 1 / 2 / 3 / 6 / 12 个月）的胜率、平均与中位涨跌幅（纳指 / 标普双锚）；较新的信号尚未走完长视界，不计入该列。这不是跑赢满仓持有的证据（总收益见第三章与方法论）：它回答的是恐慌中手握现金的人最关心的问题：这些时点之后，市场大多走向了哪里</div>
       <div class="table-wrap"><table id="k-matrix"></table></div>
     </div>
   </div>
@@ -169,7 +169,7 @@
   <div class="hero">
     <div class="kicker">S&amp;P 500 · SINCE 1927</div>
     <h1>标普 500：一个世纪的形状</h1>
-    <p class="dek">价格、回报、分布、周期、回撤、估值、盈利与结构——把近百年的标普 500 放进一部章节式编年史。</p>
+    <p class="dek">价格、回报、分布、周期、回撤、估值、盈利与结构：把近百年的标普 500 放进一部章节式编年史。</p>
   </div>
 
   <div class="chapter">
@@ -251,7 +251,7 @@
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第十章</span><h2>恐惧的标价</h2></div>
     <p class="chapter-q">市场什么时候在发抖？</p>
-    <div class="card"><h3>VIX · 保险费的账本</h3><div class="sub">VIX 衡量市场对未来 30 天的波动预期——冲破 30，意味着投资者已经在为下一轮风险付保费。叠加 20 日 / 60 日年化已实现波动率（周频）。</div><div class="chart short" id="ch-spy-vol"></div></div>
+    <div class="card"><h3>VIX · 保险费的账本</h3><div class="sub">VIX 衡量市场对未来 30 天的波动预期：冲破 30，意味着投资者已经在为下一轮风险付保费。叠加 20 日 / 60 日年化已实现波动率（周频）。</div><div class="chart short" id="ch-spy-vol"></div></div>
   </div>
 
   <div class="chapter">
@@ -375,7 +375,7 @@
   <div class="hero">
     <div class="kicker">TECHNOLOGY &amp; MEGACAP</div>
     <h1>科技：增长的引擎</h1>
-    <p class="dek">七姐妹，加半导体的博通、台积电、AMD 与存储的美光、闪迪——十二只科技巨头。先看板块的锚 QQQ，再点个股名徐徐展开各自的历史。</p>
+    <p class="dek">七姐妹，加半导体的博通、台积电、AMD 与存储的美光、闪迪：十二只科技巨头。先看板块的锚 QQQ，再点个股名徐徐展开各自的历史。</p>
   </div>
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第一章</span><h2>板块的锚：QQQ</h2></div>
@@ -447,7 +447,7 @@
   <div class="hero">
     <div class="kicker">CONSUMER STAPLES &amp; DISCRETIONARY</div>
     <h1>消费：慢变量的复利</h1>
-    <p class="dek">可乐、超市、仓储会员店、建材、折扣零售与快餐——六只穿越周期的消费龙头，锚定 XLP 与 XLY 双 ETF。</p>
+    <p class="dek">可乐、超市、仓储会员店、建材、折扣零售与快餐：六只穿越周期的消费龙头，锚定 XLP 与 XLY 双 ETF。</p>
   </div>
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第一章</span><h2>板块的锚：XLP × XLY</h2></div>
@@ -483,7 +483,7 @@
   <div class="hero">
     <div class="kicker">LUXURY · SINCE 2015</div>
     <h1>奢侈品：定价权的溢价</h1>
-    <p class="dek">LVMH、爱马仕、法拉利——三只对定价权的信仰（起点 2015-10，法拉利上市；欧股按欧元计价）。</p>
+    <p class="dek">LVMH、爱马仕、法拉利：三只对定价权的信仰（起点 2015-10，法拉利上市；欧股按欧元计价）。</p>
   </div>
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第一章</span><h2>成长的对照</h2></div>
@@ -508,7 +508,7 @@
   <div class="hero">
     <div class="kicker">MACRO · CAPITAL / CREDIT / PRICES / GROWTH</div>
     <h1>宏观：市场的水位</h1>
-    <p class="dek">资金面、信用、物价与增长——指数涨跌的四个上游变量，全部来自圣路易斯联储 FRED，随每日更新刷新。</p>
+    <p class="dek">资金面、信用、物价与增长：指数涨跌的四个上游变量，全部来自圣路易斯联储 FRED，随每日更新刷新。</p>
   </div>
 
   <div class="chapter">
@@ -533,18 +533,18 @@
 
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第三章</span><h2>物价 · PRICES</h2></div>
-    <p class="chapter-q">CPI、核心 PCE 与 PPI——Fed 盯的就是这三条线回不回 2%。</p>
+    <p class="chapter-q">CPI、核心 PCE 与 PPI：Fed 盯的就是这三条线回不回 2%。</p>
     <div class="card"><h3>通胀同比：CPI × 核心 PCE × PPI</h3><div class="chart short" id="ch-macro-inflation"></div></div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第四章</span><h2>增长与就业 · GROWTH</h2></div>
-    <p class="chapter-q">GDP、非农、失业率与企业利润——基本面的四块基石。</p>
+    <p class="chapter-q">GDP、非农、失业率与企业利润：基本面的四块基石。</p>
     <div class="grid-2">
       <div class="card"><h3>实际 GDP 环比年化</h3><div class="chart short" id="ch-macro-gdp"></div></div>
       <div class="card"><h3>非农新增就业（千人/月）× 失业率</h3><div class="chart short" id="ch-macro-jobs"></div></div>
     </div>
-    <div class="card"><h3>企业利润同比（季频）</h3><div class="sub">全美企业税后利润（FRED CP）——指数 EPS 的宏观母体</div><div class="chart short" id="ch-macro-profits"></div></div>
+    <div class="card"><h3>企业利润同比（季频）</h3><div class="sub">全美企业税后利润（FRED CP）：指数 EPS 的宏观母体</div><div class="chart short" id="ch-macro-profits"></div></div>
   </div>
 
   <div class="chapter">
@@ -563,7 +563,7 @@
   <div class="hero">
     <div class="kicker">LEAPS · 贵贱温度计</div>
     <h1>恐惧的标价指数</h1>
-    <p class="dek">今天买长期期权（LEAPS，12–18 个月）在历史上算贵还是便宜？头条 = 1 年期市场波动率（VIX1Y）在过去 3 年的百分位——把三年里的每个交易日按贵贱排成一队，看今天排第几位，越高越贵。它只描述成本，不预测方向、不构成买卖建议——像油价牌告诉你今天油贵不贵，但不替你决定要不要开车。</p>
+    <p class="dek">今天买长期期权（LEAPS，12–18 个月）在历史上算贵还是便宜？头条 = 1 年期市场波动率（VIX1Y）在过去 3 年的百分位：把三年里的每个交易日按贵贱排成一队，看今天排第几位，越高越贵。它只描述成本，不预测方向、不构成买卖建议：像油价牌告诉你今天油贵不贵，但不替你决定要不要开车。</p>
   </div>
 
   <div class="chapter">
@@ -613,12 +613,12 @@
     <div id="vf-hero"></div>
     <div class="card">
       <h3>各标的的贵贱百分位 · 30 天隐含波动率在过去 3 年的位置</h3>
-      <div class="sub">越高越贵（0–100），50 为中性；标普500成分股一行为成分股波动率的加权几何平均。<b>横向可比的是百分位、不是波动率本身</b>——个股波动天然高于指数，但百分位是各自跟自己的历史比，所以能放在一起看。历史不足 250 个交易日的标的不计算百分位，留空。</div>
+      <div class="sub">越高越贵（0–100），50 为中性；标普500成分股一行为成分股波动率的加权几何平均。<b>横向可比的是百分位、不是波动率本身</b>：个股波动天然高于指数，但百分位是各自跟自己的历史比，所以能放在一起看。历史不足 250 个交易日的标的不计算百分位，留空。</div>
       <div class="chart" id="ch-vol-family"></div>
     </div>
     <div class="card">
       <h3>做空成交结构 · 当日占比在自己三年历史中的位置</h3>
-      <div class="sub"><b>做空占比高 ≠ 有人看空。</b>做市商对冲、ETF 申赎套利、可转债对冲都会计入做空量——这里量的是卖方向成交的结构占比，不是情绪、不是持仓、更不是方向判断。所以本卡只报一件事：今天这个占比，放进这只票自己过去三年里排第几。历史不足 250 个交易日的不给百分位，留空。</div>
+      <div class="sub"><b>做空占比高 ≠ 有人看空。</b>做市商对冲、ETF 申赎套利、可转债对冲都会计入做空量：这里量的是卖方向成交的结构占比，不是情绪、不是持仓、更不是方向判断。所以本卡只报一件事：今天这个占比，放进这只票自己过去三年里排第几。历史不足 250 个交易日的不给百分位，留空。</div>
       <div class="chart" id="ch-short-flow"></div>
     </div>
     <div class="poem">这一段量的是 30 天，上面那些量的是 1 年。同一个市场的两截时间，不能相减，也不能混着说。保费说的是价格，成交结构说的是今天的成交。至于「此刻还留着多少仓位」，那是另一本账，在下一章。</div>
@@ -649,12 +649,12 @@
         <div class="cal-verdict" id="cal-verdict">—</div>
       </div>
     </div>
-    <div class="poem">同一批数字，除不除以成交量，指向相反的结论。所以这里不给判断，只把两把尺并排放着——你自己看它们分别说了什么。</div>
+    <div class="poem">同一批数字，除不除以成交量，指向相反的结论。所以这里不给判断，只把两把尺并排放着：你自己看它们分别说了什么。</div>
   </div>
 
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">当前横截面</span><h2>此刻，谁的空头最拥挤</h2></div>
-    <p class="chapter-q">用补仓天数（持仓 ÷ 日均成交量）在自身近两年中的位置。它回答的是「相对于这只票自己的流动性，空头有多挤」——而不是「谁被做空的股数多」（大票天然多）。持仓高 ≠ 有人看空：做市商对冲、ETF 申赎套利、可转债与并购套利都会留下空头持仓。</p>
+    <p class="chapter-q">用补仓天数（持仓 ÷ 日均成交量）在自身近两年中的位置。它回答的是「相对于这只票自己的流动性，空头有多挤」：而不是「谁被做空的股数多」（大票天然多）。持仓高 ≠ 有人看空：做市商对冲、ETF 申赎套利、可转债与并购套利都会留下空头持仓。</p>
     <div class="seg" id="seg-cross">
       <button type="button" data-k="dtc" aria-selected="true">补仓天数分位</button>
       <button type="button" data-k="si" aria-selected="false">持仓股数分位</button>
@@ -662,7 +662,7 @@
     </div>
     <div class="card">
       <h3>各标的的拥挤度百分位</h3>
-      <div class="sub">本表滞后约两周——每月两次结算，结算日之后约 8 个交易日才发布，所以它不是今天的读数，只能当缓慢变动的背景。历史不足 24 期的不给百分位，留空。</div>
+      <div class="sub">本表滞后约两周：每月两次结算，结算日之后约 8 个交易日才发布，所以它不是今天的读数，只能当缓慢变动的背景。历史不足 24 期的不给百分位，留空。</div>
       <div class="chart tall" id="ch-short-interest"></div>
       <p class="footnote" id="cross-note"></p>
     </div>
@@ -670,7 +670,7 @@
 
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">单票下钻</span><h2>一只票的两条命</h2></div>
-    <p class="chapter-q">上面是横截面，这里是纵切面。选一只票，看它的持仓（柱）与补仓天数（线）在最近 48 个结算期里怎么走。两者常常不同向——这正是「股数」与「拥挤度」不是一回事的直接证据。</p>
+    <p class="chapter-q">上面是横截面，这里是纵切面。选一只票，看它的持仓（柱）与补仓天数（线）在最近 48 个结算期里怎么走。两者常常不同向：这正是「股数」与「拥挤度」不是一回事的直接证据。</p>
     <div class="tk-picker" id="tk-picker"></div>
     <div class="card">
       <h3>持仓与拥挤度 · 最近 48 个结算期</h3>
@@ -682,7 +682,7 @@
 
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">一个被数据否掉的提案</span><h2>「流量与存量背离」，是零</h2></div>
-    <p class="chapter-q">原本的设想是：某天做空成交占比冲高、但持仓没增，就说明那是对冲或套利而非建仓。听起来很顺——实测不成立。537 个结算窗口，横轴是流量，纵轴是持仓变化。按开关换配对方式。</p>
+    <p class="chapter-q">原本的设想是：某天做空成交占比冲高、但持仓没增，就说明那是对冲或套利而非建仓。听起来很顺：实测不成立。537 个结算窗口，横轴是流量，纵轴是持仓变化。按开关换配对方式。</p>
     <div class="seg" id="seg-scatter">
       <button type="button" data-k="lvl" aria-selected="true">流量水平 vs 持仓变化（原提案）</button>
       <button type="button" data-k="chg" aria-selected="false">流量变化 vs 持仓变化（同类对同类）</button>
@@ -704,10 +704,10 @@
 
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">显著性</span><h2>四只显著，但校正后一只不剩</h2></div>
-    <p class="chapter-q">把「流量变化 vs 持仓变化」逐票拆开，每只做 4,000 次置换检验。11 只里有 4 只 p&lt;0.05（纯随机的期望是 0.55 只）——说明确实有东西。但做多重比较校正（Bonferroni，阈值 p&lt;0.0045）之后，一只都不存活。</p>
+    <p class="chapter-q">把「流量变化 vs 持仓变化」逐票拆开，每只做 4,000 次置换检验。11 只里有 4 只 p&lt;0.05（纯随机的期望是 0.55 只）：说明确实有东西。但做多重比较校正（Bonferroni，阈值 p&lt;0.0045）之后，一只都不存活。</p>
     <div class="card">
       <h3>逐票相关系数与置换检验</h3>
-      <div class="sub">条形是 Spearman ρ，标红的是 p&lt;0.05。注意两只 ETF 精确为零——这与「ETF 的做空量由申赎套利主导、跟看空无关」的理论预期一致。一个符合理论的零值，比一堆勉强显著的正值更能说明这组数没被过度拟合。</div>
+      <div class="sub">条形是 Spearman ρ，标红的是 p&lt;0.05。注意两只 ETF 精确为零：这与「ETF 的做空量由申赎套利主导、跟看空无关」的理论预期一致。一个符合理论的零值，比一堆勉强显著的正值更能说明这组数没被过度拟合。</div>
       <div class="chart tall" id="ch-short-sig"></div>
     </div>
     <div class="poem">四只显著、校正后归零，这句话本身就是结论：有东西，但不够硬。所以这一章只陈列检验结果，不据此下任何判断。</div>
@@ -717,14 +717,14 @@
   <div class="lg-divider"><span>历史参照 · 恐惧极值之后</span><em>以下为描述性历史记录，不是买卖建议</em></div>
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">历史参照</span><h2>恐惧极值之后</h2></div>
-    <p class="chapter-q">历史上每次极端恐惧（CNN 恐贪 &lt; 25）之后，市场怎么走了？以下是一份诚实的历史记录——陈列"之后发生了什么"，含赢的和输的，供你参照，不构成买卖建议。</p>
+    <p class="chapter-q">历史上每次极端恐惧（CNN 恐贪 &lt; 25）之后，市场怎么走了？以下是一份诚实的历史记录：陈列"之后发生了什么"，含赢的和输的，供你参照，不构成买卖建议。</p>
     <div class="k-status" id="leaps-status"></div>
     <div class="card">
       <h3>CNN 恐贪 × 纳指 100（2011 年至今）</h3>
       <div class="sub">黄色为 CNN 恐贪指数（左轴 0–100），蓝色为纳指 100（右轴 · 对数）；恐贪 &lt; 25 的极端恐惧期红色高亮，25 处虚线为极端恐惧线</div>
       <div class="chart tall" id="ch-leaps"></div>
     </div>
-    <div class="poem">恐惧极值标记的是情绪，不是估值底——2021 下半年几次极端恐惧，12 个月后仍在下方。这里陈列的是"之后发生了什么"，含赢与输，供你参照，不替你决定。</div>
+    <div class="poem">恐惧极值标记的是情绪，不是估值底：2021 下半年几次极端恐惧，12 个月后仍在下方。这里陈列的是"之后发生了什么"，含赢与输，供你参照，不替你决定。</div>
   </div>
 
   <div class="chapter">
@@ -732,7 +732,7 @@
     <p class="chapter-q">2011 年以来每次极端恐惧，6 / 12 / 18 个月后指数在哪里？</p>
     <div class="card">
       <h3>恐贪 &lt; 25 · 逐次历史对账</h3>
-      <div class="sub">连续低于 25 的交易日聚为一段（间隔 &gt;10 个交易日记新段）；数字为该段首日起 6/12/18 个月（126/252/378 交易日）标普 500 与纳指 100 的涨跌幅——历史事实记录，非建议</div>
+      <div class="sub">连续低于 25 的交易日聚为一段（间隔 &gt;10 个交易日记新段）；数字为该段首日起 6/12/18 个月（126/252/378 交易日）标普 500 与纳指 100 的涨跌幅：历史事实记录，非建议</div>
       <div class="table-wrap table-scroll"><table id="leaps-table"></table></div>
       <p class="footnote" id="leaps-verdict"></p>
     </div>
@@ -743,7 +743,7 @@
     </div>
     <div class="card">
       <h3>如果机械地每次都跟、持有 12 个月，历史上长什么样？</h3>
-      <div class="sub">净值 = 1 元照此规则操作后变成几元。这是一份<strong>诚实披露的历史记录，不是策略推荐</strong>：它约 6 成时间空仓，长期<strong>跑不赢一直持有纳指</strong>（两条虚线）。空仓期记零、不计成本与滑点，完整口径见方法论——列在这里是为了"连输的也摊开"，不是让你照做</div>
+      <div class="sub">净值 = 1 元照此规则操作后变成几元。这是一份<strong>诚实披露的历史记录，不是策略推荐</strong>：它约 6 成时间空仓，长期<strong>跑不赢一直持有纳指</strong>（两条虚线）。空仓期记零、不计成本与滑点，完整口径见方法论：列在这里是为了"连输的也摊开"，不是让你照做</div>
       <div class="chart" id="ch-leaps-eq"></div>
     </div>
   </div>
@@ -758,7 +758,7 @@
     </div>
     <div class="card">
       <h3>滚动三年年化：机械跟随 vs 一直持有（历史对照）</h3>
-      <div class="sub">任一时点回看三年的年化收益率；实线为机械跟随、虚线为满仓两个锚——纯历史对照，说明"低暴露≠更优"，非策略推荐 · 底部滑块可拖拽缩放</div>
+      <div class="sub">任一时点回看三年的年化收益率；实线为机械跟随、虚线为满仓两个锚：纯历史对照，说明"低暴露≠更优"，非策略推荐 · 底部滑块可拖拽缩放</div>
       <div class="chart" id="ch-leaps-roll"></div>
     </div>
     <!-- 辅助入口只说送达，不提价格，不做按钮：与上方历史对照图保持文案与形态上的距离（相邻性定案） -->
@@ -770,14 +770,14 @@
 <section class="panel" id="panel-about">
   <div class="doc-page">
     <div class="hero"><div class="kicker">ABOUT · 关于</div><h1>关于美股编年史</h1>
-      <p class="dek">一个每个交易日收盘后自动更新的美股历史图表档案站——免费、无广告、代码公开。把近百年的市场，做成一部可以读的编年史。</p></div>
+      <p class="dek">一个每个交易日收盘后自动更新的美股历史图表档案站：免费、无广告、代码公开。把近百年的市场，做成一部可以读的编年史。</p></div>
     <div class="doc-body">
       <h3>这是什么</h3>
-      <p>美股编年史（Market Chronicle）把标普 500、纳斯达克，以及金融、消费、奢侈品等个股篮子的历史，整理成章节式的可视化：回报的形状、危机的节奏、估值的锚、波动的纹理、时间的复利。除了长历史图表，还有三个自研视角——「今日头版」的市场温度、「K 指数」、「LEAPS 窗口」。</p>
+      <p>美股编年史（Market Chronicle）把标普 500、纳斯达克，以及金融、消费、奢侈品等个股篮子的历史，整理成章节式的可视化：回报的形状、危机的节奏、估值的锚、波动的纹理、时间的复利。除了长历史图表，还有三个自研视角：「今日头版」的市场温度、「K 指数」、「LEAPS 窗口」。</p>
       <h3>数据与口径</h3>
-      <p>价格与回报以复权收盘价（Adj Close）近似含分红总回报；估值 CAPE / PE(TTM) 来自 multpl / Robert Shiller 的长历史序列；恐惧贪婪指数来自 CNN；个股基本面来自 macrotrends 与 Yahoo Finance；今日板块热力图为 TradingView 实时数据。长历史图表多采用对数坐标，以如实呈现百年尺度上的涨跌——1929 年跌得比 2000、2008 深得多，图上就应当更陡，这是数据本身的诚实。本站对数字只做忠实转录：按官方源当日发布的值原样入账，绝不修改；源头日后修订时，旧记录保持原样——它记录的是「官方当时说了什么」——修订另行注明，绝不悄悄覆盖。</p>
+      <p>价格与回报以复权收盘价（Adj Close）近似含分红总回报；估值 CAPE / PE(TTM) 来自 multpl / Robert Shiller 的长历史序列；恐惧贪婪指数来自 CNN；个股基本面来自 macrotrends 与 Yahoo Finance；今日板块热力图为 TradingView 实时数据。长历史图表多采用对数坐标，以如实呈现百年尺度上的涨跌：1929 年跌得比 2000、2008 深得多，图上就应当更陡，这是数据本身的诚实。本站对数字只做忠实转录：按官方源当日发布的值原样入账，绝不修改；源头日后修订时，旧记录保持原样：它记录的是「官方当时说了什么」：修订另行注明，绝不悄悄覆盖。</p>
       <h3>怎么建的</h3>
-      <p>本站由一人搭建，纯静态托管——没有服务器，也没有数据库，站上的数据就是公开仓库里那几百个 JSON 文件，谁都能翻。数据管线用 Python（yfinance / pandas）+ GitHub Actions，每个交易日收盘后自动拉数、算指标、提交、重新部署。代码以 PolyForm Noncommercial 1.0.0 许可公开：非商业使用免费，商业使用需另行授权。</p>
+      <p>本站由一人搭建，纯静态托管：没有服务器，也没有数据库，站上的数据就是公开仓库里那几百个 JSON 文件，谁都能翻。数据管线用 Python（yfinance / pandas）+ GitHub Actions，每个交易日收盘后自动拉数、算指标、提交、重新部署。代码以 PolyForm Noncommercial 1.0.0 许可公开：非商业使用免费，商业使用需另行授权。</p>
       <h3>一句话免责</h3>
       <p>本站所有内容仅供信息与教育用途，<strong>不构成任何投资建议</strong>。市场有风险，决策请独立判断。</p>
     </div>
@@ -821,10 +821,10 @@
       <h3>第三方与跨境传输</h3>
       <p>加载页面时会向以下第三方发起请求，可能将你的 IP 等技术信息传输至你所在地以外（含美国等）的服务器，它们各自的隐私政策适用，我们不控制其处理行为：</p>
       <ul>
-        <li>Google Fonts（fonts.googleapis.com）——网页字体；</li>
-        <li>TradingView（tradingview.com）——板块热力图组件，可能设置其自身 cookie；</li>
-        <li>parqet（assets.parqet.com）——公司 logo 图标；</li>
-        <li>GitHub Pages（github.io）——网站托管方。</li>
+        <li>Google Fonts（fonts.googleapis.com）：网页字体；</li>
+        <li>TradingView（tradingview.com）：板块热力图组件，可能设置其自身 cookie；</li>
+        <li>parqet（assets.parqet.com）：公司 logo 图标；</li>
+        <li>GitHub Pages（github.io）：网站托管方。</li>
       </ul>
       <h3>我们不做的事</h3>
       <p>我们<strong>不出售、不出租、不交易你的个人信息</strong>（包括美国加州 CCPA 定义下的「出售 / 分享」），也不进行定向广告。</p>
@@ -855,9 +855,9 @@
       <h3>责任限制</h3>
       <p>在适用法律允许的最大范围内，对于因使用或无法使用本站而产生的任何直接或间接损失，我们不承担责任。</p>
       <h3>知识产权与第三方</h3>
-      <p>本站代码以 PolyForm Noncommercial 1.0.0 许可公开（见 GitHub 仓库）——非商业使用免费，商业使用需另行授权；图表与文案供个人非商业参考。站内嵌入的第三方组件（如 TradingView）受其各自条款约束。</p>
+      <p>本站代码以 PolyForm Noncommercial 1.0.0 许可公开（见 GitHub 仓库）：非商业使用免费，商业使用需另行授权；图表与文案供个人非商业参考。站内嵌入的第三方组件（如 TradingView）受其各自条款约束。</p>
       <h3>付费产品与结算</h3>
-      <p>本站的付费订阅产品由支付服务商 <strong>Paddle 作为 Merchant of Record（记录商户）</strong> 处理结账、发票与税费——即你的付款合同对方为 Paddle，其条款与隐私政策一并适用。购买者须年满 18 周岁或所在地法定成年年龄。退款遵循本站《退款政策》。</p>
+      <p>本站的付费订阅产品由支付服务商 <strong>Paddle 作为 Merchant of Record（记录商户）</strong> 处理结账、发票与税费：即你的付款合同对方为 Paddle，其条款与隐私政策一并适用。购买者须年满 18 周岁或所在地法定成年年龄。退款遵循本站《退款政策》。</p>
       <h3>适用法律与可分割性</h3>
       <p>本条款受运营者所在司法管辖区的法律约束（具体管辖地将随正式运营明确）。若其中任一条款被认定无效，其余条款仍然有效。本条款构成你与我们之间就使用本站的完整约定。</p>
       <h3>变更</h3>
@@ -889,28 +889,28 @@
 <section class="panel" id="panel-methodology">
   <div class="doc-page">
     <div class="hero"><div class="kicker">METHODOLOGY · 方法论</div><h1>方法论：两个刻度，一本台账</h1>
-      <p class="dek">定义、公式、统计口径与全部历史结果——包括失效的那几次。本页所有数字由每日数据管线自动更新的公开 JSON 支撑；上线（2026 年 7 月）起的读数带 GitHub 提交时间戳、为事前记录，之前回溯至 2011 年的历史台账则为公开数据回填、可独立复现。</p></div>
+      <p class="dek">定义、公式、统计口径与全部历史结果：包括失效的那几次。本页所有数字由每日数据管线自动更新的公开 JSON 支撑；上线（2026 年 7 月）起的读数带 GitHub 提交时间戳、为事前记录，之前回溯至 2011 年的历史台账则为公开数据回填、可独立复现。</p></div>
     <div class="doc-body">
       <h3>K 指数（KAPX Index）</h3>
       <p>定义：<strong>K = CNN 恐惧贪婪指数 ÷ VIX</strong>。当恐惧（CNN 走低）与波动（VIX 走高）同时出现，K 跌破 1，记为一次信号。聚类口径：连续 K &lt; 1 的交易日聚为一次信号，间隔超过 10 个交易日记为新信号。收益视界：信号首日纳指 100 收盘价之后 20 / 40 / 60 个交易日的涨跌幅。</p>
       <p><strong>官方定义（canonical）</strong>：KAPX 指数（K 取自「恐」字拼音首字母）是 Market Chronicle 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。读数、方法论与完整信号台账永久免费公开，Git 时间戳可验证。英文引用统一使用 <strong>the KAPX Index</strong>（此前英文材料中的 K-Index 为同一指标；中文名「K 指数」不变）。</p>
-      <p>截至 2026 年 7 月：2011 年以来共 39 次信号，60 个交易日视界下 26 次上涨、13 次下跌——V 形回调中胜率高，2011、2015、2018 年底、2022 等持续压力期多次为负；所有信号持有至今全部为正。逐次对账表见「<a href="#kindex">K 指数</a>」页，原始数据见 <a href="https://chronicle.klay-wang.com/data/kindex_signals.json" target="_blank" rel="noopener">kindex_signals.json</a>。</p>
+      <p>截至 2026 年 7 月：2011 年以来共 39 次信号，60 个交易日视界下 26 次上涨、13 次下跌：V 形回调中胜率高，2011、2015、2018 年底、2022 等持续压力期多次为负；所有信号持有至今全部为正。逐次对账表见「<a href="#kindex">K 指数</a>」页，原始数据见 <a href="https://chronicle.klay-wang.com/data/kindex_signals.json" target="_blank" rel="noopener">kindex_signals.json</a>。</p>
       <h3>恐惧的标价指数（LEAPS 贵贱温度计）</h3>
-      <p>定义：头条 = <strong>1 年期市场波动率（VIX1Y）在过去 3 年的百分位</strong>，0 = 历史最便宜、100 = 历史最贵。它回答一个问题——今天买长期期权（LEAPS，12–18 个月）在历史上算贵还是便宜。旁配 5 年 / 全史两个坐标，以及四项 context（只展示、不平均进头条）：VRP 波动税（VIX1Y − 1 年已实现波动率）、期限阶梯（VIX9D→VIX1Y）、Call 偏斜 SKEW（全史百分位）、10 年期实际利率（全史百分位）。为何用 VIX1Y：LEAPS 是长期期权，须用期限最贴近它的波动率——VIX1Y 是 Cboe 免费家族里最长、最接近的一档。</p>
-      <p><strong>它是描述性温度计，不是交易信号、不是预测。</strong>只描述"贵不贵"，不说"该不该买"——像油价牌告诉你今天油贵不贵，但不替你决定要不要开车。因此本指数<strong>永不以择时/入场工具名义营销、永不测收益</strong>。公式一经注册即冻结（VIX1Y 头条 / 高=贵 / 三窗口 / 四 context），迭代即另立新兄弟。数据回填至 2007 年、可独立复现；2026 年 7 月发布起的读数带 GitHub 提交时间戳、为事前记录。原始数据见 <a href="https://chronicle.klay-wang.com/data/leaps_gauge.json" target="_blank" rel="noopener">leaps_gauge.json</a>。</p>
+      <p>定义：头条 = <strong>1 年期市场波动率（VIX1Y）在过去 3 年的百分位</strong>，0 = 历史最便宜、100 = 历史最贵。它回答一个问题：今天买长期期权（LEAPS，12–18 个月）在历史上算贵还是便宜。旁配 5 年 / 全史两个坐标，以及四项 context（只展示、不平均进头条）：VRP 波动税（VIX1Y − 1 年已实现波动率）、期限阶梯（VIX9D→VIX1Y）、Call 偏斜 SKEW（全史百分位）、10 年期实际利率（全史百分位）。为何用 VIX1Y：LEAPS 是长期期权，须用期限最贴近它的波动率：VIX1Y 是 Cboe 免费家族里最长、最接近的一档。</p>
+      <p><strong>它是描述性温度计，不是交易信号、不是预测。</strong>只描述"贵不贵"，不说"该不该买"：像油价牌告诉你今天油贵不贵，但不替你决定要不要开车。因此本指数<strong>永不以择时/入场工具名义营销、永不测收益</strong>。公式一经注册即冻结（VIX1Y 头条 / 高=贵 / 三窗口 / 四 context），迭代即另立新兄弟。数据回填至 2007 年、可独立复现；2026 年 7 月发布起的读数带 GitHub 提交时间戳、为事前记录。原始数据见 <a href="https://chronicle.klay-wang.com/data/leaps_gauge.json" target="_blank" rel="noopener">leaps_gauge.json</a>。</p>
       <h3>LEAPS 窗口（历史参照）</h3>
       <p>定义：CNN 恐惧贪婪指数收于 <strong>25 以下（极端恐惧）</strong>，即记为一段；连续低于 25 的交易日聚为同一段。视界：该段首日之后 6 / 12 / 18 个月的标普 500 与纳指 100 涨跌幅。这是一份"恐惧极值之后发生了什么"的<strong>描述性历史记录，非买卖建议</strong>。</p>
-      <p>截至 2026 年 7 月：2011 年以来共 45 次窗口，12 个月视界下纳指 100 为 34 涨 7 跌（其余尚未满 12 个月）——2021 年下半年的几次窗口 12 个月后为负，<strong>情绪极值不等于估值底</strong>。逐次对账见「<a href="#leaps">LEAPS 窗口</a>」页，原始数据见 <a href="https://chronicle.klay-wang.com/data/leaps.json" target="_blank" rel="noopener">leaps.json</a>。</p>
+      <p>截至 2026 年 7 月：2011 年以来共 45 次窗口，12 个月视界下纳指 100 为 34 涨 7 跌（其余尚未满 12 个月）：2021 年下半年的几次窗口 12 个月后为负，<strong>情绪极值不等于估值底</strong>。逐次对账见「<a href="#leaps">LEAPS 窗口</a>」页，原始数据见 <a href="https://chronicle.klay-wang.com/data/leaps.json" target="_blank" rel="noopener">leaps.json</a>。</p>
       <h3>「如果每次都跟」的口径与如实披露</h3>
-      <p>先说人话：<strong>净值就是「1 元变几元」</strong>——曲线走到 ×9.5，意思是期初投入的 1 元变成了 9.5 元。计算规则：窗口（或信号）首日按纳指 100 收盘价入场，LEAPS 窗口持有 12 个月、K 信号持有 60 个交易日后离场；持有期内出现的新信号跳过、不加仓、不重置；空仓期收益记零；不计交易成本、滑点与税费。</p>
-      <p>如实披露（截至 2026 年 7 月）：按此口径，LEAPS 策略（买纳指）2011 年以来净值约 <strong>9.5 倍</strong>——高于同期一直持有标普 500 的约 <strong>5.8 倍</strong>，低于一直持有纳指 100 的约 <strong>13.0 倍</strong>；K 策略 2011 年以来约 <strong>4.0 倍</strong>，明显低于同期一直持有纳指的约 <strong>13.0 倍</strong>。<strong>本站不宣称这些信号能跑赢同标的的买入持有。</strong>台账的价值在于告诉你「现在处于历史的哪个位置」，以及每一次极端情绪之后市场实际发生了什么——赢的和输的都在账上。</p>
-      <p>为什么 K 策略的净值远低于一直持有？因为它约有六成时间空仓：只在 K &lt; 1 后持有 60 个交易日，其余时间收益记零。在一个长期上行的市场里，空仓越久，总收益就越难追上一直满仓——这是仓位暴露的结构性差异，不是信号失效。同一个原因也解释了它更浅的回撤（2011 年以来最大回撤约 <strong>−26.7%</strong>，浅于纳指 100 的 −35.6% 与标普 500 的 −33.9%）：一半时间不在场，下跌自然也躲过一半——这是低暴露的机械结果，并非择时技巧。<strong>净值垫底与回撤最浅，是同一枚硬币的两面。</strong>宜把 K 当作定位「现在有多恐慌」的刻度、恐慌时部署现金的纪律锚，而非用来跑赢大盘的策略。</p>
-      <p>基准说明：对账一律双锚——纳指 100（策略实际交易标的）与标普 500（主流市场锚）并列展示。情绪输入端为标普 / 全市场口径（VIX 期限结构仅标普体系有官方指数，恐贪指数本身以标普为中心），属数据现实而非选择。</p>
+      <p>先说人话：<strong>净值就是「1 元变几元」</strong>：曲线走到 ×9.5，意思是期初投入的 1 元变成了 9.5 元。计算规则：窗口（或信号）首日按纳指 100 收盘价入场，LEAPS 窗口持有 12 个月、K 信号持有 60 个交易日后离场；持有期内出现的新信号跳过、不加仓、不重置；空仓期收益记零；不计交易成本、滑点与税费。</p>
+      <p>如实披露（截至 2026 年 7 月）：按此口径，LEAPS 策略（买纳指）2011 年以来净值约 <strong>9.5 倍</strong>：高于同期一直持有标普 500 的约 <strong>5.8 倍</strong>，低于一直持有纳指 100 的约 <strong>13.0 倍</strong>；K 策略 2011 年以来约 <strong>4.0 倍</strong>，明显低于同期一直持有纳指的约 <strong>13.0 倍</strong>。<strong>本站不宣称这些信号能跑赢同标的的买入持有。</strong>台账的价值在于告诉你「现在处于历史的哪个位置」，以及每一次极端情绪之后市场实际发生了什么：赢的和输的都在账上。</p>
+      <p>为什么 K 策略的净值远低于一直持有？因为它约有六成时间空仓：只在 K &lt; 1 后持有 60 个交易日，其余时间收益记零。在一个长期上行的市场里，空仓越久，总收益就越难追上一直满仓：这是仓位暴露的结构性差异，不是信号失效。同一个原因也解释了它更浅的回撤（2011 年以来最大回撤约 <strong>−26.7%</strong>，浅于纳指 100 的 −35.6% 与标普 500 的 −33.9%）：一半时间不在场，下跌自然也躲过一半：这是低暴露的机械结果，并非择时技巧。<strong>净值垫底与回撤最浅，是同一枚硬币的两面。</strong>宜把 K 当作定位「现在有多恐慌」的刻度、恐慌时部署现金的纪律锚，而非用来跑赢大盘的策略。</p>
+      <p>基准说明：对账一律双锚：纳指 100（策略实际交易标的）与标普 500（主流市场锚）并列展示。情绪输入端为标普 / 全市场口径（VIX 期限结构仅标普体系有官方指数，恐贪指数本身以标普为中心），属数据现实而非选择。</p>
       <h3>可验证性</h3>
-      <p>本站为纯静态架构：每个交易日收盘后，GitHub Actions 数据管线自动拉取数据、计算指标并提交至公开仓库。<strong>自本站上线（2026 年 7 月）起</strong>，每一天的读数都带有 Git 提交时间戳——<a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">提交历史</a>公开可查，属事前记录。<strong>管线偶尔会因技术故障漏跑</strong>：发生时读数于修复后补录，<strong>Git 历史里能清楚看到哪天是当日提交、哪天是补录，我们不抹平这个差别</strong>；已发生的故障逐次记录在下方「已知特性与局限」。<strong>上线之前、回溯至 2011 年的历史台账</strong>，则是按公开公式、用公开历史数据（CNN 恐贪存档 + VIX）回填而成：任何人都能用同样的公开数据独立复现，但属历史回填、并非事前提交。两段口径分开标注，不混为一谈。</p>
+      <p>本站为纯静态架构：每个交易日收盘后，GitHub Actions 数据管线自动拉取数据、计算指标并提交至公开仓库。<strong>自本站上线（2026 年 7 月）起</strong>，每一天的读数都带有 Git 提交时间戳：<a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">提交历史</a>公开可查，属事前记录。<strong>管线偶尔会因技术故障漏跑</strong>：发生时读数于修复后补录，<strong>Git 历史里能清楚看到哪天是当日提交、哪天是补录，我们不抹平这个差别</strong>；已发生的故障逐次记录在下方「已知特性与局限」。<strong>上线之前、回溯至 2011 年的历史台账</strong>，则是按公开公式、用公开历史数据（CNN 恐贪存档 + VIX）回填而成：任何人都能用同样的公开数据独立复现，但属历史回填、并非事前提交。两段口径分开标注，不混为一谈。</p>
       <h3>已知特性与局限</h3>
-      <p><strong>2026-07-12 → 07-14 管线故障（已修复）</strong>：<code>scripts/build_data.py</code> 中一个仍被下游使用的变量，在 2026-07-12 的一次改动里被误删，导致 daily-update 连续失败；<strong>07-13、07-14 两个交易日未能当日提交</strong>，读数于 07-15 补录（commit <code>569e047</code>）。数据本身由公开数据源重算得到、可独立复现，受影响的只是这两天的<strong>提交时间戳</strong>——按本站口径，它们属「补录」而非「事前」。故障已修复（commit <code>82f5822</code>），并补上了失败告警：此前的通知脚本在管线失败时仍会读取旧数据、发出一条看起来正常的播报，把故障静默掉了。</p>
-      <p>VIX 本身是 CNN 恐惧贪婪指数七个分量之一（其「市场波动」分量以 VIX 相对 50 日均线衡量）。而 K = CNN 恐贪 ÷ VIX，因此 VIX 通过两条同向通道影响 K——分母直接除以 VIX，分子里还占约七分之一的波动分量——波动率被部分双重计重。这意味着 KAPX 对波动率的敏感度，高于一个「完全独立的恐惧 ÷ 波动率」比值，「两个独立信号相除」的说法并不严格（约七分之六的恐贪独立于 VIX）。这不是缺陷：可把 KAPX 理解为一个「偏重波动率应激的恐惧指标」，对本指标「在恐慌与波动同时极端时定位历史坐标」的用途而言，这份灵敏度正是想要的。我们如实披露这一重叠，而非悄悄剔除——公式一经公开即不静默更改，任何口径迭代都会另立新版本。</p>
+      <p><strong>2026-07-12 → 07-14 管线故障（已修复）</strong>：<code>scripts/build_data.py</code> 中一个仍被下游使用的变量，在 2026-07-12 的一次改动里被误删，导致 daily-update 连续失败；<strong>07-13、07-14 两个交易日未能当日提交</strong>，读数于 07-15 补录（commit <code>569e047</code>）。数据本身由公开数据源重算得到、可独立复现，受影响的只是这两天的<strong>提交时间戳</strong>：按本站口径，它们属「补录」而非「事前」。故障已修复（commit <code>82f5822</code>），并补上了失败告警：此前的通知脚本在管线失败时仍会读取旧数据、发出一条看起来正常的播报，把故障静默掉了。</p>
+      <p>VIX 本身是 CNN 恐惧贪婪指数七个分量之一（其「市场波动」分量以 VIX 相对 50 日均线衡量）。而 K = CNN 恐贪 ÷ VIX，因此 VIX 通过两条同向通道影响 K：分母直接除以 VIX，分子里还占约七分之一的波动分量：波动率被部分双重计重。这意味着 KAPX 对波动率的敏感度，高于一个「完全独立的恐惧 ÷ 波动率」比值，「两个独立信号相除」的说法并不严格（约七分之六的恐贪独立于 VIX）。这不是缺陷：可把 KAPX 理解为一个「偏重波动率应激的恐惧指标」，对本指标「在恐慌与波动同时极端时定位历史坐标」的用途而言，这份灵敏度正是想要的。我们如实披露这一重叠，而非悄悄剔除：公式一经公开即不静默更改，任何口径迭代都会另立新版本。</p>
       <h3>数据源</h3>
       <p>CNN Fear &amp; Greed（whit3rabbit 每日存档 + CNN 官方接口当日值）；价格与 VIX 来自 Yahoo Finance（复权收盘价近似含分红总回报）；VIX 期限结构（VIX9D / VIX3M / VIX6M）来自 Cboe 官方历史数据；Put/Call 比为 CNN 口径的全市场 5 日均值；估值长历史来自 multpl / Robert Shiller。机器可读入口见 <a href="https://chronicle.klay-wang.com/llms.txt" target="_blank" rel="noopener">llms.txt</a>。KAPX 指数历史读数亦以公开数据集形式发布于 <a href="https://www.kaggle.com/datasets/klaywong/kapx-index-daily-fear-pricing-gauge" target="_blank" rel="noopener">Kaggle</a> 与 <a href="https://huggingface.co/datasets/klay24/kapx-index" target="_blank" rel="noopener">Hugging Face</a>（CC BY 4.0，季度更新）。</p>
       <p>数据修订说明：CNN 恐贪存档对最近数日的读数可能有 ±1–2 点的事后修订（当日实时快照会被官方历史值替换），台账随每日管线自动吸收修订；收益视界一律在无缺日的价格日历上按交易日计。</p>
@@ -925,7 +925,7 @@
 <section class="panel" id="panel-pricing">
   <div class="doc-page">
     <div class="hero"><div class="kicker">PRICING · 定价</div><h1>定价</h1>
-      <p class="dek">本站不荐股、不预测、不晒收益——想要这三样，请出门右转。每个开盘前只回答三个问题：今天贵不贵，市场怕不怕，这个位置在历史上排第几。三分钟人话，错了不删。</p></div>
+      <p class="dek">本站不荐股、不预测、不晒收益：想要这三样，请出门右转。每个开盘前只回答三个问题：今天贵不贵，市场怕不怕，这个位置在历史上排第几。三分钟人话，错了不删。</p></div>
     <div class="doc-body">
       <div class="pbill">
         <div class="pbill-inner">
@@ -955,10 +955,10 @@
           <div class="ptier-price"><span class="p-m">$29<i class="u">/ 月</i></span><span class="p-y">$290<i class="u">/ 年</i></span></div>
           <div class="ptier-tag"><span class="p-m">创始价 <b>$9.9 / 月 · 按年 $99</b> 永久锁定（前 50 名）· 邮件预约</span><span class="p-y">≈ $24 / 月 · 年付 = 10 个月价</span></div>
           <ul class="ptier-list">
-            <li><b>每日判读正文</b>——站上永不公开</li>
-            <li><b>判读档案</b>——逐日归档，越攒越厚</li>
-            <li><b>每周一期传说处决</b>——付费先看，30 天后公开</li>
-            <li>期权结构数据表——覆盖美股期权成交量前列的十余只标的，清单随流动性调整</li>
+            <li><b>每日判读正文</b>：站上永不公开</li>
+            <li><b>判读档案</b>：逐日归档，越攒越厚</li>
+            <li><b>每周一期传说处决</b>：付费先看，30 天后公开</li>
+            <li>期权结构数据表：覆盖美股期权成交量前列的十余只标的，清单随流动性调整</li>
           </ul>
           <div class="ptier-soon">订阅后 24 小时内开通（这一步由我手动完成），之后每个交易日开盘前送达。14 天内不满意可全额退款。</div>
           <!-- 标签整串放进 p-m/p-y，不留裸文本节点：i18n 的 applyTo 按整节点精确匹配 D 字典，
@@ -980,7 +980,7 @@
           <div class="ptier-soon">Standard 上线 3–6 个月后开放</div>
         </div>
       </div>
-      <p><strong>数字，随处可见，永远免费。</strong>档案真正的用处在之后每次大跌的那天——你手里已经有一个 15 年没换过口径的读数。</p>
+      <p><strong>数字，随处可见，永远免费。</strong>档案真正的用处在之后每次大跌的那天：你手里已经有一个 15 年没换过口径的读数。</p>
       <p class="pricing-inst"><strong>机构 / 数据授权</strong>（序列授权、指数授权、再分发）— <a href="#contact">联系我们</a>，不标价。</p>
       <p>年付 = 10 个月价（$290 / $990）· 14 天无条件退款、无试用（免费层即试用）· 通过订阅邮件中的管理链接随时取消。订单与支付由 Merchant of Record 处理，账单上会显示其名称。<strong>仅为数据与信息，不构成投资建议，不含任何买卖推荐。</strong></p>
       <p class="doc-fineprint">Pro 与 API 为后续规划，非最终承诺，上线时间待定。</p>
@@ -1012,7 +1012,7 @@
         <div class="footer-col-h">Get Started</div>
         <a href="#pricing">定价与套餐</a>
         <!-- 2026-07-16：从 About 挪到 Get Started（它是「拿去用」不是「了解我们」）；
-             并从裸文件树改指向 data/README.md —— 先给上下文(来源/许可/口径)，再给 375 个 JSON。
+             并从裸文件树改指向 data/README.md ： 先给上下文(来源/许可/口径)，再给 375 个 JSON。
              那份 README 同时是 GEO 资产：结构化、可被反复链接的说明页正是 LLM 摄取时最爱的东西。 -->
         <a href="https://github.com/klaywang24/market-chronicle/blob/main/data/README.md" target="_blank" rel="noopener">数据 &amp; API</a>
       </div>
@@ -1030,26 +1030,26 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260719r"></script>
-<script src="js/app.js?v=20260719r"></script>
-<script src="js/docs-i18n.js?v=20260719r"></script>
+<script src="js/i18n.js?v=20260719s"></script>
+<script src="js/app.js?v=20260719s"></script>
+<script src="js/docs-i18n.js?v=20260719s"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。
 // 三条设计依据，改动前先读：
-//  1) 用 Paddle.Checkout.open() 而非 class="paddle_button"+data-items —— 后者的属性读取时机
+//  1) 用 Paddle.Checkout.open() 而非 class="paddle_button"+data-items ： 后者的属性读取时机
 //     官方文档零表述，且 cdn 路径不带版本号会静默升级；万一改成 init 时快照，症状是
 //     「用户选年付却被按月付收款」，静默且本站无 webhook 可发现。open() 的签名是文档化契约。
-//  2) 必须事件委托 —— 切到 EN 时 docs-i18n.js 会整块换掉 #panel-pricing 的 HTML，
+//  2) 必须事件委托 ： 切到 EN 时 docs-i18n.js 会整块换掉 #panel-pricing 的 HTML，
 //     按钮是新节点；而 Paddle 只在 Initialize 的 DOM-ready 扫一次、无任何重扫方法。
-//  3) if (window.Paddle) 兜底 —— cdn.paddle.com 不可达时静默降级，不拖垮下面的 sw 注册。
+//  3) if (window.Paddle) 兜底 ： cdn.paddle.com 不可达时静默降级，不拖垮下面的 sw 注册。
 if (window.Paddle) {
   Paddle.Initialize({ token: "live_9a38df12cfaaa8645cc6c4ee404" }); // client-side token=公开凭证，非 API key
   const PADDLE_PRICES = {
     m: "pri_01kxgfsayca5nv3re1103pzvew", // Standard $29 / Monthly
     y: "pri_01kxgg3h87b5e9rzd9gmky685g", // Standard $290 / Yearly
   };
-  // 创始价带码链接（2026-07-17）：?code=XXX 时结账自动挂码——「我亲手给你开的价」，
+  // 创始价带码链接（2026-07-17）：?code=XXX 时结账自动挂码：「我亲手给你开的价」，
   // 收礼的人连码都不用输。有码时强制按年价：创始价定义就是按年 $99（$290−$191），
   // 且 $191 的 flat 折扣绝不能落在 $29 月价上（负价/清零边界）。
   const FOUNDING_CODE = new URLSearchParams(location.search).get("code");
@@ -1061,7 +1061,7 @@ if (window.Paddle) {
     const open = {
       items: [{ priceId: PADDLE_PRICES[(FOUNDING_CODE || y) ? "y" : "m"], quantity: 1 }],
       // 付完钱落到自己的页面：Paddle 自带成功页不会说「24 小时内手动开通」，
-      // 而本站是一个人手动把付费者加进邮件列表的——不设这个，买家付完钱会以为没下文。
+      // 而本站是一个人手动把付费者加进邮件列表的：不设这个，买家付完钱会以为没下文。
       settings: { successUrl: "https://chronicle.klay-wang.com/welcome/" },
     };
     if (FOUNDING_CODE) open.discountCode = FOUNDING_CODE;

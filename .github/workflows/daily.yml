@@ -51,15 +51,28 @@ jobs:
         continue-on-error: true
         run: |
           SHA=$(git rev-parse HEAD)
+          # 🔴 锚定是整条证据链的效力来源，而本步是 continue-on-error（故意的：Wayback
+          #    抽风不该阻塞管线）。但那意味着**锚丢了不会有人知道**——十年后无法回答
+          #    「哪些天有锚、哪些天没有」。故逐条记结果，下一次 commit 会把它带上。
+          OK=0; FAIL=0; LOG="data/anchor_log.jsonl"
           for u in \
             "https://github.com/${{ github.repository }}/commit/$SHA" \
             "https://chronicle.klay-wang.com/" \
             "https://chronicle.klay-wang.com/data/kindex.json" \
             "https://chronicle.klay-wang.com/data/leaps_gauge.json" \
             "https://chronicle.klay-wang.com/data/ledger_hashes.jsonl"; do
-            curl -sS -m 60 "https://web.archive.org/save/$u" -o /dev/null || true
+            if curl -sS -m 60 "https://web.archive.org/save/$u" -o /dev/null; then
+              OK=$((OK+1))
+            else
+              FAIL=$((FAIL+1)); echo "  ⚠️ 锚定失败: $u"
+            fi
             sleep 5
           done
+          printf '{"date":"%s","sha":"%s","ok":%d,"fail":%d}\n' \
+            "$(date -u +%F)" "$SHA" "$OK" "$FAIL" >> "$LOG"
+          echo "锚定结果：成功 $OK / 失败 $FAIL（已记入 $LOG，随下次 commit 提交）"
+          # 全部失败 = 当天完全没有独立见证，值得知道
+          [ "$OK" -eq 0 ] && echo "::warning::当日 Wayback 锚定全部失败，该日无独立见证" || true
       # ⚠️ if: always() 是故意的——失败时也要发通知。但必须把 job 状态传进去，
       # 否则脚本会读到磁盘上的旧 pulse.json，发出一条「看起来一切正常」的播报，
       # 把失败静默掉。2026-07-12→14 管线死了 4 天没人发现，就是栽在这里。

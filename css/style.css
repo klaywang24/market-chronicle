@@ -17,7 +17,7 @@
   --teal: #2D4A48;
   --purple: #6A4E9E;
   --danger: #FF2400;
-  /* 对比图专用四色：深红 / Chase 蓝 / 深紫 / 凯尔特人绿 —— 高饱和高区分 */
+  /* 对比图专用四色：深红 / Chase 蓝 / 深紫 / 凯尔特人绿 ： 高饱和高区分 */
   --cmp-red: #B01212;
   --cmp-blue: #117ACA;
   --cmp-purple: #6A3FB5;
@@ -161,7 +161,7 @@ html:not([lang^="zh"]) .brand em { display: none; }
 /* 西语系 tab 标签更宽（Consommation / LEAPS-Fenster…），9 个 tab 会把最后一个
    「LEAPS Window」挤出 .tabs 的 overflow-x 边界被截断。非中文界面下收紧 tab 字号/
    内边距、顶栏间距与右侧控件占位，让全部 tab 单行完整显示。 */
-/* 2026-07-19：改芯片式后这里不能再压到 padding 6px 7px——那会让边框贴着字，
+/* 2026-07-19：改芯片式后这里不能再压到 padding 6px 7px：那会让边框贴着字，
    芯片的形没了。改为只收字号与间距；两行布局本来就腾出了 200+px，够放。 */
 html:not([lang^="zh"]) .topbar-inner { gap: 14px; }
 html:not([lang^="zh"]) .tab { font-size: 12.5px; padding: 6px 11px; }
@@ -288,7 +288,7 @@ html:not([lang^="zh"]) .lang-switch { font-size: 11.5px; padding: 3px 8px; }
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 14px 18px;
-  /* 2026-07-16：与 .senti-card / .ledger-card 对齐——此前 .stat 三行左对齐，
+  /* 2026-07-16：与 .senti-card / .ledger-card 对齐：此前 .stat 三行左对齐，
      而隔壁卡片已居中 = 同一页两套轴。居中后标题/数字/副注同一条中线。 */
   text-align: center;
 }
@@ -518,7 +518,7 @@ html:not([lang^="zh"]) .temp-ring .lbl { font-size: 9.5px; letter-spacing: 0; }
 /* 西语系"平/flat/stable"更长，给窄段留足宽度不被截断 */
 html:not([lang^="zh"]) .breadth-bar div { min-width: 62px; }
 .breadth-note { color: var(--ink-muted); font-size: 12.5px; margin-top: 6px; }
-/* 板块热力图（TradingView 官方 widget 容器）——始终暗色，做成嵌入式数据面板 */
+/* 板块热力图（TradingView 官方 widget 容器）：始终暗色，做成嵌入式数据面板 */
 .heat-tree {
   width: 100%;
   height: 620px;
@@ -612,7 +612,7 @@ html:not([lang^="zh"]) .breadth-bar div { min-width: 62px; }
 /* 单组行（科技=半导体/平台·软件/硬件·终端）：标签字数不等（3 字 38.88px vs 5 字 64.8px），
    胶囊紧跟标签排 → 各行首个胶囊左边缘差 25.92px，肉眼可见的错位。给标签一个最小宽度对齐。
    用 em 而非 px：手机端 font-size 降到 11px 时按比例缩，不写死。
-   :only-child 精确限定到单组行——金融前三行是双组（第二组本就无法对齐，加了只是白填空隙），
+   :only-child 精确限定到单组行：金融前三行是双组（第二组本就无法对齐，加了只是白填空隙），
    金融第四行「加密·稳定币」77.77px 已超过此值、自动无效。改标签字数前先量一次宽度。
    ⚠️ flex-shrink:0 必须留着：flex 项默认 min-width:auto(=不小于内容)本来在防压缩，
    一旦写死 min-width 就顶掉了这层保护，长标签会被压到 5.4em 把字挤出去
@@ -784,7 +784,7 @@ html:not([lang^="zh"]) .toc a { font-size: 11.5px; }
 /* ---------- 长表格 / 个股 logo / 数据条 ---------- */
 .table-scroll { max-height: 440px; overflow-y: auto; }
 th.left { text-align: left; }
-/* 2026-07-16：表 logo 尺寸提成变量——「公司」表头要跟着它缩进同样的量，
+/* 2026-07-16：表 logo 尺寸提成变量：「公司」表头要跟着它缩进同样的量，
    写死 26px 的话将来改 logo 尺寸表头就又错位了（实测：18+8=26px，与错位量分毫不差）。 */
 :root { --tbl-logo-size: 18px; --tbl-logo-gap: 8px; }
 .tbl-logo {
@@ -798,22 +798,22 @@ th.left { text-align: left; }
 }
 /* 「公司」列内容是 [logo]名称，文字被 logo 顶开 → 表头贴着列左边就比内容左 26px。
    给带 logo 的那列表头同量缩进。⚠️ 只作用于 .has-logo，别误伤「行业」（无 logo，本来就是齐的）。 */
-/* 2026-07-16（用户定）：表头「公司」与 logo 共一条左边线——此前表头缩进 26px 去对齐"名字"，
+/* 2026-07-16（用户定）：表头「公司」与 logo 共一条左边线：此前表头缩进 26px 去对齐"名字"，
    结果 logo 凸在表头左边，左缘不齐。现在表头和 logo 同一 x（都比基础位置右移 8px 透气），
    名字跟在 logo 后面向右展开。 */
 th.left.has-logo { padding-left: 18px; }
 td.left-col { padding-left: 18px; }
 /* 2026-07-16（用户第三次校准）：宽列里内容贴左 = 大片空白全堆在右边。
-   要的是「块居中、块内左对齐」：表头居中；每行内容包进同宽 inline-block（21em）——
+   要的是「块居中、块内左对齐」：表头居中；每行内容包进同宽 inline-block（21em）：
    整块坐在列中间，logo 仍排成一条竖线（盒内 text-align:left）。
    21em 按最长名「Meta Platforms Inc Class A」量的（≈17.8em），盒子略宽只吃右侧空白。
    仅用于公司列很宽的两张表（前二十大持仓 / 五百家一览）；篮子对照表列窄，保持 18px 左对齐。 */
 .co-wrap { display: inline-block; width: 21em; max-width: 100%; text-align: left; }
-/* 2026-07-16：持仓表「公司」「行业」两列改居中（用户要的是居中，不是「表头与内容对齐」——
+/* 2026-07-16：持仓表「公司」「行业」两列改居中（用户要的是居中，不是「表头与内容对齐」：
    此前一轮把需求读成后者、改了 padding，所以他说「还是居左」）。
    居中后 has-logo 那条缩进反而会把表头推偏，故一并归零。 */
 th.left.center-col, td.center-col { text-align: center; }
-/* 2026-07-16：带 logo 的列不能居中——名字长短不一会让 logo 上下参差。
+/* 2026-07-16：带 logo 的列不能居中：名字长短不一会让 logo 上下参差。
    左对齐让 logo 排成一条竖线、名字向右展开；表头靠 th.left.has-logo 的同量缩进与名字对齐。
    只有「行业」这种等长文本的列才用 center-col。 */
 td.left-col { text-align: left; }
@@ -1024,7 +1024,7 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
   .lc-val { font-size: 26px; }
 }
 
-/* 台账区收尾（2026-07-17 用户裁：免费订阅表单全站移除，只剩验证框——
+/* 台账区收尾（2026-07-17 用户裁：免费订阅表单全站移除，只剩验证框：
    净值曲线的解药，不能挪进页脚，它的价值不是被点击，是它存在。
    网格保留 1fr 1fr：验证框占左半、右半留白（观感失衡就留白=定案）。 */
 .ledger-actions {
@@ -1064,7 +1064,7 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 .senti-card, .ledger-card { display: flex; flex-direction: column; text-align: center; }
 .senti-card .lc-name, .ledger-card .lc-name { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .senti-card .lc-name span, .ledger-card .lc-name span { margin-left: 0; }
-/* 2026-07-16：lc-meta 里每个「短语」不许内部折行——只准在「·」两侧断。
+/* 2026-07-16：lc-meta 里每个「短语」不许内部折行：只准在「·」两侧断。
    中文短、一行放得下；英文长，不加这条就会折成 "…since / 2025-04-25" 这种半截。 */
 .lc-meta .nw { white-space: nowrap; }
 .senti-card .lc-val { text-align: center; font-size: 38px; margin: 10px 0 4px; }
@@ -1093,7 +1093,7 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 .lv-title { font-size: 12.5px; font-weight: 500; color: var(--ink-soft); margin-bottom: 7px; }
 .ledger-verify:hover .lv-title { color: var(--accent); }
 /* keep-all：中文默认可在任意字之间断行，「GitHub 精确可查」被拆成「…精确可」/「查」。
-   不用 <span class="nw"> 包——applyTo 按整文本节点精确匹配 i18n 的 D key，插标签即失配、EN 会 fallback 成中文。
+   不用 <span class="nw"> 包：applyTo 按整文本节点精确匹配 i18n 的 D key，插标签即失配、EN 会 fallback 成中文。
    keep-all 让中文串整体不可断，只在「，」与空格处换行：零 HTML 改动、零 i18n 风险。 */
 .lv-note { font-size: 10.5px; color: var(--ink-muted); line-height: 1.65; margin-top: auto; word-break: keep-all; }
 
@@ -1139,7 +1139,7 @@ html:not([lang^="zh"]) .senti-name { flex-basis: 118px; font-size: 11.5px; }
 /* EN 顶栏压缩。2026-07-19 改芯片式后**下调压缩力度**：原为 12px/6px 7px/gap 2px，
    那是为了「一行塞满 11 个 tab」；现在 tab 与控件已分两行，宽度不再紧张，
    而 padding 7px 会让边框贴着字、芯片的形立不住。
-   ⚠️ 本条在 165 行同名规则之后，会覆盖它——两处必须同时改，只改前一处不生效。 */
+   ⚠️ 本条在 165 行同名规则之后，会覆盖它：两处必须同时改，只改前一处不生效。 */
 html:not([lang^="zh"]) .tab { font-size: 12.5px; padding: 6px 11px; }
 html:not([lang^="zh"]) .tabs { gap: 7px; }
 html:not([lang^="zh"]) .brand { font-size: 17.5px; }
@@ -1223,7 +1223,7 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 .footer-col { display: flex; flex-direction: column; gap: 9px; }
 .footer-col-h { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); margin-bottom: 5px; font-family: 'JetBrains Mono', monospace; }
 /* 2026-07-16：用户三次报「页脚不够黑」。实测：色已是 --ink-soft 13.3:1（AAA 上游），
-   再深就是纯黑、纸感没了。真因是字号+字重——13px/400 的细笔画对比 48px/700 的「46」，
+   再深就是纯黑、纸感没了。真因是字号+字重：13px/400 的细笔画对比 48px/700 的「46」，
    同样墨色看起来就是不一样黑，那是字体的物理特性不是颜色问题。故加字重不加墨。
    ⚠️ 也别把页脚底改纯白：#2E2822 从 #F6F5F1 换到 #FFF 只有 13.3→14.6（+10%，肉眼看不出），
    代价却是页面底部横一条白带子把纸感切断。 */
@@ -1274,7 +1274,7 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 }
 
 /* ================= 浅色底 v2：暖底 + 白卡（Stripe/Apple 式层级：暖纸面退后，白卡片上浮） ================= */
-/* Apple 式低饱和暖灰：AI 味来自"黄的饱和度"，不是"暖"本身——纸感=近灰+一口气暖 */
+/* Apple 式低饱和暖灰：AI 味来自"黄的饱和度"，不是"暖"本身：纸感=近灰+一口气暖 */
 :root:not(.dark-mode) {
   --bg: #F6F5F1;
   --bg-card: #FFFFFF;
@@ -1282,7 +1282,7 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
   --bg-deep: #EFEEE8;
   --border: #E5E3DB;
   /* 2026-07-16 加深一档：用户实测「不够黑」。基准 = --ink #1A1410（「46」那个大数）。
-     往 ink 靠但保住暖褐色相——纸感来自暖，不是来自淡（AI 味来自黄的饱和度，不是「暖」本身）。
+     往 ink 靠但保住暖褐色相：纸感来自暖，不是来自淡（AI 味来自黄的饱和度，不是「暖」本身）。
      浅色小字原 5.1:1（AA 刚过线，而它承载的是「示意口径」这类诚实声明）→ 现 ~7:1 追平暗色 */
   --ink-soft: #2E2822;
   --ink-muted: #554E45;
@@ -1299,7 +1299,7 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 .lg-bar .lg-col { max-width: 42px; transition: height 0.4s cubic-bezier(0.2, 0.7, 0.3, 1); }
 .lg-ctx4 .senti-card { text-align: center; }
 /* 2026-07-16：四个 context 读数原为默认墨色，视觉上像四段死数字。
-   改为猩红家族由浅到深（左→右）。⚠️ 这是纯视觉层级，不编码任何含义——
+   改为猩红家族由浅到深（左→右）。⚠️ 这是纯视觉层级，不编码任何含义：
    四项单位互不相同、方向也不同向（注册文档：相关 −0.47，故「只展示、不平均进头条」），
    深浅绝不可被读成「越右越危险」。 */
 .lg-ctx4 .senti-card:nth-child(1) .lc-val { color: #E8735A; }
@@ -1372,7 +1372,7 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 .ptier.t-pro .ptier-list li::before { color: var(--gold); }
 .ptier.featured .ptier-name { color: var(--accent); }
 
-/* ── 顶栏订阅入口（2026-07-17：付费入口可发现性修复——朋友反馈「找不到付费的地方」）── */
+/* ── 顶栏订阅入口（2026-07-17：付费入口可发现性修复：朋友反馈「找不到付费的地方」）── */
 .topbar-sub{display:inline-block;font-size:13px;font-weight:600;color:#A0392F;border:1.5px solid #A0392F;
  border-radius:999px;padding:2.5px 13px;text-decoration:none;letter-spacing:.02em;white-space:nowrap;line-height:1.5}
 .topbar-sub:hover{background:rgba(160,57,47,.08)}
@@ -1387,8 +1387,8 @@ html:not([lang^="zh"]) .topbar-sub{font-size:12px;padding:2.5px 11px}
 
    🚨 安全设计（这是本块最重要的部分，别为了简洁删掉）：
    内容**默认完全可见**。只有 JS 确认 IntersectionObserver 可用、并在 <html> 上
-   打了 .rv-on 之后，元素才进入「待揭示」态。这样任何一环失败——JS 报错、
-   IO 不触发、脚本没加载——最坏结果是**没有动画**，而不是**整块内容看不见**。
+   打了 .rv-on 之后，元素才进入「待揭示」态。这样任何一环失败：JS 报错、
+   IO 不触发、脚本没加载：最坏结果是**没有动画**，而不是**整块内容看不见**。
    站上是 tab 路由（面板 display:none 切换），隐藏面板里的元素若默认 opacity:0
    且 IO 不复算，切过去就是一片空白。这个风险必须用「默认可见」来兜。
    JS 侧另有 3 秒兜底定时器强制全亮。 */
@@ -1426,7 +1426,7 @@ html.rv-on .rv.rv-in { opacity: 1; transform: none; }
 
 /* ================= 分段切换（2026-07-19 新增，用于「口径实验室」） =================
    用户看中的交互：点一个标签，下面的内容整体换掉。
-   ⚠️ 它只适用于「同一个问题、不同的尺」——两个读数并列会被读成两件事，
+   ⚠️ 它只适用于「同一个问题、不同的尺」：两个读数并列会被读成两件事，
    而重点恰恰是换把尺结论会翻转。站上「三窗并陈」那类**故意全摆出来**的地方
    不要改成这个（配文写着「不藏选择」，改了就自相矛盾）。 */
 .seg {
@@ -1461,7 +1461,7 @@ html.rv-on .rv.rv-in { opacity: 1; transform: none; }
 
 /* 口径实验室的读数块：大数字 + 对照 + 判读 */
 /* 读数卡：标签与数字居中成一列；判读段落保持左对齐（居中的段落不好读）。
-   ⚠️ 卡片**不要拉伸**到与图等高——grid 默认 stretch，会在判读下方留一大片空白。 */
+   ⚠️ 卡片**不要拉伸**到与图等高：grid 默认 stretch，会在判读下方留一大片空白。 */
 .cal-read { display: flex; gap: 28px; flex-wrap: wrap; align-items: baseline; margin: 6px 0 4px; }
 .readout { align-self: start; text-align: center; }
 .readout .cal-verdict { text-align: left; }

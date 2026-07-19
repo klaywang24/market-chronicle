@@ -58,7 +58,7 @@
   // ECharts option 内的中文（series 名/轴名/图例/标注）按当前语言翻译
   function i18nOption(o) {
     if (!window.MC_I18N || MC_I18N.lang() === "zh" || o == null) return o;
-    // ⚠️ 数组元素若是字符串，必须在这里翻译——不能只 forEach(i18nOption)，
+    // ⚠️ 数组元素若是字符串，必须在这里翻译：不能只 forEach(i18nOption)，
     // 因为 i18nOption 对字符串是空操作（它只处理对象/数组），于是「类目轴的
     // data 数组」「legend 的 data 数组」这类纯字符串数组永远不会被翻译。
     // 2026-07-18 由波动率家族横条图暴露：EN 下 y 轴仍是「高盛/苹果/谷歌/亚马逊」，
@@ -103,8 +103,8 @@
         <html>.rv-on。任何一环失败 → 没动画，而不是没内容。
      2) 站上是 tab 路由，面板 display:none 时元素**零尺寸**，IO 不会把它们判为进入视口。
         所以每次面板构建完必须重扫；且**读数卡（.stat 等）是 JS 动态生成的**，
-        一次性扫 DOM 会全部漏掉——用户点名要效果的那四处正好都是这种。
-     3) 一律交给 IO，不做「首屏直接就位」的捷径——见 rvScan 内注释（依赖布局已稳定，
+        一次性扫 DOM 会全部漏掉：用户点名要效果的那四处正好都是这种。
+     3) 一律交给 IO，不做「首屏直接就位」的捷径：见 rvScan 内注释（依赖布局已稳定，
         而扫描时图表尚未渲染，该假设不成立）。 */
   const RV_SEL = ".card, .stat, .senti-card, .ledger-card, .lg-ladder, .chapter-head";
   const rvSeen = new WeakSet();
@@ -115,7 +115,7 @@
        ① 隐藏面板里的元素 rect 全为 0，而 IO 会把「零面积且坐标在视口内」判为已进入
           → 一观察就全亮；
        ② 换成只观察非零尺寸元素后，IO 在本页结构下干脆不触发，实测视口内 3 张卡长期
-          停在 opacity:0 —— 正是最不能接受的「内容看不见」。
+          停在 opacity:0 ： 正是最不能接受的「内容看不见」。
      39 个元素逐个算 rect 的开销可以忽略，换来的是**行为完全可预测**。 */
   function rvTick() {
     if (!rvArmed) return;
@@ -147,14 +147,14 @@
     addEventListener("scroll", onScroll, { passive: true });
     addEventListener("resize", onScroll, { passive: true });
     /* 兜底：绝不让内容因动画机制卡住而消失。
-       ⚠️ 第一版是「3 秒后无差别点亮全部」——那等于让揭示效果自己失效，
+       ⚠️ 第一版是「3 秒后无差别点亮全部」：那等于让揭示效果自己失效，
        而且把我自己的验收也污染了：每次测到的都是兜底后的「全亮」，
        连续三轮误判为「揭示没工作」，其实那三轮它一直是好的。 */
     setTimeout(rvTick, 1200);
     setTimeout(rvTick, 2600);
 
     /* 卡片几乎全是**异步**渲染的（render* 先 fetch JSON 再插 DOM），比 activatePanel 晚得多，
-       所以不能只在面板激活时扫一次——实测那时扫到 0 个。
+       所以不能只在面板激活时扫一次：实测那时扫到 0 个。
        ⚠️ 也不要用「每 150ms 轮询面板 scrollHeight 判断布局是否稳定」那套：
        读 scrollHeight 会**强制重排**，在这种上万像素、十几张图的页面上开销可观，
        实测把浏览器拖到多次操作超时。
@@ -170,7 +170,7 @@
       if (rvSeen.has(n) || n.closest(".pulse-base")) return;  // pulse 头部已有 heroRise，不叠
       const r = n.getBoundingClientRect();
       /* 🚨 隐藏面板（display:none）里的元素 rect 全为 0。而 IntersectionObserver 会把
-         「零面积、坐标落在视口内」的目标判为 isIntersecting=true，一观察就立刻点亮——
+         「零面积、坐标落在视口内」的目标判为 isIntersecting=true，一观察就立刻点亮：
          实测因此 174 个元素在 1.4s 内全亮，滚动揭示形同虚设。
          ∴ 零尺寸的**跳过且不记入 rvSeen**，等它所在面板显示后（activatePanel 会再扫）
          再处理。这也顺带保证了不会给看不见的东西挂一堆观察器。 */
@@ -213,7 +213,7 @@
   // ---------------- 篮子板块配置（与 build_data.py 的 BASKETS 保持一致） ----------------
   const BASKET_CFG = {
     tech: {
-      anchorLabel: "科技总览",   // 2026-07-16：原「QQQ 总览」名实不符——TSM 挂 NYSE，进不了纳斯达克 100，用站上自己那张 103 只成分股表一对就穿帮。这一栏的用途是「我盯的这些票」不是复刻指数，故改标题、留台积电（AI 硬件链最要紧的一环）。
+      anchorLabel: "科技总览",   // 2026-07-16：原「QQQ 总览」名实不符：TSM 挂 NYSE，进不了纳斯达克 100，用站上自己那张 103 只成分股表一对就穿帮。这一栏的用途是「我盯的这些票」不是复刻指数，故改标题、留台积电（AI 硬件链最要紧的一环）。
       // ⚠️ 与 scripts/build_data.py 的 BASKETS["tech"] 必须同步；分组标签保持 ≤5 字
       //（.pill-group:only-child .pill-group-label 的 min-width:5.4em 按 5 字量的，超了就不对齐了）
       rows: [
@@ -258,7 +258,7 @@
   const safeTicker = (t) => t.toLowerCase().replace(".", "-");
 
   // logo 三级加载链：自托管 logos/（scripts/fetch_logos.py 每周同步，与站点同源、
-  // 不受客户端拦截影响——iPad 曾整站拦掉 parqet 直连）→ parqet 直连（新 ticker 兜底）→ 首字母圆章
+  // 不受客户端拦截影响：iPad 曾整站拦掉 parqet 直连）→ parqet 直连（新 ticker 兜底）→ 首字母圆章
   window.__logoErr = function (img) {
     const t = img.dataset.t || "";
     if (!img.dataset.step) {
@@ -333,7 +333,7 @@
         <div class="chapter-head"><span class="chapter-no">第一章</span><h2>上市以来</h2></div>
         <div class="card">
           <h3>走势（月线 · 对数坐标 · 复权价）</h3>
-          <div class="sub">和谁比一比？—— <span class="cmp-chips" id="${basket}-cmp"></span></div>
+          <div class="sub">和谁比一比？： <span class="cmp-chips" id="${basket}-cmp"></span></div>
           <div class="chart" id="${basket}-sd-century"></div>
           <p class="footnote" id="${basket}-cmp-note" style="display:none">对比模式：全部序列在共同起点归一化为 100（对数坐标），跑赢基准 = 长期真正的好公司。</p>
         </div>
@@ -414,7 +414,7 @@
     load(basket + "_table").then((d) => {
       const r = d.rows.find((x) => x.ticker === ticker);
       // 新成员上线当天：app.js 带 ?v= 会立刻更新、data JSON 不带（sw 是 stale-while-revalidate），
-      // 于是回访者第一次点新票时表里还没有它的行。别静默留白——说清楚，下次刷新就好了。
+      // 于是回访者第一次点新票时表里还没有它的行。别静默留白：说清楚，下次刷新就好了。
       if (!r) {
         document.getElementById(basket + "-sd-stats").innerHTML =
           '<div class="stat"><div class="label">关键数据</div><div class="value" style="font-size:14px">' +
@@ -1397,7 +1397,7 @@
         `<div class="stat ${hot ? "signal-on" : ""} ${String(v).length > 8 ? "compact" : ""}"><div class="label">${l}</div><div class="value">${v}</div><div class="note">${n}</div></div>`).join("");
       document.getElementById("spy-val-note").textContent =
         `口径说明：PE(TTM) 与 CAPE 来自 multpl/席勒月度数据（${st.since} 年起），百分位为当前值在全部历史读数中的位置；` +
-        `三条中位数是三个不同时代的"估值重力"——离哪条锚越远，弹性拉得越满。数据截至 ${st.asof}。`;
+        `三条中位数是三个不同时代的"估值重力"：离哪条锚越远，弹性拉得越满。数据截至 ${st.asof}。`;
       const qv = iv.QQQ || {};
       document.getElementById("qqq-val-cards").innerHTML = [
         ["QQQ PE (TTM · ETF 口径)", qv.trailing_pe ? qv.trailing_pe.toFixed(1) : "--", "持仓加权"],
@@ -1512,7 +1512,7 @@
       '<div class="tradingview-widget-copyright">' +
       '<a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">TradingView</a>' + credit + '</div>';
     // 不注入 TradingView 引导脚本（TV 文档警告动态注入会出问题、Safari 曾因此反复崩溃渲染进程），
-    // 直接自己拼 iframe——引导脚本唯一职责就是拼它
+    // 直接自己拼 iframe：引导脚本唯一职责就是拼它
     const cfg = {
       dataSource: "SPX500",
       blockSize: "market_cap_basic",
@@ -1879,11 +1879,11 @@
                 改动词治不了，那是相邻性的问题（此前一直挂着的未决项，本次解决）。
              ③ 读完台账的自然下一步是「验证」与「继续跟着看」，不是掏钱。掏钱的位置在定价页（页脚有入口）。
              不需要再加锚点（且 #pulse-base 不是面板名，会打乱 hash 路由）。
-             2026-07-17：订阅表单从这里搬进 #pricing 免费档——全站订阅动线唯一化（顶栏胶囊→定价页，
+             2026-07-17：订阅表单从这里搬进 #pricing 免费档：全站订阅动线唯一化（顶栏胶囊→定价页，
              免费/付费并排）；主页不补替代 CTA，观感失衡就留白。 -->
         <!-- 「方法论全文」已删：正上方 .ledger-note 那句已经写着「完整口径与如实披露见方法论」，
              隔 20px 再放个按钮是同一件事说两遍；页脚也有。
-             「在 GitHub 验证台账」留下且不进页脚：它是净值曲线的解药——上面那句「本站不宣称信号能跑赢买入持有」
+             「在 GitHub 验证台账」留下且不进页脚：它是净值曲线的解药：上面那句「本站不宣称信号能跑赢买入持有」
              之后，把可验证的链接就摆在这里，本身就是可信度。它的价值不是被点击，是它存在。
              挪进页脚 = 从「我请你查」变成「你想查自己找」，那是两种人格。 -->
         <div class="ledger-actions">
@@ -1939,9 +1939,9 @@
         <div class="pulse-section-label">板块热力图 · 标普 500 全成分股（面积 = 市值 · 颜色 = 当日涨跌 · 点任意板块可放大细看）</div>
         <div class="tv-heatmap heat-tree tradingview-widget-container"></div>
       </div>
-      <div class="pulse-foot">滑动光标，掀开夜之一角。数据每交易日收盘后自动更新；温度是尺度不是信号——96 度的估值曾经烫了三年。</div>`;
+      <div class="pulse-foot">滑动光标，掀开夜之一角。数据每交易日收盘后自动更新；温度是尺度不是信号：96 度的估值曾经烫了三年。</div>`;
 
-    // 顶部世纪带：真实标普 500 月线（1927→，对数坐标——天然一路向上）。
+    // 顶部世纪带：真实标普 500 月线（1927→，对数坐标：天然一路向上）。
     // 只做「峰值相对」的温和回撤放大：每个历史新高原样保留（上涨气势不变），
     // 仅把从峰值起的回撤加深一点点，让危机比原始更可辨、又不失向上主线。
     // 第 4 项 = 标签上/下；第 5 项 = 水平微调 px（负=左移）；第 6 项 = 垂直微调 px
@@ -2037,11 +2037,11 @@
     ["ch-spy-sectors", "Wikipedia"], ["ch-qqq-sectors", "Wikipedia"],
     ["spy-top-table", "SSGA (SPDR)"], ["qqq-top-table", "stockanalysis"],
     ["ch-leaps-vx", "Cboe CFE daily settlement"], ["ch-leaps-cot", "CFTC · Traders in Financial Futures"],
-    // 2026-07-18：这两张图不吃页面默认的 Cboe+FRED+CNN+Yahoo 那串——写错出处比不写更糟。
+    // 2026-07-18：这两张图不吃页面默认的 Cboe+FRED+CNN+Yahoo 那串：写错出处比不写更糟。
     // ⚠️ 源名必须纯英文（本串不走 i18n，中文会在 EN 下泄漏）。
     ["ch-vol-family", "Cboe equity & sector volatility indices"],
     ["ch-short-flow", "FINRA RegSHO daily short volume"],
-    // 2026-07-18 夜：这张卡不能吃「数据截至 <今天> · 每交易日更新」——它是双月结算且
+    // 2026-07-18 夜：这张卡不能吃「数据截至 <今天> · 每交易日更新」：它是双月结算且
     // 滞后约两周。一张主打「我滞后」的卡片若把日期写成今天，是自己打自己。
     // ∴ 第三元素 = { asofFrom: 数据文件名 }，出处行改用该文件 meta.asof 与专属频率句。
     ["ch-short-interest", "FINRA consolidated short interest", { asofFrom: "short_interest" }],
@@ -2078,7 +2078,7 @@
       let line;
       if (opts && opts.asofFrom) {
         const asof = _asofCache[opts.asofFrom];
-        if (!asof) return;          // 拿不到就不写——宁可缺一行，也不写一个错的日期
+        if (!asof) return;          // 拿不到就不写：宁可缺一行，也不写一个错的日期
         const [y, mo, dd] = asof.split("-");
         line = `数据截至 ${dd}-${mo}-${y}（结算日） · ${src} · 每月两次结算，结算日后约 8 个交易日发布`;
       } else if (/-fd-/.test(inner.id || "")) {
@@ -2153,7 +2153,7 @@
     const spxWin = spxDone.filter((e) => e.spx_m12 > 0).length;
     document.getElementById("leaps-verdict").textContent =
       `历史记录：${d.episodes.length} 段极端恐惧中，12 个月后 NDX 上行 ${win}/${done.length}、SPX 上行 ${spxWin}/${spxDone.length}。` +
-      `注意 2021 年下半年的几段：高位回落途中的"极端恐惧"并非底部，12 个月后仍为负——恐惧标记的是情绪极值，不是估值底。` +
+      `注意 2021 年下半年的几段：高位回落途中的"极端恐惧"并非底部，12 个月后仍为负：恐惧标记的是情绪极值，不是估值底。` +
       `与 K 指数（CNN÷VIX）参照观察即可。以上为历史事实记录，非买卖建议，历史规律不保证未来。`;
   }
 
@@ -2172,7 +2172,7 @@
         borderColor: p.border, fillerColor: "rgba(160,57,47,0.08)",
         handleStyle: { color: p.accent }, textStyle: { color: p.muted, fontSize: 10 } }],
       series: [
-        // 2026-07-17 统一色调（用户定）：数据色只留猩红(danger)与绿(moss)，灰色退场——回测段绿、前向段猩红
+        // 2026-07-17 统一色调（用户定）：数据色只留猩红(danger)与绿(moss)，灰色退场：回测段绿、前向段猩红
         { name: "回测（可复现）", type: "line", showSymbol: false, connectNulls: false,
           data: bt, lineStyle: { color: p.moss, width: 1.4 }, itemStyle: { color: p.moss },
           markLine: { silent: true, symbol: "none",
@@ -2185,7 +2185,7 @@
     };
   });
 
-  // 短端 vs 长端（2026-07-16 用户定）：把「斜率故事」从文案搬上站——两条原始序列自己说话。
+  // 短端 vs 长端（2026-07-16 用户定）：把「斜率故事」从文案搬上站：两条原始序列自己说话。
   // 展示层，非指数成分（斜率进不进分类器走注册流程，见 digest README「分类器的已知盲区」）。图注只写事实。
   chart("leaps", "ch-leaps-ends", async (p) => {
     const [lg, sent] = await Promise.all([load("leaps_gauge"), load("sentiment")]);
@@ -2303,7 +2303,7 @@
               <div><span>近 5 年</span><b>${Math.round(e.p5y)}</b><i>中期</i></div>
               <div><span>全 史</span><b>${Math.round(e.pfull)}</b><i>长期</i></div>
             </div>
-            <div class="lg-wnote">同一天，近 3 年偏贵、拉长看只是中性——最近三年太平静。三窗并陈，不藏选择。</div>
+            <div class="lg-wnote">同一天，近 3 年偏贵、拉长看只是中性：最近三年太平静。三窗并陈，不藏选择。</div>
           </div>
         </div>
       </div>
@@ -2343,7 +2343,7 @@
       <p class="footnote src-note"><span>VIX1Y = ${c.vix1y}</span> · <span>4 context 只展示，不平均进头条</span> · <span>数据截至</span> ${c.date} (<span>${c.segment === "forward" ? "前向台账" : "回测"}</span>) · <span>描述性数据，非投资建议</span></p>`;
   }
 
-  // 恐惧的分解（2026-07-17 自头版迁入）：与本页 4 context 去重后剩四卡——
+  // 恐惧的分解（2026-07-17 自头版迁入）：与本页 4 context 去重后剩四卡：
   // P/C、VXN 纳指溢价、广度 %>200DMA、恐贪七分量（SKEW/期限结构两张与 4 context 重复，已删）。
   // 文案逐字沿用头版旧卡，i18n D key 原样命中；语言切换由文本节点翻译器接管，无需重渲。
   async function renderFearDecomp() {
@@ -2362,7 +2362,7 @@
       market_volatility_vix: "波动率 VIX", junk_bond_demand: "垃圾债需求",
       safe_haven_demand: "避险需求",
     };
-    // 2026-07-17 统一色调（用户定）：中性灰退场，两色制——恐惧侧(<45)猩红，其余绿
+    // 2026-07-17 统一色调（用户定）：中性灰退场，两色制：恐惧侧(<45)猩红，其余绿
     const subColor = (s) => (s < 45 ? "var(--danger)" : "var(--moss)");
     const subRows = Object.entries(SUB_NAMES).map(([k, name]) => {
       const v = senti.subs && senti.subs[k];
@@ -2457,7 +2457,7 @@
   });
 
   // ---------------- 个股与板块（30 天口径；2026-07-18） ----------------
-  // ⚠️ 本段全部 30 天，与旗舰的 1 年不是一把尺——文案里已写死，改动时勿弱化。
+  // ⚠️ 本段全部 30 天，与旗舰的 1 年不是一把尺：文案里已写死，改动时勿弱化。
   async function renderVolFamily() {
     const host = document.getElementById("vf-hero");
     if (!host) return;
@@ -2507,7 +2507,7 @@
         baseAxis(p), { axisLabel: { color: p.muted, fontSize: 11 } }),
       // 配色沿用 VRP 四格的定案：由浅到深猩红（#E8735A→#A0392F），纯视觉层级、不编码含义。
       // 全都 ≥60 时若一律用 danger，六根同色的墙会让 86.6 和 98.7 除了长度毫无区别。
-      // 低于 50（真便宜）仍走绿 moss——红/绿的语义边界不动，只在红这一侧补层级。
+      // 低于 50（真便宜）仍走绿 moss：红/绿的语义边界不动，只在红这一侧补层级。
       series: [{
         type: "bar", data: rows.map((r) => r.p3y), barMaxWidth: 18,
         itemStyle: {
@@ -2533,7 +2533,7 @@
 
   // 做空成交结构（2026-07-18）：只报位置，不报方向。
   // 🚨 做空占比高 ≠ 看空（做市商对冲/ETF 套利/可转债对冲均计入），故这张图画的是
-  // 「当日占比在自己三年历史中的百分位」，而不是占比本身——占比只作 tooltip 里的原值。
+  // 「当日占比在自己三年历史中的百分位」，而不是占比本身：占比只作 tooltip 里的原值。
   chart("leaps", "ch-short-flow", async (p) => {
     const d = await load("short_flow");
     const rows = Object.entries(d.current)
@@ -2552,7 +2552,7 @@
         baseAxis(p), { axisLabel: { color: p.muted, fontSize: 11 } }),
       series: [{
         type: "bar", data: rows.map((r) => r.pctile), barMaxWidth: 18,
-        // 同 VRP 定案：由浅到深猩红，纯视觉层级；此处不设红绿语义——
+        // 同 VRP 定案：由浅到深猩红，纯视觉层级；此处不设红绿语义：
         // 因为「占比高」本身没有好坏，绿色会被误读成「安全」。
         itemStyle: {
           color: (x) => {
@@ -2576,7 +2576,7 @@
   // 做空持仓（2026-07-18 夜）：存量，非流量；滞后约两周，故只当背景变量。
   // 🚨 用 DTC（补仓天数 = 持仓 ÷ 日均量）而不是持仓股数：股数会随股本与成交量长期漂移，
   //    实测「持仓水平分位」跨票均值近 6 期 81.8、2024 全年 60.1，看着像在飙升；但同期
-  //    DTC 分位是 63.3 vs 74.5——**两个口径指向相反**。归一化之后才是真的拥挤度。
+  //    DTC 分位是 63.3 vs 74.5：**两个口径指向相反**。归一化之后才是真的拥挤度。
   /* 贰 · 当前横截面：三档可切（补仓天数 / 持仓股数 / 当日流量） */
   let crossMode = "dtc";
   chart("leaps", "ch-short-interest", async (p) => {
@@ -2599,8 +2599,8 @@
       note.textContent =
         (crossMode === "flow" ? T("当日做空成交占比在自身三年历史中的位置。这是流量，与另外两档的存量口径不同。")
          : crossMode === "dtc" ? T("补仓天数 = 做空持仓 ÷ 日均成交量，除掉了规模，读的是相对拥挤度。")
-         : T("持仓股数的分位。注意它有非平稳问题——多数票同时逼近高位，多半是尺子的问题不是市场的问题。"))
-        + (miss.length ? "　" + T("未显示：") + miss.join("、") + T("（历史不足，不给百分位——宁可不出数，也不出假数）") : "");
+         : T("持仓股数的分位。注意它有非平稳问题：多数票同时逼近高位，多半是尺子的问题不是市场的问题。"))
+        + (miss.length ? "　" + T("未显示：") + miss.join("、") + T("（历史不足，不给百分位：宁可不出数，也不出假数）") : "");
     }
     if (!rows.length) {
       return { title: { text: T("历史积累中"), left: "center", top: "middle",
@@ -2615,7 +2615,7 @@
         baseAxis(p), { axisLabel: { color: p.muted, fontSize: 11 } }),
       series: [{
         type: "bar", data: rows.map((r) => r.v), barMaxWidth: 18,
-        // 单色由浅到深，不设红绿语义——「拥挤」本身没有好坏，绿色会被读成「安全」
+        // 单色由浅到深，不设红绿语义：「拥挤」本身没有好坏，绿色会被读成「安全」
         itemStyle: {
           color: (x) => {
             const t = rows.length > 1 ? x.dataIndex / (rows.length - 1) : 1;
@@ -2717,7 +2717,7 @@
       vd.style.borderLeftColor = Math.abs(rho) < 0.05 ? p.muted : p.accent;
       const parts = scMode === "lvl"
         ? ["这就是原提案的形式：相关系数等于零。",
-           "「做空占比冲高 = 有人在建空头仓位」这个直觉，在数据上完全不成立——点云是一团圆的，没有任何方向。",
+           "「做空占比冲高 = 有人在建空头仓位」这个直觉，在数据上完全不成立：点云是一团圆的，没有任何方向。",
            "提案死在这里：它不是没做，是做了、数据说不行。"]
         : ["换成同类对同类（变化对变化）才有，但很弱。",
            "而且这个弱相关不是均匀分布的：个股有，两只 ETF 精确为零。请看下一章的逐票拆解。"];
@@ -2851,10 +2851,10 @@
       vd.style.borderLeftColor = up ? p.accent : p.moss;
       const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
       /* 判读拆成两段：第一句是读数，第二句是它的限度。
-         挤成一段时读者会把限度那半句读丢——而这一章存在的意义就是那半句。 */
+         挤成一段时读者会把限度那半句读丢：而这一章存在的意义就是那半句。 */
       const parts = breadthMode === "si"
         ? ["按持仓股数读：最近 6 期高于 2024 年，看起来像空头在高位堆积。",
-           "但股数会随股本与成交量长期漂移——请切到另一个口径再看一次。"]
+           "但股数会随股本与成交量长期漂移：请切到另一个口径再看一次。"]
         : ["按补仓天数读：除以日均成交量之后，当前低于 2024 年。",
            "绝对股数确实涨了，但成交量涨得更快，相对于流动性，空头并不比 2024 年拥挤。"];
       vd.replaceChildren(...parts.map((s) => {
