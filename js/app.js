@@ -2045,6 +2045,11 @@
     // 滞后约两周。一张主打「我滞后」的卡片若把日期写成今天，是自己打自己。
     // ∴ 第三元素 = { asofFrom: 数据文件名 }，出处行改用该文件 meta.asof 与专属频率句。
     ["ch-short-interest", "FINRA consolidated short interest", { asofFrom: "short_interest" }],
+    // 做空章新增四图：同样按结算日口径署源，别吃「数据截至<今天>·每交易日更新」的默认值
+    ["ch-short-breadth", "FINRA consolidated short interest", { asofFrom: "short_interest" }],
+    ["ch-short-single", "FINRA consolidated short interest", { asofFrom: "short_interest" }],
+    ["ch-short-scatter", "FINRA RegSHO + consolidated short interest", { asofFrom: "short_interest" }],
+    ["ch-short-sig", "FINRA RegSHO + consolidated short interest", { asofFrom: "short_interest" }],
   ];
   let metaDate = "";
 
@@ -2572,26 +2577,45 @@
   // 🚨 用 DTC（补仓天数 = 持仓 ÷ 日均量）而不是持仓股数：股数会随股本与成交量长期漂移，
   //    实测「持仓水平分位」跨票均值近 6 期 81.8、2024 全年 60.1，看着像在飙升；但同期
   //    DTC 分位是 63.3 vs 74.5——**两个口径指向相反**。归一化之后才是真的拥挤度。
+  /* 贰 · 当前横截面：三档可切（补仓天数 / 持仓股数 / 当日流量） */
+  let crossMode = "dtc";
   chart("leaps", "ch-short-interest", async (p) => {
-    const d = await load("short_interest");
+    const [si, sf] = await Promise.all([load("short_interest"), load("short_flow")]);
     const isEN = !!(window.MC_I18N && MC_I18N.lang && MC_I18N.lang() === "en");
-    const rows = Object.entries(d.current)
-      .filter(([, v]) => v.pctile_dtc != null)
-      .map(([tk, v]) => ({ tk, ...v }))
-      .sort((a, b) => a.pctile_dtc - b.pctile_dtc);
+    const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
+    const rows = [];
+    for (const tk of Object.keys(si.series)) {
+      const c = si.current[tk] || {}, f = (sf.current || {})[tk] || {};
+      let v = null, extra = "";
+      if (crossMode === "dtc") { v = c.pctile_dtc; extra = c.dtc != null ? c.dtc.toFixed(2) + (isEN ? "d" : " 天") : ""; }
+      else if (crossMode === "si") { v = c.pctile_si; extra = c.si != null ? (c.si / 1e6).toFixed(0) + "M" : ""; }
+      else { v = f.pctile; extra = f.ratio != null ? f.ratio.toFixed(0) + "%" : ""; }
+      if (v != null) rows.push({ tk, v, extra });
+    }
+    rows.sort((a, b) => a.v - b.v);
+    const miss = Object.keys(si.series).filter((tk) => !rows.find((r) => r.tk === tk));
+    const note = document.getElementById("cross-note");
+    if (note) {
+      note.textContent =
+        (crossMode === "flow" ? T("当日做空成交占比在自身三年历史中的位置。这是流量，与另外两档的存量口径不同。")
+         : crossMode === "dtc" ? T("补仓天数 = 做空持仓 ÷ 日均成交量，除掉了规模，读的是相对拥挤度。")
+         : T("持仓股数的分位。注意它有非平稳问题——多数票同时逼近高位，多半是尺子的问题不是市场的问题。"))
+        + (miss.length ? "　" + T("未显示：") + miss.join("、") + T("（历史不足，不给百分位——宁可不出数，也不出假数）") : "");
+    }
     if (!rows.length) {
-      return { title: { text: "历史积累中，满 24 个结算期后显示", left: "center", top: "middle",
+      return { title: { text: T("历史积累中"), left: "center", top: "middle",
         textStyle: { color: p.muted, fontSize: 13, fontWeight: "normal" } } };
     }
     return {
-      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(1) + " 分位") }),
-      grid: { left: 78, right: 96, top: 22, bottom: 34 },   // 标签是「100（1.99 天）」，比 short_flow 长，右边距要更宽
-      xAxis: Object.assign({ type: "value", min: 0, max: 100, name: "近两年百分位" }, baseAxis(p)),
+      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(1)) }),
+      grid: { left: 62, right: 92, top: 24, bottom: 32 },
+      xAxis: Object.assign({ type: "value", min: 0, max: 100,
+        name: isEN ? "percentile" : "百分位" }, baseAxis(p)),
       yAxis: Object.assign({ type: "category", data: rows.map((r) => r.tk) },
         baseAxis(p), { axisLabel: { color: p.muted, fontSize: 11 } }),
       series: [{
-        type: "bar", data: rows.map((r) => r.pctile_dtc), barMaxWidth: 18,
-        // 同 short_flow 定案：单色由浅到深，不设红绿语义——「持仓高」本身没有好坏。
+        type: "bar", data: rows.map((r) => r.v), barMaxWidth: 18,
+        // 单色由浅到深，不设红绿语义——「拥挤」本身没有好坏，绿色会被读成「安全」
         itemStyle: {
           color: (x) => {
             const t = rows.length > 1 ? x.dataIndex / (rows.length - 1) : 1;
@@ -2602,21 +2626,173 @@
         },
         label: { show: true, position: "right", color: p.muted, fontSize: 11,
           fontFamily: "JetBrains Mono",
-          // ⚠️ 单位「天」不能走 D 字典：那是全局键，会把全站任何独立的「天」一起翻掉。
-          // 图表本来就随语言 rebuildAll 重建，故在这里按当前语言直接选词。
-          // 🔬 也别指望「扫 getOption() 找中文」能发现这里——formatter 是函数，
-          //    JSON.stringify 会把函数整个丢掉，扫描器对它是瞎的（2026-07-18 夜实测漏报）。
-          formatter: (x) => x.value.toFixed(0) + (isEN
-            ? " (" + rows[x.dataIndex].dtc.toFixed(2) + "d)"
-            : "（" + rows[x.dataIndex].dtc.toFixed(2) + " 天）") },
+          formatter: (x) => x.value.toFixed(0) + (rows[x.dataIndex].extra ? "（" + rows[x.dataIndex].extra + "）" : "") },
         markLine: { silent: true, symbol: "none",
           lineStyle: { color: p.ink, type: "dashed", width: 1 },
-          label: { color: p.ink, formatter: isEN ? "50 neutral" : "50 中性",
-            fontSize: 10, fontFamily: "JetBrains Mono" },
+          label: { color: p.ink, formatter: isEN ? "50 neutral" : "50 中性", fontSize: 10, fontFamily: "JetBrains Mono" },
           data: [{ xAxis: 50 }] },
       }],
     };
   });
+  segBind("seg-cross", (k) => { crossMode = k; rebuild("ch-short-interest"); });
+
+  /* 叁 · 单票下钻：持仓（柱）与补仓天数（线）同图，双轴各自缩放 */
+  let curTk = "NVDA";
+  chart("leaps", "ch-short-single", async (p) => {
+    const si = await load("short_interest");
+    const sa = await shortAnalytics();
+    const isEN = !!(window.MC_I18N && MC_I18N.lang && MC_I18N.lang() === "en");
+    const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
+    const N = 48;
+    const dates = si.dates.slice(-N), ser = si.series[curTk].slice(-N), dtc = si.days_to_cover[curTk].slice(-N);
+    const keep = dates.map((d, i) => i).filter((i) => ser[i] != null);
+    const note = document.getElementById("single-note");
+    const c = si.current[curTk] || {}, co = sa.corr[curTk];
+    if (note) {
+      /* ⚠️ 这段曾硬编码「，」「。」「），」等全角标点，英文态下读起来是坏的；
+         且 T(" 股（环比 ") 这类**带首尾空格的键在 translate() 里会被 trim 掉、永远匹配不上**（实测）。
+         ∴ 键一律不留首尾空格，分隔符改用语言中性的「 · 」与半角逗号。 */
+      const sep = " · ";
+      note.textContent = keep.length
+        ? [curTk,
+           `${T("最新结算")} ${c.settle || "—"}`,
+           `${T("持仓")} ${c.si != null ? (c.si / 1e6).toFixed(1) + "M" : "—"} (${c.chg != null ? (c.chg >= 0 ? "+" : "") + c.chg.toFixed(1) + "%" : "—"})`,
+           `${T("补仓天数")} ${c.dtc != null ? c.dtc.toFixed(2) : "—"}`,
+           `${T("股数分位")} ${c.pctile_si != null ? c.pctile_si.toFixed(0) : "—"}`,
+           `${T("拥挤度分位")} ${c.pctile_dtc != null ? c.pctile_dtc.toFixed(0) : "—"}`,
+          ].join(sep)
+          + (co ? sep + `${T("流量变化与持仓变化的相关")} ρ=${co.chg >= 0 ? "+" : ""}${co.chg.toFixed(3)}, ${T("置换检验")} p=${co.p.toFixed(4)}${co.p < 0.05 ? T("（p<0.05，但 Bonferroni 校正后不存活）") : T("（不显著）")}` : "")
+          + (c.note ? sep + c.note : "")
+        : T("该标的在本窗口内无数据（代码复用切断后历史不足）");
+    }
+    if (!keep.length) {
+      return { title: { text: T("该标的在本窗口内无数据"), left: "center", top: "middle",
+        textStyle: { color: p.muted, fontSize: 13, fontWeight: "normal" } } };
+    }
+    return {
+      tooltip: tip(p),
+      legend: { data: [T("做空持仓（股数）"), T("补仓天数")], top: 0, textStyle: { color: p.muted, fontSize: 11 } },
+      grid: { left: 62, right: 56, top: 34, bottom: 34 },
+      xAxis: Object.assign({ type: "category", data: dates }, baseAxis(p),
+        { axisLabel: { color: p.muted, fontSize: 10, interval: Math.ceil(dates.length / 8) } }),
+      yAxis: [
+        Object.assign({ type: "value", name: isEN ? "shares" : "股数",
+          axisLabel: { color: p.muted, fontSize: 10, formatter: (v) => (v / 1e6).toFixed(0) + "M" } }, baseAxis(p)),
+        Object.assign({ type: "value", name: isEN ? "days" : "天", scale: true,
+          splitLine: { show: false } }, baseAxis(p)),
+      ],
+      series: [
+        { name: T("做空持仓（股数）"), type: "bar", data: dates.map((d, i) => ser[i]),
+          itemStyle: { color: p.border, borderRadius: [2, 2, 0, 0] }, barMaxWidth: 12 },
+        { name: T("补仓天数"), type: "line", yAxisIndex: 1, data: dates.map((d, i) => dtc[i]),
+          symbol: "none", lineStyle: { width: 2.2, color: p.accent }, connectNulls: true },
+      ],
+    };
+  });
+
+  /* 肆 · 散点：流量 × 持仓变化。原提案（水平 vs 变化）是零，换同类对同类才有微弱正相关 */
+  let scMode = "lvl";
+  chart("leaps", "ch-short-scatter", async (p) => {
+    const sa = await shortAnalytics();
+    const isEN = !!(window.MC_I18N && MC_I18N.lang && MC_I18N.lang() === "en");
+    const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
+    const pts = [];
+    for (const tk of Object.keys(sa.periods)) {
+      const ps = sa.periods[tk];
+      if (ps.length < 20) continue;
+      const etf = tk === "SPY" || tk === "QQQ";
+      for (let i = 1; i < ps.length; i++) {
+        pts.push({ value: [scMode === "lvl" ? ps[i].fp : +(ps[i].fp - ps[i - 1].fp).toFixed(1), ps[i].sc],
+                   tk, d: ps[i].d, etf });
+      }
+    }
+    const rho = scMode === "lvl" ? sa.pooled.lvl : sa.pooled.chg;
+    const setT = (id, t) => { const n = document.getElementById(id); if (n) n.textContent = t; };
+    setT("sc-rho", (rho >= 0 ? "+" : "") + rho.toFixed(3));
+    setT("sc-n", "n = " + sa.pooled.n + (isEN ? " settlement windows" : " 个结算窗口"));
+    const big = document.getElementById("sc-rho");
+    if (big) big.style.color = Math.abs(rho) < 0.05 ? p.muted : p.accent;
+    const vd = document.getElementById("sc-verdict");
+    if (vd) {
+      vd.style.borderLeftColor = Math.abs(rho) < 0.05 ? p.muted : p.accent;
+      vd.textContent = scMode === "lvl"
+        ? T("这就是原提案的形式：相关系数等于零。「做空占比冲高 = 有人在建空头仓位」这个直觉，在数据上完全不成立——点云是一团圆的，没有任何方向。提案死在这里：它不是没做，是做了、数据说不行。")
+        : T("换成同类对同类（变化对变化）才有，但很弱。而且这个弱相关不是均匀分布的：个股有，两只 ETF 精确为零。请看下一章的逐票拆解。");
+    }
+    return {
+      tooltip: Object.assign(tip(p), { formatter: (o) => `${o.data.tk} ${o.data.d}<br>${o.data.value[0]}　${o.data.value[1]}%` }),
+      grid: { left: 56, right: 20, top: 22, bottom: 46 },
+      xAxis: Object.assign({ type: "value", scale: true,
+        name: scMode === "lvl" ? (isEN ? "flow: avg percentile" : "流量：当期做空占比的平均分位")
+                               : (isEN ? "flow change" : "流量变化：本期分位 − 上期分位"),
+        nameLocation: "middle", nameGap: 28 }, baseAxis(p)),
+      yAxis: Object.assign({ type: "value", scale: true,
+        name: isEN ? "short interest change %" : "持仓变化 %" }, baseAxis(p)),
+      series: [{
+        type: "scatter", symbolSize: 6, data: pts,
+        itemStyle: { color: (x) => (x.data.etf ? p.blue : p.accent), opacity: 0.5 },
+        markLine: { silent: true, symbol: "none",
+          lineStyle: { color: p.ink, type: "dashed", width: 1 }, data: [{ yAxis: 0 }] },
+      }],
+    };
+  });
+  segBind("seg-scatter", (k) => { scMode = k; rebuild("ch-short-scatter"); });
+
+  /* 伍 · 显著性：逐票 ρ 与置换检验 p */
+  chart("leaps", "ch-short-sig", async (p) => {
+    const sa = await shortAnalytics();
+    const isEN = !!(window.MC_I18N && MC_I18N.lang && MC_I18N.lang() === "en");
+    const rows = Object.entries(sa.corr).map(([tk, c]) => ({ tk, ...c })).sort((a, b) => a.chg - b.chg);
+    return {
+      tooltip: Object.assign(tip(p), {
+        formatter: (o) => {
+          const r = rows[o.dataIndex];
+          return `${r.tk}<br>ρ = ${r.chg.toFixed(3)}<br>p = ${r.p.toFixed(4)}<br>n = ${r.n}`;
+        },
+      }),
+      grid: { left: 62, right: 108, top: 22, bottom: 32 },
+      xAxis: Object.assign({ type: "value", scale: true,
+        name: isEN ? "Spearman ρ" : "Spearman ρ" }, baseAxis(p)),
+      yAxis: Object.assign({ type: "category", data: rows.map((r) => r.tk) },
+        baseAxis(p), { axisLabel: { color: p.muted, fontSize: 11 } }),
+      series: [{
+        type: "bar", data: rows.map((r) => r.chg), barMaxWidth: 16,
+        // 标红＝p<0.05；ETF 用蓝，呼应散点图里那两只精确为零的点
+        itemStyle: {
+          color: (x) => (rows[x.dataIndex].p < 0.05 ? p.accent : (rows[x.dataIndex].etf ? p.blue : p.border)),
+          borderRadius: 3,
+        },
+        label: { show: true, position: "right", color: p.muted, fontSize: 11,
+          fontFamily: "JetBrains Mono",
+          formatter: (x) => {
+            const r = rows[x.dataIndex];
+            return `${r.chg >= 0 ? "+" : ""}${r.chg.toFixed(3)}  p=${r.p.toFixed(3)}`;
+          } },
+        markLine: { silent: true, symbol: "none",
+          lineStyle: { color: p.ink, type: "dashed", width: 1 }, data: [{ xAxis: 0 }] },
+      }],
+    };
+  });
+
+  /* 单票选择器：动态生成，随语言重建时保持当前选中 */
+  function buildTkPicker() {
+    const box = document.getElementById("tk-picker");
+    if (!box || box.children.length) return;
+    load("short_interest").then((si) => {
+      Object.keys(si.series).forEach((tk) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "tk-chip"; b.textContent = tk;
+        b.setAttribute("aria-selected", String(tk === curTk));
+        b.onclick = () => {
+          curTk = tk;
+          [...box.children].forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+          rebuild("ch-short-single");
+        };
+        box.appendChild(b);
+      });
+    });
+  }
+  buildTkPicker();
 
   /* ---------------- 口径实验室（2026-07-19）：同一批数据，换把尺，结论会翻 ----------------
      广度序列**在客户端从既有 short_interest.json 现算**：不动管线、不加数据文件、
@@ -2697,13 +2873,102 @@
     };
   });
 
-  document.getElementById("seg-breadth")?.addEventListener("click", (e) => {
-    const b = e.target.closest("button");
-    if (!b) return;
-    [...e.currentTarget.children].forEach((x) => x.setAttribute("aria-selected", String(x === b)));
-    breadthMode = b.dataset.k;
-    buildOne("ch-short-breadth", registry.leaps.find((r) => r.elId === "ch-short-breadth").build);
-  });
+  /* ---------------- 做空分析：流量 × 存量（客户端现算，不新增数据文件） ----------------
+     两个源都已在站上：short_flow.json（每日做空成交占比，759 天）与
+     short_interest.json（双月合并短仓，205 期）。以下全部由它们派生。
+     🚨 置换检验用**固定种子**的 PRNG：这是台账站，同一份数据每次打开必须得到
+        完全相同的 p 值。用 Math.random 会让数字每次刷新都变，那是不可对账的。 */
+  const FLOW_WIN = 756, FLOW_MIN = 250;
+  let _sa = null;
+
+  function rank(v) { const s = v.map((x, i) => i).sort((a, b) => v[a] - v[b]); const r = []; s.forEach((i, k) => { r[i] = k; }); return r; }
+  function pearson(a, b) {
+    const n = a.length, ma = a.reduce((x, y) => x + y, 0) / n, mb = b.reduce((x, y) => x + y, 0) / n;
+    let num = 0, da = 0, db = 0;
+    for (let i = 0; i < n; i++) { const x = a[i] - ma, y = b[i] - mb; num += x * y; da += x * x; db += y * y; }
+    return da && db ? num / Math.sqrt(da * db) : 0;
+  }
+  const spearman = (a, b) => pearson(rank(a), rank(b));
+
+  async function shortAnalytics() {
+    if (_sa) return _sa;
+    const [si, sf] = await Promise.all([load("short_interest"), load("short_flow")]);
+    const fdates = sf.dates, di = {}; fdates.forEach((d, i) => { di[d] = i; });
+
+    // 每日流量的滚动百分位（无前视）；先按 >10 交易日断口切掉代码复用前的历史
+    const fpct = {};
+    for (const tk of Object.keys(sf.series)) {
+      const vals = sf.series[tk];
+      const idx = []; vals.forEach((v, i) => { if (v != null) idx.push(i); });
+      let cut = 0;
+      for (let k = 1; k < idx.length; k++) if (idx[k] - idx[k - 1] - 1 > 10) cut = idx[k];
+      const pct = new Array(vals.length).fill(null), hist = [];
+      for (let i = 0; i < vals.length; i++) {
+        const v = vals[i];
+        if (i < cut || v == null) continue;
+        if (hist.length >= FLOW_MIN) {
+          const w = hist.slice(-FLOW_WIN);
+          pct[i] = w.filter((x) => x <= v).length / w.length * 100;
+        }
+        hist.push(v);
+      }
+      fpct[tk] = pct;
+    }
+
+    // 结算窗口：窗口内流量分位均值 × 该期持仓变化
+    const sdates = si.dates, periods = {};
+    for (const tk of Object.keys(sf.series)) {
+      const ser = si.series[tk], chg = si.change_pct[tk], dtc = si.days_to_cover[tk];
+      if (!ser) continue;
+      const ps = [];
+      for (let i = 1; i < sdates.length; i++) {
+        if (ser[i] == null || chg[i] == null) continue;
+        const a = sdates[i - 1].replace(/-/g, ""), b = sdates[i].replace(/-/g, "");
+        const win = [];
+        for (const d of fdates) if (d > a && d <= b && fpct[tk][di[d]] != null) win.push(fpct[tk][di[d]]);
+        if (win.length < 5) continue;
+        ps.push({ d: sdates[i], fp: +(win.reduce((x, y) => x + y, 0) / win.length).toFixed(1),
+                  sc: +chg[i].toFixed(1), si: ser[i], dtc: dtc[i] });
+      }
+      if (ps.length) periods[tk] = ps;
+    }
+
+    // 相关性 + 置换检验（固定种子）
+    let seed = 20260719;
+    const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+    const corr = {}, poolL = [], poolC = [], poolS = [];
+    for (const tk of Object.keys(periods)) {
+      const ps = periods[tk];
+      if (ps.length < 20) continue;
+      const lvl = [], chg2 = [], sc = [];
+      for (let i = 1; i < ps.length; i++) { lvl.push(ps[i].fp); chg2.push(ps[i].fp - ps[i - 1].fp); sc.push(ps[i].sc); }
+      poolL.push(...lvl); poolC.push(...chg2); poolS.push(...sc);
+      const rC = spearman(chg2, sc);
+      let hit = 0;
+      for (let k = 0; k < 4000; k++) {
+        const s2 = sc.slice();
+        for (let i = s2.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); const t = s2[i]; s2[i] = s2[j]; s2[j] = t; }
+        if (Math.abs(spearman(chg2, s2)) >= Math.abs(rC)) hit++;
+      }
+      corr[tk] = { lvl: +spearman(lvl, sc).toFixed(3), chg: +rC.toFixed(3),
+                   p: hit / 4000, n: chg2.length, etf: tk === "SPY" || tk === "QQQ" };
+    }
+    _sa = { periods, corr,
+            pooled: { lvl: +spearman(poolL, poolS).toFixed(3), chg: +spearman(poolC, poolS).toFixed(3), n: poolS.length } };
+    return _sa;
+  }
+
+  function segBind(id, onPick) {
+    document.getElementById(id)?.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      [...e.currentTarget.children].forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+      onPick(b.dataset.k);
+    });
+  }
+  const rebuild = (elId) => buildOne(elId, registry.leaps.find((r) => r.elId === elId).build);
+
+  segBind("seg-breadth", (k) => { breadthMode = k; rebuild("ch-short-breadth"); });
 
   // ---------------- 启动 ----------------
   renderKStatus();
