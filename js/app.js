@@ -1955,24 +1955,46 @@
     // ⚠️ 源名必须纯英文（本串不走 i18n，中文会在 EN 下泄漏）。
     ["ch-vol-family", "Cboe equity & sector volatility indices"],
     ["ch-short-flow", "FINRA RegSHO daily short volume"],
+    // 2026-07-18 夜：这张卡不能吃「数据截至 <今天> · 每交易日更新」——它是双月结算且
+    // 滞后约两周。一张主打「我滞后」的卡片若把日期写成今天，是自己打自己。
+    // ∴ 第三元素 = { asofFrom: 数据文件名 }，出处行改用该文件 meta.asof 与专属频率句。
+    ["ch-short-interest", "FINRA consolidated short interest", { asofFrom: "short_interest" }],
   ];
   let metaDate = "";
 
-  function stampSources() {
+  // ⚠️ 先把需要的 as-of 日期全部取回，**再**进同步循环。
+  // 不要在循环里 await：「已有 .src-note 则跳过」这个守卫一旦被 await 打断，
+  // 两次调用（meta 加载后一次、切语言 rebuildAll 后一次）会同时穿过守卫 → 出处行重复两遍。
+  // 2026-07-18 夜实测踩中，改回「异步取数在前、DOM 写入全同步」。
+  const _asofCache = {};
+  async function stampSources() {
     if (!metaDate) return;
+    const needed = [...new Set(SRC_OVERRIDES.filter((o) => o[2] && o[2].asofFrom).map((o) => o[2].asofFrom))];
+    await Promise.all(needed.map(async (name) => {
+      if (_asofCache[name] !== undefined) return;
+      try { _asofCache[name] = (await load(name)).meta.asof || null; } catch (e) { _asofCache[name] = null; }
+    }));
     document.querySelectorAll(".panel .card").forEach((card) => {
       if (card.querySelector(".src-note")) return;
       const inner = card.querySelector(".chart, table");
       if (!inner) return;
       const panelKey = card.closest(".panel").id.replace("panel-", "");
       let src = SRC_BY_PANEL[panelKey] || "Yahoo Finance";
-      for (const [id, s] of SRC_OVERRIDES) {
-        if (card.querySelector("#" + id)) { src = s; break; }
+      let opts = null;
+      for (const [id, s, o] of SRC_OVERRIDES) {
+        if (card.querySelector("#" + id)) { src = s; opts = o || null; break; }
       }
-      const weekly = /-fd-/.test(inner.id || "");
-      const line = weekly
-        ? `数据截至 ${metaDate} · macrotrends + Yahoo Finance · 每周六自动更新`
-        : `数据截至 ${metaDate} · ${src} · 每交易日收盘后自动更新`;
+      let line;
+      if (opts && opts.asofFrom) {
+        const asof = _asofCache[opts.asofFrom];
+        if (!asof) return;          // 拿不到就不写——宁可缺一行，也不写一个错的日期
+        const [y, mo, dd] = asof.split("-");
+        line = `数据截至 ${dd}-${mo}-${y}（结算日） · ${src} · 每月两次结算，结算日后约 8 个交易日发布`;
+      } else if (/-fd-/.test(inner.id || "")) {
+        line = `数据截至 ${metaDate} · macrotrends + Yahoo Finance · 每周六自动更新`;
+      } else {
+        line = `数据截至 ${metaDate} · ${src} · 每交易日收盘后自动更新`;
+      }
       card.insertAdjacentHTML("beforeend", `<p class="footnote src-note">${line}</p>`);
     });
   }
@@ -2455,6 +2477,56 @@
         markLine: { silent: true, symbol: "none",
           lineStyle: { color: p.ink, type: "dashed", width: 1 },
           label: { color: p.ink, formatter: "50 中性", fontSize: 10, fontFamily: "JetBrains Mono" },
+          data: [{ xAxis: 50 }] },
+      }],
+    };
+  });
+
+  // 做空持仓（2026-07-18 夜）：存量，非流量；滞后约两周，故只当背景变量。
+  // 🚨 用 DTC（补仓天数 = 持仓 ÷ 日均量）而不是持仓股数：股数会随股本与成交量长期漂移，
+  //    实测「持仓水平分位」跨票均值近 6 期 81.8、2024 全年 60.1，看着像在飙升；但同期
+  //    DTC 分位是 63.3 vs 74.5——**两个口径指向相反**。归一化之后才是真的拥挤度。
+  chart("leaps", "ch-short-interest", async (p) => {
+    const d = await load("short_interest");
+    const isEN = !!(window.MC_I18N && MC_I18N.lang && MC_I18N.lang() === "en");
+    const rows = Object.entries(d.current)
+      .filter(([, v]) => v.pctile_dtc != null)
+      .map(([tk, v]) => ({ tk, ...v }))
+      .sort((a, b) => a.pctile_dtc - b.pctile_dtc);
+    if (!rows.length) {
+      return { title: { text: "历史积累中，满 24 个结算期后显示", left: "center", top: "middle",
+        textStyle: { color: p.muted, fontSize: 13, fontWeight: "normal" } } };
+    }
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(1) + " 分位") }),
+      grid: { left: 78, right: 96, top: 22, bottom: 34 },   // 标签是「100（1.99 天）」，比 short_flow 长，右边距要更宽
+      xAxis: Object.assign({ type: "value", min: 0, max: 100, name: "近两年百分位" }, baseAxis(p)),
+      yAxis: Object.assign({ type: "category", data: rows.map((r) => r.tk) },
+        baseAxis(p), { axisLabel: { color: p.muted, fontSize: 11 } }),
+      series: [{
+        type: "bar", data: rows.map((r) => r.pctile_dtc), barMaxWidth: 18,
+        // 同 short_flow 定案：单色由浅到深，不设红绿语义——「持仓高」本身没有好坏。
+        itemStyle: {
+          color: (x) => {
+            const t = rows.length > 1 ? x.dataIndex / (rows.length - 1) : 1;
+            const mix = (a, b) => Math.round(a + (b - a) * t);
+            return `rgb(${mix(232, 160)},${mix(115, 57)},${mix(90, 47)})`;
+          },
+          borderRadius: [0, 4, 4, 0],
+        },
+        label: { show: true, position: "right", color: p.muted, fontSize: 11,
+          fontFamily: "JetBrains Mono",
+          // ⚠️ 单位「天」不能走 D 字典：那是全局键，会把全站任何独立的「天」一起翻掉。
+          // 图表本来就随语言 rebuildAll 重建，故在这里按当前语言直接选词。
+          // 🔬 也别指望「扫 getOption() 找中文」能发现这里——formatter 是函数，
+          //    JSON.stringify 会把函数整个丢掉，扫描器对它是瞎的（2026-07-18 夜实测漏报）。
+          formatter: (x) => x.value.toFixed(0) + (isEN
+            ? " (" + rows[x.dataIndex].dtc.toFixed(2) + "d)"
+            : "（" + rows[x.dataIndex].dtc.toFixed(2) + " 天）") },
+        markLine: { silent: true, symbol: "none",
+          lineStyle: { color: p.ink, type: "dashed", width: 1 },
+          label: { color: p.ink, formatter: isEN ? "50 neutral" : "50 中性",
+            fontSize: 10, fontFamily: "JetBrains Mono" },
           data: [{ xAxis: 50 }] },
       }],
     };
