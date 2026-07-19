@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260719q">
+<link rel="stylesheet" href="css/style.css?v=20260719r">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -641,7 +641,7 @@
         <div class="chart" id="ch-short-breadth"></div>
       </div>
       <!-- ⚠️ 标签与数字分开放在各自元素里：文本节点里混着 <b> 会把整句切碎，i18n 的 D 键匹配不上 -->
-      <div class="card">
+      <div class="card readout">
         <div class="cal-cap"><span>最近 6 期平均</span></div>
         <div class="cal-big" id="cal-now">—</div>
         <div class="cal-cap" style="margin-top:22px"><span>2024 全年</span></div>
@@ -687,13 +687,13 @@
       <button type="button" data-k="lvl" aria-selected="true">流量水平 vs 持仓变化（原提案）</button>
       <button type="button" data-k="chg" aria-selected="false">流量变化 vs 持仓变化（同类对同类）</button>
     </div>
-    <div class="grid-2">
+    <div class="grid-2 wide-left">
       <div class="card">
         <h3>每个结算窗口一个点</h3>
         <div class="sub">红点为个股，蓝点为 ETF（SPY / QQQ）。</div>
         <div class="chart" id="ch-short-scatter"></div>
       </div>
-      <div class="card">
+      <div class="card readout">
         <div class="cal-cap"><span>SPEARMAN 相关系数 · 全样本合并</span></div>
         <div class="cal-big" id="sc-rho">—</div>
         <div class="cal-cap" id="sc-n"></div>
@@ -1030,9 +1030,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260719q"></script>
-<script src="js/app.js?v=20260719q"></script>
-<script src="js/docs-i18n.js?v=20260719q"></script>
+<script src="js/i18n.js?v=20260719r"></script>
+<script src="js/app.js?v=20260719r"></script>
+<script src="js/docs-i18n.js?v=20260719r"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。

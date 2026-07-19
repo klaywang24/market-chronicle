@@ -250,6 +250,16 @@
     "，做市商对冲、ETF 申赎套利、可转债与并购套利都会留下空头持仓。历史不足 24 期的不给百分位，留空。": [" — market-maker hedging, ETF create/redeem arbitrage, convertible and merger arbitrage all leave short positions behind. Names with fewer than 24 settlement periods of history are left blank.", "", "", ""],
     "近两年百分位": ["2-year percentile", "", "", ""],
     "历史积累中，满 24 个结算期后显示": ["Accumulating history — shown once 24 settlement periods are on record", "", "", ""],
+    // ---- 判读分段后的新键（2026-07-19）----
+    "按持仓股数读：最近 6 期高于 2024 年，看起来像空头在高位堆积。": ["Read by shares short: the last six periods sit above 2024, which looks like short positions piling up at a high.", "", "", ""],
+    "但股数会随股本与成交量长期漂移——请切到另一个口径再看一次。": ["But raw share counts drift over time with share issuance and volume — switch to the other yardstick and look again.", "", "", ""],
+    "按补仓天数读：除以日均成交量之后，当前低于 2024 年。": ["Read by days-to-cover: once divided by average daily volume, the present sits below 2024.", "", "", ""],
+    "绝对股数确实涨了，但成交量涨得更快，相对于流动性，空头并不比 2024 年拥挤。": ["Raw share counts did rise, but volume rose faster — relative to liquidity, the short side is no more crowded than it was in 2024.", "", "", ""],
+    "这就是原提案的形式：相关系数等于零。": ["This is the original proposal's exact form: the correlation is zero.", "", "", ""],
+    "「做空占比冲高 = 有人在建空头仓位」这个直觉，在数据上完全不成立——点云是一团圆的，没有任何方向。": ["The intuition that “a spike in short volume means someone is building a short position” simply does not hold in the data — the cloud is round, with no direction at all.", "", "", ""],
+    "提案死在这里：它不是没做，是做了、数据说不行。": ["The proposal dies here: not untried, but tried — and the data said no.", "", "", ""],
+    "换成同类对同类（变化对变化）才有，但很弱。": ["Pairing like with like (change against change) does produce something, but it is weak.", "", "", ""],
+    "而且这个弱相关不是均匀分布的：个股有，两只 ETF 精确为零。请看下一章的逐票拆解。": ["And that weak relationship is not evenly spread: single stocks have it, both ETFs come in at exactly zero. See the name-by-name breakdown in the next chapter.", "", "", ""],
     // ---- 做空的两本账 · 贰~伍节（2026-07-19）----
     "当前横截面": ["The Cross-Section Today", "", "", ""],
     "此刻，谁的空头最拥挤": ["Whose short side is most crowded right now", "", "", ""],

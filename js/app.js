@@ -2715,9 +2715,15 @@
     const vd = document.getElementById("sc-verdict");
     if (vd) {
       vd.style.borderLeftColor = Math.abs(rho) < 0.05 ? p.muted : p.accent;
-      vd.textContent = scMode === "lvl"
-        ? T("这就是原提案的形式：相关系数等于零。「做空占比冲高 = 有人在建空头仓位」这个直觉，在数据上完全不成立——点云是一团圆的，没有任何方向。提案死在这里：它不是没做，是做了、数据说不行。")
-        : T("换成同类对同类（变化对变化）才有，但很弱。而且这个弱相关不是均匀分布的：个股有，两只 ETF 精确为零。请看下一章的逐票拆解。");
+      const parts = scMode === "lvl"
+        ? ["这就是原提案的形式：相关系数等于零。",
+           "「做空占比冲高 = 有人在建空头仓位」这个直觉，在数据上完全不成立——点云是一团圆的，没有任何方向。",
+           "提案死在这里：它不是没做，是做了、数据说不行。"]
+        : ["换成同类对同类（变化对变化）才有，但很弱。",
+           "而且这个弱相关不是均匀分布的：个股有，两只 ETF 精确为零。请看下一章的逐票拆解。"];
+      vd.replaceChildren(...parts.map((s) => {
+        const el = document.createElement("p"); el.textContent = T(s); return el;
+      }));
     }
     return {
       tooltip: Object.assign(tip(p), { formatter: (o) => `${o.data.tk} ${o.data.d}<br>${o.data.value[0]}　${o.data.value[1]}%` }),
@@ -2844,9 +2850,16 @@
     if (vd) {
       vd.style.borderLeftColor = up ? p.accent : p.moss;
       const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
-      vd.textContent = breadthMode === "si"
-        ? T("按持仓股数读：最近 6 期高于 2024 年，看起来像空头在高位堆积。但股数会随股本与成交量长期漂移——请切到另一个口径再看一次。")
-        : T("按补仓天数读：除以日均成交量之后，当前低于 2024 年。绝对股数确实涨了，但成交量涨得更快，相对于流动性，空头并不比 2024 年拥挤。");
+      /* 判读拆成两段：第一句是读数，第二句是它的限度。
+         挤成一段时读者会把限度那半句读丢——而这一章存在的意义就是那半句。 */
+      const parts = breadthMode === "si"
+        ? ["按持仓股数读：最近 6 期高于 2024 年，看起来像空头在高位堆积。",
+           "但股数会随股本与成交量长期漂移——请切到另一个口径再看一次。"]
+        : ["按补仓天数读：除以日均成交量之后，当前低于 2024 年。",
+           "绝对股数确实涨了，但成交量涨得更快，相对于流动性，空头并不比 2024 年拥挤。"];
+      vd.replaceChildren(...parts.map((s) => {
+        const el = document.createElement("p"); el.textContent = T(s); return el;
+      }));
     }
     // ⚠️ formatter 是函数，i18n 的 D 字典扫不到它里面的中文（2026-07-18 在「天」上踩过）。
     //    按当前语言选词，图表本来就随语言重建。
