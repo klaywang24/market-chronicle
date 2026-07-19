@@ -250,6 +250,23 @@
     "，做市商对冲、ETF 申赎套利、可转债与并购套利都会留下空头持仓。历史不足 24 期的不给百分位，留空。": [" — market-maker hedging, ETF create/redeem arbitrage, convertible and merger arbitrage all leave short positions behind. Names with fewer than 24 settlement periods of history are left blank.", "", "", ""],
     "近两年百分位": ["2-year percentile", "", "", ""],
     "历史积累中，满 24 个结算期后显示": ["Accumulating history — shown once 24 settlement periods are on record", "", "", ""],
+    // ---- 做空的两本账 · 口径实验室（2026-07-19）----
+    "做空的两本账": ["Two Ledgers of Short Selling", "", "", ""],
+    "同一批数据，换把尺，结论可能是反的": ["Same data, a different yardstick — the conclusion can flip", "", "", ""],
+    "口径实验室": ["Yardstick Lab", "", "", ""],
+    "换把尺，结论就翻了": ["Change the yardstick, and the conclusion flips", "", "", ""],
+    "下面这条线是 11 只大盘科技股的做空持仓，在各自历史里的平均位置。数据一个字没变，只换了衡量方式：一种数绝对股数，一种除以日均成交量。请按这个开关。": ["The line below is short interest across 11 mega-cap tech names, expressed as their average position within their own history. Not a single figure changes between the two views — only how it is measured: raw shares short, versus shares divided by average daily volume. Try the switch.", "", "", ""],
+    "做空持仓的广度 · 跨票平均分位": ["Breadth of short interest · average percentile across names", "", "", ""],
+    "每期取各标的在自身近 48 期（约两年）中的百分位，再跨票平均。50 为中性。样本不足 24 期的标的不参与当期平均。": ["For each settlement period, every name is ranked within its own trailing 48 periods (about two years), and those percentiles are averaged across names. 50 is neutral. Names with fewer than 24 periods of history are excluded from that period's average.", "", "", ""],
+    "按持仓股数": ["By shares short", "", "", ""],
+    "按补仓天数（÷ 成交量）": ["By days-to-cover (÷ volume)", "", "", ""],
+    "最近 6 期平均": ["Last 6 periods, average", "", "", ""],
+    "2024 全年": ["Full-year 2024", "", "", ""],
+    "跨票平均分位": ["Avg percentile across names", "", "", ""],
+    "历史积累中": ["Accumulating history", "", "", ""],
+    "按持仓股数读：最近 6 期高于 2024 年，看起来像空头在高位堆积。但股数会随股本与成交量长期漂移——请切到另一个口径再看一次。": ["Read by shares short: the last six periods sit above 2024, which looks like short positions piling up at a high. But raw share counts drift over time with share issuance and volume — switch to the other yardstick and look again.", "", "", ""],
+    "按补仓天数读：除以日均成交量之后，当前低于 2024 年。绝对股数确实涨了，但成交量涨得更快，相对于流动性，空头并不比 2024 年拥挤。": ["Read by days-to-cover: once divided by average daily volume, the present sits below 2024. Raw share counts did rise, but volume rose faster — relative to liquidity, the short side is no more crowded than it was in 2024.", "", "", ""],
+    "同一批数字，除不除以成交量，指向相反的结论。所以这里不给判断，只把两把尺并排放着——你自己看它们分别说了什么。": ["The same numbers, divided by volume or not, point to opposite conclusions. So no verdict is offered here — both yardsticks are simply laid side by side, and you can see for yourself what each one says.", "", "", ""],
     // 「VIXEQ ÷ VIX」故意不建键：中英同形无需翻译，且它无汉字、÷ 是 U+00F7
     // 不在守卫的三段范围内（一-鿿 / ＀-￯ / 　-〿）→ 建了也是死键（见 f336af0）
     "同一天，近 3 年偏贵、拉长看只是中性——最近三年太平静。三窗并陈，不藏选择。": ["Same day: rich versus the past 3 years, merely neutral over longer windows — the last three years were unusually calm. All three windows shown; nothing hidden.", "", "", ""],

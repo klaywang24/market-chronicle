@@ -2618,6 +2618,93 @@
     };
   });
 
+  /* ---------------- 口径实验室（2026-07-19）：同一批数据，换把尺，结论会翻 ----------------
+     广度序列**在客户端从既有 short_interest.json 现算**：不动管线、不加数据文件、
+     不影响台账自核的五文件对账。算法与 2026-07-19 那次离线复核完全一致：
+       每期取各标的在自身近 48 期中的百分位（样本不足 24 期不参与），再跨票平均。
+     🚨 这张图存在的意义就是让人看到「持仓股数」与「补仓天数」指向相反：
+        最近 6 期 81.8 vs 63.3、2024 全年 60.1 vs 74.5。
+        HANDOFF §31.6 曾按股数口径发过一个「连续 6 期两年高位」的观察，
+        隔天用归一化口径复核发现方向是反的，已撤回。故此处**只并排陈列两把尺，
+        不给方向判断**。 */
+  const SI_WIN = 48, SI_MIN = 24;
+  let breadthMode = "si";
+
+  function calcBreadth(d, container) {
+    const dates = d.dates, tks = Object.keys(d.series), out = [];
+    for (let j = 0; j < dates.length; j++) {
+      if (dates[j] < "2024-01-01") continue;
+      const ps = [];
+      for (const tk of tks) {
+        const s = d[container][tk];
+        if (!s || s[j] == null) continue;
+        const hist = [];
+        for (let k = Math.max(0, j - SI_WIN + 1); k <= j; k++) if (s[k] != null) hist.push(s[k]);
+        if (hist.length < SI_MIN) continue;
+        ps.push(hist.filter((v) => v <= s[j]).length / hist.length * 100);
+      }
+      if (ps.length >= 8) out.push([dates[j], +(ps.reduce((a, b) => a + b, 0) / ps.length).toFixed(1), ps.length]);
+    }
+    return out;
+  }
+
+  chart("leaps", "ch-short-breadth", async (p) => {
+    const d = await load("short_interest");
+    const rows = calcBreadth(d, breadthMode === "si" ? "series" : "days_to_cover");
+    if (!rows.length) {
+      return { title: { text: "历史积累中", left: "center", top: "middle",
+        textStyle: { color: p.muted, fontSize: 13, fontWeight: "normal" } } };
+    }
+    const last6 = rows.slice(-6).reduce((a, r) => a + r[1], 0) / Math.min(6, rows.length);
+    const y24 = rows.filter((r) => r[0] < "2025-01-01");
+    const base = y24.length ? y24.reduce((a, r) => a + r[1], 0) / y24.length : null;
+    const up = base != null && last6 > base;
+    const setTxt = (id, t) => { const n = document.getElementById(id); if (n) n.textContent = t; };
+    setTxt("cal-now", last6.toFixed(1));
+    setTxt("cal-base", base == null ? "—" : base.toFixed(1));
+    const big = document.getElementById("cal-now");
+    if (big) big.style.color = up ? p.accent : p.moss;
+    const vd = document.getElementById("cal-verdict");
+    if (vd) {
+      vd.style.borderLeftColor = up ? p.accent : p.moss;
+      const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
+      vd.textContent = breadthMode === "si"
+        ? T("按持仓股数读：最近 6 期高于 2024 年，看起来像空头在高位堆积。但股数会随股本与成交量长期漂移——请切到另一个口径再看一次。")
+        : T("按补仓天数读：除以日均成交量之后，当前低于 2024 年。绝对股数确实涨了，但成交量涨得更快，相对于流动性，空头并不比 2024 年拥挤。");
+    }
+    // ⚠️ formatter 是函数，i18n 的 D 字典扫不到它里面的中文（2026-07-18 在「天」上踩过）。
+    //    按当前语言选词，图表本来就随语言重建。
+    const isEN = !!(window.MC_I18N && MC_I18N.lang && MC_I18N.lang() === "en");
+    const unit = isEN ? "th pct" : " 分位";
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(1) + unit) }),
+      grid: { left: 48, right: 20, top: 20, bottom: 34 },
+      xAxis: Object.assign({ type: "category", data: rows.map((r) => r[0]) }, baseAxis(p),
+        { axisLabel: { color: p.muted, fontSize: 10, interval: Math.ceil(rows.length / 7) } }),
+      yAxis: Object.assign({ type: "value", min: 0, max: 100,
+        name: isEN ? "Avg percentile" : "跨票平均分位" }, baseAxis(p)),
+      series: [{
+        type: "line", data: rows.map((r) => r[1]), smooth: false, symbol: "none",
+        lineStyle: { width: 2.2, color: p.accent },
+        // ⚠️ 调色板里没有 accentSoft；不要硬编码 rgba（那是浅色态的值，暗色下会脏）。
+        // 用 accent + opacity，明暗两态都跟着 token 走。
+        areaStyle: { color: p.accent, opacity: 0.12 },
+        markLine: { silent: true, symbol: "none",
+          lineStyle: { color: p.ink, type: "dashed", width: 1 },
+          label: { color: p.ink, formatter: "50", fontSize: 10, fontFamily: "JetBrains Mono" },
+          data: [{ yAxis: 50 }] },
+      }],
+    };
+  });
+
+  document.getElementById("seg-breadth")?.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    [...e.currentTarget.children].forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+    breadthMode = b.dataset.k;
+    buildOne("ch-short-breadth", registry.leaps.find((r) => r.elId === "ch-short-breadth").build);
+  });
+
   // ---------------- 启动 ----------------
   renderKStatus();
   renderValCards();

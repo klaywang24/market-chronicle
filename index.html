@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260719m">
+<link rel="stylesheet" href="css/style.css?v=20260719n">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -629,6 +629,30 @@
     <div class="poem">这一段量的是 30 天，上面那些量的是 1 年。同一个市场的两截时间，不能相减，也不能混着说。保费、成交结构、持仓，是三件事：一件说价格，一件说今天的成交，一件说此刻还留着的仓位——而最后那件，还是两周前的。</div>
   </div>
 
+  <!-- ===== 做空的两本账（2026-07-19 新增）：同一批数据换把尺，结论会翻 ===== -->
+  <div class="lg-divider"><span>做空的两本账</span><em>同一批数据，换把尺，结论可能是反的</em></div>
+  <div class="chapter">
+    <div class="chapter-head"><span class="chapter-no">口径实验室</span><h2>换把尺，结论就翻了</h2></div>
+    <p class="chapter-q">下面这条线是 11 只大盘科技股的做空持仓，在各自历史里的平均位置。数据一个字没变，只换了衡量方式：一种数绝对股数，一种除以日均成交量。请按这个开关。</p>
+    <div class="card">
+      <h3>做空持仓的广度 · 跨票平均分位</h3>
+      <div class="sub">每期取各标的在自身近 48 期（约两年）中的百分位，再跨票平均。50 为中性。样本不足 24 期的标的不参与当期平均。</div>
+      <div class="seg" id="seg-breadth">
+        <button type="button" data-k="si" aria-selected="true">按持仓股数</button>
+        <button type="button" data-k="dtc" aria-selected="false">按补仓天数（÷ 成交量）</button>
+      </div>
+      <div class="chart" id="ch-short-breadth"></div>
+      <!-- ⚠️ 标签与数字分开放在各自的元素里：文本节点里混着 <b> 会让 i18n 的 D key
+           匹配不上（整句被切成碎片），英文态就会泄漏中文。 -->
+      <div class="cal-read">
+        <div><span class="cal-big" id="cal-now">—</span><div class="cal-cap"><span>最近 6 期平均</span></div></div>
+        <div><span class="cal-vs" id="cal-base">—</span><div class="cal-cap"><span>2024 全年</span></div></div>
+      </div>
+      <div class="cal-verdict" id="cal-verdict">—</div>
+    </div>
+    <div class="poem">同一批数字，除不除以成交量，指向相反的结论。所以这里不给判断，只把两把尺并排放着——你自己看它们分别说了什么。</div>
+  </div>
+
   <!-- ===== 历史参照：恐惧极值之后（描述性记录，非建议） ===== -->
   <div class="lg-divider"><span>历史参照 · 恐惧极值之后</span><em>以下为描述性历史记录，不是买卖建议</em></div>
   <div class="chapter">
@@ -946,9 +970,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260719m"></script>
-<script src="js/app.js?v=20260719m"></script>
-<script src="js/docs-i18n.js?v=20260719m"></script>
+<script src="js/i18n.js?v=20260719n"></script>
+<script src="js/app.js?v=20260719n"></script>
+<script src="js/docs-i18n.js?v=20260719n"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。

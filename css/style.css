@@ -1420,3 +1420,49 @@ html.rv-on .rv.rv-in { opacity: 1; transform: none; }
   .card, .stat, .senti-card, .ledger-card, .lg-ladder { transition: none; }
   .card:hover, .stat:hover, .senti-card:hover, .ledger-card:hover, .lg-ladder:hover { transform: none; }
 }
+
+/* ================= 分段切换（2026-07-19 新增，用于「口径实验室」） =================
+   用户看中的交互：点一个标签，下面的内容整体换掉。
+   ⚠️ 它只适用于「同一个问题、不同的尺」——两个读数并列会被读成两件事，
+   而重点恰恰是换把尺结论会翻转。站上「三窗并陈」那类**故意全摆出来**的地方
+   不要改成这个（配文写着「不藏选择」，改了就自相矛盾）。 */
+.seg {
+  display: inline-flex;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 2px;
+  margin: 4px 0 16px;
+  flex-wrap: wrap;
+}
+.seg button {
+  font: inherit;
+  font-size: 12.5px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color .3s ease, color .3s ease;
+}
+.seg button[aria-selected="true"] {
+  background: var(--accent);
+  color: #FFF8F0;
+}
+.seg button:hover:not([aria-selected="true"]) { color: var(--ink); }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .seg button { transition: none; } }
+
+/* 口径实验室的读数块：大数字 + 对照 + 判读 */
+.cal-read { display: flex; gap: 28px; flex-wrap: wrap; align-items: baseline; margin: 6px 0 4px; }
+.cal-big { font-family: 'JetBrains Mono', monospace; font-size: 42px; font-weight: 600;
+  line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.cal-vs { font-family: 'JetBrains Mono', monospace; font-size: 26px; color: var(--ink-muted);
+  font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+.cal-cap { font-size: 11px; letter-spacing: .1em; color: var(--ink-muted); margin-top: 9px; }
+.cal-verdict { margin-top: 14px; padding: 13px 16px; border-left: 3px solid var(--accent);
+  background: var(--bg-deep); border-radius: 0 8px 8px 0; font-size: 13.5px; line-height: 1.75;
+  color: var(--ink-soft); }
