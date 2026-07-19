@@ -1163,7 +1163,9 @@
             const b = d.buckets[params[0].dataIndex];
             const yrs = [];
             for (let i = 0; i < b.years.length; i += 6) yrs.push(b.years.slice(i, i + 6).join(" "));
-            return `<b>${b.label}</b> · ${b.count} 年<br/>${yrs.join("<br/>") || "--"}`;
+            // 函数体内的中文走 translate（JSON.stringify(getOption()) 扫不进函数体）
+            const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
+            return `<b>${b.label}</b> · ${T(`${b.count} 年`)}<br/>${yrs.join("<br/>") || "--"}`;
           },
         }),
         grid: { left: 54, right: 20, top: 24, bottom: 28 },
@@ -1185,7 +1187,10 @@
           axisPointer: { type: "shadow" },
           formatter: (params) => {
             const r = d.rows[params[0].dataIndex];
-            return `持有 ${r.years} 年<br/>胜率 ${r.win}%<br/>年化中位 ${r.median}% · 最差 ${r.worst}% · 最好 ${r.best}%`;
+            // 函数体内的中文走 translate（JSON.stringify(getOption()) 扫不进函数体）
+            const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
+            return `${T(`持有 ${r.years} 年`)}<br/>${T(`胜率 ${r.win}%`)}<br/>`
+              + T(`年化中位 ${r.median}% · 最差 ${r.worst}% · 最好 ${r.best}%`);
           },
         }),
         grid: { left: 54, right: 20, top: 24, bottom: 28 },
@@ -2570,7 +2575,10 @@
     const rows = d.members.filter((m) => m.pctile_available && m.p3y != null)
       .sort((a, b) => a.p3y - b.p3y);
     return {
-      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(1) + " 分位") }),
+      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--"
+        // ⚠️ 函数体内的中文 JSON.stringify(getOption()) 扫不到——2026-07-18 那次
+        //    全域审计正是因此漏掉这两处（英文态悬停显示「76.4 分位」）。走 translate。
+        : (+v).toFixed(1) + " " + (window.MC_I18N ? MC_I18N.translate("分位") : "分位")) }),
       grid: { left: 118, right: 44, top: 22, bottom: 34 },
       xAxis: Object.assign({ type: "value", min: 0, max: 100, name: "贵贱百分位" }, baseAxis(p)),
       yAxis: Object.assign({ type: "category", data: rows.map((r) => r.label) },
@@ -2615,7 +2623,10 @@
         textStyle: { color: p.muted, fontSize: 13, fontWeight: "normal" } } };
     }
     return {
-      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(1) + " 分位") }),
+      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--"
+        // ⚠️ 函数体内的中文 JSON.stringify(getOption()) 扫不到——2026-07-18 那次
+        //    全域审计正是因此漏掉这两处（英文态悬停显示「76.4 分位」）。走 translate。
+        : (+v).toFixed(1) + " " + (window.MC_I18N ? MC_I18N.translate("分位") : "分位")) }),
       grid: { left: 78, right: 44, top: 22, bottom: 34 },
       xAxis: Object.assign({ type: "value", min: 0, max: 100, name: "三年百分位" }, baseAxis(p)),
       yAxis: Object.assign({ type: "category", data: rows.map((r) => r.tk) },

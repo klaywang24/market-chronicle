@@ -777,6 +777,9 @@
     "逐段明细": ["Segment detail", "Détail par segment", "Segmentdetails", "Detalle por tramo"],
     "牛市": ["Bull", "Marché haussier", "Bullenmarkt", "Mercado alcista"],
     "熊市": ["Bear", "Marché baissier", "Bärenmarkt", "Mercado bajista"],
+    // 2026-07-19 全域四层扫描抓到：ch-vol-family / ch-short-flow 的 valueFormatter
+    // 函数体内硬编码「分位」，07-18 用 JSON.stringify(getOption()) 扫不进函数体故漏掉
+    "分位": ["pctile", "centile", "Perzentil", "percentil"],
     "距前高的百分比距离（周频）": ["Percent below prior peak (weekly)", "Écart au sommet précédent (hebdo)", "Abstand zum Hoch in % (wöchentlich)", "Distancia al máximo previo (semanal)"],
     "几乎每一年都有回撤，多数年份仍收正": ["Nearly every year has a drawdown; most still close positive", "Presque chaque année connaît un repli ; la plupart finissent positives", "Fast jedes Jahr hat einen Drawdown; die meisten schließen positiv", "Casi todos los años hay caídas; la mayoría cierra en positivo"],
     "全历史（1871→）· 近 50 年 · 2010 年以来，三条虚线即三个\"回归锚\"": ["All history (1871→), last 50 years, and 2010→ — three dashed anchors of mean reversion", "Tout l'historique (1871→), 50 ans, 2010→ — trois ancres de retour à la moyenne", "Gesamthistorie (1871→), 50 Jahre, 2010→ — drei Anker der Rückkehr zum Mittel", "Todo el histórico (1871→), 50 años y 2010→: tres anclas de reversión a la media"],
@@ -955,6 +958,15 @@
     [/^今日 CNN 恐贪（(.+)）$/, ["CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)"]],
     [/^即：比过去三年 (\d+)% 的交易日都贵$/, ["i.e. pricier than $1% of all trading days in the past three years", "", "", ""]],
     [/^历时 (\d+) 天（([\d.]+) 年）$/, ["$1 days ($2 years)", "$1 jours ($2 ans)", "$1 Tage ($2 Jahre)", "$1 días ($2 años)"]],
+    // 2026-07-19 四层扫描抓到的存量泄漏：收益分布图与持有期图的 tooltip 函数体
+    [/^(\d+) 年$/, ["$1 yrs", "$1 ans", "$1 J.", "$1 años"]],
+    [/^持有 ([\d.]+) 年$/, ["Held $1 years", "Détenu $1 ans", "$1 Jahre gehalten", "Mantenido $1 años"]],
+    [/^胜率 ([\d.]+)%$/, ["Win rate $1%", "Taux de réussite $1 %", "Trefferquote $1 %", "Tasa de acierto $1 %"]],
+    [/^年化中位 ([-\d.]+)% · 最差 ([-\d.]+)% · 最好 ([-\d.]+)%$/,
+      ["Median annualised $1% · worst $2% · best $3%",
+       "Médiane annualisée $1 % · pire $2 % · meilleur $3 %",
+       "Median annualisiert $1 % · schlechtester $2 % · bester $3 %",
+       "Mediana anualizada $1 % · peor $2 % · mejor $3 %"]],
     // 降级横幅（2026-07-19）：上游断供时显式说出来，绝不拿旧值假装新鲜
     [/^数据源中断：本页读数停在 (.+)（(\d+) 天前），等待上游恢复。历史台账完整未受影响。$/,
       ["Data feed interrupted: readings on this page stop at $1 ($2 days ago), awaiting upstream recovery. The historical ledger is complete and unaffected.",
