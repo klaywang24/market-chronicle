@@ -74,14 +74,21 @@ body {
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
 }
+/* 2026-07-19 芯片式 tab（方案 C）：品牌 + tab 一行，订阅/语言/主题移到第二行右侧。
+   ⚠️ 原本这里写死 height:58px。改两行布局时若不去掉，第二行会**溢出到顶栏外面**
+   （实测控件底边 82 vs 顶栏底边 59），顶栏是 sticky 的，滚动时会直接盖在正文上。
+   ∴ 高度改为由内容撑开 + 上下内边距。 */
 .topbar-inner {
+  --topbar-pad: 9px;      /* 顶栏上下内边距；品牌绝对定位时要对齐首行，需引用它 */
+  --topbar-row1: 40px;    /* 首行（tab 行）高度 = 芯片 padding 7×2 + 行高约 26 */
   max-width: 1180px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: var(--topbar-pad) 24px;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 24px;
-  height: 58px;
+  row-gap: 7px;
 }
 .brand {
   font-family: 'Noto Serif SC', serif;
@@ -105,42 +112,61 @@ body {
 }
 .tabs {
   display: flex;
-  gap: 2px;
+  gap: 8px;
   flex: 1;
-  flex-wrap: nowrap;
-  overflow-x: auto;
+  flex-wrap: wrap;
+  overflow-x: visible;
   scrollbar-width: none;
 }
 .tabs::-webkit-scrollbar { display: none; }
+/* 芯片式（2026-07-19，方案 C）：每个 tab 一枚带边框的圆角块，选中态整块反色。
+   实测宽度（中文、14px、10 个 tab、gap 8）：需 851px；两行布局下可用 = 视口 − 266，
+   故 1280 余 163px、1440 余 323px，留足了以后加 tab 的余量。 */
 .tab {
-  padding: 6px 11px;
-  border: none;
-  background: none;
+  padding: 7px 13px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   color: var(--ink-muted);
   font: inherit;
   font-size: 14px;
   cursor: pointer;
-  border-radius: 6px 6px 0 0;
-  border-bottom: 2px solid transparent;
+  border-radius: 8px;
   white-space: nowrap;
   flex-shrink: 0;
+  transition: transform .3s cubic-bezier(.22, .61, .36, 1), border-color .3s ease,
+              background-color .3s ease, color .3s ease;
 }
-.tab:hover { color: var(--ink); background: var(--bg-card-hover); }
+.tab:hover { color: var(--ink); background: var(--bg-card-hover);
+  border-color: var(--accent); transform: translateY(-1px); }
+.tab.active:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .tab.active {
-  color: var(--accent-deep);
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
   font-weight: 600;
-  border-bottom-color: var(--accent);
 }
-.top-controls { display: flex; align-items: center; gap: 10px; margin-left: 18px; }
+/* 方案 C：控件整体移到第二行右侧（order 3 + 占满整行触发换行） */
+.top-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 100%;
+  order: 3;
+  justify-content: flex-end;
+  margin-left: 0;
+}
 /* 窄屏收起品牌副题，给 tab 让位；非中文界面下主名已译为英文，副题冗余 */
 @media (max-width: 1560px) { .brand em { display: none; } }
 html:not([lang^="zh"]) .brand em { display: none; }
 /* 西语系 tab 标签更宽（Consommation / LEAPS-Fenster…），9 个 tab 会把最后一个
    「LEAPS Window」挤出 .tabs 的 overflow-x 边界被截断。非中文界面下收紧 tab 字号/
    内边距、顶栏间距与右侧控件占位，让全部 tab 单行完整显示。 */
+/* 2026-07-19：改芯片式后这里不能再压到 padding 6px 7px——那会让边框贴着字，
+   芯片的形没了。改为只收字号与间距；两行布局本来就腾出了 200+px，够放。 */
 html:not([lang^="zh"]) .topbar-inner { gap: 14px; }
-html:not([lang^="zh"]) .tab { font-size: 12.5px; padding: 6px 7px; }
-html:not([lang^="zh"]) .top-controls { margin-left: 8px; gap: 8px; }
+html:not([lang^="zh"]) .tab { font-size: 12.5px; padding: 6px 11px; }
+html:not([lang^="zh"]) .tabs { gap: 7px; }
+html:not([lang^="zh"]) .top-controls { margin-left: 0; gap: 8px; }
 html:not([lang^="zh"]) .lang-switch { font-size: 11.5px; padding: 3px 8px; }
 .lang-switch {
   white-space: nowrap;
@@ -669,7 +695,14 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
     margin: 0;
     position: relative;
   }
-  .brand { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); }
+  /* ⚠️ 原为 top:50% + translateY(-50%)：顶栏一行时那就是 tab 那行的中线。
+     2026-07-19 顶栏改两行（tab 一行、控件一行）后，50% 落到了两行之间，
+     品牌与 tab 差 21px 不对齐。改为显式对齐第一行（= 顶栏上内边距 + 首行高的一半）。 */
+  .brand {
+    position: absolute; left: 24px;
+    top: var(--topbar-pad); height: var(--topbar-row1);
+    display: flex; align-items: center; transform: none;
+  }
   .tabs { margin-left: calc(max(214px, (100vw - 1180px) / 2) - 11px); }
 }
 /* 窄屏：☰ 展开为「抽屉 + 背景遮罩」，内容明显退到后面而非被目录压住 */
@@ -1100,9 +1133,12 @@ html:not([lang^="zh"]) .senti-name { flex-basis: 118px; font-size: 11.5px; }
 .footer-left { flex: 1 1 auto; min-width: 0; }
 .footer-copy { flex: 0 0 auto; margin-left: auto; }
 
-/* EN 顶栏在对齐宽度内的压缩：字号/间距收紧，保证 11 个 tab 一行放满不截断 */
-html:not([lang^="zh"]) .tab { font-size: 12px; padding: 6px 7px; }
-html:not([lang^="zh"]) .tabs { gap: 2px; }
+/* EN 顶栏压缩。2026-07-19 改芯片式后**下调压缩力度**：原为 12px/6px 7px/gap 2px，
+   那是为了「一行塞满 11 个 tab」；现在 tab 与控件已分两行，宽度不再紧张，
+   而 padding 7px 会让边框贴着字、芯片的形立不住。
+   ⚠️ 本条在 165 行同名规则之后，会覆盖它——两处必须同时改，只改前一处不生效。 */
+html:not([lang^="zh"]) .tab { font-size: 12.5px; padding: 6px 11px; }
+html:not([lang^="zh"]) .tabs { gap: 7px; }
 html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 
 /* 页脚标语一行（宽屏）；窄屏回退自然换行 */
