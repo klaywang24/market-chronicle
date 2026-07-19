@@ -307,6 +307,7 @@
     "做空持仓（股数）": ["Short interest (shares)", "", "", ""],
     "这就是原提案的形式：相关系数等于零。「做空占比冲高 = 有人在建空头仓位」这个直觉，在数据上完全不成立：点云是一团圆的，没有任何方向。提案死在这里：它不是没做，是做了、数据说不行。": ["This is the original proposal's exact form: the correlation is zero. The intuition that “a spike in short volume means someone is building a short position” simply does not hold in the data — the cloud is round, with no direction at all. The proposal dies here: not untried, but tried, and the data said no.", "", "", ""],
     "换成同类对同类（变化对变化）才有，但很弱。而且这个弱相关不是均匀分布的：个股有，两只 ETF 精确为零。请看下一章的逐票拆解。": ["Pairing like with like (change against change) does produce something, but it is weak. And that weak relationship is not evenly spread: single stocks have it, both ETFs come in at exactly zero. See the name-by-name breakdown in the next chapter.", "", "", ""],
+    "这一段量的是 30 天，上面那些量的是 1 年。同一个市场的两截时间，不能相减，也不能混着说。保费说的是价格，成交结构说的是今天的成交。至于「此刻还留着多少仓位」，那是另一本账，在下一章。": ["This section measures 30 days; everything above measures one year. Two different stretches of time in the same market — they cannot be subtracted from one another, nor spoken of interchangeably. The premium speaks of price; the structure of trading speaks of today's flow. As for how much position is still held right now, that is a different ledger — it is in the next chapter.", "", "", ""],
     // ---- 做空的两本账 · 口径实验室（2026-07-19）----
     "做空的两本账": ["Two Ledgers of Short Selling", "", "", ""],
     "同一批数据，换把尺，结论可能是反的": ["Same data, a different yardstick — the conclusion can flip", "", "", ""],
