@@ -1474,8 +1474,16 @@ html.rv-on .rv.rv-in { opacity: 1; transform: none; }
 .cal-verdict p { margin: 0; }
 .cal-verdict p + p { margin-top: 10px; }
 .cal-verdict { margin-top: 14px; padding: 13px 16px; border-left: 3px solid var(--accent);
-  background: var(--bg-deep); border-radius: 0 8px 8px 0; font-size: 13.5px; line-height: 1.75;
-  color: var(--ink-soft); }
+  background: var(--bg-deep); border-radius: 0 8px 8px 0; font-size: 12px; line-height: 1.85;
+  color: var(--ink-soft);
+  /* 🚨 中文孤字：末行只剩「行。」「积。」一两个字，很难看。
+     1280 屏实测三种策略的末行占容器宽比例（越大越好，<20% 即孤字）：
+       auto（默认） 7%　pretty 10%　balance 49~77%
+     ∴ 用 balance。**pretty 基本无效**——它主要为西文的断词与孤行设计，
+     对中文这种逐字可断的文本几乎不改变结果。
+     （我先前在这条注释里写过"别用 balance，它把每行拉等长、段落越长越糟"，
+       那是想当然：这里是 2~3 行的短段，balance 正是为这种情形设计的，实测完胜。） */
+  text-wrap: balance; }
 
 /* 单票选择器（做空章 · 叁）：与 tab 芯片同语言，但更小 */
 .tk-picker { display: flex; flex-wrap: wrap; gap: 7px; margin: 4px 0 18px; }
