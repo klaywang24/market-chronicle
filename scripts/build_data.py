@@ -1450,11 +1450,10 @@ def build_constituents():
 
 
 def build_top_holdings(top_n: int = 20):
-    """前 N 大持仓（每日刷新，调仓自动反映）。
-    SPY：道富官方 holdings XLSX；QQQ：stockanalysis 页面内嵌数据。
-    市值来自 yfinance 快照，行业与我们的成分股数据集拼接。"""
+    """QQQ 前 N 大持仓（每日刷新，调仓自动反映）。源=stockanalysis 页面内嵌数据。
+    市值来自 yfinance 快照，行业与我们的成分股数据集拼接。
+    （SPY 那张已于 2026-07-19 下线，理由见下方注释。）"""
     print("== 前二十大持仓")
-    from io import BytesIO
     sector_of = {}
     for fname in ("sp500_constituents.json", "ndx_constituents.json"):
         try:
@@ -1470,39 +1469,13 @@ def build_top_holdings(top_n: int = 20):
         except Exception:
             return None
 
-    # ---- SPY（SSGA 官方 XLSX）----
-    try:
-        import openpyxl
-        r = requests.get("https://www.ssga.com/us/en/intermediary/library-content/"
-                         "products/fund-data/etfs/us/holdings-daily-us-en-spy.xlsx",
-                         headers=UA, timeout=60, allow_redirects=True)
-        r.raise_for_status()
-        ws = openpyxl.load_workbook(BytesIO(r.content)).active
-        rows_iter = ws.iter_rows(values_only=True)
-        asof = ""
-        header_seen = False
-        rows = []
-        for row in rows_iter:
-            if row[0] == "Holdings:":
-                asof = str(row[1]).replace("As of ", "")
-            if row[0] == "Name":
-                header_seen = True
-                continue
-            if header_seen and row[1] and row[4] is not None:
-                tick = str(row[1])
-                if not re.match(r"^[A-Z][A-Z.]{0,6}$", tick):
-                    continue  # 跳过现金/衍生品等非股票行（如 2670549D）
-                rows.append({"ticker": tick, "name": str(row[0]).title(),
-                             "weight": round(float(row[4]), 2)})
-                if len(rows) >= top_n:
-                    break
-        for x in rows:
-            x["sector"] = sector_of.get(x["ticker"], "")
-            x["mcap"] = mcap(x["ticker"])
-            time.sleep(0.4)
-        write_json("sp500_top.json", {"rows": rows, "asof": asof, "source": "SSGA SPY"})
-    except Exception as e:
-        print(f"  SPY holdings failed (kept old): {e}")
+    # ---- SPY 前二十大持仓：2026-07-19 下线 ----
+    # 源是 SSGA 官方 holdings XLSX，而 SSGA 条款是本站所有数据源里写得最硬的一条：
+    # "may not be reproduced, copied or transmitted... without SSGA's express written consent"。
+    # 自算权重需要全指数总市值当分母 → 要抓 503 只市值 → 每天多 503 次 yfinance 调用，
+    # 而降低 yfinance 依赖恰恰是同批工作的目的，为一张卡把运营脆弱性加重不划算。
+    # 且前二十大权重股是 Google 一秒可查的 commodity，不产生任何差异化
+    # （同 07-17 头版撤图、07-18 下线行情 tab 的判断）。∴ 直接下线，不找替代源。
 
     # ---- QQQ（stockanalysis 内嵌 JSON）----
     try:

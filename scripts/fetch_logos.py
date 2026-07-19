@@ -20,10 +20,11 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 OUT = ROOT / "logos"
 
-# ticker 来源：两份成分股全表 + 两份前二十大 + 四个篮子表
+# ticker 来源：两份成分股全表 + 一份前二十大 + 四个篮子表
+# （sp500_top.json 已于 2026-07-19 随 SPY 前二十大卡片一并下线）
 SOURCES = [
     "sp500_constituents.json", "ndx_constituents.json",
-    "sp500_top.json", "ndx_top.json",
+    "ndx_top.json",
     "tech_table.json", "fin_table.json", "consumer_table.json", "luxury_table.json",
 ]
 

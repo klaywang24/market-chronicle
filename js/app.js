@@ -2035,7 +2035,7 @@
     ["ch-spy-eps", "multpl"], ["ch-spy-val", "multpl / Shiller"],
     ["spy-constituents", "Wikipedia"], ["qqq-constituents", "Wikipedia"],
     ["ch-spy-sectors", "Wikipedia"], ["ch-qqq-sectors", "Wikipedia"],
-    ["spy-top-table", "SSGA (SPDR)"], ["qqq-top-table", "stockanalysis"],
+    ["qqq-top-table", "stockanalysis"],
     ["ch-leaps-vx", "Cboe CFE daily settlement"], ["ch-leaps-cot", "CFTC · Traders in Financial Futures"],
     // 2026-07-18：这两张图不吃页面默认的 Cboe+FRED+CNN+Yahoo 那串：写错出处比不写更糟。
     // ⚠️ 源名必须纯英文（本串不走 i18n，中文会在 EN 下泄漏）。
@@ -3004,7 +3004,6 @@
   renderExtremesTable("ndx_extremes", "qqq-extremes-table");
   renderConstituents("sp500_constituents", "spy-constituents");
   renderConstituents("ndx_constituents", "qqq-constituents");
-  renderTopTable("sp500_top", "spy-top-table");
   renderTopTable("ndx_top", "qqq-top-table");
   renderBasketTable("tech", "tech-table");
   renderBasketTable("fin", "fin-table");

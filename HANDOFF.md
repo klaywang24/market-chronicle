@@ -58,7 +58,7 @@
 | Tab | 章节/内容 | 数据集（data/） | 来源 | 频率 |
 |---|---|---|---|---|
 | **今日**（默认页） | 市场温度环=（估值百分位+情绪百分位）/2；四大指数+VIX/恐贪/K/LEAPS 八芯片；涨跌分布带；11 行业 ETF 热力图；顶部世纪带+六大危机红点；聚光灯揭示夜层 | pulse.json | yfinance（503 成分股批量+指数+11 ETF）、复用 pe_ttm/kindex/leaps | 每日 |
-| **标普 500** | 14 章：头版世纪尺度/年度结账+收益分布/入场离场(持有期胜率)/滚动 5·10·20 年/牛熊周期(zigzag±20/25%)/左尾放大镜/回撤谱系/估值两曲线(CAPE+PE)/估值弹性(三中位锚+百分位)/EPS/VIX 保费账本/季节性/行业结构+前二十持仓/五百家一览 | sp500_*.json, sp500_pe_ttm, sp500_cape, sp500_eps_hist, sp500_constituents, sp500_top | yfinance ^GSPC、multpl.com（CAPE/PE/EPS 1871→）、Wikipedia、SSGA 官方持仓 XLSX | 每日 |
+| **标普 500** | 14 章：头版世纪尺度/年度结账+收益分布/入场离场(持有期胜率)/滚动 5·10·20 年/牛熊周期(zigzag±20/25%)/左尾放大镜/回撤谱系/估值两曲线(CAPE+PE)/估值弹性(三中位锚+百分位)/EPS/VIX 保费账本/季节性/行业结构+前二十持仓/五百家一览 | sp500_*.json, sp500_pe_ttm, sp500_cape, sp500_eps_hist, sp500_constituents | yfinance ^GSPC、multpl.com（CAPE/PE/EPS 1871→）、Wikipedia | 每日 |
 | **纳斯达克** | 12 章（同体系）：综指 1971→ × 纳指100 1985→、VXN、ICB 行业(维基用 ICB 非 GICS!)、纳指百家、前二十持仓 | ixic_*, ndx_*, ndx_constituents, ndx_top | yfinance ^IXIC/^NDX/^VXN、Wikipedia、stockanalysis(QQQ 持仓) | 每日 |
 | **金融** | XLF 锚一章 + 成长对照(2008 共同起跑) + 组合脾气；13 只：银行 JPM/BAC·卡组织 V/MA/AXP·投行 GS/MS·资管 BLK·券商 SCHW/IBKR·加密稳定币 COIN/HOOD/CRCL(卫星成员不入组合) | fin_*.json, s_{tick}_* | yfinance | 每日 |
 | **消费** | XLP×XLY 双锚 + 六只（必需 KO/WMT/COST，可选 HD/TJX/MCD，1987 起跑） | consumer_* | yfinance | 每日 |
@@ -142,13 +142,13 @@ python3 -m http.server 8137          # 本地预览
 git add -A && git commit -m "..." && git pull --rebase && git push   # push 即上线
 ```
 
-⚠️ 本地网络注意：**FRED 与本机代理不合**（fredgraph 超时；官方 API 走代理可通，需 `FRED_API_KEY=xxx` 环境变量）；macrotrends/SSGA/stockanalysis 本地可通但注意限流。
+⚠️ 本地网络注意：**FRED 与本机代理不合**（fredgraph 超时；官方 API 走代理可通，需 `FRED_API_KEY=xxx` 环境变量）；macrotrends/stockanalysis 本地可通但注意限流。
 
 ### 数据管线源码地图（scripts/build_data.py）
 
 `fetch_history`(yfinance 带重试) → `build_kindex` / `build_leaps` / `build_index_val` / `build_macro`(FRED) /
 `build_index_panels`(任意价格序列→7 个面板 JSON，指数与个股共用) / `build_index_extras`(分布/持有期/滚动矩阵/牛熊zigzag/左尾) /
-`build_constituents`(Wikipedia) / `build_top_holdings`(SSGA XLSX + stockanalysis) / `build_valuation_extras`(multpl) /
+`build_constituents`(Wikipedia) / `build_top_holdings`(stockanalysis；SPY 侧已 07-19 下线) / `build_valuation_extras`(multpl) /
 `build_basket`(篮子：成长曲线/等权组合/对照表/逐股面板) / `build_pulse`(今日头版) / `mcap_usd_b`(市值通用函数，⚠️ 先试原代码再试 .→-，非美元自动汇率转换)。
 
 ---
