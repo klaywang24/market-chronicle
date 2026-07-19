@@ -8,14 +8,21 @@
 
 ## 许可 · License
 
-**[PolyForm Noncommercial 1.0.0](../LICENSE)**
+**先说清楚哪些是我们的、哪些不是**——这个区分比许可证本身重要。
+
+| | 是什么 | 归谁 |
+|---|---|---|
+| **编排、衍生计算、台账结构** | 百分位怎么算、窗口怎么定、逐日怎么记、修订怎么标 | 我们的 → **[PolyForm Noncommercial 1.0.0](../LICENSE)** |
+| **原始数值** | VIX 的收盘价、股价、做空成交量…… | **不是我们的**，是各源发布的事实，各自条款照旧 |
+
+**我们不对任何一个原始数字主张所有权**，也无权授权别人使用它们——需要商用上游数据的，请直接找上游。
+能授权的只有上面第一行：[klaywang24+marketchronicle@gmail.com](mailto:klaywang24+marketchronicle@gmail.com)
 
 - ✅ **随便用**：自己看、研究、复算、教学、写文章引用
-- ❌ **不可以**：用于任何商业目的（包括拿它做付费产品、再分发、训练用于商业变现的模型）
-- 商业授权：[klaywang24+marketchronicle@gmail.com](mailto:klaywang24+marketchronicle@gmail.com)
-- 每个 JSON 文件顶部带 `_notice` 许可标记（管线写库时自动注入）——文件被单独拷走或热链时，声明跟着文件走
+- ❌ **不可以**：把这本账的编排与衍生计算用于商业目的（拿它做付费产品、再分发、训练用于商业变现的模型）
+- 每个 JSON 文件顶部带 `_notice` 标记（管线写库时自动注入）——文件被单独拷走或热链时，这个区分跟着文件走
 
-**Noncommercial use is free. Commercial use requires a license — contact the address above.**
+**The compilation, derived metrics and ledger structure are ours (PolyForm Noncommercial 1.0.0). The underlying values are facts published by the sources below, remain subject to their own terms, and we claim no ownership over them.**
 
 ---
 
@@ -27,12 +34,18 @@
 
 | 来源 | 用途 |
 |---|---|
-| [Cboe](https://www.cboe.com/tradable_products/vix/vix_historical_data/) | VIX9D / VIX / VIX3M / VIX6M / VIX1Y / VXN / SKEW（官方日收盘） |
-| CNN Fear & Greed（第三方存档） | 恐贪指数与七个分量 |
+| [Cboe](https://www.cboe.com/tradable_products/vix/vix_historical_data/) | VIX9D / VIX / VIX3M / VIX6M / VIX1Y / VXN / SKEW（官方日收盘）；VX 期货结算曲线；个股与板块波动率指数 |
+| [FINRA](https://www.finra.org/finra-data/browse-catalog/short-sale-volume-data) | RegSHO 逐日做空成交占比；双月合并短仓 |
+| [CFTC](https://publicreporting.cftc.gov/) | COT 持仓报告（Traders in Financial Futures，VIX 期货） |
 | [FRED](https://fred.stlouisfed.org/) | 10 年期实际利率（DFII10）、信用利差（DBAA/DAAA） |
-| Yahoo Finance | 指数与个股价格 |
-| [multpl.com](https://www.multpl.com/) | 标普 500 PE(TTM) 长史 |
+| CNN Fear & Greed（含第三方存档回填） | 恐贪指数与七个分量 |
+| Yahoo Finance | 指数与个股价格、基本面快照 |
+| [multpl.com](https://www.multpl.com/) / Robert Shiller | 标普 500 PE(TTM)、CAPE 长史 |
+| [Wikipedia](https://en.wikipedia.org/wiki/List_of_S%26P_500_companies) | 标普 500 / 纳斯达克 100 成分股名单 |
+| macrotrends | 个股基本面长史 |
 | NAAIM | 主动管理人仓位（周频） |
+
+各源对自己数据的条款不尽相同（有的明确限制再分发）。我们的做法是：**只发衍生统计与位置读数，不做原始文件的整表镜像，并逐图署名出处**——站上每张图下方那行「数据截至 X · 来源 · 更新频率」就是这条规矩的执行。发现我们哪里越界了，写信来，我们改。
 
 ## 那护城河是什么 · Then what's the moat
 

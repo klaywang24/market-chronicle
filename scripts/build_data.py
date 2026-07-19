@@ -31,7 +31,19 @@ MULTPL_CAPE = "https://www.multpl.com/shiller-pe/table/by-month"
 
 
 # 许可标记：文件被单独拷走/热链时声明跟着走；改这句必须同步重写存量文件，否则新旧不一致
-NOTICE = "PolyForm Noncommercial 1.0.0 · © Klay Wang · https://chronicle.klay-wang.com · free for noncommercial use; commercial use requires a license (klaywang24+marketchronicle@gmail.com)"
+#
+# 2026-07-19：把「本站的」与「不是本站的」分开写。此前整句是 "© Klay Wang"，
+# 而文件里装着 4,909 个 Cboe 原始收盘值、Yahoo 价格、FINRA 成交量——对别人的事实
+# 主张自己的版权、还在同一句里对外卖授权，与 data/README.md 自己写的
+# 「这里没有任何一个数字是私有的」直接冲突。承诺不改，改机制。
+# 能授权的只有编排、衍生计算与台账结构；原始数值各归各源。
+NOTICE = ("Compilation, derived metrics and ledger structure © Klay Wang — "
+          "PolyForm Noncommercial 1.0.0; commercial use requires a license "
+          "(klaywang24+marketchronicle@gmail.com). "
+          "Underlying values are facts transcribed from public sources "
+          "(Cboe, FRED, FINRA, CFTC, Yahoo Finance, CNN) and remain subject to those "
+          "sources' own terms — no ownership is claimed over them. "
+          "https://chronicle.klay-wang.com")
 
 
 def write_json(name: str, obj):
