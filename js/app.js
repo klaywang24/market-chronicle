@@ -2286,8 +2286,15 @@
     const ladderVals = [t.vix9d, t.vix, t.vix3m, t.vix6m, t.vix1y];
     const ladderHi = Math.max(...ladderVals), ladderLo = Math.min(...ladderVals);
     const barH = (v) => Math.round(16 + 84 * (v - ladderLo + 0.6) / (ladderHi - ladderLo + 0.6));
+    // 2026-07-19 降级横幅：上游断供时**显式说出来**，绝不拿旧值假装新鲜。
+    // 站的立身之本是「数字是那天官方说的、我们没动过」——那就必须包括「今天没拿到」也照说。
+    const m = d.meta || {};
+    // ⚠️ 必须单行：多行模板字面量会把换行与缩进带进 textContent，i18n 的 P 正则就永远匹配不上
+    const banner = m.degraded
+      ? `<p class="lg-degraded">数据源中断：本页读数停在 ${c.date}（${m.stale_days} 天前），等待上游恢复。历史台账完整未受影响。</p>`
+      : "";
     document.getElementById("lg-hero").innerHTML = `
-      <div class="card">
+      <div class="card">${banner}
         <div class="lg-top">
           <div class="lg-num">
             <div class="lg-big" style="color:${col}">${p3}<span>/100</span></div>

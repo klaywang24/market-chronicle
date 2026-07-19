@@ -94,6 +94,40 @@ def main():
               "**已发布过的数值被改写，或有交易日消失。**\n" + "\n".join(lines)
               + f"\n\n逐条明细：data/ledger_audit.json\n日志：{run_url}")
 
+    # ④ 非致命小节失败（2026-07-19 新增）：build_data 的 _guard 把失败写进 meta.json。
+    #    此前这些失败只 print 进 Actions 日志，而没有人每天读日志——2026-07-12→14 静默死
+    #    4 天就是这个形态。job 整体仍是 success，所以①②③都不会响，必须单独看这个字段。
+    meta = load("meta") or {}
+    failures = meta.get("failures") or []
+    if failures:
+        lines = [f'· **{f.get("section")}**：{f.get("error")}' for f in failures]
+        alert(url, f"🟠 {len(failures)} 个数据小节失败（站上仍是旧值）",
+              "job 报成功，但下列小节这次没跑成，站上对应板块还是上一次的数据：\n"
+              + "\n".join(lines) + f"\n\n日志：{run_url}")
+
+    # ⑤ 恐惧的标价降级（2026-07-19 新增）：这是唯一在赚钱的读数，走备胎或数据陈旧都要当天知道。
+    #    degraded=true 有两种：headline_source=banked_only（Cboe+Yahoo 双挂，只剩本地存底）
+    #    或 stale_days>4（源还在但没前进）。两种都意味着卡片与 digest 不该照常发。
+    lg_meta = (load("leaps_gauge") or {}).get("meta") or {}
+    if lg_meta.get("degraded"):
+        alert(url, "🔴 恐惧的标价：数据降级",
+              f'来源=**{lg_meta.get("headline_source")}** · 数据停在 '
+              f'**{lg_meta.get("stale_days")}** 天前。\n'
+              "**这是付费产品的头条读数**，发 digest / 出卡前先确认。\n"
+              f"日志：{run_url}")
+    elif lg_meta.get("headline_source") == "yahoo_fallback":
+        # 没到降级线但已经在吃备胎 = 早期信号，Cboe 那边出事了
+        alert(url, "🟠 恐惧的标价：正在走 Yahoo 备胎",
+              "Cboe 主源这次没拉到，已自动切 Yahoo（口径实测一致，读数可信）。\n"
+              "但备胎只有最近 1 个交易日、没有缓冲：**若管线漏跑一天，那天补不回来**。\n"
+              f"请查 Cboe 侧是否恢复。日志：{run_url}")
+    if lg_meta.get("revisions"):
+        n = len(lg_meta["revisions"])
+        alert(url, f"🟠 恐惧的标价：上游修订了 {n} 个历史值",
+              "按修订政策，**台账旧行保持原样未动**，分歧已记入 "
+              "`leaps_gauge.json` 的 `meta.revisions` 公开。\n"
+              f"逐条：{json.dumps(lg_meta['revisions'][:5], ensure_ascii=False)}\n日志：{run_url}")
+
     leaps = load("leaps") or {}
     q = d.get("quotes", {})
 

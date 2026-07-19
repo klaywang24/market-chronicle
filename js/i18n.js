@@ -948,6 +948,10 @@
     [/^今日 K 指数（(.+)）$/, ["KAPX Index today ($1)", "Indice KAPX aujourd'hui ($1)", "KAPX Index heute ($1)", "Índice KAPX hoy ($1)"]],
     [/^今日 CNN 恐贪（(.+)）$/, ["CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)"]],
     [/^即：比过去三年 (\d+)% 的交易日都贵$/, ["i.e. pricier than $1% of all trading days in the past three years", "", "", ""]],
+    // 降级横幅（2026-07-19）：上游断供时显式说出来，绝不拿旧值假装新鲜
+    [/^数据源中断：本页读数停在 (.+)（(\d+) 天前），等待上游恢复。历史台账完整未受影响。$/,
+      ["Data feed interrupted: readings on this page stop at $1 ($2 days ago), awaiting upstream recovery. The historical ledger is complete and unaffected.",
+       "", "", ""]],
     // 个股与板块（30 天口径，2026-07-18）：动态串走正则，特殊排通用前
     [/^单只股票的保费 = 大盘的 ([\d.]+) 倍$/, ["a single stock's premium = $1× the index's", "", "", ""]],
     [/^第 (\d+) 百分位$/, ["$1th percentile", "", "", ""]],

@@ -730,6 +730,113 @@ def _cboe_close(name: str) -> pd.Series:
                      index=df["DATE"]).dropna().sort_index()
 
 
+# ---- 2026-07-19：断供保护。恐惧的标价是唯一在赚钱的产品，而它此前单源、无备胎、每天全量覆盖写 ----
+#
+# 三件事分开看：
+#   ① 历史（VIX1Y 4,909 天，2007→）——已经在 git 全史 + 哈希链 + Wayback 锚里，Cboe 关站也拿不走。
+#      此前的问题不是拿不到，是「每天重抓重写」：源挂一天，19 年历史就整个消失。∴ 改成本地存底 + 只追加。
+#   ② 每日增量（1 行）——Cboe 主，Yahoo 备。
+#   ③ 两边都挂——保留存底，标记陈旧，让站上显式说「数据源中断」，绝不白屏也绝不假装新鲜。
+#
+# Yahoo 备胎口径实测（2026-07-19，非推断）：
+#   ^VIX1Y 日线与 Cboe 官方收盘**逐日精确一致**（07-17 双方均 23.82，差 0.0000）→ 可入账。
+#   ⚠️ 但 ^VIX1Y 在 Yahoo 只有最近 1 个交易日（period 传 max/5d/1d 均只返回 1 行，
+#      传 max 直接报 "Period 'max' is invalid, must be one of: 1d, 5d"）——它能救「今天」，
+#      救不了「漏掉的那天」。∴ 存底是必需的，不是锦上添花；且管线漏跑要能被发现（见 notify 侧）。
+#   ⚠️ 小时线能给 5 天，但末根小时线与官方收盘差 0.01~0.07（收在 4:15 结算前）＝不同口径，
+#      **绝不可用来回补**：混口径入账比缺一行严重得多。
+#   其余四条 Yahoo 有全史（实测 ^VIX9D 3907 / ^VIX3M 5032 / ^VIX6M 4664 / ^SKEW 9128 行），
+#   ^VIX9D 行数与 Cboe 完全一致。
+CBOE_YAHOO_FALLBACK = {
+    "VIX1Y": "^VIX1Y", "VIX9D": "^VIX9D", "VIX3M": "^VIX3M",
+    "VIX6M": "^VIX6M", "SKEW": "^SKEW",
+}
+# 本次运行各序列的实际来源，写进 meta 供站上显示降级状态
+_SOURCE_TRACE: dict[str, str] = {}
+
+
+def _yahoo_close(sym: str) -> pd.Series:
+    """Yahoo 备胎 → 日频收盘 Series。^VIX1Y 只有 1 交易日，其余为全史。"""
+    df = yf.Ticker(sym).history(period="5d" if sym == "^VIX1Y" else "max")
+    if df is None or df.empty:
+        return pd.Series(dtype=float)
+    s = pd.Series(df["Close"].values,
+                  index=pd.to_datetime([d.date() for d in df.index]))
+    return s.dropna().sort_index()
+
+
+def _cboe_close_resilient(name: str) -> pd.Series:
+    """Cboe 主 → Yahoo 备 → 空序列。永不抛异常：让调用方拿存底兜底，而不是整条管线倒下。"""
+    try:
+        s = _cboe_close(name)
+        if not s.empty:
+            _SOURCE_TRACE[name] = "cboe"
+            return s
+        raise ValueError("Cboe 返回空序列")
+    except Exception as e:
+        print(f"  ⚠️ {name}: Cboe 拉取失败（{type(e).__name__}: {str(e)[:60]}），转 Yahoo 备胎")
+    try:
+        s = _yahoo_close(CBOE_YAHOO_FALLBACK[name])
+        if not s.empty:
+            _SOURCE_TRACE[name] = "yahoo_fallback"
+            print(f"  ✅ {name}: Yahoo 备胎取到 {len(s)} 行（末日 {s.index[-1].date()}）")
+            return s
+    except Exception as e:
+        print(f"  ⚠️ {name}: Yahoo 备胎也失败（{type(e).__name__}: {str(e)[:60]}）")
+    _SOURCE_TRACE[name] = "banked_only"
+    return pd.Series(dtype=float)
+
+
+# 修订判定阈值：台账按 2 位小数记账（rnd(v, 2)），真实修订至少是 0.01 量级；
+# 而 Yahoo 备胎返回 float32（23.82 实际是 23.81999969482422，与存底差 ~3e-7）。
+# 2026-07-19 实测：阈值设 1e-9 会让每次走备胎都假报「上游修订了历史值」——
+# 这个站的信誉全押在修订记录可信上，**假报比不报严重得多**。
+# 5e-4 远高于 float32 噪声（~2.4e-6）、远低于任何真实修订（≥0.01），两头都不沾。
+_REVISION_EPS = 5e-4
+
+
+def _merge_append_only(banked: pd.Series, fresh: pd.Series, label: str):
+    """只追加合并：已入账的日子一律以存底为准，新日子才写入。返回 (合并序列, 分歧列表)。
+
+    这是 data/README「修订政策」的代码级强制——此前那条政策只写在文档里，
+    而 leaps_gauge 每天整份覆盖写（同 kindex 80 处分歧的根因 build_data.py:42）。
+    上游日后修订历史值时：**旧行原样不动**，分歧另行记入 meta.revisions 公开，绝不悄悄覆盖。"""
+    if banked.empty:
+        return fresh.sort_index(), []
+    revisions = []
+    for d, old in banked.items():
+        if d in fresh.index:
+            new = float(fresh[d])
+            if abs(new - float(old)) > _REVISION_EPS:
+                revisions.append({"date": d.strftime("%Y-%m-%d"),
+                                  "as_recorded": round(float(old), 4),
+                                  "source_now": round(new, 4)})
+    added = fresh[~fresh.index.isin(banked.index)]
+    merged = pd.concat([banked, added]).sort_index()
+    if len(added):
+        print(f"  {label}: 存底 {len(banked)} 行 + 新增 {len(added)} 行 → {len(merged)} 行")
+    else:
+        print(f"  {label}: 存底 {len(banked)} 行，无新增（源末日 "
+              f"{fresh.index[-1].date() if not fresh.empty else '—'}）")
+    if revisions:
+        print(f"  ⚠️ {label}: 上游修订了 {len(revisions)} 个历史值，旧行保持原样，已记入 meta.revisions")
+    return merged, revisions
+
+
+def _banked_series(fname: str, date_key: str, val_key: str) -> pd.Series:
+    """从已发布的 JSON 取回本地存底序列。文件不存在/损坏 → 空序列（首次运行即为此）。"""
+    p = DATA / fname
+    if not p.exists():
+        return pd.Series(dtype=float)
+    try:
+        j = json.loads(p.read_text())
+        s = pd.Series(j[val_key], index=pd.to_datetime(j[date_key]))
+        return s.dropna().sort_index()
+    except Exception as e:
+        print(f"  ⚠️ {fname} 存底读取失败（{type(e).__name__}），本次不做只追加保护: {e}")
+        return pd.Series(dtype=float)
+
+
 def _roll_pctile(s: pd.Series, window: int, min_periods: int = 250) -> pd.Series:
     """滚动百分位：当前值在过去 window 交易日内的分位（0-1，高值=高分位=贵）。"""
     return s.rolling(window, min_periods=min_periods).apply(
@@ -815,13 +922,38 @@ def compute_leaps_index(vix1y, gspc, vix, vix9d, vix3m, vix6m, skew, dfii):
 
 
 def build_leaps_index(gspc_close: pd.Series, vix_close: pd.Series):
-    """恐惧的标价指数旗舰台账 → data/leaps_index.json（kindex.json 隔壁）。拉失败抛异常，留旧文件不覆盖。"""
+    """恐惧的标价指数旗舰台账 → data/leaps_gauge.json。
+
+    2026-07-19 起：VIX1Y 走「本地存底 + 只追加 + Yahoo 备胎」，源全挂也不丢历史、不覆盖旧行。
+    其余四条 Cboe 序列只用于 context 当前值快照（不入台账字段），故只做备胎不做存底。"""
     print("== 恐惧的标价指数（LEAPS 温度计）")
+    _SOURCE_TRACE.clear()
+
+    # 头条输入：存底优先、只追加。这是全站唯一在赚钱的读数，单独按最高规格保护。
+    banked = _banked_series("leaps_gauge.json", "dates", "vix1y")
+    vix1y, revisions = _merge_append_only(banked, _cboe_close_resilient("VIX1Y"), "VIX1Y")
+    if vix1y.empty:
+        raise RuntimeError("VIX1Y 三条路（Cboe / Yahoo / 本地存底）全空——绝不写出空台账，留旧文件")
+
     out = compute_leaps_index(
-        _cboe_close("VIX1Y"), gspc_close.dropna(), vix_close.dropna(),
-        _cboe_close("VIX9D"), _cboe_close("VIX3M"), _cboe_close("VIX6M"),
-        _cboe_close("SKEW"), _fred("DFII10", start="2003-01-01"),
+        vix1y, gspc_close.dropna(), vix_close.dropna(),
+        _cboe_close_resilient("VIX9D"), _cboe_close_resilient("VIX3M"),
+        _cboe_close_resilient("VIX6M"), _cboe_close_resilient("SKEW"),
+        _fred("DFII10", start="2003-01-01"),
     )
+
+    # 降级状态写进 meta：站上据此显示「数据源中断」，绝不白屏，也绝不假装数据是新鲜的
+    stale_days = (pd.Timestamp.utcnow().tz_localize(None).normalize() - vix1y.index[-1]).days
+    out["meta"]["sources"] = dict(_SOURCE_TRACE)
+    out["meta"]["headline_source"] = _SOURCE_TRACE.get("VIX1Y", "unknown")
+    out["meta"]["stale_days"] = int(stale_days)
+    # 4 天＝跨一个周末+一个假日的上限；与 make_card.sh 的新鲜度闸同阈值，两处口径别打架
+    out["meta"]["degraded"] = bool(_SOURCE_TRACE.get("VIX1Y") == "banked_only" or stale_days > 4)
+    if revisions:
+        out["meta"]["revisions"] = revisions        # 上游改了历史值：旧行不动，分歧公开在此
+    if out["meta"]["degraded"]:
+        print(f"  🔴 降级：headline_source={out['meta']['headline_source']} stale_days={stale_days}")
+
     write_json("leaps_gauge.json", out)
 
 
@@ -1674,6 +1806,24 @@ def build_cape():
         print(f"  CAPE unavailable this run (kept old file if any): {e}")
 
 
+# ---- 2026-07-19：非致命小节的失败必须留痕 ----
+# 2026-07-12→14 管线静默死 4 天，根因**不是**没有 try/except，是 except 里只 print——
+# print 进了 Actions 日志，而没有人每天读日志（「真洞=人不看」，见 HANDOFF §17.10）。
+# ∴ 失败除了打印，还要写进 data/meta.json，让 notify_discord 看得见、当天就吵。
+_FAILURES: list[dict] = []
+
+
+def _guard(label: str, fn, *args, **kwargs) -> bool:
+    """跑一个非致命小节：失败只留旧文件、不拖死主管线，但一定留痕。"""
+    try:
+        fn(*args, **kwargs)
+        return True
+    except Exception as e:
+        _FAILURES.append({"section": label, "error": f"{type(e).__name__}: {str(e)[:200]}"})
+        print(f"  ⚠️ {label} 失败（留旧文件）: {e}")
+        return False
+
+
 def main():
     print("fetching prices …")
     gspc = fetch_history("^GSPC")["Close"]
@@ -1687,38 +1837,14 @@ def main():
 
     build_kindex(ndx, gspc, vix)
     build_leaps(gspc, ndx, vix)
-    try:
-        build_sentiment(vix, vxn)
-    except Exception as e:
-        print(f"  情绪仪表盘失败（留旧文件）: {e}")
-    try:
-        build_naaim()
-    except Exception as e:
-        print(f"  NAAIM 失败（留旧文件）: {e}")
-    try:
-        build_leaps_index(gspc, vix)
-    except Exception as e:
-        print(f"  恐惧的标价指数失败（留旧文件）: {e}")
-    try:
-        build_vx_curve(vix)
-    except Exception as e:
-        print(f"  VX 期限结构失败（留旧文件）: {e}")
-    try:
-        build_cot_vix()
-    except Exception as e:
-        print(f"  COT 持仓失败（留旧文件）: {e}")
-    try:
-        build_vol_family(vix)
-    except Exception as e:
-        print(f"  波动率家族失败（留旧文件）: {e}")
-    try:
-        build_short_flow()      # 增量：日常只补 1 天；回填另用大 max_backfill 手动跑
-    except Exception as e:
-        print(f"  做空成交结构失败（留旧文件）: {e}")
-    try:
-        build_short_interest()   # 双月，滞后约 2 周；只追加、修订另注
-    except Exception as e:
-        print(f"  做空持仓失败（留旧文件）: {e}")
+    _guard("情绪仪表盘", build_sentiment, vix, vxn)
+    _guard("NAAIM", build_naaim)
+    _guard("恐惧的标价指数", build_leaps_index, gspc, vix)   # ← 唯一在赚钱的读数，失败必须吵
+    _guard("VX 期限结构", build_vx_curve, vix)
+    _guard("COT 持仓", build_cot_vix)
+    _guard("波动率家族", build_vol_family, vix)
+    _guard("做空成交结构", build_short_flow)   # 增量：日常只补 1 天；回填另用大 max_backfill 手动跑
+    _guard("做空持仓", build_short_interest)   # 双月，滞后约 2 周；只追加、修订另注
     build_index_val()
     build_macro()
     build_index_panels("sp500", gspc, vix, "VIX")
@@ -1739,8 +1865,14 @@ def main():
 
     write_json("meta.json", {
         "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "sources": "Yahoo Finance · CNN Fear & Greed (whit3rabbit archive) · multpl.com",
+        "sources": "Yahoo Finance · Cboe · FRED · FINRA · CFTC · CNN Fear & Greed · multpl.com",
+        # 非致命小节的失败清单：空 = 本次全绿。notify_discord 读这个字段决定要不要吵。
+        "failures": _FAILURES,
     })
+    if _FAILURES:
+        print(f"\n⚠️ 本次有 {len(_FAILURES)} 个小节失败（已写入 meta.json，告警器会响）：")
+        for f in _FAILURES:
+            print(f"   · {f['section']}: {f['error']}")
     print("done.")
 
 
