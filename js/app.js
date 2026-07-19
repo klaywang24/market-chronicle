@@ -1242,6 +1242,67 @@
         `<td class="${c.ret >= 0 ? "pos" : "neg"}">${(c.ret > 0 ? "+" : "") + c.ret}%</td><td>${c.days}</td></tr>`).join("");
   }
 
+  // 牛长熊短发散条形图（2026-07-19）：把「周期换挡」从表格改成一眼能看懂的图。
+  // 为什么必须对数压缩牛市：实测标普牛市最大 +582%、纳指 +787%，而熊市最深 −61.8%——
+  // 同一条线性轴上画，熊市会被压成几乎看不见的一条，而「熊有多深」恰恰是这张图的另一半信息。
+  // ∴ 牛市走 log10(1+ret) 压缩、熊市保持百分比原样，两种刻度并存但**每根柱都标真实涨跌幅**，
+  // 且卡片副标题明写这件事（口径透明＝诚实的一部分，不靠读者自己发现）。
+  const BULL_LOG_K = 65;   // 让最大牛市(+787%)的柱高≈最深熊市(−61.8%)，两侧视觉平衡
+  function bullBearChart(dsName) {
+    return async (p) => {
+      const d = await load(dsName);
+      const cs = d.cycles;
+      const plot = (c) => (c.kind === "bull"
+        ? Math.log10(1 + c.ret / 100) * BULL_LOG_K   // 牛：对数压缩
+        : c.ret);                                     // 熊：百分比原样（本身为负）
+      // ⚠️ tooltip 是函数型 formatter：它里面的中文 JSON.stringify(getOption()) 扫不到，
+      // 泄漏扫描必须执行 formatter 再看输出。∴ 逐段走 translate（同 app.js:2645 既有做法）。
+      const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
+      return {
+        tooltip: tip(p, {
+          axisPointer: { type: "shadow" },
+          formatter: (ps) => {
+            const c = cs[ps[0].dataIndex];
+            const kind = T(c.kind === "bull" ? "牛市" : "熊市");
+            const yrs = (c.days / 365).toFixed(1);
+            return `${c.start} → ${c.end || T("进行中")}<br/>${kind} `
+              + `<b>${(c.ret > 0 ? "+" : "") + c.ret}%</b><br/>`
+              + T(`历时 ${c.days} 天（${yrs} 年）`);
+          },
+        }),
+        grid: { left: 20, right: 20, top: 52, bottom: 46 },
+        // ⚠️ baseAxis(p) 必须放 Object.assign 的**前面**：它在后面会覆盖掉这里的 axisLabel。
+        //    2026-07-19 实测踩中——y 轴刻度因此照常显示，而这张图的 y 轴是合成刻度
+        //    （牛市对数压缩、熊市线性），标出来会被读成百分比，让人以为 +88% 的柱子"等于 20"。
+        //    合成刻度必须彻底隐藏，真实数字只出现在柱标签与 tooltip 里。
+        xAxis: Object.assign({}, baseAxis(p), {
+          type: "category",
+          data: cs.map((c) => c.start.slice(0, 4)),
+          axisLabel: { fontSize: 10, interval: "auto", color: p.muted },
+          splitLine: { show: false },
+        }),
+        yAxis: Object.assign({}, baseAxis(p), {
+          type: "value",
+          axisLabel: { show: false }, splitLine: { show: false },
+          axisLine: { show: false }, axisTick: { show: false },
+        }),
+        series: [{
+          type: "bar", barCategoryGap: "18%",
+          data: cs.map((c) => ({
+            value: plot(c),
+            itemStyle: { color: c.kind === "bull" ? p.moss : p.danger },
+            label: {
+              show: true,
+              position: c.kind === "bull" ? "top" : "bottom",
+              formatter: () => (c.ret > 0 ? "+" : "") + Math.round(c.ret) + "%",
+              fontSize: 9, color: p.muted, fontFamily: "JetBrains Mono",
+            },
+          })),
+        }],
+      };
+    };
+  }
+
   function dailyHistChart(dsName) {
     return async (p) => {
       const d = await load(dsName);
@@ -2419,6 +2480,7 @@
   chart("spy", "ch-spy-eps", simpleLine("sp500_eps_hist", "EPS(TTM)", "moss", { log: true }));
   chart("spy", "ch-spy-vol", volChart("sp500_volatility"));
   chart("spy", "ch-spy-season", seasonChart("sp500_seasonality"));
+  chart("spy", "ch-spy-bullbear", bullBearChart("sp500_bullbear"));
   chart("spy", "ch-spy-sectors", sectorChart("sp500_constituents"));
 
   chart("qqq", "ch-qqq-century", centuryChart(null, [
@@ -2433,6 +2495,7 @@
   chart("qqq", "ch-qqq-intra", intraChart("ndx_intrayear"));
   chart("qqq", "ch-qqq-vol", volChart("ndx_volatility"));
   chart("qqq", "ch-qqq-season", seasonChart("ndx_seasonality"));
+  chart("qqq", "ch-qqq-bullbear", bullBearChart("ndx_bullbear"));
   chart("qqq", "ch-qqq-sectors", sectorChart("ndx_constituents"));
 
   ["tech", "fin", "consumer", "luxury"].forEach((b) => {

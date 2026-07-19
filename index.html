@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260719z">
+<link rel="stylesheet" href="css/style.css?v=20260720b">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -203,7 +203,8 @@
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第五章</span><h2>周期换挡</h2></div>
     <p class="chapter-q">牛市走多久，熊市跌多深？</p>
-    <div class="card"><h3>牛熊周期（跌 20% 确认熊 · 涨 25% 确认牛）</h3><div class="sub">首段自数据起点截断</div><div class="table-wrap table-scroll"><table id="spy-bullbear-table"></table></div></div>
+    <div class="card"><h3>牛长熊短（跌 20% 确认熊 · 涨 25% 确认牛）</h3><div class="sub">上方牛市（对数压缩）· 下方熊市（百分比）· 标注均为真实涨跌幅</div><div class="chart" id="ch-spy-bullbear"></div></div>
+    <div class="card"><h3>逐段明细</h3><div class="sub">首段自数据起点截断</div><div class="table-wrap table-scroll"><table id="spy-bullbear-table"></table></div></div>
   </div>
 
   <div class="chapter">
@@ -312,7 +313,8 @@
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第五章</span><h2>周期换挡</h2></div>
     <p class="chapter-q">纳指的牛市更陡，熊市也更狠。</p>
-    <div class="card"><h3>牛熊周期（跌 20% 确认熊 · 涨 25% 确认牛）</h3><div class="sub">首段自数据起点截断</div><div class="table-wrap table-scroll"><table id="qqq-bullbear-table"></table></div></div>
+    <div class="card"><h3>牛长熊短（跌 20% 确认熊 · 涨 25% 确认牛）</h3><div class="sub">上方牛市（对数压缩）· 下方熊市（百分比）· 标注均为真实涨跌幅</div><div class="chart" id="ch-qqq-bullbear"></div></div>
+    <div class="card"><h3>逐段明细</h3><div class="sub">首段自数据起点截断</div><div class="table-wrap table-scroll"><table id="qqq-bullbear-table"></table></div></div>
   </div>
 
   <div class="chapter">
@@ -1029,9 +1031,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260719z"></script>
-<script src="js/app.js?v=20260719z"></script>
-<script src="js/docs-i18n.js?v=20260719z"></script>
+<script src="js/i18n.js?v=20260720b"></script>
+<script src="js/app.js?v=20260720b"></script>
+<script src="js/docs-i18n.js?v=20260720b"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。

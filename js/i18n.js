@@ -771,6 +771,12 @@
     "年度回报分桶 · 悬停查看每桶年份": ["Annual returns bucketed · hover for years", "Rendements par tranche · survolez pour les années", "Jahresrenditen in Klassen · Hover zeigt Jahre", "Rendimientos por tramos · pase el cursor"],
     "月频滚动窗口 · 正收益概率": ["Monthly rolling windows · probability of gain", "Fenêtres mensuelles glissantes · probabilité de gain", "Monatlich rollierend · Gewinnwahrscheinlichkeit", "Ventanas móviles mensuales · probabilidad de ganancia"],
     "首段自数据起点截断": ["First segment truncated at data start", "Premier segment tronqué au début des données", "Erstes Segment am Datenbeginn gekappt", "Primer tramo truncado al inicio de datos"],
+    // 牛长熊短发散条形图（2026-07-19）
+    "牛长熊短（跌 20% 确认熊 · 涨 25% 确认牛）": ["Bulls run long, bears run short (−20% confirms bear, +25% confirms bull)", "", "", ""],
+    "上方牛市（对数压缩）· 下方熊市（百分比）· 标注均为真实涨跌幅": ["Bulls above (log-compressed) · bears below (percentage) · every label is the real move", "", "", ""],
+    "逐段明细": ["Segment detail", "Détail par segment", "Segmentdetails", "Detalle por tramo"],
+    "牛市": ["Bull", "Marché haussier", "Bullenmarkt", "Mercado alcista"],
+    "熊市": ["Bear", "Marché baissier", "Bärenmarkt", "Mercado bajista"],
     "距前高的百分比距离（周频）": ["Percent below prior peak (weekly)", "Écart au sommet précédent (hebdo)", "Abstand zum Hoch in % (wöchentlich)", "Distancia al máximo previo (semanal)"],
     "几乎每一年都有回撤，多数年份仍收正": ["Nearly every year has a drawdown; most still close positive", "Presque chaque année connaît un repli ; la plupart finissent positives", "Fast jedes Jahr hat einen Drawdown; die meisten schließen positiv", "Casi todos los años hay caídas; la mayoría cierra en positivo"],
     "全历史（1871→）· 近 50 年 · 2010 年以来，三条虚线即三个\"回归锚\"": ["All history (1871→), last 50 years, and 2010→ — three dashed anchors of mean reversion", "Tout l'historique (1871→), 50 ans, 2010→ — trois ancres de retour à la moyenne", "Gesamthistorie (1871→), 50 Jahre, 2010→ — drei Anker der Rückkehr zum Mittel", "Todo el histórico (1871→), 50 años y 2010→: tres anclas de reversión a la media"],
@@ -948,6 +954,7 @@
     [/^今日 K 指数（(.+)）$/, ["KAPX Index today ($1)", "Indice KAPX aujourd'hui ($1)", "KAPX Index heute ($1)", "Índice KAPX hoy ($1)"]],
     [/^今日 CNN 恐贪（(.+)）$/, ["CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)"]],
     [/^即：比过去三年 (\d+)% 的交易日都贵$/, ["i.e. pricier than $1% of all trading days in the past three years", "", "", ""]],
+    [/^历时 (\d+) 天（([\d.]+) 年）$/, ["$1 days ($2 years)", "$1 jours ($2 ans)", "$1 Tage ($2 Jahre)", "$1 días ($2 años)"]],
     // 降级横幅（2026-07-19）：上游断供时显式说出来，绝不拿旧值假装新鲜
     [/^数据源中断：本页读数停在 (.+)（(\d+) 天前），等待上游恢复。历史台账完整未受影响。$/,
       ["Data feed interrupted: readings on this page stop at $1 ($2 days ago), awaiting upstream recovery. The historical ledger is complete and unaffected.",
