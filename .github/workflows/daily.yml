@@ -30,6 +30,12 @@ jobs:
       - name: verify ledger
         id: verify
         run: python scripts/verify_ledger.py
+      # 哈希链：让「这份数据确实是那天记的」十年后仍能被外人验证。
+      # 必须在 commit 之前跑——此刻 data/ 已是当日终稿，哈希算的就是随后被提交的那份字节。
+      # 🔑 链（而非独立每日哈希）的全部理由：独立哈希挡不住「事后偷偷删掉难看的那几天」，
+      #    剩下的照样验证通过；链把每天绑在前一天上，删任何一天其后 chain 全部对不上。
+      - name: anchor hashes
+        run: python scripts/anchor_hashes.py
       - name: commit data
         run: |
           git config user.name "klaywang24"
@@ -49,7 +55,8 @@ jobs:
             "https://github.com/${{ github.repository }}/commit/$SHA" \
             "https://chronicle.klay-wang.com/" \
             "https://chronicle.klay-wang.com/data/kindex.json" \
-            "https://chronicle.klay-wang.com/data/leaps_gauge.json"; do
+            "https://chronicle.klay-wang.com/data/leaps_gauge.json" \
+            "https://chronicle.klay-wang.com/data/ledger_hashes.jsonl"; do
             curl -sS -m 60 "https://web.archive.org/save/$u" -o /dev/null || true
             sleep 5
           done
