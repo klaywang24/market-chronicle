@@ -97,6 +97,89 @@
     }
   }
 
+  /* ---------------- 滚动揭示（2026-07-19） ----------------
+     🚨 三条安全约束，改这段前先读：
+     1) 内容默认可见（CSS 侧不给初始 opacity:0），只有这里确认 IO 可用后才加
+        <html>.rv-on。任何一环失败 → 没动画，而不是没内容。
+     2) 站上是 tab 路由，面板 display:none 时元素**零尺寸**，IO 不会把它们判为进入视口。
+        所以每次面板构建完必须重扫；且**读数卡（.stat 等）是 JS 动态生成的**，
+        一次性扫 DOM 会全部漏掉——用户点名要效果的那四处正好都是这种。
+     3) 一律交给 IO，不做「首屏直接就位」的捷径——见 rvScan 内注释（依赖布局已稳定，
+        而扫描时图表尚未渲染，该假设不成立）。 */
+  const RV_SEL = ".card, .stat, .senti-card, .ledger-card, .lg-ladder, .chapter-head";
+  const rvSeen = new WeakSet();
+  let rvArmed = false;
+
+  /* 点亮当前视口内（含下方一点余量）尚未点亮的元素。
+     ⚠️ 这里**不用 IntersectionObserver**。用过，踩了两个坑：
+       ① 隐藏面板里的元素 rect 全为 0，而 IO 会把「零面积且坐标在视口内」判为已进入
+          → 一观察就全亮；
+       ② 换成只观察非零尺寸元素后，IO 在本页结构下干脆不触发，实测视口内 3 张卡长期
+          停在 opacity:0 —— 正是最不能接受的「内容看不见」。
+     39 个元素逐个算 rect 的开销可以忽略，换来的是**行为完全可预测**。 */
+  function rvTick() {
+    if (!rvArmed) return;
+    const h = innerHeight;
+    document.querySelectorAll(".rv:not(.rv-in)").forEach((n) => {
+      const r = n.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < h * 0.94) n.classList.add("rv-in");
+    });
+  }
+
+  function rvInit() {
+    if (rvArmed) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    rvArmed = true;
+    document.documentElement.classList.add("rv-on");
+    /* ⚠️ 节流**不要用 requestAnimationFrame 做闸**。
+       第一版写的是 `if (raf) return; raf = requestAnimationFrame(...)`，
+       在不触发 rAF 的渲染上下文里 raf 永远保持真值 → 之后每一次滚动都被吞掉，
+       实测滚了 10800px 一张卡都没再点亮。（同一个坑昨夜在预览页的数字滚动上踩过一次。）
+       改用时间戳节流，不依赖任何回调是否被调度。 */
+    let last = 0;
+    const onScroll = () => {
+      const now = Date.now();
+      if (now - last < 80) return;
+      last = now;
+      rvScan();   // 顺带补扫：切面板/异步渲染出来的新卡片在这里也能接住
+      rvTick();
+    };
+    addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("resize", onScroll, { passive: true });
+    /* 兜底：绝不让内容因动画机制卡住而消失。
+       ⚠️ 第一版是「3 秒后无差别点亮全部」——那等于让揭示效果自己失效，
+       而且把我自己的验收也污染了：每次测到的都是兜底后的「全亮」，
+       连续三轮误判为「揭示没工作」，其实那三轮它一直是好的。 */
+    setTimeout(rvTick, 1200);
+    setTimeout(rvTick, 2600);
+
+    /* 卡片几乎全是**异步**渲染的（render* 先 fetch JSON 再插 DOM），比 activatePanel 晚得多，
+       所以不能只在面板激活时扫一次——实测那时扫到 0 个。
+       ⚠️ 也不要用「每 150ms 轮询面板 scrollHeight 判断布局是否稳定」那套：
+       读 scrollHeight 会**强制重排**，在这种上万像素、十几张图的页面上开销可观，
+       实测把浏览器拖到多次操作超时。
+       ∴ 用固定几个时点补扫（已扫过的靠 rvSeen 跳过，重复调用几乎零成本）。
+       扫描不能太早：太早时面板还塌缩着，整屏卡片都会落在首屏而被一次点亮。 */
+    [900, 1800, 3200].forEach((ms) => setTimeout(() => { rvScan(); rvTick(); }, ms));
+  }
+
+  function rvScan(scope) {
+    if (!rvArmed) return;
+    const root = scope || document;
+    root.querySelectorAll(RV_SEL).forEach((n) => {
+      if (rvSeen.has(n) || n.closest(".pulse-base")) return;  // pulse 头部已有 heroRise，不叠
+      const r = n.getBoundingClientRect();
+      /* 🚨 隐藏面板（display:none）里的元素 rect 全为 0。而 IntersectionObserver 会把
+         「零面积、坐标落在视口内」的目标判为 isIntersecting=true，一观察就立刻点亮——
+         实测因此 174 个元素在 1.4s 内全亮，滚动揭示形同虚设。
+         ∴ 零尺寸的**跳过且不记入 rvSeen**，等它所在面板显示后（activatePanel 会再扫）
+         再处理。这也顺带保证了不会给看不见的东西挂一堆观察器。 */
+      if (r.width === 0 && r.height === 0) return;
+      rvSeen.add(n);
+      n.classList.add("rv");
+    });
+  }
+
   const panelDone = new Set();
   async function activatePanel(name) {
     document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
@@ -109,6 +192,9 @@
     }
     // 切换显示后需要 resize（display:none 时初始化的尺寸不对）
     registry[name].forEach(({ elId }) => built.get(elId) && built.get(elId).resize());
+    rvInit();
+    // 切面板后补扫：延迟到图表画完再扫，否则面板还塌缩着，整屏卡片会被一次点亮
+    [700, 1600].forEach((ms) => setTimeout(() => { rvScan(); rvTick(); }, ms));
   }
 
   async function rebuildAll() {
@@ -2565,7 +2651,9 @@
     stampSources();
   }).catch(() => {});
   if (window.MC_I18N) {
-    MC_I18N.onChange(() => { rebuildAll(); renderPulse(); }); // 图表与头版随语言重建
+    // 切语言会重建图表与头版 → 产生全新 DOM 节点，必须重扫，否则新节点没有 .rv、
+    // 或有 .rv 却没人观察（旧 observer 只认旧节点），表现为切完语言整块不亮。
+    MC_I18N.onChange(() => { rebuildAll(); renderPulse(); rvScan(); });
     MC_I18N.ready.then(route);
   } else route();
 })();
