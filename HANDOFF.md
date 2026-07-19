@@ -1721,3 +1721,109 @@ auto（默认） 7%      pretty 10%      balance 49~77%
 
 我这边的流程也改：**改完立刻提交、再验收**。此前做完 169 处替换先去浏览器验了几分钟，
 那个窗口本身就是在制造误伤机会。
+
+---
+
+## §35 数据源许可审计 + 恐惧的标价断供保护 + 牛熊图（2026-07-19 夜～07-20 凌晨）
+
+起点是一句怀疑：另一 session 交接说「Cboe 条款禁止再分发」。查证后，事情比那句话大，
+也比那句话轻——**方向反了，重点也错了**。
+
+### 35.1 全站 14 个数据源许可普查（结论：真风险是运营的，不是法律的）
+
+| 源 | 喂什么 | 法律 | 运营 |
+|---|---|---|---|
+| Yahoo / yfinance | ~350 个文件（century/volatility/drawdowns/fund） | 低 | 🔴 高 |
+| CNN 恐贪 | K 指数的分子 | 中 | 🔴 高 |
+| Cboe | leaps_gauge / sentiment 期限结构 / vol_family / vx_curve | 低-中 | 低 |
+| FRED · FINRA · CFTC · Wikipedia | macro / 做空两份 / COT / 成分股 | 低（CFTC 为零） | 低 |
+| SSGA | SPY 前二十大持仓 | 🔴 明确禁止 | — |
+| stockanalysis · macrotrends · multpl · NAAIM · parqet | QQQ 持仓 / 基本面 / CAPE / 仓位 / logo | 中（未逐条核实） | 中 |
+
+**Cboe 条款属实**（`cboe.com/us_disclaimers`：*"...may not be modified, reverse-engineered,
+reproduced, or distributed... or stored in a database..."*），**但版权主张站不住**：
+**NYMEX v. IntercontinentalExchange, 497 F.3d 109 (2d Cir. 2007)** 认定**结算价不受版权保护**
+（合并原则：价格只能表达为数字，表达与思想合并）——正中我们用的 VX 结算价，且同一逻辑适用于
+按公开方法论算出的指数值。上游是 Feist（事实不受版权保护）。真正的效力来源是合同，
+而我们是 `curl` 一个公开 CSV、无登录无点击同意＝browsewrap，可执行性本就弱。
+⚠️ 非法律意见；若此线将来撑起收入大头或用于融资/授权，值得花几百美元买一页 IP 律师意见。
+
+**FRED 不是备用路**：VIXCLS 在 FRED 上标 `Copyrighted: Citation Required`，
+注明 *"Copyright, 2016, Chicago Board Options Exchange, Inc."*，只授 personal/non-commercial。
+两条路指向同一个 Cboe 主张。
+
+### 35.2 优先级被一句话翻转：赚钱的是恐惧的标价，不是 K 指数
+用户点破「K 指数不赚钱，恐惧的标价才赚钱」。而恐惧的标价的输入是 **VIX1Y，只有 Cboe 有**：
+- 实测 Yahoo `^VIX1Y` **日线与 Cboe 官方收盘逐日精确一致**（07-17 双方 23.82，差 0.0000）
+- ⚠️ 但 Yahoo 只给最近 **1 个交易日**（`period='max'` 直接报错 "must be one of: 1d, 5d"）
+- ⚠️ 小时线能给 5 天，**但末根与官方收盘差 0.01~0.07**（收在 4:15 结算前）＝不同口径，不可回补
+- 其余四条（VIX9D/VIX3M/VIX6M/SKEW）Yahoo 有全史，`^VIX9D` 行数与 Cboe 完全一致
+
+∴ 历史必须本地存底（4,909 天已在 git 全史＋哈希链＋Wayback 里，源关站也拿不走），
+每天真正要新增的只有一行；**备胎能救「今天」，救不了「漏掉的那天」**，所以漏跑必须能被发现。
+
+### 35.3 五个提交
+- `fbce856` **许可声明分家**：`_notice` 此前整句 `© Klay Wang`，而文件里装着 4,909 个 Cboe
+  原始值——对别人的事实主张版权、还在同一句里卖授权，与 `data/README.md` 自己写的
+  「这里没有任何一个数字是私有的」直接冲突。按「承诺与机制冲突时改机制不改承诺」改声明：
+  能授权的只有编排/衍生计算/台账结构。384 个 JSON 同步重写，**逐文件比对 HEAD，数据字段零变动**。
+- `22e4fed` **下线 SPY 前二十大持仓卡**（SSGA 是全站条款最硬的一条）。不找替代源：自算权重
+  需要全指数总市值当分母＝每天多 503 次 yfinance 调用，而降低 yfinance 依赖正是同批工作的目的。
+  且前二十大权重是 Google 一秒可查的 commodity。
+- `f8de78b` **断供保护 + 失败不再静默**（见 35.4）
+- `f59da8a` **牛熊周期改发散条形图**（见 35.5）
+- `baf3f77` **修 6 处存量英文态中文残留**（见 35.6）
+
+### 35.4 只追加 + 备胎 + 降级（`f8de78b`）
+`_banked_series` / `_cboe_close_resilient` / `_merge_append_only`：存底优先、只追加、
+上游修订时**旧行原样不动**、分歧记入 `meta.revisions` 公开
+＝ `data/README`「修订政策」**第一次由代码强制**（此前只写在文档里，而 leaps_gauge
+天天整份覆盖写，同 kindex 80 处分歧的根因）。三条路全空则抛异常留旧文件，绝不写空台账。
+
+🐛 **修订阈值 1e-9 会每天假报**：Yahoo 返回 float32（23.82 实际是 23.81999969482422，
+差 ~3e-7）。→ 改 `5e-4`（远高于噪声 2.4e-6、远低于真修订 0.01）。
+**这个站的信誉全押在修订记录可信上，假报比不报严重得多。**
+
+失败留痕：`_guard()` 把 main() 里 8 个非致命小节的失败写进 `meta.json.failures`。
+2026-07-12→14 静默死 4 天的根因**不是**没有 try/except，是 **except 里只 print——
+print 进了 Actions 日志而没有人每天读日志**。notify_discord 新增两类告警
+（小节失败清单／恐惧的标价降级·走备胎·上游修订）。站上加 `.lg-degraded` 横幅：
+明说「数据源中断，读数停在 X（N 天前）」，不白屏也不拿旧值假装新鲜。
+
+### 35.5 牛长熊短（`f59da8a`）
+表格看不出这一章要说的事，改发散条形图：牛市向上（对数压缩 log10(1+ret)×65）、
+熊市向下（百分比原样），**每根柱标真实涨跌幅**，副标题明写两种刻度并存。
+表格保留为「逐段明细」放图下方——图给直觉，表给可查的账。
+🐛 `Object.assign(自定义, baseAxis(p))` 顺序反了，`baseAxis` 覆盖掉 `axisLabel:{show:false}`，
+y 轴照常显示 0/20/40/60/80——**合成刻度标出来会被读成百分比，让人以为 +88% 的柱子「等于 20」**。
+
+### 35.6 🔬 量尺又漏了一整类：`JSON.stringify` 丢弃函数
+2026-07-18 那次「全域 17 面板 × 三层、EN 零残留」的第三层用
+`JSON.stringify(getOption())` 扫图表配置，而 **`JSON.stringify` 会直接丢弃函数值**——
+`formatter` 是函数，它的函数体**从来没有进入过扫描视野**。
+本次加第四层「**执行 formatter 再看输出**」，当场抓到 6 处存量泄漏：
+`ch-vol-family`/`ch-short-flow` 的「NN 分位」、`ch-spy-dist`/`ch-qqq-dist` 的「N 年」、
+`ch-spy-holding`/`ch-qqq-holding` 的「持有 N 年／胜率 N%／年化中位…」。
+
+**三层不够，四层才够。而三层给出的是「零残留」这种看起来最让人放心的结论。**
+
+复扫验收：10 主面板 × 四层 = 0，7 个页脚静态页 = 0。
+唯一排除项＝英文版刻意保留的字源汉字「kǒng (恐)」与双语规范名。
+
+### 35.7 留给用户的三件事（我没动）
+1. **哈希链有覆盖缺口**：`short_interest.json` 在 `verify_ledger` TARGETS 里、
+   **却不在 `anchor_hashes` TRACKED 里**（07-18 新增时漏注册）。往链里加文件是单向门
+   （本文档自己写死「TRACKED 加文件只往后加、改口径＝另起新链」），故留给用户决定。
+2. **`notify_discord.py:11` 的 `SITE` 仍是 `klaywang24.github.io`**（还活着但非 canonical），
+   每日推送的链接都指向它。一行的事，但不在今晚的清单里。
+3. **Kaggle / Hugging Face 上的 KAPX 数据集标的是 CC BY 4.0**——那是衍生读数（K=CNN÷VIX），
+   比原始值站得住，但与今晚改的 `_notice` 口径值得对齐一次。
+
+### 35.8 待办（用户已选、明天做）
+新增三个功能：**行业暴露（按权重）**（`SPY.funds_data.sector_weightings`，实测 **1 次调用**
+就给全 11 个行业、合计 100.01%）／**七巨头自编指数**（tech 篮子里七只全在，**零新数据源**）／
+**AIAE 仓位**（公式 = 股票市值 ÷（股票市值 + 五类借款人负债），源全在 FRED Z.1，
+⚠️ 本机代理连不上 FRED 故 series ID **未实测**；⚠️ 必须扔掉 `implied_10y_forecast` 字段，
+它撞「永不预测方向」红线）。
+**「标普500 牛熊周期」本站早已有**（第五章），本轮已换成对方那种更直观的图。
+兴登堡预兆**永不做**（崩盘预测信号，撞两条红线）。
