@@ -802,7 +802,7 @@
     "NVDA / MSFT / GOOGL / AMZN / META / AAPL / TSLA 等权、每日再平衡，自 Meta 2012 上市同一起跑线；墨色粗线为指数，图例括号内为各自总倍数。": ["NVDA / MSFT / GOOGL / AMZN / META / AAPL / TSLA, equal-weighted and rebalanced daily, from Meta's 2012 IPO as the common start; the ink line is the index, and each legend entry's bracket shows its total multiple.", "", "", ""],
     // AIAE 全社会股票配置（2026-07-20）
     "全社会股票配置（AIAE · 1945 年至今 · 季频）": ["Aggregate equity allocation (AIAE · since 1945 · quarterly)", "", "", ""],
-    "所有投资者手里，股票占「股票+债务」的比例：越高，全社会越把钱压在股票上。数据来自美联储资金流量表（Z.1）。这是 NAAIM 的慢镜头——一个是专业管理人这周的仓位，一个是整个社会几十年的配置。只报位置、不测方向。": ["Across all investors, the share of equities within equities+debt: the higher it is, the more of society's money sits in stocks. Data from the Federal Reserve Flow of Funds (Z.1). This is NAAIM in slow motion — one is professional managers' stance this week, the other is society's allocation across decades. Position only, no direction called.", "", "", ""],
+    "所有投资者手里，股票占「股票+债务」的比例：越高，全社会越把钱压在股票上。数据来自美联储资金流量表（Z.1）。这是 NAAIM 的慢镜头：一个是专业管理人这周的仓位，一个是整个社会几十年的配置。只报位置、不测方向。": ["Across all investors, the share of equities within equities+debt: the higher it is, the more of society's money sits in stocks. Data from the Federal Reserve Flow of Funds (Z.1). This is NAAIM in slow motion — one is professional managers' stance this week, the other is society's allocation across decades. Position only, no direction called.", "", "", ""],
     "全社会股票配置": ["Aggregate equity allocation", "Allocation actions agrégée", "Aggregierte Aktienallokation", "Asignación agregada a renta variable"],
     "历史中位": ["median", "médiane", "Median", "mediana"],
     "数据核对中": ["Data being verified", "Vérification des données", "Daten werden geprüft", "Verificando datos"],
