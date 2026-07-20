@@ -823,6 +823,36 @@ def _merge_append_only(banked: pd.Series, fresh: pd.Series, label: str):
     return merged, revisions
 
 
+# 对账阈值：Cboe 与 Yahoo 都发官方 VIX1Y，实测同日逐字节一致（07-17 差 0.0000）。
+# 用 0.10 抓「Cboe 悄悄给了错数」（陈旧值=昨天的、或损坏值，都会偏 ≥0.1），
+# 同时容忍两源极小的取整差。比修订阈值 5e-4 宽得多——那是同源浮点噪声，这是跨源比对。
+_RECONCILE_EPS = 0.10
+
+
+def _reconcile_vix1y(series: pd.Series):
+    """交叉验证：Cboe 正常时**额外**拉一次 Yahoo，比最新共有交易日的值。
+    抓的是「Cboe 没报错、但数字悄悄错了」——只报错的备胎盖不住这种。
+    返回 None（一致/无法比较）或 dict（分歧详情，写进 meta 让告警器响）。
+    这是给运营者的内部核查，不上站横幅：两源不一致时并不知道哪个对。"""
+    try:
+        y = _yahoo_close("^VIX1Y")
+        if y.empty or series.empty:
+            return None
+        common = series.index.intersection(y.index)
+        if len(common) == 0:
+            return None
+        d = common.max()
+        cv, yv = float(series[d]), float(y[d])
+        if abs(cv - yv) > _RECONCILE_EPS:
+            print(f"  🟠 对账分歧 {d.date()}：Cboe {cv} vs Yahoo {yv}（差 {round(cv - yv, 4)}）")
+            return {"date": d.strftime("%Y-%m-%d"), "cboe": round(cv, 4),
+                    "yahoo": round(yv, 4), "diff": round(cv - yv, 4)}
+        print(f"  ✅ 对账一致 {d.date()}：Cboe 与 Yahoo 差 {round(abs(cv - yv), 4)}")
+    except Exception as e:
+        print(f"  对账跳过（{type(e).__name__}）: {e}")
+    return None
+
+
 def _banked_series(fname: str, date_key: str, val_key: str) -> pd.Series:
     """从已发布的 JSON 取回本地存底序列。文件不存在/损坏 → 空序列（首次运行即为此）。"""
     p = DATA / fname
@@ -953,6 +983,14 @@ def build_leaps_index(gspc_close: pd.Series, vix_close: pd.Series):
         out["meta"]["revisions"] = revisions        # 上游改了历史值：旧行不动，分歧公开在此
     if out["meta"]["degraded"]:
         print(f"  🔴 降级：headline_source={out['meta']['headline_source']} stale_days={stale_days}")
+
+    # 每日对账（2026-07-20）：只在源=Cboe 时做——已经走了 Yahoo 备胎就没有独立第二源可比。
+    # 抓「Cboe 没报错但数字悄悄错了」，只报错的备胎盖不住这种。分歧写进 meta 让告警器响，
+    # 不设站上横幅（两源不一致时不知道哪个对，是给运营者查的内部信号，不是给读者的状态）。
+    if _SOURCE_TRACE.get("VIX1Y") == "cboe":
+        rec = _reconcile_vix1y(vix1y)
+        if rec:
+            out["meta"]["reconcile_warning"] = rec
 
     write_json("leaps_gauge.json", out)
 

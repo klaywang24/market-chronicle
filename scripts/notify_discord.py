@@ -121,6 +121,13 @@ def main():
               "Cboe 主源这次没拉到，已自动切 Yahoo（口径实测一致，读数可信）。\n"
               "但备胎只有最近 1 个交易日、没有缓冲：**若管线漏跑一天，那天补不回来**。\n"
               f"请查 Cboe 侧是否恢复。日志：{run_url}")
+    if lg_meta.get("reconcile_warning"):
+        rw = lg_meta["reconcile_warning"]
+        alert(url, "🟠 恐惧的标价：Cboe 与 Yahoo 对不上",
+              f'{rw.get("date")} 当天 Cboe=**{rw.get("cboe")}** vs Yahoo=**{rw.get("yahoo")}**'
+              f'（差 {rw.get("diff")}）。\n两源本应一致，对不上意味着**其中一个可能给了错数**——'
+              "Cboe 没报错所以备胎没触发，需人工判断哪个对。\n"
+              f"日志：{run_url}")
     if lg_meta.get("revisions"):
         n = len(lg_meta["revisions"])
         alert(url, f"🟠 恐惧的标价：上游修订了 {n} 个历史值",
