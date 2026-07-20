@@ -1657,6 +1657,18 @@ def build_aiae():
     print("== AIAE 全社会股票配置")
     eq = pd.DataFrame({s: _fred(s, start="1945-01-01") for s in AIAE_EQUITY})
     dt = pd.DataFrame({s: _fred(s, start="1945-01-01") for s in AIAE_DEBT})
+    # 🔬 debug（2026-07-20 首跑 sane_check 失败，值 0.0011 差 ~1000 倍）：把每个序列最新值
+    #    打出来，看谁的单位跟假设不符（股票假设百万、债务假设十亿）。定位后删掉这段。
+    _dbg = {}
+    for col in eq.columns:
+        s = eq[col].dropna()
+        _dbg[col] = {"latest": round(float(s.iloc[-1]), 1), "assumed_unit": "millions"} if len(s) else None
+    for col in dt.columns:
+        s = dt[col].dropna()
+        _dbg[col] = {"latest": round(float(s.iloc[-1]), 1), "assumed_unit": "billions"} if len(s) else None
+    print("  🔬 各序列最新值：")
+    for k, v in _dbg.items():
+        print(f"     {k}: {v}")
     aiae = compute_aiae(eq, dt)
     if aiae.empty:
         raise RuntimeError("AIAE 空序列——绝不写空台账，留旧文件")
@@ -1676,6 +1688,7 @@ def build_aiae():
             "current_value": round(cur, 4),
             "current_pctile_full": pct_full,
             "asof": aiae.index[-1].strftime("%Y-%m-%d"),
+            "_debug": _dbg,              # 临时：各序列最新值+假设单位，定位单位错后删
         },
         "dates": [d.strftime("%Y-%m-%d") for d in aiae.index],
         "aiae": [round(float(v), 4) for v in aiae.values],
