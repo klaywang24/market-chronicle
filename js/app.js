@@ -1317,36 +1317,32 @@
         ? Math.log10(1 + r) * BULL_LOG_K   // 牛：累计涨幅对数压缩，向上
         : r * 100);                         // 熊：累计跌幅百分比原样，向下（r<0）
 
-      // ⭐ 关键：x 轴**按段等宽**，不按真实时间。每段占一个固定单位宽度 [si, si+1]，
-      // 段内的点按进度 0→1 均分在这个单位里。这样 1929 那几个短命熊市和 2020 的疫情熊
-      // 在轴上宽度相同、不会被时间压成红钢针——参考图正是这么做的（牺牲「时间比例」，
-      // 换「每段都看得清」）。x 轴标签改成标注段的年份，不再是连续年代。
-      const bullLine = [], bearLine = [], areas = [], marks = [];
-      let si = 0;                            // 段序号（= x 单位）
-      const xTicks = [];                     // {x, year} 给 x 轴离散标签
+      // ⭐ x 轴 = 真实时间（月），宽度正比于持续时间：长牛市宽、短熊市窄——
+      // 参考图正是这样（牛市是宽绿山、熊市是窄红尖）。x = 距全史起点的月数（含日内小数）。
+      const ym2abs = (s) => { const [y, m] = s.split("-").map(Number); return y * 12 + (m - 1); };
+      const gAbs = ym2abs(px.dates[0]);
+      const xOf = (s) => { const [y, m, dd] = s.split("-").map(Number); return (y * 12 + (m - 1)) - gAbs + ((dd || 1) - 1) / 30.44; };
+      const bullLine = [], bearLine = [], marks = [], segRanges = [];
       cs.forEach((c) => {
         const endDate = c.end || px.dates[px.dates.length - 1];
         // 切出本段的采样序列（月线优先，短段退日线）
         const { dates: seg, map: segMap } = segDatesOf(c.start, endDate);
-        if (seg.length < 2) { si++; return; }
+        if (seg.length < 2) return;
         const base = segMap[seg[0]];
         const tgt = c.kind === "bull" ? bullLine : bearLine;
         const other = c.kind === "bull" ? bearLine : bullLine;
-        const n = seg.length - 1;
-        let extreme = { y: 0, gx: si, r: 0 };
-        seg.forEach((dt, k) => {
-          const gx = si + k / n;              // 段内进度 0→1，映射到 [si, si+1]
+        let extreme = { y: 0, gx: xOf(seg[0]), r: 0 };
+        seg.forEach((dt) => {
+          const gx = xOf(dt);                 // 真实时间：距起点月数
           const r = segMap[dt] / base - 1;    // 累计涨跌（相对本段起点）
           const y = yPlot(c.kind, r);
           tgt.push([gx, y]);
           other.push([gx, null]);            // 对方 series 在这段留空
-          areas.push({ x: gx, y, kind: c.kind });
           if (Math.abs(y) >= Math.abs(extreme.y)) extreme = { y, gx, r };
         });
-        bullLine.push([si + 1, null]); bearLine.push([si + 1, null]);  // 段间断开
-        // 每隔几段放一个年份刻度（避免 x 轴太挤）
-        if (si % 4 === 0) xTicks.push({ x: si, year: c.start.slice(0, 4) });
-        si++;
+        const xEnd = xOf(endDate);
+        segRanges.push({ x0: xOf(seg[0]), x1: xEnd, kind: c.kind });
+        bullLine.push([xEnd + 0.01, null]); bearLine.push([xEnd + 0.01, null]);  // 段间断开
         // 标注只给「够大的段」：小段曲线照画、但不加文字，否则 50 个三行标注糊成一团。
         // 阈值取 |ret|>=33%（让 2020 疫情熊 −34%/33天 这种标志性短熊也进来）或 >=1 年。
         if (c.days < 365 && Math.abs(c.ret) < 33) return;
@@ -1356,12 +1352,28 @@
         const annYr = Math.round(((1 + c.ret / 100) ** (1 / Math.max(yrsExact, 0.25)) - 1) * 100);
         marks.push({
           coord: [extreme.gx, extreme.y],
-          kind: c.kind,
+          kind: c.kind, x: extreme.gx, absRet: Math.abs(c.ret),
           l1: `${c.start.slice(0, 4)}.${c.start.slice(5, 7)}`,
           l2: `${months}m · ${annPct > 0 ? "+" : ""}${annPct}%`,
           l3: `${annYr > 0 ? "+" : ""}${annYr}%/yr`,
         });
       });
+
+      // 最小间距去重：同色标注若 x 挨得太近（早期大萧条一段十年八个周期），
+      // 只留较大的那个——但 |ret|>=50% 的重大事件永远保留（1929/1987/2008…）。
+      const declutter = (ms) => {
+        const sorted = ms.slice().sort((a, b) => a.x - b.x);
+        const kept = [];
+        const MIN_GAP = 42;   // 月：约 3.5 年，够放下三行标注不打架
+        for (const m of sorted) {
+          const near = kept.find((k) => Math.abs(k.x - m.x) < MIN_GAP);
+          if (!near) { kept.push(m); continue; }
+          if (m.absRet >= 50 && m.absRet > near.absRet) {   // 重大事件挤掉较小的邻居
+            kept[kept.indexOf(near)] = m;
+          }
+        }
+        return kept;
+      };
 
       // 牛熊分色：用两条独立 line（牛一条、熊一条），互相在对方的段上填 null。
       // ⚠️ 不用 visualMap piecewise 分色——本版 ECharts 对上万点的 line 配 piecewise
@@ -1369,8 +1381,8 @@
       //    2026-07-20 逐项二分实测确认是 visualMap 单独致命，与 null 断点无关。
       //    两条 series 各带 markPoint（分开就不会跨段反查 coord 崩）。
       const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
-      const bullMarks = marks.filter((m) => m.kind === "bull");
-      const bearMarks = marks.filter((m) => m.kind === "bear");
+      const bullMarks = declutter(marks.filter((m) => m.kind === "bull"));
+      const bearMarks = declutter(marks.filter((m) => m.kind === "bear"));
       const mkSeries = (data, color, ms, pos) => ({
         type: "line", data, showSymbol: false, connectNulls: false,
         lineStyle: { color, width: 1.4 }, areaStyle: { color, opacity: 0.13 },
@@ -1385,24 +1397,27 @@
           })),
         },
       });
-      // x 轴按段等宽，用离散年份刻度（每 4 段一个），tooltip 按段序号判牛熊
-      const kindBySeg = cs.map((c) => c.kind);
+      // tooltip 按真实 x（月数）落在哪一段判牛熊；x 轴按真实时间标年份
+      const gEnd = px.dates[px.dates.length - 1];
+      const xMax = xOf(gEnd);
+      const startYear = +px.dates[0].slice(0, 4);
+      const step = (+gEnd.slice(0, 4) - startYear) > 60 ? 16 : 8;  // 长史每 16 年一个刻度
       return {
         tooltip: tip(p, {
           trigger: "axis",
           formatter: (ps) => {
-            const seg = Math.floor(ps[0].data[0]);
-            const k = kindBySeg[seg];
-            return k ? T(k === "bull" ? "牛市" : "熊市") : "";
+            const x = ps[0].data[0];
+            const seg = segRanges.find((s) => x >= s.x0 && x <= s.x1);
+            return seg ? T(seg.kind === "bull" ? "牛市" : "熊市") : "";
           },
         }),
         grid: { left: 46, right: 20, top: 40, bottom: 64 },
         xAxis: Object.assign({}, baseAxis(p), {
-          type: "value", min: 0, max: si,
-          interval: null,
+          type: "value", min: 0, max: xMax,
+          interval: step * 12,            // 每 step 年一个刻度（月数）
           axisLabel: {
             color: p.muted, fontSize: 10,
-            formatter: (v) => { const t = xTicks.find((z) => z.x === Math.round(v)); return t ? t.year : ""; },
+            formatter: (v) => String(Math.round(startYear + v / 12)),
           },
           splitLine: { show: false },
         }),
@@ -1490,26 +1505,36 @@
     };
   }
 
-  // 行业暴露（按权重）：与「按家数」互补——家数看分布，权重看集中度。
-  // 头部行业加深色（>=25% 猩红提示集中），其余绿；每条标真实权重。
+  // 行业暴露（按权重）：环形图，一眼看出集中度。头部行业（≥25%）猩红、其余按大小
+  // 由深到浅的绿；中心留空放「头部行业 + 占比」。饼图读准确值不如横条，但看「一家独大」更直观。
   function sectorWeightChart(dsName) {
     return async (p) => {
       const d = await load(dsName);
-      const s = d.rows.slice().reverse();   // 横条从下往上升序 → 顶部最大
       const T = (x) => (window.MC_I18N ? MC_I18N.translate(x) : x);
+      const rows = d.rows.slice().sort((a, b) => b.weight - a.weight);
+      const top = rows[0];
+      // 绿色梯度：最大的深、往后渐浅；≥25% 的头部用猩红
+      const greens = ["#1f7a4d", "#2e9d63", "#43b878", "#6cc796", "#96d6b4", "#bfe4d1", "#d8eee2"];
       return {
-        tooltip: tip(p, { axisPointer: { type: "shadow" },
-          valueFormatter: (v) => (v == null ? "--" : v + "%") }),
-        grid: { left: 96, right: 52, top: 10, bottom: 28 },
-        xAxis: Object.assign({}, baseAxis(p), { type: "value", name: T("权重 %"), max: (v) => Math.ceil(v.max / 10) * 10 }),
-        yAxis: Object.assign({}, baseAxis(p), { type: "category", data: s.map((x) => x.name),
-          splitLine: { show: false }, axisLabel: { color: p.inkSoft, fontSize: 11 } }),
+        tooltip: tip(p, { trigger: "item",
+          formatter: (o) => `${o.name}<br/><b>${o.value}%</b>` }),
+        // 图例底部两行；环形图正中，中心文字用 left:"center" 真正水平居中（跟居中的环对齐）
+        legend: { bottom: 0, left: "center", orient: "horizontal", itemWidth: 10, itemHeight: 10,
+          textStyle: { color: p.inkSoft, fontSize: 10 },
+          formatter: (name) => { const r = rows.find((x) => x.name === name || T(x.name) === name); return r ? `${name} ${r.weight}%` : name; } },
+        graphic: [{ type: "text", left: "center", top: "38%", style: {
+          text: `{big|${top.weight}%}\n{small|${T(top.name)}}`,
+          textAlign: "center",
+          rich: {
+            big: { fontSize: 22, fontWeight: 700, lineHeight: 26, fill: top.weight >= 25 ? p.danger : p.ink },
+            small: { fontSize: 10, lineHeight: 15, fill: p.muted },
+          },
+        } }],
         series: [{
-          type: "bar", barCategoryGap: "28%",
-          data: s.map((x) => ({ value: x.weight,
-            itemStyle: { color: x.weight >= 25 ? p.danger : p.moss } })),
-          label: { show: true, position: "right", color: p.muted,
-            fontFamily: "JetBrains Mono", fontSize: 11, formatter: (o) => o.value + "%" },
+          type: "pie", radius: ["40%", "62%"], center: ["50%", "44%"],
+          avoidLabelOverlap: true, label: { show: false }, labelLine: { show: false },
+          data: rows.map((x, i) => ({ name: x.name, value: x.weight,
+            itemStyle: { color: x.weight >= 25 ? p.danger : greens[Math.min(i, greens.length - 1)] } })),
         }],
       };
     };
