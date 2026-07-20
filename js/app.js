@@ -2039,6 +2039,41 @@
     };
   });
 
+  // 宏观 · 仓位与杠杆：AIAE 全社会股票配置（季频，1945→）
+  chart("macro", "ch-aiae", async (p) => {
+    const d = await load("aiae");
+    const m = d.meta || {};
+    const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
+    // 🔒 sane_check 守卫：值落合理区间外（如首跑 0.0011 单位错）不画数值，显式说「核对中」。
+    //    belt-and-suspenders——即便将来某次 CI 出坏数据，前端也绝不显示错的 AIAE。
+    if (m.sane_check === false || !d.aiae || !d.aiae.length) {
+      return { graphic: [{ type: "text", left: "center", top: "middle", style: {
+        text: T("数据核对中"), fill: p.muted, fontSize: 13, textAlign: "center" } }] };
+    }
+    const pts = zip(d.dates, d.aiae).map(([x, v]) => [x, +(v * 100).toFixed(1)]);   // 0.53 → 53%
+    const vals = d.aiae.map((v) => v * 100).slice().sort((a, b) => a - b);
+    const med = vals[Math.floor(vals.length / 2)];
+    return {
+      tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(1) + "%") }),
+      grid: { left: 46, right: 56, top: 24, bottom: 60 },
+      dataZoom: ledgerZoom(p),
+      xAxis: timeX(p),
+      yAxis: Object.assign({ type: "value", axisLabel: { formatter: "{value}%" } }, baseAxis(p)),
+      series: [{
+        name: T("全社会股票配置"), type: "line", data: pts, showSymbol: false,
+        lineStyle: { color: p.accent, width: 1.6 }, itemStyle: { color: p.accent },
+        endLabel: { show: true, formatter: (o) => (+o.value[1]).toFixed(0) + "%",
+          fontFamily: "JetBrains Mono", fontSize: 11, color: p.accent },
+        markLine: { silent: true, symbol: "none",
+          lineStyle: { color: p.muted, type: "dashed", width: 1 },
+          // 标签放左侧：右侧要留给末值 endLabel，且右边距窄会被切
+          label: { position: "insideStartTop", color: p.muted, fontFamily: "JetBrains Mono",
+            fontSize: 10, formatter: T("历史中位") + " " + med.toFixed(0) + "%" },
+          data: [{ yAxis: med }] },
+      }],
+    };
+  });
+
   // K / LEAPS 页注册台账图表（带缩放的完整版；头版是紧凑钩子）
   chart("kindex", "ch-k-map", buildKMap);
   chart("kindex", "ch-k-eq", buildKEq);
