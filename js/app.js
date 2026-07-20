@@ -533,9 +533,21 @@
   const CN_NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五"];
 
   function renumberChapters(scope) {
-    [...scope.querySelectorAll(".chapter")].forEach((ch, i) => {
+    // 2026-07-20：只重排「第N章」式标签；HTML 里精心写的描述性标签（口径实验室/当前横截面/
+    // 单票下钻/历史参照…，多为分节内小标题，信息量远大于「第N章」）必须保留，别拍平。
+    // renumber 每次 buildToc 都跑、首次就覆盖原文，故首次把原标签缓存进 dataset 再据此判定。
+    // 输出走 translate 以匹配当前语言（自定义标签都有 i18n D 键）。
+    const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
+    let n = 0;
+    [...scope.querySelectorAll(".chapter")].forEach((ch) => {
       const no = ch.querySelector(".chapter-no");
-      if (no) no.textContent = "第" + (CN_NUM[i] || i + 1) + "章";
+      if (!no) return;
+      if (no.dataset.orig === undefined) no.dataset.orig = no.textContent.trim();
+      const orig = no.dataset.orig;
+      // 「第N章」与**空号**都按出现次序连续编号（空号如 spy「估值的弹性」子节，保持老行为不回归）；
+      // 只有**非空的自定义描述性标签**（口径实验室/当前横截面…，作者故意写、有 i18n 键）才保留。
+      if (/^第.+章$/.test(orig) || orig === "") { n += 1; no.textContent = T("第" + (CN_NUM[n - 1] || n) + "章"); }
+      else no.textContent = T(orig);
     });
   }
 

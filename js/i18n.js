@@ -341,6 +341,7 @@
     "10 年期": ["10-year", "", "", ""],
     "4 context 只展示，不平均进头条": ["4 context readings shown only — never averaged into the headline", "", "", ""],
     "历史参照 · 逐次对账": ["Historical reference · reconciliation", "", "", ""],
+    "历史参照 · 保费": ["Historical reference · the premium", "", "", ""],
     "短端平静、长端（LEAPS 所在）结构性最贵": ["near end calm; the long end (where LEAPS live) is structurally priciest", "", "", ""],
     "VIX1Y − 1 年已实现波动率（vol 点）": ["VIX1Y − 1-year realized volatility (vol points)", "", "", ""],
     "今天买长期期权（LEAPS，12–18 个月）在历史上算贵还是便宜？头条 = 1 年期市场波动率（VIX1Y）在过去 3 年的百分位：把三年里的每个交易日按贵贱排成一队，看今天排第几位，越高越贵。它只描述成本，不预测方向、不构成买卖建议：像油价牌告诉你今天油贵不贵，但不替你决定要不要开车。": ["Is buying long-dated options (LEAPS, 12–18 months) historically expensive or cheap today? The headline is the percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years — line up every trading day of the past three years from cheap to dear and see where today stands — higher = pricier. It describes cost only, not direction, and is not advice — like a fuel-price sign telling you whether gas is dear today, without deciding whether you should drive.", "", "", ""],
