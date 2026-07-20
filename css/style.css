@@ -844,6 +844,19 @@ td.left-col { text-align: left; }
   max-width: 1180px;
   margin: 40px auto 0;
 }
+/* 桌面：页脚与正文同一左缩进，否则页脚居中(margin:auto)时左缘会滑到固定目录(.toc)
+   底下重叠（2026-07-20 用户指出）。⚠️ 本块必须放在上面 base .site-footer 之后——
+   base 的 `margin:auto` 简写在源码里靠后，同优先级会覆盖任何靠前的 margin-left 覆盖。 */
+@media (min-width: 1280px) {
+  .site-footer {
+    max-width: none;
+    margin-left: max(214px, calc((100vw - 1180px) / 2));
+    margin-right: max(24px, calc((100vw - 1180px) / 2));
+  }
+  html:not([lang^="zh"]) .site-footer {
+    margin-left: max(254px, calc((100vw - 1180px) / 2));
+  }
+}
 .footer-cols {
   display: flex;
   justify-content: space-between;

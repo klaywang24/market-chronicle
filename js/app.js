@@ -1543,19 +1543,7 @@
   const tblLogo = (ticker) =>
     `<img class="tbl-logo" loading="lazy" data-t="${ticker}" src="logos/${safeTicker(ticker)}.png" referrerpolicy="no-referrer" onerror="__logoErr(this)" alt="">`;
 
-  async function renderTopTable(dsName, tableId) {
-    const d = await load(dsName);
-    const tbl = document.getElementById(tableId);
-    tbl.innerHTML =
-      '<tr><th>#</th><th>代码</th><th class="left center-col">公司</th><th class="left center-col">行业</th><th>市值 ($B)</th><th>权重</th></tr>' +
-      d.rows.map((r, i) =>
-        `<tr><td>${i + 1}</td><td>${r.ticker}</td>` +
-        `<td class="center-col"><span class="co-wrap">${tblLogo(r.ticker)}${r.name}</span></td>` +
-        `<td class="center-col" style="font-family:'Noto Sans SC',sans-serif">${r.sector || "--"}</td>` +
-        `<td>${r.mcap ? Math.round(r.mcap).toLocaleString("en-US") : "--"}</td>` +
-        `<td class="k-min">${r.weight.toFixed(2)}%</td></tr>`).join("") +
-      (d.asof ? `<tr><td colspan="6" style="text-align:left;color:var(--ink-muted)">数据截至 ${d.asof} · ${d.source}</td></tr>` : "");
-  }
+  // renderTopTable 已随两张「前二十大持仓」卡下线删除（2026-07-20）
 
   async function renderConstituents(dsName, tableId) {
     const d = await load(dsName);
@@ -2269,7 +2257,6 @@
     ["ch-spy-sectors", "Wikipedia"], ["ch-qqq-sectors", "Wikipedia"],
     ["ch-spy-sectorw", "Yahoo Finance"], ["ch-qqq-sectorw", "Yahoo Finance"],
     ["ch-mag7", "Yahoo Finance"],
-    ["qqq-top-table", "stockanalysis"],
     ["ch-leaps-vx", "Cboe CFE daily settlement"], ["ch-leaps-cot", "CFTC · Traders in Financial Futures"],
     // 2026-07-18：这两张图不吃页面默认的 Cboe+FRED+CNN+Yahoo 那串：写错出处比不写更糟。
     // ⚠️ 源名必须纯英文（本串不走 i18n，中文会在 EN 下泄漏）。
@@ -2751,7 +2738,8 @@
         //    全域审计正是因此漏掉这两处（英文态悬停显示「76.4 分位」）。走 translate。
         : (+v).toFixed(1) + " " + (window.MC_I18N ? MC_I18N.translate("分位") : "分位")) }),
       grid: { left: 118, right: 44, top: 22, bottom: 34 },
-      xAxis: Object.assign({ type: "value", min: 0, max: 100, name: "贵贱百分位" }, baseAxis(p)),
+      // 轴名去掉：卡片标题已写「贵贱百分位」，放轴末尾会跟「100」刻度重叠（2026-07-20 用户指出）
+      xAxis: Object.assign({ type: "value", min: 0, max: 100 }, baseAxis(p)),
       yAxis: Object.assign({ type: "category", data: rows.map((r) => r.label) },
         baseAxis(p), { axisLabel: { color: p.muted, fontSize: 11 } }),
       // 配色沿用 VRP 四格的定案：由浅到深猩红（#E8735A→#A0392F），纯视觉层级、不编码含义。
@@ -3256,7 +3244,6 @@
   renderExtremesTable("ndx_extremes", "qqq-extremes-table");
   renderConstituents("sp500_constituents", "spy-constituents");
   renderConstituents("ndx_constituents", "qqq-constituents");
-  renderTopTable("ndx_top", "qqq-top-table");
   renderBasketTable("tech", "tech-table");
   renderBasketTable("fin", "fin-table");
   renderBasketTable("consumer", "consumer-table");
