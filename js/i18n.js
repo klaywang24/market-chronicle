@@ -310,7 +310,7 @@
     "这一段量的是 30 天，上面那些量的是 1 年。同一个市场的两截时间，不能相减，也不能混着说。保费说的是价格，成交结构说的是今天的成交。至于「此刻还留着多少仓位」，那是另一本账，在下一章。": ["This section measures 30 days; everything above measures one year. Two different stretches of time in the same market — they cannot be subtracted from one another, nor spoken of interchangeably. The premium speaks of price; the structure of trading speaks of today's flow. As for how much position is still held right now, that is a different ledger — it is in the next chapter.", "", "", ""],
     // ---- 做空的两本账 · 口径实验室（2026-07-19）----
     "做空的两本账": ["Two Ledgers of Short Selling", "", "", ""],
-    "同一批数据，换把尺，结论可能是反的": ["Same data, a different yardstick — the conclusion can flip", "", "", ""],
+    "做空有两本账：持仓（多少股票正被做空）和成交（每天有多少做空在换手）。这一节反复证明一件事：换个数法，画面可能相反，所以只把它们并排摊开，不替你下结论。": ["Short selling keeps two ledgers: holdings (how many shares are currently sold short) and flow (how much short selling changes hands each day). This section keeps proving one thing — count it differently and the picture can flip — so we set the two side by side and call no conclusion for you.", "", "", ""],
     "口径实验室": ["Yardstick Lab", "", "", ""],
     "换把尺，结论就翻了": ["Change the yardstick, and the conclusion flips", "", "", ""],
     "下面这条线是 11 只大盘科技股的做空持仓，在各自历史里的平均位置。数据一个字没变，只换了衡量方式：一种数绝对股数，一种除以日均成交量。请按这个开关。": ["The line below is short interest across 11 mega-cap tech names, expressed as their average position within their own history. Not a single figure changes between the two views — only how it is measured: raw shares short, versus shares divided by average daily volume. Try the switch.", "", "", ""],
