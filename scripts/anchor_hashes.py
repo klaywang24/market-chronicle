@@ -51,8 +51,12 @@ DATA = ROOT / "data"
 CHAIN = DATA / "ledger_hashes.jsonl"
 
 # 纳入链的文件 = 构成资产的那些台账。加新文件只能往后加，绝不改既有条目的口径。
+# 2026-07-20 加 short_interest.json：它 07-18 建库时进了 verify_ledger 但漏进本链。
+#   本脚本按 TRACKED「当天现算」写每日新行、绝不回改历史行（main:149-150），所以加它
+#   只让**今后**的行多含它一项，链只声明「从今天起受保护」，不追溯——符合家规。
 TRACKED = ["kindex.json", "leaps_gauge.json", "vol_family.json",
-           "short_flow.json", "kindex_signals.json", "ledger_audit.json"]
+           "short_flow.json", "short_interest.json",
+           "kindex_signals.json", "ledger_audit.json"]
 GENESIS = "0" * 64
 
 
