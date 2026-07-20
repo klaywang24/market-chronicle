@@ -724,13 +724,28 @@
     tocEl.querySelectorAll("a").forEach((a) =>
       a.classList.toggle("active", a.dataset.target === current.id));
   }
+  // 目录跟随：固定目录默认悬在视口(top 116)，内容短时会飘到页脚旁的空白里。
+  // 2026-07-20 用户要求「和底部表格对齐，不要到底部」：滚到内容尾部时把目录整体顶上去，
+  // 使其底缘 = 正文底缘（.container 底），不再越过内容飘向页脚。
+  const containerEl = document.querySelector(".container");
+  function positionToc() {
+    // 只在桌面固定态生效；窄屏是抽屉，别动它的 transform
+    if (!window.matchMedia("(min-width: 1280px)").matches || tocEl.classList.contains("open")) {
+      tocEl.style.transform = ""; return;
+    }
+    if (!containerEl) return;
+    const contentBottom = containerEl.getBoundingClientRect().bottom;
+    const overshoot = (116 + tocEl.offsetHeight) - (contentBottom - 8); // 目录底超出正文底多少
+    tocEl.style.transform = overshoot > 0 ? `translateY(${-overshoot}px)` : "";
+  }
   let tocTick = false;
   window.addEventListener("scroll", () => {
     if (tocTick) return;
     tocTick = true;
-    setTimeout(() => { highlightToc(); tocTick = false; }, 80);
+    setTimeout(() => { highlightToc(); positionToc(); tocTick = false; }, 80);
   }, { passive: true });
-  setInterval(highlightToc, 500); // scroll 事件之外的兜底，保证高亮永远跟手
+  window.addEventListener("resize", positionToc, { passive: true });
+  setInterval(() => { highlightToc(); positionToc(); }, 500); // 兜底，保证高亮与跟随永远跟手
 
   function buildToc() {
     const panel = document.querySelector(".panel.active");
@@ -756,6 +771,7 @@
     renumberChapters(scope); // 插入/裁剪章节后重排"第N章"标签
     tocChapters = chapters;
     highlightToc();
+    positionToc();
   }
   tocEl.addEventListener("click", (e) => {
     const a = e.target.closest("a");
