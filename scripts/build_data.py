@@ -1676,6 +1676,57 @@ _SECTOR_ZH = {
 }
 
 
+# AIAE（Average Investor Allocation to Equities，Jesse Livermore/Philosophical Economics）
+# = 全社会股票市值 ÷（股票市值 + 五类借款人债务）。数据全来自 FRED 资金流量表 Z.1（公有领域，季频）。
+# 🔑 单位坑：股票市值两条是「百万美元」，五条债务是「十亿美元」——官方公式把股票 ÷1000 换成十亿再比。
+# ⚠️ 本机代理连不上 FRED（HANDOFF:145），此函数的数据正确性只能在 CI 里验；公式逻辑本地用 mock 单测过。
+# 🚫 只取「今天在历史上排第几」的位置读数，绝不发布 implied_10y_forecast（撞「永不预测方向」红线）。
+AIAE_EQUITY = ["NCBEILQ027S", "FBCELLQ027S"]                    # 股票市值（百万美元）：非金融企业 + 金融部门
+AIAE_DEBT = ["BCNSDODNS", "CMDEBT", "FGSDODNS", "SLGSDODNS", "WCMITCMFODNS"]  # 五类借款人债务（十亿美元）
+
+
+def compute_aiae(equity_m: pd.DataFrame, debt_b: pd.DataFrame) -> pd.Series:
+    """纯函数（无网络，便于 mock 单测）：equity_m=股票市值(百万)各列，debt_b=债务(十亿)各列。
+    对齐季度 → 股票÷1000 换十亿 → AIAE = 股票 ÷ (股票 + 债务)。"""
+    eq = (equity_m.sum(axis=1) / 1000.0)                       # 百万 → 十亿
+    dt = debt_b.sum(axis=1)
+    df = pd.concat({"eq": eq, "dt": dt}, axis=1).dropna()
+    return (df["eq"] / (df["eq"] + df["dt"])).dropna()
+
+
+def build_aiae():
+    """AIAE 台账 → data/aiae.json。头条=当前值在全史的百分位（低=股票配置低=历史上偏悲观）。"""
+    print("== AIAE 全社会股票配置")
+    eq = pd.DataFrame({s: _fred(s, start="1945-01-01") for s in AIAE_EQUITY})
+    dt = pd.DataFrame({s: _fred(s, start="1945-01-01") for s in AIAE_DEBT})
+    aiae = compute_aiae(eq, dt)
+    if aiae.empty:
+        raise RuntimeError("AIAE 空序列——绝不写空台账，留旧文件")
+    cur = float(aiae.iloc[-1])
+    # 🔑 自检：AIAE 有公开发布真值，近年在 0.40~0.55 高位。落此区间外 = series ID/单位错，标记待人工核。
+    sane = 0.30 <= cur <= 0.60
+    pct_full = round(float((aiae <= cur).mean() * 100), 1)
+    out = {
+        "meta": {
+            "name": "全社会股票配置（AIAE）",
+            "question": "今天所有投资者把多少钱压在股票上，历史上算高还是低？",
+            "headline": "AIAE 当前值在全史的百分位（高=仓位重=历史上偏乐观）",
+            "nature": "描述性位置读数，非交易信号/非预测；只报位置不报方向。",
+            "formula": "股票市值 ÷ (股票市值 + 五类借款人债务)；数据 FRED 资金流量表 Z.1（季频）",
+            "source": "FRED (Federal Reserve Z.1 Financial Accounts)",
+            "sane_check": sane,          # false = 值落在合理区间外，前端别展示、等人工核 series ID
+            "current_value": round(cur, 4),
+            "current_pctile_full": pct_full,
+            "asof": aiae.index[-1].strftime("%Y-%m-%d"),
+        },
+        "dates": [d.strftime("%Y-%m-%d") for d in aiae.index],
+        "aiae": [round(float(v), 4) for v in aiae.values],
+    }
+    print(f"  AIAE 当前 {cur:.4f}（全史第 {pct_full} 百分位，as-of {out['meta']['asof']}）"
+          f"{'' if sane else ' 🔴 落合理区间外，series ID 可能有误，前端勿用'}")
+    write_json("aiae.json", out)
+
+
 def build_sector_weights():
     """指数按权重的行业暴露（Yahoo funds_data，每 ETF 1 次调用）。
     与现有「按家数」的行业结构互补：家数看分布，权重看集中度（QQQ 科技占六成才是真相）。"""
@@ -1953,6 +2004,7 @@ def main():
     _guard("做空成交结构", build_short_flow)   # 增量：日常只补 1 天；回填另用大 max_backfill 手动跑
     _guard("做空持仓", build_short_interest)   # 双月，滞后约 2 周；只追加、修订另注
     _guard("行业暴露", build_sector_weights)   # 按权重（Yahoo funds_data，每 ETF 1 次调用）
+    _guard("AIAE 股票配置", build_aiae)         # FRED Z.1 季频；数据正确性首跑靠 CI 验（本机连不上 FRED）
     build_index_val()
     build_macro()
     build_index_panels("sp500", gspc, vix, "VIX")

@@ -135,6 +135,15 @@ def main():
               "`leaps_gauge.json` 的 `meta.revisions` 公开。\n"
               f"逐条：{json.dumps(lg_meta['revisions'][:5], ensure_ascii=False)}\n日志：{run_url}")
 
+    # AIAE 自检（2026-07-20 新增）：值落在 0.30~0.60 合理区间外 = FRED series ID 可能有误。
+    #   前端未上线前靠这个 + 人工核 CI 输出把关，绝不让错数据上站。
+    aiae_meta = (load("aiae") or {}).get("meta") or {}
+    if aiae_meta and not aiae_meta.get("sane_check", True):
+        alert(url, "🔴 AIAE 自检失败：值落在合理区间外",
+              f'当前值 **{aiae_meta.get("current_value")}**（应在 0.30~0.60），'
+              "FRED series ID 或单位可能有误——**前端勿上线，先核对**。\n"
+              f"as-of {aiae_meta.get('asof')} · 日志：{run_url}")
+
     leaps = load("leaps") or {}
     q = d.get("quotes", {})
 
