@@ -796,6 +796,10 @@
     "公用事业": ["Utilities", "Services publics", "Versorger", "Servicios públicos"],
     "房地产": ["Real Estate", "Immobilier", "Immobilien", "Bienes raíces"],
     "原材料": ["Materials", "Matériaux", "Grundstoffe", "Materiales"],
+    // 七巨头等权指数（2026-07-20）
+    "七巨头等权指数": ["Magnificent 7 (equal-weight)", "Magnificent 7 (équipondéré)", "Magnificent 7 (gleichgewichtet)", "Magnificent 7 (equiponderado)"],
+    "七巨头等权指数（起点 = 100 · 对数坐标 · 周线）": ["Magnificent 7 equal-weight index (base = 100 · log scale · weekly)", "", "", ""],
+    "NVDA / MSFT / GOOGL / AMZN / META / AAPL / TSLA 等权、每日再平衡，自 Meta 2012 上市同一起跑线；墨色粗线为指数，图例括号内为各自总倍数。": ["NVDA / MSFT / GOOGL / AMZN / META / AAPL / TSLA, equal-weighted and rebalanced daily, from Meta's 2012 IPO as the common start; the ink line is the index, and each legend entry's bracket shows its total multiple.", "", "", ""],
     "距前高的百分比距离（周频）": ["Percent below prior peak (weekly)", "Écart au sommet précédent (hebdo)", "Abstand zum Hoch in % (wöchentlich)", "Distancia al máximo previo (semanal)"],
     "几乎每一年都有回撤，多数年份仍收正": ["Nearly every year has a drawdown; most still close positive", "Presque chaque année connaît un repli ; la plupart finissent positives", "Fast jedes Jahr hat einen Drawdown; die meisten schließen positiv", "Casi todos los años hay caídas; la mayoría cierra en positivo"],
     "全历史（1871→）· 近 50 年 · 2010 年以来，三条虚线即三个\"回归锚\"": ["All history (1871→), last 50 years, and 2010→ — three dashed anchors of mean reversion", "Tout l'historique (1871→), 50 ans, 2010→ — trois ancres de retour à la moyenne", "Gesamthistorie (1871→), 50 Jahre, 2010→ — drei Anker der Rückkehr zum Mittel", "Todo el histórico (1871→), 50 años y 2010→: tres anclas de reversión a la media"],

@@ -1848,9 +1848,52 @@ def build_basket(prefix: str, members: list):
         })
     write_json(f"{prefix}_table.json", {"rows": rows, "start": start.strftime("%Y-%m-%d")})
 
+    # 七巨头等权指数（2026-07-20）：复用 tech 篮子已抓的价格，不另发请求。
+    # 共同起点 = 七只中最晚上市者（META 2012-05），等权、每日再平衡、rebase 到 100。
+    if prefix == "tech":
+        build_mag7(closes)
+
     # 个股钻取页：每只成员生成全套指数面板（各自全历史）
     for t, n in members:
         build_index_panels(f"s_{safe_ticker(t)}", closes[t])
+
+
+MAG7 = [("NVDA", "英伟达"), ("MSFT", "微软"), ("GOOGL", "谷歌"), ("AMZN", "亚马逊"),
+        ("META", "Meta"), ("AAPL", "苹果"), ("TSLA", "特斯拉")]
+
+
+def build_mag7(closes: dict):
+    """七巨头等权指数：共同起点=最晚上市者，等权每日再平衡，rebase 到 100。
+    closes 来自 tech 篮子（已抓），只算不抓。缺任一成员则跳过（不出半真的指数）。"""
+    print("== 七巨头等权指数")
+    try:
+        missing = [t for t, _ in MAG7 if t not in closes or closes[t].dropna().empty]
+        if missing:
+            raise RuntimeError(f"缺成员 {missing}")
+        df = pd.DataFrame({t: closes[t] for t, _ in MAG7}).dropna()  # 共同起点=七只都在
+        start = df.index[0]
+        norm = df / df.iloc[0] * 100                                  # 各成员 rebase 100
+        daily_ret = df.pct_change().dropna()
+        idx = (1 + daily_ret.mean(axis=1)).cumprod() * 100           # 等权每日再平衡
+        idx = pd.concat([pd.Series([100.0], index=[start]), idx])
+        weekly = norm.resample("W").last().dropna(how="all")
+        idx_w = idx.resample("W").last().dropna()
+        # 各成员自起点至今的总倍数（给标注/tooltip 用）
+        members = [{"ticker": t, "name": n,
+                    "mult": round(float(df[t].iloc[-1] / df[t].iloc[0]), 1),
+                    "values": rnd(weekly[t], 1)} for t, n in MAG7]
+        write_json("m7_index.json", {
+            "name": "七巨头等权指数",
+            "start": start.strftime("%Y-%m-%d"),
+            "methodology": "等权、每日再平衡、起点=100；起点为七只中最晚上市者的首日",
+            "index_mult": round(float(idx.iloc[-1] / 100), 1),
+            "dates": dates(weekly.index),
+            "index": {"dates": dates(idx_w.index), "values": rnd(idx_w, 1)},
+            "members": members,
+            "source": "Yahoo Finance（等权指数为本站自建）",
+        })
+    except Exception as e:
+        print(f"  七巨头指数失败（留旧文件）: {e}")
 
 
 def build_cape():

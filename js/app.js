@@ -1132,6 +1132,39 @@
     };
   }
 
+  // 七巨头等权指数（2026-07-20）：等权指数粗线 + 7 成员细线，对数坐标。
+  // 复用 basketGrowthChart 的模式，但数据形状是 {index, members}，且突出指数线。
+  function mag7Chart() {
+    return async (p) => {
+      const d = await load("m7_index");
+      const colors = basketPalette(p);
+      const T = (x) => (window.MC_I18N ? MC_I18N.translate(x) : x);
+      const series = d.members.map((m, i) => ({
+        // 成员名走 translate（数据文件里是中文，EN 态直接拼会泄漏）
+        name: `${T(m.name)} ${m.mult}×`, type: "line", showSymbol: false,
+        data: zip(d.dates, m.values),
+        lineStyle: { color: colors[i % colors.length], width: 1.1 },
+        itemStyle: { color: colors[i % colors.length] },
+      }));
+      series.push({
+        name: `${T("七巨头等权指数")} ${d.index_mult}×`, type: "line", showSymbol: false,
+        data: zip(d.index.dates, d.index.values),
+        lineStyle: { color: p.ink, width: 2.6 }, itemStyle: { color: p.ink }, z: 10,
+      });
+      return {
+        tooltip: tip(p),
+        legend: { textStyle: { color: p.muted, fontSize: 11 }, top: 0, type: "scroll" },
+        grid: { left: 64, right: 24, top: 36, bottom: 60 },
+        xAxis: timeX(p),
+        yAxis: Object.assign({ type: "log" }, baseAxis(p)),
+        dataZoom: [{ type: "inside" }, { type: "slider", bottom: 6, height: 18,
+          borderColor: p.border, fillerColor: "rgba(160,57,47,0.08)",
+          handleStyle: { color: p.accent }, textStyle: { color: p.muted, fontSize: 10 } }],
+        series,
+      };
+    };
+  }
+
   async function renderBasketTable(prefix, tableId) {
     const d = await load(prefix + "_table");
     const c = (v, suffix) => v == null ? "<td>--</td>" :
@@ -2210,6 +2243,7 @@
     ["spy-constituents", "Wikipedia"], ["qqq-constituents", "Wikipedia"],
     ["ch-spy-sectors", "Wikipedia"], ["ch-qqq-sectors", "Wikipedia"],
     ["ch-spy-sectorw", "Yahoo Finance"], ["ch-qqq-sectorw", "Yahoo Finance"],
+    ["ch-mag7", "Yahoo Finance"],
     ["qqq-top-table", "stockanalysis"],
     ["ch-leaps-vx", "Cboe CFE daily settlement"], ["ch-leaps-cot", "CFTC · Traders in Financial Futures"],
     // 2026-07-18：这两张图不吃页面默认的 Cboe+FRED+CNN+Yahoo 那串：写错出处比不写更糟。
@@ -2619,6 +2653,7 @@
     chart(b, "ch-" + b + "-annual", annualChart(b + "_annual"));
     chart(b, "ch-" + b + "-dd", ddChart(b + "_drawdowns"));
   });
+  chart("tech", "ch-mag7", mag7Chart());
   // 科技板块锚 = QQQ，复用纳指 100（ndx）面板
   chart("tech", "ch-tech-etf", centuryChart(null, [{ ds: "ndx_century", name: "QQQ 纳指 100" }]));
   chart("tech", "ch-tech-etf-annual", annualChart("ndx_annual"));
