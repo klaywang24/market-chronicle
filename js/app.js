@@ -1518,11 +1518,8 @@
       return {
         tooltip: tip(p, { trigger: "item",
           formatter: (o) => `${o.name}<br/><b>${o.value}%</b>` }),
-        // 图例底部两行；环形图正中，中心文字用 left:"center" 真正水平居中（跟居中的环对齐）
-        legend: { bottom: 0, left: "center", orient: "horizontal", itemWidth: 10, itemHeight: 10,
-          textStyle: { color: p.inkSoft, fontSize: 10 },
-          formatter: (name) => { const r = rows.find((x) => x.name === name || T(x.name) === name); return r ? `${name} ${r.weight}%` : name; } },
-        graphic: [{ type: "text", left: "center", top: "38%", style: {
+        // 中心大数字=头部行业；每块环外引线标「行业名 权重%」（去掉图例，信息全在图上）
+        graphic: [{ type: "text", left: "center", top: "40%", style: {
           text: `{big|${top.weight}%}\n{small|${T(top.name)}}`,
           textAlign: "center",
           rich: {
@@ -1531,8 +1528,11 @@
           },
         } }],
         series: [{
-          type: "pie", radius: ["40%", "62%"], center: ["50%", "44%"],
-          avoidLabelOverlap: true, label: { show: false }, labelLine: { show: false },
+          type: "pie", radius: ["34%", "52%"], center: ["50%", "48%"],
+          avoidLabelOverlap: true, minAngle: 3,
+          label: { show: true, color: p.inkSoft, fontSize: 10,
+            formatter: (o) => `${o.name} ${o.value}%` },
+          labelLine: { show: true, length: 8, length2: 12, lineStyle: { color: p.border } },
           data: rows.map((x, i) => ({ name: x.name, value: x.weight,
             itemStyle: { color: x.weight >= 25 ? p.danger : greens[Math.min(i, greens.length - 1)] } })),
         }],
