@@ -1247,43 +1247,130 @@
         `<td class="${c.ret >= 0 ? "pos" : "neg"}">${(c.ret > 0 ? "+" : "") + c.ret}%</td><td>${c.days}</td></tr>`).join("");
   }
 
-  // 牛长熊短发散条形图（2026-07-19）：把「周期换挡」从表格改成一眼能看懂的图。
-  // 为什么必须对数压缩牛市：实测标普牛市最大 +582%、纳指 +787%，而熊市最深 −61.8%——
-  // 同一条线性轴上画，熊市会被压成几乎看不见的一条，而「熊有多深」恰恰是这张图的另一半信息。
-  // ∴ 牛市走 log10(1+ret) 压缩、熊市保持百分比原样，两种刻度并存但**每根柱都标真实涨跌幅**，
-  // 且卡片副标题明写这件事（口径透明＝诚实的一部分，不靠读者自己发现）。
-  const BULL_LOG_K = 65;   // 让最大牛市(+787%)的柱高≈最深熊市(−61.8%)，两侧视觉平衡
-  function bullBearChart(dsName) {
+  // 牛熊周期山峦图（2026-07-20 重做）：每一段画的是那段时间的**真实价格路径**，
+  // 不是一根柱——牛市累计涨幅向上（绿色山头）、熊市累计跌幅向下（红色山谷），归零在每段交界。
+  // 为什么牛市对数压缩：实测标普牛市最大 +582%、纳指 +787%，熊市最深 −61.8%；同一线性轴上
+  // 熊市会被压成看不见的一条，而「熊有多深」正是这张图的另一半。∴ 牛市 y=log10(1+r) 压缩、
+  // 熊市 y=r 原样；每段在极值处标注真实数字（年月 / 月数 / 总涨跌 / 年化），两种刻度并存但
+  // 副标题明写。价格取自 century 全史（标普 24752 天 / 纳指 10277 天）。
+  const BULL_LOG_K = 68;   // 让最大牛市(+787%)的山头≈最深熊市(−61.8%)的谷底，两侧视觉平衡
+  function bullBearChart(cycleDs, priceDs) {
     return async (p) => {
-      const d = await load(dsName);
+      const [d, pxRaw] = await Promise.all([load(cycleDs), load(priceDs)]);
       const cs = d.cycles;
-      const plot = (c) => (c.kind === "bull"
-        ? Math.log10(1 + c.ret / 100) * BULL_LOG_K   // 牛：对数压缩
-        : c.ret);                                     // 熊：百分比原样（本身为负）
-      // ⚠️ tooltip 是函数型 formatter：它里面的中文 JSON.stringify(getOption()) 扫不到，
-      // 泄漏扫描必须执行 formatter 再看输出。∴ 逐段走 translate（同 app.js:2645 既有做法）。
+      // 月线重采样：century 是日线（标普 24752 天），直接画又密又抖、熊市被拉成红钢针。
+      // 每月取最后一个交易日 → ~1184 点，曲线平滑成真正的「山峦」，也让标注不再糊成一团。
+      const mDates = [], mClose = [];
+      let lastYm = "";
+      for (let i = 0; i < pxRaw.dates.length; i++) {
+        const ym = pxRaw.dates[i].slice(0, 7);
+        if (ym !== lastYm) { mDates.push(pxRaw.dates[i]); mClose.push(pxRaw.close[i]); lastYm = ym; }
+        else { mDates[mDates.length - 1] = pxRaw.dates[i]; mClose[mDates.length - 1] = pxRaw.close[i]; }
+      }
+      const px = { dates: mDates, close: mClose };
+      const pxMap = Object.create(null);
+      px.dates.forEach((dt, i) => { pxMap[dt] = px.close[i]; });
+      // 日线查表（给短段兜底：月线下不足 2 点的段——如 2020 疫情熊市 33 天——退回日线画）
+      const dayMap = Object.create(null);
+      pxRaw.dates.forEach((dt, i) => { dayMap[dt] = pxRaw.close[i]; });
+      const dayDates = pxRaw.dates;
+      // 取某段的采样日期序列：优先月线，不足 2 点则用日线
+      const segDatesOf = (start, end) => {
+        const m = px.dates.filter((dt) => dt >= start && dt <= end);
+        if (m.length >= 2) return { dates: m, map: pxMap };
+        return { dates: dayDates.filter((dt) => dt >= start && dt <= end), map: dayMap };
+      };
+      const yPlot = (kind, r) => (kind === "bull"
+        ? Math.log10(1 + r) * BULL_LOG_K   // 牛：累计涨幅对数压缩，向上
+        : r * 100);                         // 熊：累计跌幅百分比原样，向下（r<0）
+
+      // ⭐ 关键：x 轴**按段等宽**，不按真实时间。每段占一个固定单位宽度 [si, si+1]，
+      // 段内的点按进度 0→1 均分在这个单位里。这样 1929 那几个短命熊市和 2020 的疫情熊
+      // 在轴上宽度相同、不会被时间压成红钢针——参考图正是这么做的（牺牲「时间比例」，
+      // 换「每段都看得清」）。x 轴标签改成标注段的年份，不再是连续年代。
+      const bullLine = [], bearLine = [], areas = [], marks = [];
+      let si = 0;                            // 段序号（= x 单位）
+      const xTicks = [];                     // {x, year} 给 x 轴离散标签
+      cs.forEach((c) => {
+        const endDate = c.end || px.dates[px.dates.length - 1];
+        // 切出本段的采样序列（月线优先，短段退日线）
+        const { dates: seg, map: segMap } = segDatesOf(c.start, endDate);
+        if (seg.length < 2) { si++; return; }
+        const base = segMap[seg[0]];
+        const tgt = c.kind === "bull" ? bullLine : bearLine;
+        const other = c.kind === "bull" ? bearLine : bullLine;
+        const n = seg.length - 1;
+        let extreme = { y: 0, gx: si, r: 0 };
+        seg.forEach((dt, k) => {
+          const gx = si + k / n;              // 段内进度 0→1，映射到 [si, si+1]
+          const r = segMap[dt] / base - 1;    // 累计涨跌（相对本段起点）
+          const y = yPlot(c.kind, r);
+          tgt.push([gx, y]);
+          other.push([gx, null]);            // 对方 series 在这段留空
+          areas.push({ x: gx, y, kind: c.kind });
+          if (Math.abs(y) >= Math.abs(extreme.y)) extreme = { y, gx, r };
+        });
+        bullLine.push([si + 1, null]); bearLine.push([si + 1, null]);  // 段间断开
+        // 每隔几段放一个年份刻度（避免 x 轴太挤）
+        if (si % 4 === 0) xTicks.push({ x: si, year: c.start.slice(0, 4) });
+        si++;
+        // 标注只给「够大的段」：小段曲线照画、但不加文字，否则 50 个三行标注糊成一团。
+        // 阈值取 |ret|>=33%（让 2020 疫情熊 −34%/33天 这种标志性短熊也进来）或 >=1 年。
+        if (c.days < 365 && Math.abs(c.ret) < 33) return;
+        const months = Math.round(c.days / 30.44);
+        const yrsExact = c.days / 365.25;
+        const annPct = Math.round(c.ret);
+        const annYr = Math.round(((1 + c.ret / 100) ** (1 / Math.max(yrsExact, 0.25)) - 1) * 100);
+        marks.push({
+          coord: [extreme.gx, extreme.y],
+          kind: c.kind,
+          l1: `${c.start.slice(0, 4)}.${c.start.slice(5, 7)}`,
+          l2: `${months}m · ${annPct > 0 ? "+" : ""}${annPct}%`,
+          l3: `${annYr > 0 ? "+" : ""}${annYr}%/yr`,
+        });
+      });
+
+      // 牛熊分色：用两条独立 line（牛一条、熊一条），互相在对方的段上填 null。
+      // ⚠️ 不用 visualMap piecewise 分色——本版 ECharts 对上万点的 line 配 piecewise
+      //    visualMap 会崩（"Cannot read properties of undefined (reading 'coord')"），
+      //    2026-07-20 逐项二分实测确认是 visualMap 单独致命，与 null 断点无关。
+      //    两条 series 各带 markPoint（分开就不会跨段反查 coord 崩）。
       const T = (s) => (window.MC_I18N ? MC_I18N.translate(s) : s);
+      const bullMarks = marks.filter((m) => m.kind === "bull");
+      const bearMarks = marks.filter((m) => m.kind === "bear");
+      const mkSeries = (data, color, ms, pos) => ({
+        type: "line", data, showSymbol: false, connectNulls: false,
+        lineStyle: { color, width: 1.4 }, areaStyle: { color, opacity: 0.13 },
+        markPoint: {
+          symbol: "circle", symbolSize: 1, silent: true,
+          data: ms.map((m) => ({
+            coord: m.coord, itemStyle: { color: "transparent" },
+            label: {
+              show: true, position: pos, formatter: `${m.l1}\n${m.l2}\n${m.l3}`,
+              fontSize: 9, lineHeight: 12, color, fontFamily: "JetBrains Mono",
+            },
+          })),
+        },
+      });
+      // x 轴按段等宽，用离散年份刻度（每 4 段一个），tooltip 按段序号判牛熊
+      const kindBySeg = cs.map((c) => c.kind);
       return {
         tooltip: tip(p, {
-          axisPointer: { type: "shadow" },
+          trigger: "axis",
           formatter: (ps) => {
-            const c = cs[ps[0].dataIndex];
-            const kind = T(c.kind === "bull" ? "牛市" : "熊市");
-            const yrs = (c.days / 365).toFixed(1);
-            return `${c.start} → ${c.end || T("进行中")}<br/>${kind} `
-              + `<b>${(c.ret > 0 ? "+" : "") + c.ret}%</b><br/>`
-              + T(`历时 ${c.days} 天（${yrs} 年）`);
+            const seg = Math.floor(ps[0].data[0]);
+            const k = kindBySeg[seg];
+            return k ? T(k === "bull" ? "牛市" : "熊市") : "";
           },
         }),
-        grid: { left: 20, right: 20, top: 52, bottom: 46 },
-        // ⚠️ baseAxis(p) 必须放 Object.assign 的**前面**：它在后面会覆盖掉这里的 axisLabel。
-        //    2026-07-19 实测踩中——y 轴刻度因此照常显示，而这张图的 y 轴是合成刻度
-        //    （牛市对数压缩、熊市线性），标出来会被读成百分比，让人以为 +88% 的柱子"等于 20"。
-        //    合成刻度必须彻底隐藏，真实数字只出现在柱标签与 tooltip 里。
+        grid: { left: 46, right: 20, top: 40, bottom: 64 },
         xAxis: Object.assign({}, baseAxis(p), {
-          type: "category",
-          data: cs.map((c) => c.start.slice(0, 4)),
-          axisLabel: { fontSize: 10, interval: "auto", color: p.muted },
+          type: "value", min: 0, max: si,
+          interval: null,
+          axisLabel: {
+            color: p.muted, fontSize: 10,
+            formatter: (v) => { const t = xTicks.find((z) => z.x === Math.round(v)); return t ? t.year : ""; },
+          },
           splitLine: { show: false },
         }),
         yAxis: Object.assign({}, baseAxis(p), {
@@ -1291,19 +1378,15 @@
           axisLabel: { show: false }, splitLine: { show: false },
           axisLine: { show: false }, axisTick: { show: false },
         }),
-        series: [{
-          type: "bar", barCategoryGap: "18%",
-          data: cs.map((c) => ({
-            value: plot(c),
-            itemStyle: { color: c.kind === "bull" ? p.moss : p.danger },
-            label: {
-              show: true,
-              position: c.kind === "bull" ? "top" : "bottom",
-              formatter: () => (c.ret > 0 ? "+" : "") + Math.round(c.ret) + "%",
-              fontSize: 9, color: p.muted, fontFamily: "JetBrains Mono",
-            },
-          })),
+        dataZoom: [{ type: "inside" }, {
+          type: "slider", bottom: 8, height: 16,
+          borderColor: p.border, fillerColor: "rgba(160,57,47,0.08)",
+          handleStyle: { color: p.accent },
         }],
+        series: [
+          mkSeries(bullLine, p.moss, bullMarks, "top"),
+          mkSeries(bearLine, p.danger, bearMarks, "bottom"),
+        ],
       };
     };
   }
@@ -2485,7 +2568,7 @@
   chart("spy", "ch-spy-eps", simpleLine("sp500_eps_hist", "EPS(TTM)", "moss", { log: true }));
   chart("spy", "ch-spy-vol", volChart("sp500_volatility"));
   chart("spy", "ch-spy-season", seasonChart("sp500_seasonality"));
-  chart("spy", "ch-spy-bullbear", bullBearChart("sp500_bullbear"));
+  chart("spy", "ch-spy-bullbear", bullBearChart("sp500_bullbear", "sp500_century"));
   chart("spy", "ch-spy-sectors", sectorChart("sp500_constituents"));
 
   chart("qqq", "ch-qqq-century", centuryChart(null, [
@@ -2500,7 +2583,7 @@
   chart("qqq", "ch-qqq-intra", intraChart("ndx_intrayear"));
   chart("qqq", "ch-qqq-vol", volChart("ndx_volatility"));
   chart("qqq", "ch-qqq-season", seasonChart("ndx_seasonality"));
-  chart("qqq", "ch-qqq-bullbear", bullBearChart("ndx_bullbear"));
+  chart("qqq", "ch-qqq-bullbear", bullBearChart("ndx_bullbear", "ndx_century"));
   chart("qqq", "ch-qqq-sectors", sectorChart("ndx_constituents"));
 
   ["tech", "fin", "consumer", "luxury"].forEach((b) => {
