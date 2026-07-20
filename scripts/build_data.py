@@ -1667,6 +1667,32 @@ def build_top_holdings(top_n: int = 20):
         print(f"  QQQ holdings failed (kept old): {e}")
 
 
+# GICS 行业英文键 → 中文名（Yahoo funds_data 的键）
+_SECTOR_ZH = {
+    "technology": "信息技术", "financial_services": "金融", "communication_services": "通信服务",
+    "consumer_cyclical": "可选消费", "healthcare": "医疗保健", "industrials": "工业",
+    "consumer_defensive": "必需消费", "energy": "能源", "utilities": "公用事业",
+    "realestate": "房地产", "basic_materials": "原材料",
+}
+
+
+def build_sector_weights():
+    """指数按权重的行业暴露（Yahoo funds_data，每 ETF 1 次调用）。
+    与现有「按家数」的行业结构互补：家数看分布，权重看集中度（QQQ 科技占六成才是真相）。"""
+    print("== 行业暴露（按权重）")
+    for etf, out_name in (("SPY", "sp500_sector_weights.json"), ("QQQ", "ndx_sector_weights.json")):
+        try:
+            sw = yf.Ticker(etf).funds_data.sector_weightings
+            if not sw:
+                raise RuntimeError("funds_data.sector_weightings 空")
+            rows = [{"key": k, "name": _SECTOR_ZH.get(k, k), "weight": round(float(v) * 100, 2)}
+                    for k, v in sw.items() if v]
+            rows.sort(key=lambda x: -x["weight"])
+            write_json(out_name, {"rows": rows, "etf": etf, "source": f"Yahoo Finance / {etf} funds_data"})
+        except Exception as e:
+            print(f"  {etf} 行业权重失败（留旧文件）: {e}")
+
+
 def _multpl_series(slug: str):
     html = requests.get(f"https://www.multpl.com/{slug}/table/by-month", headers=UA, timeout=30).text
     rows = re.findall(r'<td>([A-Z][a-z]{2} \d{1,2}, \d{4})</td>\s*<td>\s*(?:&#x2002;)?\s*\$?([\d.,]+)', html)
@@ -1883,6 +1909,7 @@ def main():
     _guard("波动率家族", build_vol_family, vix)
     _guard("做空成交结构", build_short_flow)   # 增量：日常只补 1 天；回填另用大 max_backfill 手动跑
     _guard("做空持仓", build_short_interest)   # 双月，滞后约 2 周；只追加、修订另注
+    _guard("行业暴露", build_sector_weights)   # 按权重（Yahoo funds_data，每 ETF 1 次调用）
     build_index_val()
     build_macro()
     build_index_panels("sp500", gspc, vix, "VIX")

@@ -1457,6 +1457,31 @@
     };
   }
 
+  // 行业暴露（按权重）：与「按家数」互补——家数看分布，权重看集中度。
+  // 头部行业加深色（>=25% 猩红提示集中），其余绿；每条标真实权重。
+  function sectorWeightChart(dsName) {
+    return async (p) => {
+      const d = await load(dsName);
+      const s = d.rows.slice().reverse();   // 横条从下往上升序 → 顶部最大
+      const T = (x) => (window.MC_I18N ? MC_I18N.translate(x) : x);
+      return {
+        tooltip: tip(p, { axisPointer: { type: "shadow" },
+          valueFormatter: (v) => (v == null ? "--" : v + "%") }),
+        grid: { left: 96, right: 52, top: 10, bottom: 28 },
+        xAxis: Object.assign({}, baseAxis(p), { type: "value", name: T("权重 %"), max: (v) => Math.ceil(v.max / 10) * 10 }),
+        yAxis: Object.assign({}, baseAxis(p), { type: "category", data: s.map((x) => x.name),
+          splitLine: { show: false }, axisLabel: { color: p.inkSoft, fontSize: 11 } }),
+        series: [{
+          type: "bar", barCategoryGap: "28%",
+          data: s.map((x) => ({ value: x.weight,
+            itemStyle: { color: x.weight >= 25 ? p.danger : p.moss } })),
+          label: { show: true, position: "right", color: p.muted,
+            fontFamily: "JetBrains Mono", fontSize: 11, formatter: (o) => o.value + "%" },
+        }],
+      };
+    };
+  }
+
   const tblLogo = (ticker) =>
     `<img class="tbl-logo" loading="lazy" data-t="${ticker}" src="logos/${safeTicker(ticker)}.png" referrerpolicy="no-referrer" onerror="__logoErr(this)" alt="">`;
 
@@ -2184,6 +2209,7 @@
     ["ch-spy-eps", "multpl"], ["ch-spy-val", "multpl / Shiller"],
     ["spy-constituents", "Wikipedia"], ["qqq-constituents", "Wikipedia"],
     ["ch-spy-sectors", "Wikipedia"], ["ch-qqq-sectors", "Wikipedia"],
+    ["ch-spy-sectorw", "Yahoo Finance"], ["ch-qqq-sectorw", "Yahoo Finance"],
     ["qqq-top-table", "stockanalysis"],
     ["ch-leaps-vx", "Cboe CFE daily settlement"], ["ch-leaps-cot", "CFTC · Traders in Financial Futures"],
     // 2026-07-18：这两张图不吃页面默认的 Cboe+FRED+CNN+Yahoo 那串：写错出处比不写更糟。
@@ -2570,6 +2596,7 @@
   chart("spy", "ch-spy-season", seasonChart("sp500_seasonality"));
   chart("spy", "ch-spy-bullbear", bullBearChart("sp500_bullbear", "sp500_century"));
   chart("spy", "ch-spy-sectors", sectorChart("sp500_constituents"));
+  chart("spy", "ch-spy-sectorw", sectorWeightChart("sp500_sector_weights"));
 
   chart("qqq", "ch-qqq-century", centuryChart(null, [
     { ds: "ixic_century", name: "纳指综指" }, { ds: "ndx_century", name: "纳指 100" },
@@ -2585,6 +2612,7 @@
   chart("qqq", "ch-qqq-season", seasonChart("ndx_seasonality"));
   chart("qqq", "ch-qqq-bullbear", bullBearChart("ndx_bullbear", "ndx_century"));
   chart("qqq", "ch-qqq-sectors", sectorChart("ndx_constituents"));
+  chart("qqq", "ch-qqq-sectorw", sectorWeightChart("ndx_sector_weights"));
 
   ["tech", "fin", "consumer", "luxury"].forEach((b) => {
     chart(b, "ch-" + b + "-growth", basketGrowthChart(b));

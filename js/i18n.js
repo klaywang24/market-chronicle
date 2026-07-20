@@ -780,6 +780,22 @@
     // 2026-07-19 全域四层扫描抓到：ch-vol-family / ch-short-flow 的 valueFormatter
     // 函数体内硬编码「分位」，07-18 用 JSON.stringify(getOption()) 扫不进函数体故漏掉
     "分位": ["pctile", "centile", "Perzentil", "percentil"],
+    // 行业暴露（按权重，2026-07-20）
+    "行业暴露（按权重）": ["Sector exposure (by weight)", "Exposition sectorielle (par poids)", "Sektorgewichtung", "Exposición sectorial (por peso)"],
+    "家数看分布，权重看集中度：单一行业占比 ≥25% 标红": ["Count shows spread; weight shows concentration — any single sector ≥25% is flagged red", "", "", ""],
+    "纳指 100 有多集中：单一行业占比 ≥25% 标红": ["How concentrated the Nasdaq-100 is — any single sector ≥25% is flagged red", "", "", ""],
+    "权重 %": ["Weight %", "Poids %", "Gewicht %", "Peso %"],
+    "信息技术": ["Information Technology", "Technologies de l'information", "Informationstechnologie", "Tecnología de la información"],
+    "金融": ["Financials", "Finance", "Finanzwesen", "Finanzas"],
+    "通信服务": ["Communication Services", "Services de communication", "Kommunikationsdienste", "Servicios de comunicación"],
+    "可选消费": ["Consumer Discretionary", "Consommation discrétionnaire", "Zyklische Konsumgüter", "Consumo discrecional"],
+    "医疗保健": ["Health Care", "Santé", "Gesundheitswesen", "Salud"],
+    "工业": ["Industrials", "Industrie", "Industrie", "Industria"],
+    "必需消费": ["Consumer Staples", "Consommation de base", "Basiskonsumgüter", "Consumo básico"],
+    "能源": ["Energy", "Énergie", "Energie", "Energía"],
+    "公用事业": ["Utilities", "Services publics", "Versorger", "Servicios públicos"],
+    "房地产": ["Real Estate", "Immobilier", "Immobilien", "Bienes raíces"],
+    "原材料": ["Materials", "Matériaux", "Grundstoffe", "Materiales"],
     "距前高的百分比距离（周频）": ["Percent below prior peak (weekly)", "Écart au sommet précédent (hebdo)", "Abstand zum Hoch in % (wöchentlich)", "Distancia al máximo previo (semanal)"],
     "几乎每一年都有回撤，多数年份仍收正": ["Nearly every year has a drawdown; most still close positive", "Presque chaque année connaît un repli ; la plupart finissent positives", "Fast jedes Jahr hat einen Drawdown; die meisten schließen positiv", "Casi todos los años hay caídas; la mayoría cierra en positivo"],
     "全历史（1871→）· 近 50 年 · 2010 年以来，三条虚线即三个\"回归锚\"": ["All history (1871→), last 50 years, and 2010→ — three dashed anchors of mean reversion", "Tout l'historique (1871→), 50 ans, 2010→ — trois ancres de retour à la moyenne", "Gesamthistorie (1871→), 50 Jahre, 2010→ — drei Anker der Rückkehr zum Mittel", "Todo el histórico (1871→), 50 años y 2010→: tres anclas de reversión a la media"],

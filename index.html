@@ -58,7 +58,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260720h">
+<link rel="stylesheet" href="css/style.css?v=20260720i">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -265,6 +265,7 @@
     <div class="chapter-head"><span class="chapter-no">第十二章</span><h2>行业结构</h2></div>
     <p class="chapter-q">五百家公司分布在哪些行业？</p>
     <div class="card"><h3>GICS 行业分布（按家数）</h3><div class="chart short" id="ch-spy-sectors"></div></div>
+    <div class="card"><h3>行业暴露（按权重）</h3><div class="sub">家数看分布，权重看集中度：单一行业占比 ≥25% 标红</div><div class="chart short" id="ch-spy-sectorw"></div></div>
   </div>
 
   <div class="chapter">
@@ -359,6 +360,7 @@
     <div class="chapter-head"><span class="chapter-no">第十章</span><h2>行业结构</h2></div>
     <p class="chapter-q">纳指 100 有多"科技"？</p>
     <div class="card"><h3>ICB 行业分布（按家数）</h3><div class="chart short" id="ch-qqq-sectors"></div></div>
+    <div class="card"><h3>行业暴露（按权重）</h3><div class="sub">纳指 100 有多集中：单一行业占比 ≥25% 标红</div><div class="chart short" id="ch-qqq-sectorw"></div></div>
     <div class="card"><h3>前二十大持仓（权重 · 每日刷新）</h3><div class="sub">季度/年度调仓后权重自动更新</div><div class="table-wrap"><table id="qqq-top-table"></table></div></div>
   </div>
 
@@ -1031,9 +1033,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260720h"></script>
-<script src="js/app.js?v=20260720h"></script>
-<script src="js/docs-i18n.js?v=20260720h"></script>
+<script src="js/i18n.js?v=20260720i"></script>
+<script src="js/app.js?v=20260720i"></script>
+<script src="js/docs-i18n.js?v=20260720i"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。
