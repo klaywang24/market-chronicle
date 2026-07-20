@@ -8,7 +8,7 @@ import os
 import sys
 import urllib.request
 
-SITE = "https://klaywang24.github.io/market-chronicle/"
+SITE = "https://chronicle.klay-wang.com/"
 
 
 def load(name):
@@ -166,7 +166,7 @@ def main():
         headers={
             "Content-Type": "application/json",
             # Discord/Cloudflare 会 403 掉默认的 python-urllib UA，需带正常 UA
-            "User-Agent": "MarketChronicle-Bot/1.0 (+https://klaywang24.github.io/market-chronicle/)",
+            "User-Agent": "MarketChronicle-Bot/1.0 (+https://chronicle.klay-wang.com/)",
         }, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=20) as r:
