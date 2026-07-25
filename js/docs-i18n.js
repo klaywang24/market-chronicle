@@ -171,7 +171,8 @@
     <ul class="ptier-list">
       <li><b>The daily reading</b> — never published on the site</li>
       <li><b>The reading archive</b> — filed daily, compounding</li>
-      <li><b>One piece of market folklore killed per week</b> — subscribers first, public after 30 days</li>
+<!-- 2026-07-25 用户裁：与中文版同步删除「每周一期传说处决」。该栏目暂时不产出，
+     售卖页不留不在交付的承诺。⚠️ 改定价权益必须中英同改：EN 版定价面板由本文件整块替换。 -->
       <li>Options-structure data table — the dozen-odd names carrying the most US options volume; the list follows liquidity</li>
     </ul>
     <div class="ptier-soon">Access is enabled within 24 hours of subscribing (I do this by hand), then the digest arrives before every open. Full refund within 14 days if you're not satisfied.</div>

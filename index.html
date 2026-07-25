@@ -56,9 +56,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- 字体样式表非阻塞加载：media=print 时不阻塞渲染，onload 后切回 all（Google Fonts 在部分网络极慢/被墙，
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260720z">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
+<link rel="stylesheet" href="css/style.css?v=20260725c">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -114,6 +114,11 @@
     <div class="chart tall" id="ch-kindex"></div>
     <p class="footnote">CNN 数据 2011 年起为每日存档；图表自 2011 年起展示。数据源：CNN Fear &amp; Greed（whit3rabbit 存档 + 官方接口）、Yahoo Finance。</p>
   </div>
+
+  <!-- 2026-07-25：读数区的送达入口。沿用 LEAPS 页末尾同一句（D 键已存在，i18n 零新增）：
+       只说「送达」，不提价格、不做按钮。位置紧贴「今日读数」（描述性），
+       与第三章的净值曲线隔开：7·16 定的相邻性红线在此照旧生效。 -->
+  <div class="poem">这一页的读数，每个交易日盘前送进邮箱 → <a href="#pricing">盘前数据简报</a></div>
 
   </div>
 
@@ -583,6 +588,11 @@
       <div class="sub">真金白银交易出来的恐惧曲线，与上方指数轨互证：实线 = 最新结算，向右上倾斜 = 越远越贵；虚线 = 一周前对照；首点 = VIX 现值。期货接近 24 小时交易，官方账本每天只记这一笔结算价。</div>
       <div class="chart" id="ch-leaps-vx"></div>
     </div>
+    <!-- 2026-07-25：三个送达入口之一（头版 / K 指数 / 本页），位置统一贴着「当日读数」。
+         本行由页末上移（原在「保费与之后的走势」章末）：同一页两句同文=重复，且读数处才是它该在的地方。
+         口径不变：只说送达、不提价格、不做按钮；紧邻的是 #lg-hero 当日读数（描述性），
+         与本页各处历史对照/净值图保持距离，7·16 相邻性定案照旧。 -->
+    <div class="poem">这一页的读数，每个交易日盘前送进邮箱 → <a href="#pricing">盘前数据简报</a></div>
   </div>
 
   <div class="chapter">
@@ -769,8 +779,8 @@
       <div class="sub">任一时点回看三年的年化收益率；实线为机械跟随、虚线为满仓两个锚：纯历史对照，说明"低暴露≠更优"，非策略推荐 · 底部滑块可拖拽缩放</div>
       <div class="chart" id="ch-leaps-roll"></div>
     </div>
-    <!-- 辅助入口只说送达，不提价格，不做按钮：与上方历史对照图保持文案与形态上的距离（相邻性定案） -->
-    <div class="poem">这一页的读数，每个交易日盘前送进邮箱 → <a href="#pricing">盘前数据简报</a></div>
+    <!-- 2026-07-25：本行已上移至第一章「今天贵不贵」读数之下（三个入口定案）。
+         此处不再重复同一句：一页两遍等于把「只说送达」的克制说没了。 -->
   </div>
 </section>
 
@@ -965,7 +975,8 @@
           <ul class="ptier-list">
             <li><b>每日判读正文</b>：站上永不公开</li>
             <li><b>判读档案</b>：逐日归档，越攒越厚</li>
-            <li><b>每周一期传说处决</b>：付费先看，30 天后公开</li>
+<!-- 2026-07-25 用户裁：删除「每周一期传说处决：付费先看，30 天后公开」。该栏目暂时不产出，
+     售卖页不留不在交付的承诺。恢复时连同「30 天后公开」的公开落点一起做，否则承诺无处兑现。 -->
             <li>期权结构数据表：覆盖美股期权成交量前列的十余只标的，清单随流动性调整</li>
           </ul>
           <div class="ptier-soon">订阅后 24 小时内开通（这一步由我手动完成），之后每个交易日开盘前送达。14 天内不满意可全额退款。</div>
@@ -1006,8 +1017,10 @@
     <div class="footer-brand-col">
       <div class="footer-brand">美股编年史<span>Market Chronicle</span></div>
       <div class="footer-tag">每个交易日自动更新的美股百年图表档案与读数台账</div>
-      <!-- 【预览项·待用户点头】免费订阅唯一入口=Buttondown 托管页；不加 target（券商 webview 吞新标签之鉴） -->
-      <div class="footer-free">极端读数出现的那天，一封免费邮件 → <a href="https://buttondown.com/klay24" rel="noopener">免费订阅</a></div>
+      <!-- 2026-07-25 用户裁：删除页脚免费订阅行（原「极端读数出现的那天，一封免费邮件 → 免费订阅」，
+           指向 Buttondown 托管页）。站上自此无免费邮件入口，订阅动线只剩付费一条：顶栏 + 三处读数送达行 + 页脚定价。
+           要恢复，把这两行还原即可（D 键仍在 i18n.js，未删）。 -->
+
     </div>
     <div class="footer-colgroup">
       <div class="footer-col">
@@ -1038,9 +1051,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260720z"></script>
-<script src="js/app.js?v=20260720z"></script>
-<script src="js/docs-i18n.js?v=20260720z"></script>
+<script src="js/i18n.js?v=20260725b"></script>
+<script src="js/app.js?v=20260725b"></script>
+<script src="js/docs-i18n.js?v=20260725b"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。

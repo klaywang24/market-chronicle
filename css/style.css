@@ -58,7 +58,7 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: 'Noto Sans SC', 'IBM Plex Sans', sans-serif;
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', 'IBM Plex Sans', sans-serif;
   font-size: 15px;
   line-height: 1.7;
   transition: background 0.3s, color 0.3s;
@@ -91,7 +91,7 @@ body {
   row-gap: 7px;
 }
 .brand {
-  font-family: 'Noto Serif SC', serif;
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
   font-weight: 700;
   font-size: 19px;
   white-space: nowrap;
@@ -230,7 +230,7 @@ html:not([lang^="zh"]) .lang-switch { font-size: 11.5px; padding: 3px 8px; }
 
 .hero { margin: 12px 0 36px; }
 .hero h1 {
-  font-family: 'Noto Serif SC', serif;
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
   font-size: 34px;
   font-weight: 700;
   line-height: 1.3;
@@ -253,7 +253,7 @@ html:not([lang^="zh"]) .lang-switch { font-size: 11.5px; padding: 3px 8px; }
   font-size: 15px;
   white-space: nowrap;
 }
-.chapter-head h2 { font-family: 'Noto Serif SC', serif; font-size: 22px; font-weight: 700; }
+.chapter-head h2 { font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif; font-size: 22px; font-weight: 700; }
 .chapter-q { color: var(--ink-muted); font-size: 14px; margin-bottom: 18px; }
 
 .card {
@@ -308,7 +308,7 @@ html:not([lang^="zh"]) .lang-switch { font-size: 11.5px; padding: 3px 8px; }
 .stat.signal-on .value { color: var(--accent-deep); }
 
 .poem {
-  font-family: 'Noto Serif SC', serif;
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
   color: var(--ink-soft);
   background: var(--gold-soft);
   border-left: 3px solid var(--gold);
@@ -338,7 +338,7 @@ td {
   font-size: 12.5px;
   white-space: nowrap;
 }
-td:first-child { font-family: 'Noto Sans SC', sans-serif; }
+td:first-child { font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif; }
 tr:hover td { background: var(--bg-card-hover); }
 .pos { color: var(--moss); }
 .neg { color: var(--danger); }
@@ -428,7 +428,7 @@ tr:hover td { background: var(--bg-card-hover); }
   white-space: nowrap;
   font-size: 12px;
   font-weight: 700;
-  font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+  font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', monospace;
   color: var(--accent-deep);
   background: color-mix(in srgb, var(--bg) 72%, transparent);
   padding: 1px 7px;
@@ -476,7 +476,7 @@ tr:hover td { background: var(--bg-card-hover); }
 }
 .pulse-head { display: flex; align-items: center; gap: 44px; flex-wrap: wrap; }
 .pulse-title { flex: 1; min-width: 260px; }
-.pulse-title h1 { font-family: 'Noto Serif SC', serif; font-size: 44px; font-weight: 700; line-height: 1.2; }
+.pulse-title h1 { font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif; font-size: 44px; font-weight: 700; line-height: 1.2; }
 .pulse-title .sub { color: var(--ink-muted); margin-top: 8px; font-size: 14.5px; max-width: 560px; }
 /* 温度环：conic-gradient 圆环 + 中心大数字（纯 CSS，可克隆） */
 .temp-ring {
@@ -583,7 +583,7 @@ html:not([lang^="zh"]) .breadth-bar div { min-width: 62px; }
   background: var(--bg-card);
   color: var(--ink-muted);
   text-decoration: none;
-  font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+  font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', monospace;
 }
 .pill:hover { background: var(--bg-card-hover); color: var(--ink); }
 .pill.active {
@@ -592,7 +592,7 @@ html:not([lang^="zh"]) .breadth-bar div { min-width: 62px; }
   color: var(--accent-deep);
   font-weight: 600;
 }
-.pill .zh { font-family: 'Noto Sans SC', sans-serif; }
+.pill .zh { font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif; }
 .cmp-chips { display: inline-flex; gap: 6px; vertical-align: middle; }
 .cmp-chips .pill { font-size: 11.5px; padding: 2px 10px; cursor: pointer; }
 .pill-group {
@@ -645,7 +645,7 @@ html:not([lang^="zh"]) .breadth-bar div { min-width: 62px; }
 
 /* ---------- 个股专页 ---------- */
 .stock-hero { margin: 20px 0 8px; }
-.stock-hero h1 { font-family: 'Noto Serif SC', serif; font-size: 30px; font-weight: 700; }
+.stock-hero h1 { font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif; font-size: 30px; font-weight: 700; }
 .stock-hero .ticker {
   font-family: 'JetBrains Mono', monospace;
   color: var(--ink-muted);
@@ -739,7 +739,7 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
   border-radius: 6px;
   padding: 4px 10px;
   margin-bottom: 6px;
-  font-family: 'JetBrains Mono', 'Noto Sans SC', monospace;
+  font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', monospace;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
@@ -867,7 +867,7 @@ td.left-col { text-align: left; }
   border-bottom: 1px solid var(--border);
 }
 .footer-brand-col { flex: 1 1 240px; min-width: 0; }
-.footer-brand { font-family: 'Noto Serif SC', serif; font-weight: 700; font-size: 16px; color: var(--ink); }
+.footer-brand { font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif; font-weight: 700; font-size: 16px; color: var(--ink); }
 .footer-tag { margin-top: 4px; font-size: 12px; }
 /* 【预览项】页脚免费订阅一行：安静文字链，指 Buttondown 托管页 */
 .footer-free { margin-top: 10px; font-size: 12px; color: var(--ink-muted); }
@@ -882,7 +882,7 @@ td.left-col { text-align: left; }
 .doc-page { max-width: 760px; margin: 0 auto; }
 .doc-body { font-size: 15px; line-height: 1.85; color: var(--ink); }
 .doc-body h3 {
-  font-family: 'Noto Serif SC', serif;
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
   font-size: 18px; font-weight: 700;
   margin: 30px 0 8px;
   padding-bottom: 6px;
@@ -1024,6 +1024,15 @@ a.ledger-card:hover { border-color: var(--accent); transform: translateY(-1px); 
 .ledger-note {
   margin: 12px 0 16px; font-size: 11.5px; line-height: 1.8; color: var(--ink-muted); max-width: 900px;
 }
+/* 2026-07-25 修既有缺陷：全站唯一的基础链接样式是 `.doc-body a`（:894），而 .poem 与 .ledger-note
+   都在 .doc-body 之外 → 这些链接一直吃浏览器默认蓝 rgb(0,0,238) + 下划线，在深色报纸版式上很扎眼。
+   实测受影响：头版台账区「K 指数 / 恐惧的标价」、LEAPS 页末「盘前数据简报」。此处补齐，与正文链接同款。 */
+.poem a, .ledger-note a {
+  color: var(--accent-deep); text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.poem a:hover, .ledger-note a:hover { border-bottom-color: var(--accent); }
+html.dark-mode .poem a, html.dark-mode .ledger-note a { color: var(--accent); }
 .ledger-cta { display: flex; gap: 10px; flex-wrap: wrap; }
 .lcta {
   padding: 9px 18px; border: 1px solid var(--border); border-radius: 999px;
@@ -1199,7 +1208,7 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 .senti-cards.lg-ctx4 { grid-template-columns: repeat(4, 1fr); margin-top: 14px; }
 @media (max-width: 760px) { .senti-cards.lg-ctx4 { grid-template-columns: repeat(2, 1fr); } .lg-bars { height: 100px; gap: 8px; } .lg-windows { gap: 6px; } }
 .lg-divider { margin: 44px 0 6px; padding-top: 20px; border-top: 2px solid var(--ink); display: flex; flex-direction: column; gap: 2px; }
-.lg-divider span { font-family: 'Noto Serif SC', serif; font-size: 18px; font-weight: 700; color: var(--ink); }
+.lg-divider span { font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif; font-size: 18px; font-weight: 700; color: var(--ink); }
 .lg-divider em { font-style: normal; font-size: 12px; color: var(--ink-muted); }
 
 /* ===== 定价三档 ===== */
@@ -1207,7 +1216,7 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 .ptier { border: 1px solid var(--border); border-radius: 12px; padding: 22px 20px; background: var(--bg-card); display: flex; flex-direction: column; position: relative; }
 .ptier.featured { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
 .ptier-badge { position: absolute; top: -11px; left: 20px; font-size: 11px; font-weight: 700; color: #fff; background: var(--accent); border-radius: 20px; padding: 3px 12px; }
-.ptier-name { font-size: 15px; font-weight: 700; font-family: 'Noto Serif SC', serif; color: var(--ink); }
+.ptier-name { font-size: 15px; font-weight: 700; font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif; color: var(--ink); }
 .ptier-price { font-size: 38px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--ink); margin: 6px 0 2px; }
 .ptier-price .u { font-size: 14px; font-weight: 500; color: var(--ink-muted); margin-left: 4px; font-style: normal; }
 .ptier-tag { font-size: 12px; color: var(--ink-muted); margin-bottom: 14px; min-height: 32px; }
@@ -1392,11 +1401,13 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 .ptier.featured .ptier-name { color: var(--accent); }
 
 /* ── 顶栏订阅入口（2026-07-17：付费入口可发现性修复：朋友反馈「找不到付费的地方」）── */
-.topbar-sub{display:inline-block;font-size:13px;font-weight:600;color:#A0392F;border:1.5px solid #A0392F;
+/* 2026-07-25：描边胶囊 → 实心。它是顶栏唯一的主行动（全站订阅动线唯一化的那一端），
+   描边在 10 个 tab 中间读起来和 tab 同级，实心才分得出主次。文案与链接不变。 */
+.topbar-sub{display:inline-block;font-size:13px;font-weight:600;color:#FAF8F2;background:#A0392F;border:1.5px solid #A0392F;
  border-radius:999px;padding:2.5px 13px;text-decoration:none;letter-spacing:.02em;white-space:nowrap;line-height:1.5}
-.topbar-sub:hover{background:rgba(160,57,47,.08)}
-html.dark-mode .topbar-sub{color:#D45D4F;border-color:#D45D4F}
-html.dark-mode .topbar-sub:hover{background:rgba(212,93,79,.12)}
+.topbar-sub:hover{background:#8A2F26;border-color:#8A2F26}
+html.dark-mode .topbar-sub{color:#14100C;background:#D45D4F;border-color:#D45D4F}
+html.dark-mode .topbar-sub:hover{background:#E06E60;border-color:#E06E60}
 html:not([lang^="zh"]) .topbar-sub{font-size:12px;padding:2.5px 11px}
 /* EN 11 tab 在 900-1379px 已满：该区间隐藏胶囊保「零溢出」定案；≤899 顶栏换行后有空间恢复显示 */
 @media (min-width:900px) and (max-width:1379px){ html:not([lang^="zh"]) .topbar-sub{display:none} }
