@@ -825,6 +825,10 @@
     ).join("");
     renumberChapters(scope); // 插入/裁剪章节后重排"第N章"标签
     tocChapters = chapters;
+    // 无章节的页面（「今日」头版就是）不该继续为目录预留左栏：
+    // ≥1280px 时 .container 的 margin-left 固定让位 214px，而目录是空的 →
+    // 实测 1600px 下左边距 254 / 右边距 225，内容被推偏、左侧 216px 是死白。
+    document.documentElement.classList.toggle("no-toc", chapters.length === 0);
     highlightToc();
     positionToc();
   }

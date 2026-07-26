@@ -133,8 +133,12 @@ body {
   border-radius: 8px;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: transform .3s cubic-bezier(.22, .61, .36, 1), border-color .3s ease,
-              background-color .3s ease, color .3s ease;
+  /* 悬停反馈 .15s（motionsites 实测值：颜色类反馈 91 处全是 .15s + cubic-bezier(.4,0,.2,1)）。
+     原为 .3s —— 手感偏黏，鼠标已经走了颜色还在追。位移仍保留稍长的 .3s 以免抖动。 */
+  transition: transform .3s cubic-bezier(.22, .61, .36, 1),
+              border-color .15s cubic-bezier(.4, 0, .2, 1),
+              background-color .15s cubic-bezier(.4, 0, .2, 1),
+              color .15s cubic-bezier(.4, 0, .2, 1);
 }
 .tab:hover { color: var(--ink); background: var(--bg-card-hover);
   border-color: var(--accent); transform: translateY(-1px); }
@@ -277,8 +281,31 @@ html:not([lang^="zh"]) .lang-switch { font-size: 11.5px; padding: 3px 8px; }
 
 /* ---------- 版面 ---------- */
 .container { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+
+/* ---------- 无目录页真居中（2026-07-26） ----------
+   ≥1280px 时 .container 固定让出 214px 给左侧常驻目录（见下方同宽度媒体查询）。
+   但「今日」头版没有章节，目录是空的 —— 实测 1600px 下左边距 254 / 右边距 225，
+   内容被推偏、左侧 216px 是死白，观感上就是"整个站没居中"。
+   buildToc() 在章节数为 0 时给 <html> 打 .no-toc，这里把让位撤销。
+   选择器特异性 (0,2,1) 高于下方的 .container (0,1,0)，与书写顺序无关。 */
+html.no-toc .toc { display: none; }
+html.no-toc .container { margin-left: auto; margin-right: auto; }
 .panel { display: none; }
 .panel.active { display: block; }
+
+/* ---------- 切换面板的入场（2026-07-26） ----------
+   此前切 tab 是 display 直接跳变，内容"啪"地换掉，是全站最生硬的一处交互。
+   动效配方照搬 motionsites 实测值：时长 .3s + 减速曲线 cubic-bezier(0,0,.2,1)
+   （该站全站只用两条曲线、两个时长，高级感来自一致与克制，不是花哨）。
+   幅度刻意小（10px）：这是页面转场，不该盖过既有的滚动逐个揭示。
+   ⚠️ transform 会给后代的 position:fixed 造containing block —— 顶栏下拉菜单在 .topbar 里、
+   不在 .panel 内，故不受影响；以后若往面板内放 fixed 元素，需重新确认这一点。 */
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+.panel.active { animation: panel-in .3s cubic-bezier(0, 0, .2, 1) both; }
+@media (prefers-reduced-motion: reduce) { .panel.active { animation: none; } }
 
 .hero { margin: 12px 0 36px; }
 .hero h1 {
