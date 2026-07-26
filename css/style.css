@@ -829,12 +829,17 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
   /* ⚠️ 原为 top:50% + translateY(-50%)：顶栏一行时那就是 tab 那行的中线。
      2026-07-19 顶栏改两行（tab 一行、控件一行）后，50% 落到了两行之间，
      品牌与 tab 差 21px 不对齐。改为显式对齐第一行（= 顶栏上内边距 + 首行高的一半）。 */
+  /* 2026-07-26 作废：品牌的绝对定位与 tab 让位边距，都是「通栏顶栏 + 品牌住左侧留白」时代的产物。
+     顶栏已改成 .topbar-row 居中的一整块单色，这两条会让品牌逃出居中容器：
+     实测 1585px 下品牌左 24、tab 左 227 —— 差 203px，tab 行悬在中间不与任何东西对齐。
+     单色顶栏下品牌与导航应共用同一条左边线（彭博 / WSJ 皆如此），故让二者都随 .topbar-row 走。
   .brand {
     position: absolute; left: 24px;
     top: var(--topbar-pad); height: var(--topbar-row1);
     display: flex; align-items: center; transform: none;
   }
   .tabs { margin-left: calc(max(214px, (100vw - 1180px) / 2) - 11px); }
+  */
 }
 /* 窄屏：☰ 展开为「抽屉 + 背景遮罩」，内容明显退到后面而非被目录压住 */
 @media (max-width: 1279px) {
@@ -856,16 +861,22 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
     z-index: -1;
   }
 }
+/* 2026-07-26 目录去盒化：原本每章一个圆角边框块 + 选中态填充底色 —— 与旧 tab 同一个毛病
+   （组件库默认值观感）。改为纯文字列表 + 左侧色条标记当前项，与顶栏导航同一套语言。
+   参考取 Seeking Alpha 的三点：独立表面感、分组小标题、当前项明确；
+   刻意不取它的深底 + 彩色图标块 —— 那是几十个入口的全站导航才需要的，
+   而这里是单页章节锚点，配色块既无信息量又更花，方向上也偏 SaaS。 */
 .toc a {
   display: block;
   font-size: 12.5px;
   color: var(--ink-muted);
   text-decoration: none;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  border-radius: 6px;
-  padding: 4px 10px;
-  margin-bottom: 6px;
+  border: none;
+  border-left: 2px solid transparent;
+  background: transparent;
+  border-radius: 0;
+  padding: 6px 10px;
+  margin-bottom: 2px;
   font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', monospace;
   cursor: pointer;
   white-space: nowrap;
@@ -897,13 +908,22 @@ html:not([lang^="zh"]) .toc a { font-size: 11.5px; }
      原公式（本文件 782 / 828 行）自带该下限，无目录时沿用即可：正文居中、tab 保持让位起点，
      两者相差约 11px —— 这点偏差换的是「永远不压住品牌」，值得。 */
 }
-.toc a:hover { color: var(--ink); background: var(--bg-card-hover); }
+.toc a:hover { color: var(--ink); background: transparent; border-left-color: var(--border); }
 .toc a.active {
-  border-color: var(--accent);
-  color: var(--accent-deep);
-  background: var(--accent-soft);
+  border-left-color: var(--accent);
+  color: var(--ink);
+  background: transparent;
   font-weight: 600;
 }
+/* 分组小标题：告诉读者这一列是什么。小型大写 + 一条细线，与正文章节标题拉开层级 */
+.toc::before {
+  content: "本页章节";
+  display: block;
+  font-size: 10.5px; letter-spacing: .18em; color: var(--ink-muted);
+  padding: 0 10px 7px; margin-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+html:not([lang^="zh"]) .toc::before { content: "CONTENTS"; }
 .toc-toggle {
   position: fixed;
   top: 72px;
