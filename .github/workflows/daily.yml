@@ -30,6 +30,13 @@ jobs:
       - name: verify ledger
         id: verify
         run: python scripts/verify_ledger.py
+      # 口径自检：verify_ledger 管「发布过的值没被改写」，这一步管「今天的值仍由
+      # 同一把尺算出」——当日头条百分位用参考实现独立重算一遍对账（取数漂移/
+      # 窗口污染/代码漂移三种翻车都会在此现形）。必须在 commit 之前跑——
+      # 产物 data/gauge_math.json 随 git add data 一起提交、公开可查。
+      - name: verify gauge math
+        id: gaugemath
+        run: python scripts/verify_gauge_math.py
       # 哈希链：让「这份数据确实是那天记的」十年后仍能被外人验证。
       # 必须在 commit 之前跑——此刻 data/ 已是当日终稿，哈希算的就是随后被提交的那份字节。
       # 🔑 链（而非独立每日哈希）的全部理由：独立哈希挡不住「事后偷偷删掉难看的那几天」，
@@ -87,3 +94,5 @@ jobs:
           # 真出事时 JOB_STATUS 那道闸会先响。
           LEDGER_DELTA: ${{ steps.verify.outputs.delta }}
           LEDGER_RELIABLE: ${{ steps.verify.outputs.reliable }}
+          # 空值（gaugemath 步骤没跑成）→ 不发这条告警也不谎报正常，JOB_STATUS 闸先响
+          GAUGE_MATH_OK: ${{ steps.gaugemath.outputs.ok }}

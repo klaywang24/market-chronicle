@@ -94,6 +94,24 @@ def main():
               "**已发布过的数值被改写，或有交易日消失。**\n" + "\n".join(lines)
               + f"\n\n逐条明细：data/ledger_audit.json\n日志：{run_url}")
 
+    # ③b 口径自检（2026-07-25 新增）：当日头条读数用参考实现独立重算一遍。
+    #    verify_ledger 管「发布过的值有没有被改」，这条管「今天发布的值是不是仍由
+    #    同一把尺算出」——取数漂移/窗口污染/代码漂移三种翻车都在这里现形。
+    #    触发判据取 env（同③的理由：不读旧文件发平安播报）；明细读本次刚写的文件。
+    if os.environ.get("GAUGE_MATH_OK") == "false":
+        gm = load("gauge_math") or {}
+        lines = [f'· {m.get("field")} @ {m.get("date")}：存档 {m.get("stored")} vs '
+                 f'重算 {m.get("recomputed")}（差 {m.get("diff")}）'
+                 for m in (gm.get("mismatches") or [])[:6]]
+        lines += [f'· 完整性：{p.get("kind")}：{p.get("detail")}'
+                  for p in (gm.get("integrity_problems") or [])[:4]]
+        alert(url, "🔴 恐惧的标价：口径自检失败（当日读数与参考实现对不上）",
+              "**今天发布的头条读数，用同一把尺独立重算对不上了。**\n"
+              "可能：当日取数进了脏值 / 序列窗口被污染 / 计算口径被改动。\n"
+              "**发 digest / 出卡前先人工核对。**\n"
+              + "\n".join(lines)
+              + f"\n\n明细：data/gauge_math.json\n日志：{run_url}")
+
     # ④ 非致命小节失败（2026-07-19 新增）：build_data 的 _guard 把失败写进 meta.json。
     #    此前这些失败只 print 进 Actions 日志，而没有人每天读日志——2026-07-12→14 静默死
     #    4 天就是这个形态。job 整体仍是 success，所以①②③都不会响，必须单独看这个字段。
