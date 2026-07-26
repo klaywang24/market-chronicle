@@ -60,6 +60,11 @@
     "两个原创指标，一本逐日自动记的账：赢的和输的都在账上。": ["Two original indicators, one ledger written automatically every trading day: wins and losses alike.", "", "", ""],
     "最新一期判读 · 每个交易日盘前更新": ["The latest read · updated before every open", "", "", ""],
     "每个交易日盘前更新": ["Updated before every open", "", "", ""],
+    // 2026-07-26 §45：TV 热力图撤换（自有板块涨跌图）+ 往期存档墙（时间墙模型）
+    "今天热在哪 · 各板块涨跌家数（标普 500 全成分股 · 自有数据，每日收盘后更新）": ["Where today ran hot · advancers vs decliners by sector (all S&P 500 members · our own data, updated after each close)", "", "", ""],
+    "往期判读 · 公开归档": ["Past reads · public archive", "", "", ""],
+    "全部往期，公开可查，越攒越厚": ["Every past issue, public and growing", "", "", ""],
+    "当日完整判读只进订户邮箱": ["Today's full read goes only to subscribers' inboxes", "", "", ""],
     "完整判读只进订户邮箱": ["The full read goes only to subscribers' inboxes", "", "", ""],
     "前向台账：第": ["Forward ledger: day", "", "", ""],
     "个交易日 · 自 2026-07-13 起": ["· recorded live since 2026-07-13", "", "", ""],
@@ -378,8 +383,7 @@
     "每个点是一次极端恐惧段：横轴 = 当日 VIX（恐慌的保费水位），纵轴 = 12 个月后纳指涨跌幅；绿 = 涨、红 = 跌 · 点任意点看当次 · 历史描述，非建议": ["Each dot is one extreme-fear segment: x = VIX that day (the panic premium level), y = Nasdaq-100 change 12 months later; green = up, red = down · click any dot for that instance · historical description, not advice.", "", "", ""],
     "任一时点回看三年的年化收益率；实线为机械跟随、虚线为满仓两个锚：纯历史对照，说明\"低暴露≠更优\"，非策略推荐 · 底部滑块可拖拽缩放": ["Annualized return looking back three years at any point; the solid line is mechanical follow, the dashed lines are two fully-invested anchors — a pure historical comparison showing \"lower exposure ≠ better,\" not a strategy recommendation · drag the slider below to zoom.", "", "", ""],
     "指数 ETF": ["Index ETFs", "ETF indiciels", "Index-ETFs", "ETF de índice"],
-    "图表由 TradingView 提供，当前网络连不上它的服务器（中国大陆地区需要国际网络）。站内其他板块的历史数据不受影响，可正常浏览。": [
-      "Charts are served by TradingView, which is unreachable on the current network (mainland China requires an international connection). All other sections of this site work normally.", "", "", ""],
+    // 2026-07-26 §45：删「图表由 TradingView 提供…连不上」死键（行情 tab 07-18 已下线，无处可显）。
     "重试": ["Retry", "", "", ""],
     "宏观": ["Macro", "Macro", "Makro", "Macro"],
     "纳指 100": ["Nasdaq-100", "Nasdaq-100", "Nasdaq-100", "Nasdaq-100"],

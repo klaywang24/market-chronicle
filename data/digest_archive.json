@@ -1,0 +1,15 @@
+{
+  "_note": "往期判读存档墙（头版判读卡下方）。契约：digest 收口时在 issues 数组头部插入当日一行（date=发送日 / title=邮件标题原样照录 / url=Buttondown 存档页真实链接），随当日提交 push。标题与链接必须取自 Buttondown 存档页实况，绝不手编。头版只渲染最新若干期 + 全部往期链接。",
+  "archive_index": "https://buttondown.com/klay24/archive/",
+  "issues": [
+    { "date": "2026-07-25", "title": "存储跌了三成，上车的票反而更贵了 · 07-25", "url": "https://buttondown.com/klay24/archive/u5b58-u50a8-u8dcc-u4e86-u4e09-u6210-u4e0a-u8f66/" },
+    { "date": "2026-07-24", "title": "昨天市场挨了三记重拳，却在收盘前自己爬了起来 · 07-24", "url": "https://buttondown.com/klay24/archive/u6628-u5929-u5e02-u573a-u6328-u4e86-u4e09-u8bb0/" },
+    { "date": "2026-07-23", "title": "Google CFO 还没念出数字，存储股的期权已经把剧本演完了 · 07-23", "url": "https://buttondown.com/klay24/archive/google-cfo-u8fd8-u6ca1-u5ff5-u51fa-u6570-u5b57/" },
+    { "date": "2026-07-22", "title": "财报开牌前，聪明钱在买翅膀 · 07-22", "url": "https://buttondown.com/klay24/archive/u8d22-u62a5-u5f00-u724c-u524d-u806a-u660e-u94b1/" },
+    { "date": "2026-07-21", "title": "有人花一万二，买了张四分钱的崩盘险 · 07-21", "url": "https://buttondown.com/klay24/archive/u6709-u4eba-u82b1-u4e00-u4e07-u4e8c-u4e70-u4e86/" },
+    { "date": "2026-07-20", "title": "三个互不相识的市场，同一天把怕调贵了 · 07-20", "url": "https://buttondown.com/klay24/archive/u4e09-u4e2a-u4e92-u4e0d-u76f8-u8bc6-u7684-u5e02/" },
+    { "date": "2026-07-17", "title": "大跌的日子，多数人反而不打开账户", "url": "https://buttondown.com/klay24/archive/u5927-u8dcc-u7684-u65e5-u5b50-u591a-u6570-u4eba/" },
+    { "date": "2026-07-16", "title": "恐惧的标价 · 07-15 收盘", "url": "https://buttondown.com/klay24/archive/u6050-u60e7-u7684-u6807-u4ef7-07-15-u6536-u76d8/" },
+    { "date": "2026-07-15", "title": "市场对眼前一点也不怕，却对一年后要价 74 分位", "url": "https://buttondown.com/klay24/archive/u5e02-u573a-u5bf9-u773c-u524d-u4e00-u70b9-u4e5f-1012/" }
+  ]
+}

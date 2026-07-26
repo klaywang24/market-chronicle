@@ -1898,55 +1898,57 @@
   });
   chart("macro", "ch-macro-profits", macroBars("cp_yoy", "企业利润同比"));
 
-  // ---------------- 今日 · 头版：板块热力图（TradingView 官方免费 widget） ----------------
-  // MC 语言码 → TradingView locale
-  function tvLocale() {
-    const L = document.documentElement.lang;
-    return L === "zh-CN" ? "zh_CN" : L === "zh-TW" ? "zh_TW" : (L || "en");
-  }
-  // 把 TradingView 标普 500 热图挂到 #pulse-base 里的容器；随日夜/语言重新挂载
-  function mountHeatmap() {
-    const box = document.querySelector("#pulse-base .tv-heatmap");
-    if (!box) return;
-    // TradingView 组件按配置里的固定像素高度自撑（用 "100%" 会取父高→塌成 0）
-    const h = window.innerWidth <= 900 ? 460 : 620;
-    const L = tvLocale();
-    // 版权署名随语言（TradingView 名字+链接必须保留；后缀本地化避免中文残留）
-    const credit = { zh_CN: " 提供热图数据", zh_TW: " 提供熱圖數據", en: " heatmap data",
-      fr: " — données heatmap", de: " — Heatmap-Daten", es: " — datos del mapa" }[L] || " heatmap data";
-    box.innerHTML =
-      '<div class="tradingview-widget-container__widget" style="height:' + (h - 22) + 'px;width:100%"></div>' +
-      '<div class="tradingview-widget-copyright">' +
-      '<a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">TradingView</a>' + credit + '</div>';
-    // 不注入 TradingView 引导脚本（TV 文档警告动态注入会出问题、Safari 曾因此反复崩溃渲染进程），
-    // 直接自己拼 iframe：引导脚本唯一职责就是拼它
-    const cfg = {
-      dataSource: "SPX500",
-      blockSize: "market_cap_basic",
-      blockColor: "change",
-      grouping: "sector",
-      locale: L,
-      symbolUrl: "",
-      // TradingView 不支持自定义背景/透明（isTransparent 会被丢弃），亮色主题是刺眼白底。
-      // 故始终用 dark 主题 + 深色边框，做成「嵌入式数据面板」，在羊皮纸亮色下也像有意为之的暗屏。
-      colorTheme: "dark",
-      hasTopBar: false,
-      isDataSetEnabled: false,
-      isZoomEnabled: true,
-      hasSymbolTooltip: true,
-      isMonoSize: false,
-      width: "100%",
-      height: h - 22,
+  // ---------------- 今日 · 头版：板块涨跌（自有数据） ----------------
+  // 2026-07-26 §45（用户裁）：撤下 TradingView 热力图 iframe，本图以自有数据补位。撤换四由：
+  // ① CTA 之后不放全页唯一的交互玩具（转化设计最典型的漏）② 全站唯一不属于自己的组件，
+  //    卖「可追责自有记录」的站把首页版面租给别人=叙事矛盾 ③ 热力图是全网最商品化的部件，
+  //    这一格永远赢不了也不需要赢 ④ iframe 无 lazy、首屏外同步加载实测 1.2s+，移动端 500 块不可读。
+  // 数据 = data/pulse_heatmap.json（管线每日收盘产出，[ticker, sector, 当日涨跌%, 市值] 503 行）。
+  // 生命周期与旧 mountHeatmap 完全一致：renderPulse 每次重建 DOM 后调用（日夜/语言切换即重画）。
+  // 数据实况：pulse_heatmap.json 用 GICS 标准 11 板块（已核 503 行全覆盖）。未命中一律原名显示，绝不猜。
+  const SECTOR_ZH = {
+    "Information Technology": "信息技术", "Health Care": "医疗保健", "Financials": "金融",
+    "Consumer Discretionary": "可选消费", "Consumer Staples": "必需消费", "Industrials": "工业",
+    "Energy": "能源", "Materials": "原材料", "Utilities": "公用事业", "Real Estate": "房地产",
+    "Communication Services": "通信服务",
+  };
+  // 标准 build 契约（接收调色板，返回 option）→ 注册进 registry：
+  // 实例由 buildOne 的 built Map 统一管理，于是自动继承全站三件事 ——
+  // ① 日夜切换 rebuildAll 重画（取色随主题）② 语言切换重画 ③ 全局 resize（app.js:254）。
+  // 自己 init + 自挂 resize 会绕开这套，主题切一次轴标签就留在旧色（07-26 实测栽过一次）。
+  async function buildSectorOption(p) {
+    const hm = await load("pulse_heatmap");   // 抛错由 buildOne 接住 → 显示「数据更新中」占位
+    const agg = {};
+    (hm.rows || []).forEach((r) => {
+      const sec = r[1], chg = r[2];
+      if (!agg[sec]) agg[sec] = { up: 0, down: 0 };
+      if (chg > 0) agg[sec].up++; else if (chg < 0) agg[sec].down++;
+    });
+    // 升序排：ECharts 类目轴自下而上 → 涨家占比最高的板块画在最顶
+    const secs = Object.keys(agg).sort((a, b) =>
+      agg[a].up / ((agg[a].up + agg[a].down) || 1) - agg[b].up / ((agg[b].up + agg[b].down) || 1));
+    // 语言自判而不交给 i18nOption：GICS 板块名没有 D 键，交出去 EN 下会留一排中文。
+    // 返回值已是目标语言，i18nOption 再跑一遍无副作用（ZH 直接 return，EN 拿到英文不动）。
+    const zh = !window.MC_I18N || MC_I18N.lang() === "zh";
+    const lbl = (o) => (o.value > 0 ? o.value : "");
+    return {
+      grid: { left: 8, right: 34, top: 4, bottom: 4, containLabel: true },
+      tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+      xAxis: { type: "value", show: false },
+      yAxis: { type: "category", data: secs.map((x) => (zh ? (SECTOR_ZH[x] || x) : x)),
+        axisLine: { show: false }, axisTick: { show: false },
+        axisLabel: { color: p.inkSoft, fontSize: 12 } },
+      series: [
+        { name: zh ? "上涨" : "Advancers", type: "bar", stack: "b", barWidth: 15,
+          data: secs.map((x) => agg[x].up), itemStyle: { color: p.moss },
+          label: { show: true, position: "inside", fontSize: 10, color: "#fff", formatter: lbl } },
+        { name: zh ? "下跌" : "Decliners", type: "bar", stack: "b", barWidth: 15,
+          data: secs.map((x) => agg[x].down), itemStyle: { color: p.danger },
+          label: { show: true, position: "inside", fontSize: 10, color: "#fff", formatter: lbl } },
+      ],
     };
-    const ifr = document.createElement("iframe");
-    ifr.src = "https://www.tradingview-widget.com/embed-widget/stock-heatmap/?locale=" + L +
-      "#" + encodeURIComponent(JSON.stringify(cfg));
-    ifr.style.cssText = "width:100%;height:" + (h - 22) + "px;border:0;display:block";
-    ifr.setAttribute("frameborder", "0");
-    ifr.setAttribute("allowtransparency", "true");
-    ifr.setAttribute("scrolling", "no");
-    box.querySelector(".tradingview-widget-container__widget").appendChild(ifr);
   }
+  chart("pulse", "ch-breadth-sector", buildSectorOption);
 
   // ---------------- 今日 · 头版（聚光灯封面） ----------------
   // ---------------- 信号台账图表（头版紧凑版 + K/LEAPS 页缩放版共用） ----------------
@@ -2268,6 +2270,10 @@
     // 超过 6 天未更新自动回退为纯送达行 —— 机制烂掉时站上不留过期样品。
     let jt = null;
     try { jt = await load("judgment_teaser"); } catch (e) {}
+    // 2026-07-26 §45：往期存档墙（时间墙模型：当日只进订户邮箱，往期归档公开）。
+    // 数据契约见 data/digest_archive.json 的 _note：标题/链接取 Buttondown 存档实况，绝不手编。
+    let arch = null;
+    try { arch = await load("digest_archive"); } catch (e) {}
     const jtFresh = jt && jt.date && jt.zh &&
       (Date.now() - new Date(jt.date + "T00:00:00").getTime()) / 86400000 < 6.5;
 
@@ -2364,9 +2370,15 @@
             <p class="jt-body jt-zh">${jt.zh}</p>
             <p class="jt-body jt-en">${jt.en || jt.zh}</p>
           </div>
-          <p class="jt-lock"><span>完整判读只进订户邮箱</span> → <a href="pricing">盘前数据简报</a></p>
+          <p class="jt-lock"><span>当日完整判读只进订户邮箱</span> → <a href="pricing">盘前数据简报</a></p>
         </div>` : `
         <p class="ledger-note">这一页的读数，每个交易日盘前送进邮箱 → <a href="pricing">盘前数据简报</a></p>`}
+        ${arch && arch.issues && arch.issues.length ? `
+        <div class="digest-archive">
+          <div class="da-head"><span>往期判读 · 公开归档</span></div>
+          ${arch.issues.slice(0, 6).map((i) => `<a class="da-row" href="${i.url}" target="_blank" rel="noopener"><span class="da-date">${i.date.slice(5)}</span><span class="da-title">${i.title}</span></a>`).join("")}
+          <a class="da-all" href="${arch.archive_index}" target="_blank" rel="noopener"><span>全部往期，公开可查，越攒越厚</span> →</a>
+        </div>` : ""}
         <p class="ledger-note lv-line"><a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener"><span>在 GitHub 验证台账</span></a> · <span>每个交易日的读数，每日收盘自动更新提交，带 GitHub 时间戳，事后不可改写，GitHub 精确可查</span>${fwdN != null ? ` · <span>前向台账：第</span> <b class="fwd-n">${fwdN}</b> <span>个交易日 · 自 2026-07-13 起</span>` : ""}</p>
         <p class="ledger-note">15 年台账与全部输赢（包括跑输的那部分）→ <a href="kindex">K 指数</a> · <a href="leaps">恐惧的标价</a></p>
       </div>`;
@@ -2413,8 +2425,8 @@
         <div class="breadth-note">上涨家数占比 ${d.adv_ratio}%（(涨 + 平÷2) ÷ ${d.total}），处于近一年第 ${pct(d.sent_pct)} 百分位</div>
       </div>
       <div>
-        <div class="pulse-section-label">板块热力图 · 标普 500 全成分股（面积 = 市值 · 颜色 = 当日涨跌 · 点任意板块可放大细看）</div>
-        <div class="tv-heatmap heat-tree tradingview-widget-container"></div>
+        <div class="pulse-section-label">今天热在哪 · 各板块涨跌家数（标普 500 全成分股 · 自有数据，每日收盘后更新）</div>
+        <div id="ch-breadth-sector" class="sector-breadth"></div>
       </div>
       <div class="pulse-foot">滑动光标，掀开夜之一角。数据每交易日收盘后自动更新；温度是尺度不是信号：96 度的估值曾经烫了三年。</div>`;
 
@@ -2468,9 +2480,10 @@
     if (clonedSvg) clonedSvg.remove();
     if (rBand) await drawCentury(rBand, "#E0B05A", 0.8, 2, 0.9, false);
 
-    // 板块热力图：挂 TradingView 官方 widget（只挂日间层；揭示层的空容器留着不挂，
-    // 聚光灯只掀开顶部时间线，热图区不会被揭示，无需第二个 widget）
-    mountHeatmap();
+    // 板块涨跌图（自有数据，§45 取代 TradingView widget）：只画日间层 —— 聚光灯只掀开顶部
+    // 时间线，本区不会被揭示；揭示层的克隆容器已被上面 removeAttribute("id") 摘掉 id，不会抢渲染。
+    // 走 buildOne 而非自建实例：renderPulse 每次重建 DOM，旧实例须由 built Map 统一 dispose。
+    buildOne("ch-breadth-sector", buildSectorOption);
 
     // 台账两张图已随头版瘦身撤除（buildLedgerMap/Eq 仍服务 K 页与恐惧的标价页）；
     // stampSources 保留：它统一给全站 .card 补数据源行，与头版是否有图无关

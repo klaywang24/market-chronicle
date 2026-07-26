@@ -32,7 +32,7 @@
         body: `<h3>What it is</h3>
 <p>Market Chronicle organizes the history of the S&amp;P 500, the Nasdaq, and baskets such as financials, consumer and luxury into a chapter-by-chapter visual record: the shape of returns, the rhythm of crises, the anchors of valuation, the texture of volatility, the compounding of time. Beyond the long-history charts, three original lenses — the "Today's Front Page" market temperature, the "KAPX Index", and the "LEAPS Window".</p>
 <h3>Data &amp; methodology</h3>
-<p>Prices and returns approximate total return using adjusted close; CAPE / PE(TTM) come from multpl / Robert Shiller's long series; the Fear &amp; Greed reading is from CNN; company fundamentals from macrotrends and Yahoo Finance; the daily sector heatmap is TradingView's live data. Long-history charts mostly use a log scale so that century-scale moves read honestly — 1929 fell far more than 2000 or 2008, so it should look steeper. That is the data being truthful. This site does exactly one thing with numbers: faithful transcription — values enter the ledger as the official sources published them that day, never altered. If a source later revises its data, the original row stays as recorded — it captures what the source said at the time — and the revision is noted separately, never silently overwritten.</p>
+<p>Prices and returns approximate total return using adjusted close; CAPE / PE(TTM) come from multpl / Robert Shiller's long series; the Fear &amp; Greed reading is from CNN; company fundamentals from macrotrends and Yahoo Finance; the sector breadth panel is computed by our own pipeline from all S&P 500 members at each close. Long-history charts mostly use a log scale so that century-scale moves read honestly — 1929 fell far more than 2000 or 2008, so it should look steeper. That is the data being truthful. This site does exactly one thing with numbers: faithful transcription — values enter the ledger as the official sources published them that day, never altered. If a source later revises its data, the original row stays as recorded — it captures what the source said at the time — and the revision is noted separately, never silently overwritten.</p>
 <h3>How it's built</h3>
 <p>This site was built by one person and hosted as pure static files — no server, no database; the data is just a few hundred JSON files sitting in a public repo, open for anyone to inspect. The data pipeline (Python, yfinance / pandas + GitHub Actions) pulls data, computes metrics, commits and redeploys automatically after each trading day's close. The code is source-available under PolyForm Noncommercial 1.0.0 — free for noncommercial use; commercial use requires a separate license.</p>
 <h3>Disclaimer, in one line</h3>
@@ -57,12 +57,12 @@
 <li><strong>Browser local storage</strong>: used only to remember your "day/night theme" and "interface language" — functionally necessary, stored on your own device, never uploaded, and containing no personally identifying information.</li>
 </ul>
 <h3>Cookies</h3>
-<p>We <strong>set no tracking cookies of our own and run no in-house analytics</strong>. The third-party embeds below (notably TradingView) may set their own cookies; you can block or clear them in your browser at any time.</p>
+<p>We <strong>set no tracking cookies of our own and run no in-house analytics</strong>. The third-party components below may set their own cookies; you can block or clear them in your browser at any time.</p>
 <h3>Third parties &amp; international transfers</h3>
 <p>Loading a page makes requests to the following third parties, which may transfer your IP and similar technical data to servers outside your region (including the US). Their own privacy policies apply, and we do not control their processing:</p>
 <ul>
 <li>Google Fonts (fonts.googleapis.com) — web fonts;</li>
-<li>TradingView (tradingview.com) — the sector heatmap widget, may set its own cookies;</li>
+<!-- 2026-07-26 §45: TradingView heatmap removed; entry deleted with it. -->
 <li>parqet (assets.parqet.com) — company logo icons;</li>
 <li>Cloudflare Web Analytics (cloudflareinsights.com) — cookie-less aggregated visit statistics (pageviews, referrers, country); it sets no cookies and does no cross-site tracking, and we never see any individual visitor's identity or IP;</li>
 <li>Cloudflare Pages (pages.dev) — the website host.</li>
@@ -90,7 +90,7 @@
 <h3>Limitation of liability</h3>
 <p>To the maximum extent permitted by law, we are not liable for any direct or indirect loss arising from your use of, or inability to use, this site.</p>
 <h3>Intellectual property &amp; third parties</h3>
-<p>The site's code is source-available under PolyForm Noncommercial 1.0.0 (see the GitHub repo) — free for noncommercial use, commercial use requires a separate license; charts and copy are for personal, non-commercial reference. Embedded third-party components (such as TradingView) are governed by their own terms.</p>
+<p>The site's code is source-available under PolyForm Noncommercial 1.0.0 (see the GitHub repo) — free for noncommercial use, commercial use requires a separate license; charts and copy are for personal, non-commercial reference. Third-party services referenced by the site are governed by their own terms.</p>
 <h3>Paid products &amp; billing</h3>
 <p>Checkout, invoicing and taxes for this site's paid subscriptions are handled by <strong>Paddle as the Merchant of Record</strong> — meaning your payment contract is with Paddle, and its terms and privacy policy also apply. Purchasers must be 18 or the age of majority in their jurisdiction. Refunds follow our Refund Policy.</p>
 <h3>Governing law &amp; severability</h3>
@@ -159,7 +159,7 @@
     <div class="ptier-tag">The website is free, always</div>
     <ul class="ptier-list">
       <li>All index ledgers + today's readings (Fear's Price Tag / KAPX / market temperature)</li>
-      <li>A century of charts + methodology + sector heatmap</li>
+      <li>A century of charts + methodology + sector breadth</li>
       <li>Verifiable day by day in the public GitHub commit log</li>
       <li>On days of extreme readings, one free email (triggered by readings, not the calendar)</li>
       <li>No ads · no paywall · no sign-up</li>
@@ -179,7 +179,7 @@
     <div class="ptier-tag"><span class="p-m"></span><span class="p-y">≈ $24 / mo · annual = 10 months' price</span></div>
     <ul class="ptier-list">
 <!-- 2026-07-26 用户裁：与中文同步 —— 头版开始露每期开头两句（judgment_teaser），措辞先行。 -->
-      <li><b>The full daily read</b> — subscribers' inboxes only; the site shows just the opening lines</li>
+      <li><b>Today's full read</b> — subscribers' inboxes only before the open; past issues are public in the archive</li>
       <li><b>The reading archive</b> — filed daily, compounding</li>
 <!-- 2026-07-25 用户裁：与中文版同步删除「每周一期传说处决」。该栏目暂时不产出，
      售卖页不留不在交付的承诺。⚠️ 改定价权益必须中英同改：EN 版定价面板由本文件整块替换。 -->
