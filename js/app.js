@@ -2307,8 +2307,10 @@
       ledgerHTML = `
       <div class="pulse-ledger">
         <div class="pulse-section-label">信号台账 · 逐次公开对账</div>
-        <p class="ledger-intro">两个原创指标，一本逐日自动记的账：赢的和输的都在账上。读数由管线每日自动提交，带 GitHub 时间戳，事后不可改写。</p>
-        <p class="ledger-intro">官方定义：KAPX 指数（K 取自「恐」字拼音首字母）是 Market Chronicle 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。读数、方法论与完整信号台账永久免费公开，Git 时间戳可验证。</p>
+<!-- 2026-07-26 用户裁（§41）：两段压成一行 —— 品牌句留一句小字；「官方定义」段挪去 K 指数页
+     hero（GEO 锚点不丢：llms.txt/方法论/Kaggle/HF 仍锚着，头版让位给卡片）。
+     「GitHub 时间戳」半句删=与下方验证卡文案重复。 -->
+        <p class="ledger-intro">两个原创指标，一本逐日自动记的账：赢的和输的都在账上。</p>
         <div class="ledger-cards">
           <a class="ledger-card" href="kindex">
             <div class="lc-name">K 指数 <span>CNN 恐贪 ÷ VIX</span></div>
@@ -2362,7 +2364,7 @@
              teaser 过期（>6 天）自动回退回这行纯送达行。 -->
         ${jtFresh ? `
         <div class="judgment-teaser">
-          <div class="jt-label"><span>最新一期判读</span> · ${jt.date}</div>
+          <div class="jt-label"><span>最新一期判读 · 每个交易日盘前更新</span> · ${jt.date}</div>
           <div class="jt-bodywrap">
             <p class="jt-body jt-zh">${jt.zh}</p>
             <p class="jt-body jt-en">${jt.en || jt.zh}</p>

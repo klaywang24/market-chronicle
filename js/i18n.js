@@ -50,6 +50,9 @@
     // 2026-07-26 今日判读卡 + 前向计数器 + 定价 Free 档恢复（HANDOFF §39）。
     // teaser 正文本身不走 D（逐日动态），中英双渲染由 CSS 按 html[lang] 切换；这里只译卡的外壳。
     "最新一期判读": ["The latest read", "", "", ""],
+    // 2026-07-26 §41：头版台账区两段压一行 + 判读卡标签带节奏承诺
+    "两个原创指标，一本逐日自动记的账：赢的和输的都在账上。": ["Two original indicators, one ledger written automatically every trading day: wins and losses alike.", "", "", ""],
+    "最新一期判读 · 每个交易日盘前更新": ["The latest read · updated before every open", "", "", ""],
     "完整判读只进订户邮箱": ["The full read goes only to subscribers' inboxes", "", "", ""],
     "前向台账：第": ["Forward ledger: day", "", "", ""],
     "个交易日 · 自 2026-07-13 起": ["· recorded live since 2026-07-13", "", "", ""],
