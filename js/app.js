@@ -180,12 +180,18 @@
     });
   }
 
+  // 收进「百年档案」下拉的七个面板（2026-07-25 导航精简）。与 index.html #archive-menu 保持一致。
+  const ARCHIVE_PANELS = new Set(["macro", "spy", "qqq", "tech", "fin", "consumer", "luxury"]);
+
   const panelDone = new Set();
   async function activatePanel(name) {
     document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
     document.getElementById("panel-" + name).classList.add("active");
     document.querySelectorAll(".tab").forEach((t) =>
       t.classList.toggle("active", t.dataset.panel === name));
+    // 档案下拉：组内任一面板激活时，触发器一并高亮（否则进了档案页顶栏看不出身在何处）
+    const archTrigEl = document.getElementById("archive-trigger");
+    if (archTrigEl) archTrigEl.classList.toggle("active", ARCHIVE_PANELS.has(name));
     if (!panelDone.has(name)) {
       panelDone.add(name);
       for (const { elId, build } of registry[name]) await buildOne(elId, build);
@@ -208,6 +214,43 @@
     const tab = e.target.closest(".tab");
     if (tab) location.hash = "#" + tab.dataset.panel;
   });
+
+  // ---------------- 百年档案下拉（2026-07-25 导航精简 10 → 4） ----------------
+  // 七个静态档案面板收进下拉；选中态与开合状态分开管理：
+  // .active 由 activatePanel 打（表示"你在这组里"），aria-expanded 只表示"菜单开着"。
+  {
+    const grp = document.getElementById("archive-group");
+    const trig = document.getElementById("archive-trigger");
+    const menu = document.getElementById("archive-menu");
+    if (grp && trig && menu) {
+      // 顶栏在窄屏会换行，触发器可能落在任意位置：打开时把菜单横向夹进视口，
+      // 否则纯 CSS 定位会在某些排布下把菜单推出屏幕（实测 390px 换行后 right:0 → left:-47）。
+      const place = () => {
+        const g = trig.getBoundingClientRect();          // 菜单是 fixed：坐标直接用视口系
+        menu.style.top = Math.round(g.bottom + 6) + "px";
+        const w = menu.offsetWidth || 160, pad = 8;
+        let left = g.left;
+        if (left + w > window.innerWidth - pad) left = window.innerWidth - pad - w;  // 右侧越界回拉
+        if (left < pad) left = pad;                                                   // 左侧越界推回
+        menu.style.left = Math.round(left) + "px";
+      };
+      const setOpen = (open) => {
+        menu.hidden = !open;
+        trig.setAttribute("aria-expanded", String(open));
+        if (open) place();
+      };
+      trig.addEventListener("click", (e) => { e.stopPropagation(); setOpen(menu.hidden); });
+      // 选完即关：点的是 .tab，hash 变化由 #tabs 的委托处理，这里只负责收起菜单
+      menu.addEventListener("click", () => setOpen(false));
+      document.addEventListener("click", (e) => { if (!grp.contains(e.target)) setOpen(false); });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !menu.hidden) { setOpen(false); trig.focus(); }
+      });
+      // fixed 定位不跟随滚动，滚动时收起，免得菜单僵在半空
+      window.addEventListener("scroll", () => { if (!menu.hidden) setOpen(false); }, { passive: true });
+      window.addEventListener("resize", () => { if (!menu.hidden) place(); });
+    }
+  }
   window.addEventListener("resize", () => built.forEach((c) => c.resize()));
 
   // ---------------- 篮子板块配置（与 build_data.py 的 BASKETS 保持一致） ----------------

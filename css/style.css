@@ -138,6 +138,58 @@ body {
 }
 .tab:hover { color: var(--ink); background: var(--bg-card-hover);
   border-color: var(--accent); transform: translateY(-1px); }
+
+/* ---------- 百年档案下拉（2026-07-25 导航精简 10 → 4） ----------
+   触发器与 .tab 同款外观，但不带 .tab 类：#tabs 的点击委托按 .closest(".tab") 找面板，
+   带上就会被当成 data-panel=undefined 的面板点击。箭头用 ::after 画，不写进文本节点——
+   i18n 的 D 键按整个文本节点精确匹配，混进 ▾ 就匹配不上了。 */
+.tab-group { position: relative; display: inline-block; flex-shrink: 0; }
+.tab-trigger {
+  padding: 7px 13px; border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--ink-muted); font: inherit; font-size: 14px; cursor: pointer;
+  border-radius: 8px; white-space: nowrap;
+  transition: border-color .3s ease, background-color .3s ease, color .3s ease, transform .3s cubic-bezier(.22,.61,.36,1);
+}
+.tab-trigger::after { content: "▾"; margin-left: 6px; font-size: 11px; opacity: .65; }
+.tab-trigger:hover { color: var(--ink); background: var(--bg-card-hover);
+  border-color: var(--accent); transform: translateY(-1px); }
+.tab-trigger[aria-expanded="true"]::after { opacity: 1; }
+/* 选中态：档案组里任一面板激活时，触发器整块反色（与 .tab.active 同构） */
+.tab-trigger.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+/* 🚨 必须 fixed，不能 absolute：.tabs 带 overflow-x:auto（顶栏横滚保护），
+   而 CSS 规范里 overflow-x 一旦不是 visible，overflow-y 就会被计算成 auto ——
+   绝对定位的子元素会被容器裁掉。实测 absolute 时菜单 317px 全在容器外＝整个不可见，
+   但 getBoundingClientRect 照样返回正常矩形、hidden=false、display=flex，
+   程序化断言全绿却什么都没画出来（rect 有值 ≠ 可见）。fixed 不受祖先 overflow 裁切。
+   代价：top/left 必须由 JS 每次打开时算（app.js 的 place()）。 */
+.tab-menu {
+  position: fixed; top: 0; left: 0; z-index: 60;
+  display: flex; flex-direction: column; gap: 3px; min-width: 160px; padding: 6px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.16);
+}
+html.dark-mode .tab-menu { box-shadow: 0 10px 28px rgba(0,0,0,.5); }
+.tab-menu[hidden] { display: none; }   /* 必须显式写：display:flex 会盖掉 hidden 属性 */
+.tab-menu .tab { border-color: transparent; background: transparent; text-align: left; width: 100%; }
+.tab-menu .tab:hover { transform: none; background: var(--bg-card-hover); }
+
+/* 菜单的横向位置由 JS 打开时按视口夹取（app.js 的 place()）：顶栏在窄屏会换行，
+   触发器可能落在任意一行的任意位置，纯 CSS 的 left:0 / right:0 都会在某种排布下把菜单推出视口
+   （实测 390px 换行后 right:0 得到 left:-47，菜单一半在屏幕外）。 */
+
+/* 窄屏尺寸收紧（2026-07-25）：精简后四项在 579px 实测需 402px、可用 358px，差 44px 就要横滚，
+   「百年档案」被切在右边缘、用户不知道能滑。收紧内距+字号+间距共省约 50px，四项一次排满不横滚。
+   ⚠️ 改 tab 文案或再加一级项后必须重测这里。 */
+.tab .t-short { display: none; }
+@media (max-width: 700px) {
+  .tabs { gap: 6px; }
+  .tab, .tab-trigger { padding: 7px 9px; font-size: 13px; }
+  .tab-trigger::after { margin-left: 4px; }
+  /* 窄屏换短标签：两个台账去掉「· 台账」后腾出约 65px，四项一行排得下 */
+  .tab .t-full { display: none; }
+  .tab .t-short { display: inline; }
+}
 .tab.active:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .tab.active {
   background: var(--ink);

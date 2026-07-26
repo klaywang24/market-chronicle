@@ -150,6 +150,7 @@
     "K 指数": ["KAPX", "KAPX", "KAPX", "KAPX"],
     // 2026-07-16 顶栏改名（对外一直说「台账」，站上却没一处入口用这个词 = 命名不一致）。
     // ⚠️ applyTo 按整节点精确匹配 D：改了 index.html 的 tab 文字就必须在这加新 key，否则 EN 下 fallback 成中文。
+    "百年档案": ["The Archive", "Les archives", "Das Archiv", "El archivo"],
     "K 指数 · 台账": ["KAPX · Ledger", "KAPX · Registre", "KAPX · Journal", "KAPX · Registro"],
     "恐惧的标价 · 台账": ["The Price of Fear · Ledger", "Le prix de la peur · Registre", "Der Preis der Angst · Journal", "El precio del miedo · Registro"],
     "LEAPS 窗口": ["LEAPS Window", "Fenêtre LEAPS", "LEAPS-Fenster", "Ventana LEAPS"],
