@@ -2270,8 +2270,9 @@
     // 超过 6 天未更新自动回退为纯送达行 —— 机制烂掉时站上不留过期样品。
     let jt = null;
     try { jt = await load("judgment_teaser"); } catch (e) {}
-    // 2026-07-26 §45：往期存档墙（时间墙模型：当日只进订户邮箱，往期归档公开）。
-    // 数据契约见 data/digest_archive.json 的 _note：标题/链接取 Buttondown 存档实况，绝不手编。
+    // 2026-07-26 §46：每周对账墙。公开度按品类切而非按时间 —— 周报/月报公开（拉新·可转发），
+    // 每日 digest 永不进表（付费独占）。按时间切会让付费者觉得「等一天就免费」，且架空
+    // 定价页「判读档案」那条权益。数据契约见 data/digest_archive.json 的 _note：绝不手编。
     let arch = null;
     try { arch = await load("digest_archive"); } catch (e) {}
     const jtFresh = jt && jt.date && jt.zh &&
@@ -2375,7 +2376,7 @@
         <p class="ledger-note">这一页的读数，每个交易日盘前送进邮箱 → <a href="pricing">盘前数据简报</a></p>`}
         ${arch && arch.issues && arch.issues.length ? `
         <div class="digest-archive">
-          <div class="da-head"><span>往期判读 · 公开归档</span></div>
+          <div class="da-head"><span>每周对账 · 公开归档</span></div>
           ${arch.issues.slice(0, 6).map((i) => `<a class="da-row" href="${i.url}" target="_blank" rel="noopener"><span class="da-date">${i.date.slice(5)}</span><span class="da-title">${i.title}</span></a>`).join("")}
           <a class="da-all" href="${arch.archive_index}" target="_blank" rel="noopener"><span>全部往期，公开可查，越攒越厚</span> →</a>
         </div>` : ""}
