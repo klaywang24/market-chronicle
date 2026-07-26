@@ -1730,8 +1730,12 @@ html.rv-on .rv.rv-in { opacity: 1; transform: none; }
   padding: 14px 16px 11px; border: 1px solid var(--border); border-left: 3px solid var(--accent);
   border-radius: 10px; background: var(--bg-card);
 }
-/* 2026-07-26 用户裁：标签标红加粗引导注意力 —— 与站上红色 kicker（TODAY'S FRONT PAGE 等）同一视觉语言 */
-.jt-label { font-size: 10.5px; letter-spacing: .14em; color: var(--accent); font-weight: 700; margin-bottom: 8px; }
+/* 2026-07-26 用户裁：标签标红加粗引导注意力 —— 与站上红色 kicker（TODAY'S FRONT PAGE 等）同一视觉语言。
+   同日追补：三段左中右撑满卡宽（space-between），窄屏允许折行。 */
+.jt-label {
+  display: flex; justify-content: space-between; gap: 8px 14px; flex-wrap: wrap;
+  font-size: 10.5px; letter-spacing: .14em; color: var(--accent); font-weight: 700; margin-bottom: 8px;
+}
 .jt-body { margin: 0; font-size: 14px; line-height: 1.8; color: var(--ink); }
 .jt-en { display: none; }
 html:not([lang^="zh"]) .jt-zh { display: none; }

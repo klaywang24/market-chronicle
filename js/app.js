@@ -2288,7 +2288,8 @@
     const q = d.quotes || {};
     const windowOpen = leaps && leaps.current && leaps.current.window_open;
 
-    // 信号台账区块（数据不全时整块跳过，不出残缺 UI）
+    // 读数台账区块（数据不全时整块跳过，不出残缺 UI）。2026-07-26 §43 用户裁：头版去「信号」「战报」——
+    // 台账不动，措辞把主语说死：收益率是纳指 100 在触发日之后的表现，不是任何人的收益。
     let ledgerHTML = "";
     if (leaps && kd && ks && kd.current && leaps.current) {
       const fmt = (v) => (v == null ? "--" : (v > 0 ? "+" : "") + v.toFixed(1) + "%");
@@ -2306,7 +2307,7 @@
       const lastLRet = lastL.ndx_to_date != null ? lastL.ndx_to_date : lastL.spx_to_date;
       ledgerHTML = `
       <div class="pulse-ledger">
-        <div class="pulse-section-label">信号台账 · 逐次公开对账</div>
+        <div class="pulse-section-label">读数台账 · 逐次公开对账</div>
 <!-- 2026-07-26 用户裁（§41）：两段压成一行 —— 品牌句留一句小字；「官方定义」段挪去 K 指数页
      hero（GEO 锚点不丢：llms.txt/方法论/Kaggle/HF 仍锚着，头版让位给卡片）。
      「GitHub 时间戳」半句删=与下方验证卡文案重复。 -->
@@ -2316,7 +2317,7 @@
             <div class="lc-name">K 指数 <span>CNN 恐贪 ÷ VIX</span></div>
             <div class="lc-val">${kd.current.k.toFixed(2)}</div>
             <div class="lc-state ${kTrig ? "neg" : "pos"}">${kTrig ? "触发中" : "未触发"} <span>（K &lt; 1 触发）</span></div>
-            <div class="lc-meta"><b>${kAll}</b> <span>次信号（2011 年起）</span> · <span>60 个交易日后</span><br><span>标普</span> <b class="pos">${kWs}</b> <span>涨</span> <b class="neg">${kLs}</b> <span>跌</span> · <span>纳指</span> <b class="pos">${kW}</b> <span>涨</span> <b class="neg">${kL}</b> <span>跌</span></div>
+            <div class="lc-meta"><b>${kAll}</b> <span>次触发（2011 年起）</span> · <span>60 个交易日后</span><br><span>标普</span> <b class="pos">${kWs}</b> <span>涨</span> <b class="neg">${kLs}</b> <span>跌</span> · <span>纳指</span> <b class="pos">${kW}</b> <span>涨</span> <b class="neg">${kL}</b> <span>跌</span></div>
           </a>
           <a class="ledger-card" href="leaps">
             <div class="lc-name">LEAPS 窗口 <span>恐贪 &lt; 25 · 极端恐惧</span></div>
@@ -2325,7 +2326,7 @@
             <div class="lc-meta"><b>${lAll}</b> <span>次窗口（2011 年起）</span> · <span>12 个月后</span><br><span>标普</span> <b class="pos">${lWs}</b> <span>涨</span> <b class="neg">${lLs}</b> <span>跌</span> · <span>纳指</span> <b class="pos">${lW}</b> <span>涨</span> <b class="neg">${lL}</b> <span>跌</span></div>
           </a>
           <div class="ledger-card">
-            <div class="lc-name">最近战报 <span>按信号首日纳指 100 收盘价计</span></div>
+            <div class="lc-name">最近一次触发后的对账 <span>纳指 100 自触发日至今的涨跌 · 非任何人的收益</span></div>
             <div class="lc-row"><span class="lc-tag">K</span> <span class="lc-date">${lastK.start}</span> <span>至今</span> <b class="${lastK.fwd_to_date >= 0 ? "pos" : "neg"}">${fmt(lastK.fwd_to_date)}</b></div>
             <div class="lc-row"><span class="lc-tag">LEAPS</span> <span class="lc-date">${lastL.start}</span> <span>至今</span> <b class="${lastLRet >= 0 ? "pos" : "neg"}">${fmt(lastLRet)}</b></div>
             <!-- 2026-07-26 用户裁：删「每一次的逐条结果，见上方…」提示行 —— 与卡下方深链行重复 -->
@@ -2358,7 +2359,7 @@
              这行在 EN 态是整键替换 + 裸标点，全角逗号会复现 §40 的英文态全角标点残留。 -->
         ${jtFresh ? `
         <div class="judgment-teaser">
-          <div class="jt-label"><span>最新一期判读 · 每个交易日盘前更新</span> · ${jt.date}</div>
+          <div class="jt-label"><span>最新一期判读</span><span>每个交易日盘前更新</span><span class="jt-date">${jt.date}</span></div>
           <div class="jt-bodywrap">
             <p class="jt-body jt-zh">${jt.zh}</p>
             <p class="jt-body jt-en">${jt.en || jt.zh}</p>

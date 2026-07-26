@@ -19,6 +19,12 @@
     "方法论": ["Methodology", "Méthodologie", "Methodik", "Metodología"],
     // ---- 头版 · 信号台账 ----
     "信号台账 · 逐次公开对账": ["The Signal Ledger · every entry reconciled in public", "", "", ""],
+    // 2026-07-26 §43：头版去「信号/战报」（Paddle AUP §10 原词，final review 未过；EN 的 Signal 同罪）。
+    // 旧键保留（其他页仍在用，全站清理待用户裁）；新键只服务头版新措辞。
+    "读数台账 · 逐次公开对账": ["The Reading Ledger · every entry reconciled in public", "", "", ""],
+    "次触发（2011 年起）": ["triggers since 2011", "", "", ""],
+    "最近一次触发后的对账": ["The last trigger, reconciled", "", "", ""],
+    "纳指 100 自触发日至今的涨跌 · 非任何人的收益": ["Nasdaq-100 change since the trigger date · not anyone's returns", "", "", ""],
     "两个原创指标，一本逐日自动记的账：赢的和输的都在账上。读数由管线每日自动提交，带 GitHub 时间戳，事后不可改写。": ["Two original indicators, one ledger written automatically every trading day: wins and losses alike. Each reading is committed daily with a GitHub timestamp; nothing can be rewritten after the fact.", "", "", ""],
     "CNN 恐贪 ÷ VIX": ["CNN Fear & Greed ÷ VIX", "", "", ""],
     "恐贪 < 25 · 极端恐惧": ["Fear & Greed < 25 · extreme fear", "", "", ""],
@@ -53,6 +59,7 @@
     // 2026-07-26 §41：头版台账区两段压一行 + 判读卡标签带节奏承诺
     "两个原创指标，一本逐日自动记的账：赢的和输的都在账上。": ["Two original indicators, one ledger written automatically every trading day: wins and losses alike.", "", "", ""],
     "最新一期判读 · 每个交易日盘前更新": ["The latest read · updated before every open", "", "", ""],
+    "每个交易日盘前更新": ["Updated before every open", "", "", ""],
     "完整判读只进订户邮箱": ["The full read goes only to subscribers' inboxes", "", "", ""],
     "前向台账：第": ["Forward ledger: day", "", "", ""],
     "个交易日 · 自 2026-07-13 起": ["· recorded live since 2026-07-13", "", "", ""],
