@@ -64,6 +64,7 @@
 <li>Google Fonts (fonts.googleapis.com) — web fonts;</li>
 <li>TradingView (tradingview.com) — the sector heatmap widget, may set its own cookies;</li>
 <li>parqet (assets.parqet.com) — company logo icons;</li>
+<li>Cloudflare Web Analytics (cloudflareinsights.com) — cookie-less aggregated visit statistics (pageviews, referrers, country); it sets no cookies and does no cross-site tracking, and we never see any individual visitor's identity or IP;</li>
 <li>Cloudflare Pages (pages.dev) — the website host.</li>
 </ul>
 <h3>What we don't do</h3>
