@@ -99,7 +99,10 @@ html.dark-mode .topbar-navband { background: var(--bg); }
   display: flex; align-items: center; gap: 16px;
 }
 .topbar-mast .topbar-row { padding-bottom: 8px; }
-.topbar-mast .top-controls { margin-left: auto; }
+/* ⚠️ 必须撤销旧「方案C」的 flex:0 0 100%（本文件 ~260 行，为 .topbar-inner 时代所写）：
+   新报头行 .topbar-row 不换行，basis 100% 会让控件条从品牌右侧再撑出一整行宽 →
+   窄视口（≤400px）实测整页横溢 76px（右缘 451 vs 视口 375），全站每页中招。 */
+.topbar-mast .top-controls { margin-left: auto; flex: 0 0 auto; }
 .topbar-navband .topbar-row { padding-top: 0; padding-bottom: 0; flex-wrap: wrap; }
 /* 中和旧的 .tabs 让位边距（本文件 ~782 / ~828 行，为「品牌绝对定位 + 通栏顶栏」时代所写）。
    新结构下 .topbar-row 已 1180 居中，那个 margin-left 变成叠加 → 实测 tab 左缘被推到 430（应为 227）。
@@ -401,11 +404,13 @@ html.no-toc .toc { display: none; }
 .chart.tall { height: 560px; }
 .chart.short { height: 320px; }
 
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+/* ⚠️ 轨道必须 minmax(0,·fr) 不能裸 ·fr：裸 fr 的最小轨宽=min-content，
+   图表 canvas / 宽表会把轨道撑过容器（375px 视口实测 SPY/QQQ 页整页横溢 89px）。 */
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; }
 /* 散点需要横向空间铺开 517 个点，读数只有一个数字＋一段话 → 不等分 */
-.grid-2.wide-left { grid-template-columns: 1.55fr 1fr; }
-@media (max-width: 900px) { .grid-2.wide-left { grid-template-columns: 1fr; } }
-@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+.grid-2.wide-left { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+@media (max-width: 900px) { .grid-2.wide-left { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 900px) { .grid-2 { grid-template-columns: minmax(0, 1fr); } }
 
 /* ---------- K 指数状态卡 ---------- */
 .k-status {

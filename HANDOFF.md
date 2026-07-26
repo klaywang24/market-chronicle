@@ -2295,3 +2295,31 @@ i18n 旧键等，7·14 普查为 98 处命中），逐处清理待用户裁—�
 
 ⊕ §43 追补（同批）：判读卡标签三段改左中右撑满卡宽（`.jt-label` flex space-between，窄屏折行）——
 用户「三等分展示」裁定；「每个交易日盘前更新」独立 D 键新增。
+
+## §44 07-26：窄视口整页横滚修复——真凶不是对账表，是顶栏方案C残留 + grid-2 裸fr（v=20260726aa）
+
+报修单写的是「K 指数页逐次对账表 751px 无滚动容器撑出 76px」。实测定性：**表是清白的**——
+`#k-table` 一直在 `.table-wrap`（overflow-x:auto，style.css ~453 行）里，375px 视口下
+wrap scrollWidth 751 / clientWidth 281，滚动一直在工作。全站 18 张表（17 静态 + app.js 动态
+`${basket}-sd-ddtable`）逐一核对，全部有 `.table-wrap` 包裹，无一同病。
+
+那 76px 的真凶有两个，都是页面级 CSS 缺陷：
+
+1. **顶栏「方案C」残留**：7·26 顶栏双色带改版把容器从 `.topbar-inner` 换成 `.topbar-row` 时，
+   只想到「旧 .topbar-inner 规则自然失效」，漏了 `.top-controls { flex:0 0 100% }`（~264 行，
+   为旧结构写的整行换行触发器）仍然生效——新报头行 nowrap，basis 100% 让控件条从品牌右侧
+   再撑出一整行宽：375px 视口实测右缘 451，整页横溢 76px，**全站每页中招**，与 K 页无关。
+   修法：`.topbar-mast .top-controls` 补 `flex:0 0 auto`（~102 行，带注释）。
+   桌面回归已验：1280px 下控件右缘与行内容右缘逐像素重合（1191=1191）。
+
+2. **`.grid-2` 裸 fr 轨道爆栅**：`1fr` 的最小轨宽是 min-content，SPY/QQQ 页图表 canvas 把
+   单列轨道撑到 436px（容器 327px），375px 视口整页横溢 89px。三处轨道全改
+   `minmax(0, ·fr)`（~407-412 行，带注释）。
+
+验收（本机 375px 与 1280px 各一轮）：21 个 panel 全扫 docOverflowX=0，EN 态抽查
+kindex/spy/pulse 三页 =0，desktop spy 初测 82px 系 ECharts 尚未随 resize 重画的瞬态，
+面板激活后复测 =0。纯 CSS 改动，未触任何文本节点，D 键零影响。
+
+⚠️ 教训：报修单的归因（表没有滚动容器）与事实（容器一直在滚，溢出来自两处别的 CSS）完全
+两回事——**先量再修**：用「谁的 rect.right 超出 clientWidth 且无 overflow 祖先」找真凶，
+比按报单直接包容器少改两处冤枉代码。
