@@ -846,6 +846,7 @@
     // ≥1280px 时 .container 的 margin-left 固定让位 214px，而目录是空的 →
     // 实测 1600px 下左边距 254 / 右边距 225，内容被推偏、左侧 216px 是死白。
     document.documentElement.classList.toggle("no-toc", chapters.length === 0);
+    document.documentElement.classList.toggle("has-toc", chapters.length > 0);
     highlightToc();
     positionToc();
   }
