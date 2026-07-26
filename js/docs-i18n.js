@@ -164,10 +164,9 @@
     </ul>
   </div>
   <div class="ptier featured">
-    <div class="ptier-badge">Founding $9.9 · by email</div>
     <div class="ptier-name">Standard</div>
     <div class="ptier-price"><span class="p-m">$29<i class="u">/ mo</i></span><span class="p-y">$290<i class="u">/ yr</i></span></div>
-    <div class="ptier-tag"><span class="p-m">Founding <b>$9.9 / mo, billed $99 / yr</b> — locked for life (first 50) · by email</span><span class="p-y">≈ $24 / mo · annual = 10 months' price</span></div>
+    <div class="ptier-tag"><span class="p-m"></span><span class="p-y">≈ $24 / mo · annual = 10 months' price</span></div>
     <ul class="ptier-list">
       <li><b>The daily reading</b> — never published on the site</li>
       <li><b>The reading archive</b> — filed daily, compounding</li>
@@ -177,7 +176,7 @@
     </ul>
     <div class="ptier-soon">Access is enabled within 24 hours of subscribing (I do this by hand), then the digest arrives before every open. Full refund within 14 days if you're not satisfied.</div>
     <a class="ptier-cta" href="#" id="pay-btn"><span class="p-m">Subscribe $29 / mo</span><span class="p-y">Subscribe $290 / yr</span></a>
-    <a class="ptier-alt" href="mailto:${EMAIL}?subject=Founding">Founding $9.9 — email to reserve →</a>
+<!-- 2026-07-26 用户裁：同步删除英文版创始价次级 CTA（EN 定价面板由本文件整块替换）。 -->
   </div>
   <div class="ptier t-pro">
     <div class="ptier-name">Pro</div>
