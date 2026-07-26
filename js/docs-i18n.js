@@ -161,15 +161,25 @@
       <li>All index ledgers + today's readings (Fear's Price Tag / KAPX / market temperature)</li>
       <li>A century of charts + methodology + sector heatmap</li>
       <li>Verifiable day by day in the public GitHub commit log</li>
+      <li>On days of extreme readings, one free email (triggered by readings, not the calendar)</li>
       <li>No ads · no paywall · no sign-up</li>
     </ul>
+<!-- 2026-07-26 用户裁：免费名单入口恢复（中英同改，EN 定价面板由本文件整块替换）。 -->
+    <form class="ledger-sub" action="https://buttondown.com/api/emails/embed-subscribe/klay24" method="post">
+      <div class="sub-row">
+        <input class="sub-input" type="email" name="email" required placeholder="you@email.com" aria-label="Email">
+        <button class="sub-btn" type="submit">Subscribe free</button>
+      </div>
+      <div class="sub-note">Free · triggered by readings, not the calendar · unsubscribe anytime, no ads</div>
+    </form>
   </div>
   <div class="ptier featured">
     <div class="ptier-name">Standard</div>
     <div class="ptier-price"><span class="p-m">$29<i class="u">/ mo</i></span><span class="p-y">$290<i class="u">/ yr</i></span></div>
     <div class="ptier-tag"><span class="p-m"></span><span class="p-y">≈ $24 / mo · annual = 10 months' price</span></div>
     <ul class="ptier-list">
-      <li><b>The daily reading</b> — never published on the site</li>
+<!-- 2026-07-26 用户裁：与中文同步 —— 头版开始露每期开头两句（judgment_teaser），措辞先行。 -->
+      <li><b>The full daily read</b> — subscribers' inboxes only; the site shows just the opening lines</li>
       <li><b>The reading archive</b> — filed daily, compounding</li>
 <!-- 2026-07-25 用户裁：与中文版同步删除「每周一期传说处决」。该栏目暂时不产出，
      售卖页不留不在交付的承诺。⚠️ 改定价权益必须中英同改：EN 版定价面板由本文件整块替换。 -->

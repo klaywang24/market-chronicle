@@ -2254,6 +2254,24 @@
     try { leaps = await load("leaps"); } catch (e) {}
     try { kd = await load("kindex"); ks = await load("kindex_signals"); } catch (e) { kd = ks = null; }
 
+    // 2026-07-26 今日判读卡（用户裁）：露每期 digest 开头两句真现象句，断点即墙。
+    // 契约见 data/judgment_teaser.json 的 _note：只取现象句，判断句永远留在断点之后（Paddle 主语测试）。
+    // 超过 6 天未更新自动回退为纯送达行 —— 机制烂掉时站上不留过期样品。
+    let jt = null;
+    try { jt = await load("judgment_teaser"); } catch (e) {}
+    const jtFresh = jt && jt.date && jt.zh &&
+      (Date.now() - new Date(jt.date + "T00:00:00").getTime()) / 86400000 < 6.5;
+
+    // 2026-07-26 前向计数器（用户裁）：N 从台账数据本身数（dates >= meta.forward_start），
+    // 不做日历推算 —— 判据=台账数据非工作流自报，休市日天然不计。数据缺失时整行不出。
+    let fwdN = null;
+    try {
+      const lg = await load("leaps_gauge");
+      const fs = (lg.meta && lg.meta.forward_start) || "2026-07-13";
+      const n = (lg.dates || []).filter((x) => x >= fs).length;
+      if (n > 0) fwdN = n;
+    } catch (e) {}
+
     const chg = (v) => `<span class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(2)}%</span>`;
     const tempColor = d.temp >= 75 ? "#B8421E" : d.temp >= 50 ? "#C9882E" : d.temp >= 25 ? "#14A63E" : "#2B5F8F";
     const tempWord = d.temp >= 75 ? "炙热" : d.temp >= 50 ? "偏暖" : d.temp >= 25 ? "温和" : "冰点";
@@ -2323,13 +2341,26 @@
         <a class="ledger-verify" href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">
           <div class="lv-title">在 GitHub 验证台账</div>
           <div class="lv-note">每个交易日的读数，每日收盘自动更新提交，带 GitHub 时间戳，事后不可改写，GitHub 精确可查</div>
+          ${fwdN != null ? `<div class="lv-count"><span>前向台账：第</span> <b>${fwdN}</b> <span>个交易日 · 自 2026-07-13 起</span></div>` : ""}
         </a>
         </div>
         <!-- 2026-07-25：头版唯一的送达入口。与 7·16 撤掉的付费 primary 不是一回事：
              那个是「创始价 $9.9」按钮（价格 + 紧挨净值曲线），本行只说送达、无价格、非按钮，
              且净值曲线已于 7·17 撤离头版。沿用 LEAPS 页同一句，D 键已存在。
-             放在「在 GitHub 验证台账」之后：先给验证，再说送达，顺序即立场。 -->
-        <p class="ledger-note">这一页的读数，每个交易日盘前送进邮箱 → <a href="pricing">盘前数据简报</a></p>
+             放在「在 GitHub 验证台账」之后：先给验证，再说送达，顺序即立场。
+             2026-07-26：本行升级为今日判读卡（teaser 新鲜时）：同一位置、同一动线终点（pricing），
+             卡内正文中英双渲染靠 CSS 按 html[lang] 切换（teaser 是逐日动态文本，进不了 D 字典）。
+             teaser 过期（>6 天）自动回退回这行纯送达行。 -->
+        ${jtFresh ? `
+        <div class="judgment-teaser">
+          <div class="jt-label"><span>最新一期判读</span> · ${jt.date}</div>
+          <div class="jt-bodywrap">
+            <p class="jt-body jt-zh">${jt.zh}</p>
+            <p class="jt-body jt-en">${jt.en || jt.zh}</p>
+          </div>
+          <p class="jt-lock"><span>完整判读只进订户邮箱</span> → <a href="pricing">盘前数据简报</a></p>
+        </div>` : `
+        <p class="ledger-note">这一页的读数，每个交易日盘前送进邮箱 → <a href="pricing">盘前数据简报</a></p>`}
       </div>`;
     }
 

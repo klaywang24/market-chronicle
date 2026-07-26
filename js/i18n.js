@@ -47,6 +47,13 @@
     "免费订阅": ["Subscribe free", "", "", ""],
     "订阅": ["Subscribe", "", "", ""],
     "免费 · 由读数触发，不按日历 · 随时退订，不发广告": ["Free · triggered by readings, not the calendar · unsubscribe anytime, no ads", "", "", ""],
+    // 2026-07-26 今日判读卡 + 前向计数器 + 定价 Free 档恢复（HANDOFF §39）。
+    // teaser 正文本身不走 D（逐日动态），中英双渲染由 CSS 按 html[lang] 切换；这里只译卡的外壳。
+    "最新一期判读": ["The latest read", "", "", ""],
+    "完整判读只进订户邮箱": ["The full read goes only to subscribers' inboxes", "", "", ""],
+    "前向台账：第": ["Forward ledger: day", "", "", ""],
+    "个交易日 · 自 2026-07-13 起": ["· recorded live since 2026-07-13", "", "", ""],
+    "极端读数出现的那天，一封免费邮件（由读数触发，不按日历）": ["On days of extreme readings, one free email (triggered by readings, not the calendar)", "", "", ""],
     "关键数据": ["Key data", "", "", ""],
     "数据更新中，刷新后出现 · data updating": ["Data updating — refresh to see it", "", "", ""],
     "分钟线": ["Minutes", "", "", ""],

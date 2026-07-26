@@ -6,8 +6,13 @@
  *  - 静态 CDN（jsdelivr 的 ECharts/opencc、Google Fonts）：同样缓存优先 + 后台刷新——
  *    这些在部分网络极慢/不可达，是冷启动白屏主因；opaque 响应也落缓存
  *  - 其余跨域（TradingView 行情、parqet 直连兜底）：不拦截，交给浏览器
- * 改缓存策略时 bump CACHE 版本号即可让旧缓存整体作废。 */
-const CACHE = "mc-v3";
+ * 改缓存策略时 bump CACHE 版本号即可让旧缓存整体作废。
+ * 🚨 两条硬规矩（2026-07-26，HANDOFF §39）：
+ *  1) 改价 / 改 Paddle priceId 必须同次 bump CACHE —— 外壳是缓存优先，回访者拿到的是上一次
+ *     访问时的旧壳，旧壳内联的是旧 priceId：不 bump 就是放任回访者按旧价结账（账实不符）。
+ *  2) 验收站上改动必须硬刷新或无痕窗口 —— 回访看到的外壳永远滞后一次部署，
+ *     正常刷新看到旧版不是部署失败（07-26 已实际骗过一次验收）。 */
+const CACHE = "mc-v4";
 const CDN_HOSTS = new Set(["cdn.jsdelivr.net", "fonts.googleapis.com", "fonts.gstatic.com"]);
 
 self.addEventListener("install", () => self.skipWaiting());
