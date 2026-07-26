@@ -801,7 +801,8 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
 .toc {
   display: none;
   position: fixed;
-  top: 116px;
+  top: 168px;   /* 2026-07-26 下移：原 116 紧贴顶栏底(105)，且与档案页的 sticky subnav(144) 并排打架；
+                   168 让目录起点落在正文首个区块附近，视觉上与正文同一水平线起步 */
   left: 18px;
   width: 176px;
   max-height: calc(100vh - 160px);
@@ -1435,10 +1436,11 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 /* ================= B · 材质与深度（Apple materials） ================= */
 /* 顶栏：更强的毛玻璃 + 去硬分割线（用极软阴影做滚动边缘） */
 .topbar {
-  background: color-mix(in srgb, var(--bg) 76%, transparent);
-  backdrop-filter: blur(20px) saturate(170%);
-  -webkit-backdrop-filter: blur(20px) saturate(170%);
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+  /* 2026-07-26 改不透明：顶栏是 sticky，半透明 76% + 模糊会让正文从底下透出来，
+     滚动到档案页(带 .subnav)时看着就像 tab 栏被折进去一块。单色顶栏本就不需要玻璃感。
+     ⚠️ 本条写在文件后段，会覆盖 :94 的同名规则 —— 改顶栏底色要认这一条。 */
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
 }
 .dark-mode .topbar { box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22); }
 

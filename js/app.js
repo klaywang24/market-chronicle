@@ -776,10 +776,26 @@
     for (const c of tocChapters) {
       if (c.getBoundingClientRect().top <= 150) current = c;
     }
-    tocEl.querySelectorAll("a").forEach((a) =>
-      a.classList.toggle("active", a.dataset.target === current.id));
+    let activeLink = null;
+    tocEl.querySelectorAll("a").forEach((a) => {
+      const on = a.dataset.target === current.id;
+      a.classList.toggle("active", on);
+      if (on) activeLink = a;
+    });
+    // 2026-07-26 目录跟着读者走：章节多时（标普 14 章）目录列表本身会溢出，
+    // 当前章滚出可视区就看不见了 —— 高亮等于白高亮。这里把目录容器滚到当前项可见。
+    // 只在真的超出时滚，且用 scrollTop 直接改（不用 scrollIntoView：那会连带滚动整个页面）。
+    if (activeLink && tocEl.scrollHeight > tocEl.clientHeight + 2) {
+      const top = activeLink.offsetTop, bottom = top + activeLink.offsetHeight;
+      const viewTop = tocEl.scrollTop, viewBottom = viewTop + tocEl.clientHeight;
+      const pad = 24;
+      if (top < viewTop + pad) tocEl.scrollTop = Math.max(0, top - pad);
+      else if (bottom > viewBottom - pad) tocEl.scrollTop = bottom - tocEl.clientHeight + pad;
+    }
   }
-  // 目录跟随：固定目录默认悬在视口(top 116)，内容短时会飘到页脚旁的空白里。
+  // 目录跟随：固定目录默认悬在视口(top 由 CSS 的 .toc{top} 决定)，内容短时会飘到页脚旁的空白里。
+  // 🚨 别把这个值写死：2026-07-26 把 .toc 的 top 从 116 下移到 168 时，这里若仍按 116 算，
+  //    目录会提前 52px 顶起来。改为运行时读实际 top，CSS 再调也不用同步改这里。
   // 2026-07-20 用户要求「和底部表格对齐，不要到底部」：滚到内容尾部时把目录整体顶上去，
   // 使其底缘 = 正文底缘（.container 底），不再越过内容飘向页脚。
   const containerEl = document.querySelector(".container");
@@ -790,7 +806,8 @@
     }
     if (!containerEl) return;
     const contentBottom = containerEl.getBoundingClientRect().bottom;
-    const overshoot = (116 + tocEl.offsetHeight) - (contentBottom - 8); // 目录底超出正文底多少
+    const tocTop = parseFloat(getComputedStyle(tocEl).top) || 116;   // 与 CSS 保持单一真源
+    const overshoot = (tocTop + tocEl.offsetHeight) - (contentBottom - 8); // 目录底超出正文底多少
     tocEl.style.transform = overshoot > 0 ? `translateY(${-overshoot}px)` : "";
   }
   let tocTick = false;
