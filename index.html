@@ -43,22 +43,22 @@
 </script>
 <!-- PWA：主屏图标 + 独立窗口 + 离线外壳 -->
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#FAF8F2" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#14100C" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="编年史">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <!-- 首帧底色内联：CSS/字体尚未到达时也不白屏（PWA 冷启动体验） -->
-<style>html{background:#F6F5F1}html.dark-mode{background:#14100C}</style>
+<style>html{background:#FFFFFF}html.dark-mode{background:#111111}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- 字体样式表非阻塞加载：media=print 时不阻塞渲染，onload 后切回 all（Google Fonts 在部分网络极慢/被墙，
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260726d">
+<link rel="stylesheet" href="css/style.css?v=20260726k">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -70,9 +70,25 @@
 </head>
 <body>
 
+<!-- 2026-07-26 顶栏改双色带（参照彭博/WSJ 的报头结构，用户裁定左对齐）：
+     报头行（刊名 + 订阅/语言/主题）与导航带（tab）各占一行、各自通栏底色。
+     结构性收益：品牌与 tab 不再同排 → 此前 ≥1280px 靠「品牌绝对定位 + tab 让位 214px」维持的
+     3px 险距（以及由它引发的压字事故）从根上消失，不必再调 margin。
+     容器类名从 .topbar-inner 换成 .topbar-row：旧的 .topbar-inner 规则（含 ≥1280 的
+     max-width:none 与品牌绝对定位）自然失配，不必逐条追杀。JS 不依赖顶栏结构（已 grep 确认）。 -->
 <header class="topbar">
-  <div class="topbar-inner">
+  <div class="topbar-mast">
+   <div class="topbar-row">
     <a class="brand" href="#pulse" aria-label="回到首页 · Back to home">美股编年史<em>Market Chronicle</em></a>
+    <div class="top-controls">
+      <a class="topbar-sub" href="#pricing">订阅</a>
+      <div class="lang-switch" id="lang-switch"></div>
+      <button class="theme-toggle" id="theme-toggle" title="日夜切换">☀</button>
+    </div>
+   </div>
+  </div>
+  <div class="topbar-navband">
+   <div class="topbar-row">
     <nav class="tabs" id="tabs">
       <button class="tab active" data-panel="pulse">今日</button>
       <!-- 双标签（2026-07-25）：窄屏四项一行放不下（390px 实测差约 40px），此处按断点换短版。
@@ -100,11 +116,7 @@
         </div>
       </div>
     </nav>
-    <div class="top-controls">
-      <a class="topbar-sub" href="#pricing">订阅</a>
-      <div class="lang-switch" id="lang-switch"></div>
-      <button class="theme-toggle" id="theme-toggle" title="日夜切换">☀</button>
-    </div>
+   </div>
   </div>
 </header>
 
