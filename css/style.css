@@ -1409,8 +1409,11 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 html.dark-mode .topbar-sub{color:#14100C;background:#D45D4F;border-color:#D45D4F}
 html.dark-mode .topbar-sub:hover{background:#E06E60;border-color:#E06E60}
 html:not([lang^="zh"]) .topbar-sub{font-size:12px;padding:2.5px 11px}
-/* EN 11 tab 在 900-1379px 已满：该区间隐藏胶囊保「零溢出」定案；≤899 顶栏换行后有空间恢复显示 */
-@media (min-width:900px) and (max-width:1379px){ html:not([lang^="zh"]) .topbar-sub{display:none} }
+/* 2026-07-25 删除「EN 900–1379px 隐藏订阅胶囊」的媒体查询。
+   原规则是为 EN 11 个 tab 写的（顶栏塞满 → 隐藏胶囊保零溢出），但 tab 现已是 10 个，规则过时：
+   实测 905 / 1010 / 1200px 三档，强制显示胶囊后顶栏高度不变、无横向溢出、tabs 不额外换行。
+   后果是英文访客在最常见的笔电宽度上完全看不到订阅入口 —— 订阅动线唯一化的那一端整个消失。
+   ⚠️ 若日后 tab 数回到 11，需重新实测这三档再决定要不要恢复。 */
 
 /* ================= 滚动揭示 + 悬停抬升（2026-07-19 新增） =================
    来源：用户看中 motionsites 那套「滚动逐个浮现 + 悬停轻抬」的观感。
