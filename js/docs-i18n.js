@@ -49,11 +49,11 @@
       en: { kicker: "PRIVACY", h1: "Privacy Policy", dek: "Last updated: 2026-07-05",
         body: `<p class="doc-fineprint">This page is a compliance notice, not legal advice.</p>
 <h3>Overview &amp; operator</h3>
-<p>This is a pure static website hosted on GitHub Pages, with no accounts and no server backend. It is operated by an individual (the data controller). For any privacy request, email <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>
+<p>This is a pure static website hosted on Cloudflare Pages, with no accounts and no server backend. It is operated by an individual (the data controller). For any privacy request, email <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>
 <h3>What we process, and on what basis</h3>
 <p>We do not collect personal information you submit. The only data that may be involved is:</p>
 <ul>
-<li><strong>Server access logs</strong>: when serving pages to you, the host (GitHub) may record technical information such as your IP and browser user-agent (basis: legitimate interest in providing the service). These logs are held and controlled by GitHub; we cannot access their details.</li>
+<li><strong>Server access logs</strong>: when serving pages to you, the host (Cloudflare) may record technical information such as your IP and browser user-agent (basis: legitimate interest in providing the service). These logs are held and controlled by Cloudflare; we cannot access their details.</li>
 <li><strong>Browser local storage</strong>: used only to remember your "day/night theme" and "interface language" — functionally necessary, stored on your own device, never uploaded, and containing no personally identifying information.</li>
 </ul>
 <h3>Cookies</h3>
@@ -64,7 +64,7 @@
 <li>Google Fonts (fonts.googleapis.com) — web fonts;</li>
 <li>TradingView (tradingview.com) — the sector heatmap widget, may set its own cookies;</li>
 <li>parqet (assets.parqet.com) — company logo icons;</li>
-<li>GitHub Pages (github.io) — the website host.</li>
+<li>Cloudflare Pages (pages.dev) — the website host.</li>
 </ul>
 <h3>What we don't do</h3>
 <p>We <strong>do not sell, rent or trade your personal information</strong> (including any "sale / sharing" as defined by California's CCPA), and we run no targeted advertising.</p>
@@ -117,13 +117,13 @@
         body: `<h3>The KAPX Index (K 指数)</h3>
 <p>Definition: <strong>K = CNN Fear &amp; Greed Index ÷ VIX</strong>. When fear (CNN falling) and volatility (VIX rising) meet, K drops below 1 — that is one signal. Clustering rule: consecutive trading days with K &lt; 1 count as one signal; a gap of more than 10 trading days starts a new one. Return horizon: Nasdaq-100 change 20 / 40 / 60 trading days after the signal's first close.</p>
 <p><strong>Canonical definition:</strong> The KAPX Index is a daily U.S. equity fear-pricing gauge published by Market Chronicle, computed as the CNN Fear &amp; Greed reading divided by the VIX. The K stands for kǒng (恐), the Chinese character for fear; readings, methodology, and the complete signal ledger are permanently free and verifiable via Git timestamps. (Previously cited in English as the K-Index; the Chinese name K 指数 is unchanged.)</p>
-<p>As of July 2026: 39 signals since 2011; at the 60-trading-day horizon, 26 up and 13 down — strong in V-shaped corrections, negative repeatedly through sustained stress like 2011, 2015, late 2018 and 2022; every signal is positive held to date. The signal-by-signal ledger is on the <a href="#kindex">KAPX Index</a> page; raw data at <a href="https://chronicle.klay-wang.com/data/kindex_signals.json" target="_blank" rel="noopener">kindex_signals.json</a>.</p>
+<p>As of July 2026: 39 signals since 2011; at the 60-trading-day horizon, 26 up and 13 down — strong in V-shaped corrections, negative repeatedly through sustained stress like 2011, 2015, late 2018 and 2022; every signal is positive held to date. The signal-by-signal ledger is on the <a href="kindex">KAPX Index</a> page; raw data at <a href="https://chronicle.klay-wang.com/data/kindex_signals.json" target="_blank" rel="noopener">kindex_signals.json</a>.</p>
 <h3>Fear's Price Tag — the LEAPS Cost Gauge (恐惧的标价指数)</h3>
 <p>Definition: the headline is the <strong>percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years</strong> — 0 = historically cheapest, 100 = priciest. It answers one question: is buying long-dated options (LEAPS, 12–18 months) historically expensive or cheap today? Alongside it sit two more coordinates (5-year / full history) and four context readings (shown, never averaged into the headline): the volatility risk premium (VIX1Y − 1-year realized vol), the VIX9D→VIX1Y term ladder, SKEW (full-history percentile), and the 10-year real rate (full-history percentile). Why VIX1Y: LEAPS are long-dated, so the headline must use the volatility closest in tenor — VIX1Y is the longest, closest tenor in Cboe's free family.</p>
 <p><strong>It is a descriptive thermometer, not a trading signal and not a forecast.</strong> It only describes "expensive or cheap," never "buy or not" — like a fuel-price sign that tells you whether gas is dear today without deciding whether you should drive. So this index is <strong>never marketed as a timing/entry tool and is never return-tested</strong>. The formula is frozen on registration (VIX1Y headline / high=expensive / three windows / four context); any iteration becomes a separate sibling. Data is backfilled to 2007 and independently reproducible; readings from the July 2026 launch carry GitHub commit timestamps as ex-ante records. Raw data at <a href="https://chronicle.klay-wang.com/data/leaps_gauge.json" target="_blank" rel="noopener">leaps_gauge.json</a>.</p>
 <h3>The LEAPS Window (historical reference)</h3>
 <p>Definition: a segment forms when CNN's Fear &amp; Greed Index closes <strong>below 25 (extreme fear)</strong>; consecutive days below 25 count as one segment. Horizon: S&amp;P 500 and Nasdaq-100 change 6 / 12 / 18 months after the segment's first day. This is a <strong>descriptive historical record</strong> of what followed fear extremes — not advice.</p>
-<p>As of July 2026: 45 windows since 2011; at the 12-month horizon the Nasdaq-100 was up 34 times and down 7 (the rest are not yet 12 months old). Several windows in late 2021 were negative 12 months on — <strong>sentiment extremes are not valuation bottoms</strong>. The episode-by-episode ledger is on the <a href="#leaps">LEAPS Window</a> page; raw data at <a href="https://chronicle.klay-wang.com/data/leaps.json" target="_blank" rel="noopener">leaps.json</a>.</p>
+<p>As of July 2026: 45 windows since 2011; at the 12-month horizon the Nasdaq-100 was up 34 times and down 7 (the rest are not yet 12 months old). Several windows in late 2021 were negative 12 months on — <strong>sentiment extremes are not valuation bottoms</strong>. The episode-by-episode ledger is on the <a href="leaps">LEAPS Window</a> page; raw data at <a href="https://chronicle.klay-wang.com/data/leaps.json" target="_blank" rel="noopener">leaps.json</a>.</p>
 <h3>The "follow every signal" rules — and an honest disclosure</h3>
 <p>In plain words first: <strong>the equity curve is simply "what $1 becomes"</strong> — a curve ending at ×9.5 means the initial $1 grew to $9.5. The rules: enter at the Nasdaq-100 close on the signal's first day; hold 12 months for LEAPS windows, 60 trading days for K signals; new signals during a holding period are skipped — no adding, no resetting; cash periods earn zero; no costs, slippage or taxes.</p>
 <p>Honest disclosure (as of July 2026): under these rules the LEAPS strategy (buying the Nasdaq-100) compounds to roughly <strong>9.5×</strong> since 2011 — above roughly <strong>5.8×</strong> for buy-and-hold S&amp;P 500, below roughly <strong>13.0×</strong> for buy-and-hold Nasdaq-100; the K strategy to roughly <strong>4.0×</strong> since 2011, well below the <strong>13.0×</strong> from simply holding the Nasdaq over the same span. <strong>This site does not claim these signals beat buy-and-hold of the same instrument.</strong> The ledger's value is telling you where today stands in history, and what actually happened after every sentiment extreme — wins and losses alike.</p>
@@ -192,7 +192,7 @@
   </div>
 </div>
 <p><strong>The numbers are everywhere, free forever.</strong> The archive earns its keep on every selloff that comes after — that morning, you are already holding a reading whose method has not changed in fifteen years.</p>
-<p class="pricing-inst"><strong>Institutional / data licensing</strong> (series licensing, index licensing, redistribution) — <a href="#contact">contact us</a>; unpriced.</p>
+<p class="pricing-inst"><strong>Institutional / data licensing</strong> (series licensing, index licensing, redistribution) — <a href="contact">contact us</a>; unpriced.</p>
 <p>Annual = 10 months' price ($290 / $990) · 14-day no-questions refund, no trial (the free tier is the trial) · cancel anytime via the manage link in your subscription email. Orders and payments are handled by a Merchant of Record, whose name will appear on your statement. <strong>Data and information only; not investment advice; no buy or sell recommendations.</strong></p>
 <p class="doc-fineprint">Pro and API are later plans, not a final commitment; launch dates TBD.</p>` },
     },

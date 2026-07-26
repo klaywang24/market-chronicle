@@ -212,7 +212,7 @@
 
   document.getElementById("tabs").addEventListener("click", (e) => {
     const tab = e.target.closest(".tab");
-    if (tab) location.hash = "#" + tab.dataset.panel;
+    if (tab) navigate(tab.dataset.panel);          // tab 是 button 不是 a，走不到链接委托，这里直接调
   });
 
   // ---------------- 百年档案下拉（2026-07-25 导航精简 10 → 4） ----------------
@@ -326,18 +326,19 @@
       const code = t.split(".")[0];
       // 中文名与代码相同时（AMD / TJX 这类没有通行中文名的）不重复渲染，否则胶囊显示成「AMD AMD」
       const zh = nameOf[t] === code ? "" : ` <span class="zh">${nameOf[t]}</span>`;
-      return `<a class="pill ${cur === s ? "active" : ""}" href="#${basket}/${s}">${code}${zh}</a>`;
+      // 全站链接一律写相对路径（不带前导斜杠）：自有域名与 github.io 子目录镜像都能用
+      return `<a class="pill ${cur === s ? "active" : ""}" href="${basket}?s=${s}">${code}${zh}</a>`;
     };
     const group = ([label, ticks]) =>
       `<span class="pill-group"><span class="pill-group-label">${label}</span>${ticks.map(pill).join("")}</span>`;
     let html;
     if (cfg.rows) {
-      html = `<a class="pill pill-anchor ${cur ? "" : "active"}" href="#${basket}"><span class="zh">${cfg.anchorLabel}</span></a>` +
+      html = `<a class="pill pill-anchor ${cur ? "" : "active"}" href="${basket}"><span class="zh">${cfg.anchorLabel}</span></a>` +
         `<div class="pill-rows">` +
         cfg.rows.map((row) => `<div class="pill-row">${row.map(group).join("")}</div>`).join("") +
         `</div>`;
     } else {
-      const anchor = `<a class="pill ${cur ? "" : "active"}" href="#${basket}"><span class="zh">${cfg.anchorLabel}</span></a>`;
+      const anchor = `<a class="pill ${cur ? "" : "active"}" href="${basket}"><span class="zh">${cfg.anchorLabel}</span></a>`;
       html = anchor + (cfg.groups ? cfg.groups.map(group).join("") : cfg.members.map(([t]) => pill(t)).join(""));
     }
     document.getElementById("subnav-" + basket).innerHTML = html;
@@ -354,7 +355,9 @@
   async function showStock(basket, safe) {
     const cfg = BASKET_CFG[basket];
     const idx = cfg.members.findIndex(([t]) => safeTicker(t) === safe);
-    if (idx < 0) return showOverview(basket);
+    // 查无此股（成分股换过、或有人手打了 ?s=）：退回总览，并把地址栏一起收干净，
+    // 免得留下一个打不开任何东西的 URL 被转发出去
+    if (idx < 0) { history.replaceState({}, "", urlFor(basket, "")); return showOverview(basket); }
     const [ticker, name] = cfg.members[idx];
     currentStock = { basket, safe };
     renderSubnav(basket);
@@ -448,9 +451,9 @@
         <div class="card"><h3>估值与质量 vs 同篮子</h3><div class="chart short" id="${basket}-fd-peers-ch"></div></div>
       </div>
       <div class="stock-nav">
-        <a href="#${basket}/${safeTicker(prev[0])}">← <span>${prev[1]}</span> ${prev[0]}</a>
-        <a href="#${basket}"><span>回到</span><span>${cfg.anchorLabel}</span></a>
-        <a href="#${basket}/${safeTicker(next[0])}"><span>${next[1]}</span> ${next[0]} →</a>
+        <a href="${basket}?s=${safeTicker(prev[0])}">← <span>${prev[1]}</span> ${prev[0]}</a>
+        <a href="${basket}"><span>回到</span><span>${cfg.anchorLabel}</span></a>
+        <a href="${basket}?s=${safeTicker(next[0])}"><span>${next[1]}</span> ${next[0]} →</a>
       </div>`;
 
     // 关键数据条
@@ -742,28 +745,110 @@
     }
   }
 
-  // ---------------- hash 路由 ----------------
+  // ---------------- 真实路径路由（2026-07-26：由 #hash 改造而来） ----------------
+  // 为什么改：站是单页应用，此前切板块不改 URL，于是 Cloudflare Web Analytics 里
+  // 所有访问都只记成一条 `/` —— 有人把标普十几章翻完，数据里也看不出来。
+  // 每个板块有了自己的路径，才分得开访问量，也才能被单独分享、被搜索引擎收录。
+  //
+  // 🚨 只用「一段」路径（/spy、/kindex），个股走 query（/spy?s=AAPL），**不做** /spy/AAPL：
+  //    站内资源全是相对路径（css/style.css、fetch("data/…")、register("sw.js")），
+  //    路径多一层目录后它们会去请求 /spy/css/…，而 Cloudflare Pages 对未命中的路径
+  //    一律回 200 + 整份 index.html —— 资源拿到的是 HTML，解析失败却不报 404，
+  //    控制台干干净净、页面样式全丢。一段路径的 base 目录仍是站根，天然避开这个坑。
+  //    （同理，绝不能往仓库根加 404.html：那会关掉 Pages 的这个兜底，深链当场全挂。）
+  //
+  // ROOT = 站根。取 pathname 最后一个「/」及其之前的部分：
+  //   /spy → "/"   /index.html → "/"   /market-chronicle/spy → "/market-chronicle/"
+  //   最后这条让 github.io 子目录镜像照常可用（全站不出现绝对路径）。
+  const ROOT = location.pathname.slice(0, location.pathname.lastIndexOf("/") + 1);
+  const DOC_PANELS = ["about", "contact", "privacy", "terms", "refunds", "pricing", "methodology"];
+
+  // 组 URL。首页归一到 ROOT 而不是 /pulse，否则统计里首页会裂成两条。
+  // 除 s 之外的既有 query 一律保留 —— ?code=forever99（创始价带码链接）靠它活着。
+  function urlFor(panel, stock) {
+    const q = new URLSearchParams(location.search);
+    q.delete("s");
+    if (stock) q.set("s", stock);
+    const qs = q.toString();
+    return ROOT + (panel === "pulse" ? "" : panel) + (qs ? "?" + qs : "");
+  }
+
+  // 读 URL。末段必须**精确等于**某个 panel 名才算命中，
+  // 这样 /welcome/、/pay/ 这类真实目录不会被误判成板块。
+  function readUrl() {
+    const rest = location.pathname.startsWith(ROOT) ? location.pathname.slice(ROOT.length) : "";
+    // 个股代码按 safeTicker 的口径归一（小写、点改横杠）：
+    // 路径 URL 是要被手打和转发的，?s=NVDA 与 ?s=BRK.B 都得能打开
+    const s = new URLSearchParams(location.search).get("s") || "";
+    return {
+      panel: registry[rest] ? rest : "pulse",
+      stock: s.toLowerCase().replace(".", "-"),
+    };
+  }
+
+  // 站内跳转：写地址栏 + 重路由。整页刷新由调用方 preventDefault 拦掉。
+  function navigate(panel, stock) {
+    const url = urlFor(panel, stock || "");
+    if (url !== location.pathname + location.search) history.pushState({}, "", url);
+    route();
+  }
+
+  // 规范链接跟着路由走（个股不单独立 canonical：它只是同一页里的一个视图）
+  function syncCanonical(panel) {
+    const href = "https://chronicle.klay-wang.com/" + (panel === "pulse" ? "" : panel);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", href);
+    document.querySelector('meta[property="og:url"]')?.setAttribute("content", href);
+  }
+
   function route() {
-    const h = location.hash.slice(1) || "pulse";
-    const [panel, stock] = h.split("/");
-    const target = registry[panel] ? panel : "pulse";
-    activatePanel(target).then(() => {
-      if (BASKET_CFG[target]) {
-        if (stock) showStock(target, stock);
-        else showOverview(target);
+    const { panel, stock } = readUrl();
+    activatePanel(panel).then(() => {
+      if (BASKET_CFG[panel]) {
+        if (stock) showStock(panel, stock);
+        else showOverview(panel);
       }
       buildToc();
     });
+    syncCanonical(panel);
     // 页脚静态页从顶部看起
-    if (["about", "contact", "privacy", "terms", "refunds", "pricing", "methodology"].includes(target)) window.scrollTo(0, 0);
+    if (DOC_PANELS.includes(panel)) window.scrollTo(0, 0);
   }
-  window.addEventListener("hashchange", route);
 
-  // 点击站名 = 回首页并滚到顶部（tab 切换不受影响，仍保留各自滚动位置）
-  document.querySelector(".brand")?.addEventListener("click", () => {
-    if (location.hash === "#pulse") route();      // 已在首页：hashchange 不触发，手动重路由
-    window.scrollTo(0, 0);
+  // 进站归一（同步执行，早于页尾的 Paddle 内联脚本与 beacon，故两者读到的都是最终 URL）：
+  //  ① 旧的 #spy / #tech/NVDA 链接站外和 Wayback 快照里还有，转成路径；
+  //  ② /pulse 与任何不认识的路径收敛到站根，免得统计里长出一堆同义或垃圾路径。
+  {
+    const [hp, hs] = decodeURIComponent(location.hash.slice(1)).split("/");
+    if (hp && registry[hp]) history.replaceState({}, "", urlFor(hp, hs || ""));
+    else if (readUrl().panel === "pulse" && location.pathname !== ROOT)
+      history.replaceState({}, "", urlFor("pulse", readUrl().stock));
+  }
+  window.addEventListener("popstate", route);
+  // 兜底：万一还有代码/外链在页内改 hash，照样接住
+  window.addEventListener("hashchange", () => {
+    const [hp, hs] = decodeURIComponent(location.hash.slice(1)).split("/");
+    if (hp && registry[hp]) { history.replaceState({}, "", urlFor(hp, hs || "")); route(); }
   });
+
+  // 站内链接统一走 pushState（否则每次点击整页刷新，SPA 体验与已建好的图表全丢）。
+  // 判据是「解析后的路径末段精确等于某个 panel 名」——
+  // /pay/、/welcome/ 这类真实目录与站外链接一律放行给浏览器。
+  document.addEventListener("click", (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest("a[href]");
+    if (!a || a.target === "_blank" || a.hasAttribute("download")) return;
+    if (a.getAttribute("href") === "#") return;              // #pay-btn 这类占位链接，交给它自己的处理器
+    const u = new URL(a.href, location.href);
+    if (u.origin !== location.origin || !u.pathname.startsWith(ROOT)) return;
+    const rest = u.pathname.slice(ROOT.length);
+    if (rest !== "" && !registry[rest]) return;
+    e.preventDefault();
+    navigate(rest || "pulse", new URLSearchParams(u.search).get("s") || "");
+  });
+
+  // 点击站名 = 回首页并滚到顶部（回首页本身由上面的链接委托完成，这里只管滚动；
+  // tab 切换不受影响，仍保留各自滚动位置）
+  document.querySelector(".brand")?.addEventListener("click", () => window.scrollTo(0, 0));
 
   // ---------------- 左侧悬浮章节目录 ----------------
   const ROMAN = ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ", "Ⅹ", "Ⅺ", "Ⅻ", "ⅩⅢ", "ⅩⅣ", "ⅩⅤ"];
@@ -1266,7 +1351,7 @@
     tbl.innerHTML =
       '<tr><th>代码</th><th class="left has-logo">名称</th><th>市值 ($B)</th><th>YTD</th><th>1年</th><th>3年年化</th><th>5年年化</th><th>10年年化</th><th>共同起点年化</th><th>最大回撤</th></tr>' +
       d.rows.map((r) =>
-        `<tr class="clickable" data-hash="#${prefix}/${r.safe}"><td>${r.ticker}</td>` +
+        `<tr class="clickable" data-stock="${r.safe}"><td>${r.ticker}</td>` +
         `<td class="left-col">${tblLogo(r.ticker)}${r.name}</td>` +
         `<td>${r.mcap ? Math.round(r.mcap).toLocaleString("en-US") : "--"}</td>` +
         c(r.ytd, "%") + c(r.y1, "%") + c(r.y3, "%") + c(r.y5, "%") + c(r.y10, "%") + c(r.since, "%") +
@@ -1274,7 +1359,7 @@
       ).join("");
     tbl.addEventListener("click", (e) => {
       const tr = e.target.closest("tr.clickable");
-      if (tr) location.hash = tr.dataset.hash;
+      if (tr) navigate(prefix, tr.dataset.stock);   // tr 不是链接，走不到链接委托
     });
   }
 
@@ -2198,13 +2283,13 @@
         <p class="ledger-intro">两个原创指标，一本逐日自动记的账：赢的和输的都在账上。读数由管线每日自动提交，带 GitHub 时间戳，事后不可改写。</p>
         <p class="ledger-intro">官方定义：KAPX 指数（K 取自「恐」字拼音首字母）是 Market Chronicle 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。读数、方法论与完整信号台账永久免费公开，Git 时间戳可验证。</p>
         <div class="ledger-cards">
-          <a class="ledger-card" href="#kindex">
+          <a class="ledger-card" href="kindex">
             <div class="lc-name">K 指数 <span>CNN 恐贪 ÷ VIX</span></div>
             <div class="lc-val">${kd.current.k.toFixed(2)}</div>
             <div class="lc-state ${kTrig ? "neg" : "pos"}">${kTrig ? "触发中" : "未触发"} <span>（K &lt; 1 触发）</span></div>
             <div class="lc-meta"><b>${kAll}</b> <span>次信号（2011 年起）</span> · <span>60 个交易日后</span><br><span>标普</span> <b class="pos">${kWs}</b> <span>涨</span> <b class="neg">${kLs}</b> <span>跌</span> · <span>纳指</span> <b class="pos">${kW}</b> <span>涨</span> <b class="neg">${kL}</b> <span>跌</span></div>
           </a>
-          <a class="ledger-card" href="#leaps">
+          <a class="ledger-card" href="leaps">
             <div class="lc-name">LEAPS 窗口 <span>恐贪 &lt; 25 · 极端恐惧</span></div>
             <div class="lc-val">${Math.round(leaps.current.fng)}</div>
             <div class="lc-state ${lOpen ? "neg" : "pos"}">${lOpen ? "窗口开启" : "窗口关闭"} <span>（恐贪 &lt; 25 开启）</span></div>
@@ -2219,7 +2304,7 @@
         </div>
         <!-- 2026-07-17 头版瘦身（用户裁）：落点图+净值曲线两张 15 年图撤回各自的家（K 页/恐惧的标价页），
              原位只留一行文字链。「净值曲线与付费 CTA 相邻」悬案随撤图自动结案。 -->
-        <p class="ledger-note">15 年台账与全部输赢（包括跑输的那部分）→ <a href="#kindex">K 指数</a> · <a href="#leaps">恐惧的标价</a></p>
+        <p class="ledger-note">15 年台账与全部输赢（包括跑输的那部分）→ <a href="kindex">K 指数</a> · <a href="leaps">恐惧的标价</a></p>
         <!-- 2026-07-16：删掉这里的付费 primary（原「盘前数据简报 · 创始价 $9.9」）。三个理由：
              ① $9.9 是邮件预约制（方案 C 两扇门：陌生人自助 $29 / 信任者预约），在头版对所有人喊 9.9 = 那扇门不存在了；
                 且数字本身已过期（创始码 dsc_01kxjqmtb40e8bsy2zqtkqxk0e 是 $99/年 不是 $9.9/月）。
@@ -2244,7 +2329,7 @@
              那个是「创始价 $9.9」按钮（价格 + 紧挨净值曲线），本行只说送达、无价格、非按钮，
              且净值曲线已于 7·17 撤离头版。沿用 LEAPS 页同一句，D 键已存在。
              放在「在 GitHub 验证台账」之后：先给验证，再说送达，顺序即立场。 -->
-        <p class="ledger-note">这一页的读数，每个交易日盘前送进邮箱 → <a href="#pricing">盘前数据简报</a></p>
+        <p class="ledger-note">这一页的读数，每个交易日盘前送进邮箱 → <a href="pricing">盘前数据简报</a></p>
       </div>`;
     }
 
