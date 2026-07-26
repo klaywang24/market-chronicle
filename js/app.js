@@ -2348,20 +2348,13 @@
              「在 GitHub 验证台账」留下且不进页脚：它是净值曲线的解药：上面那句「本站不宣称信号能跑赢买入持有」
              之后，把可验证的链接就摆在这里，本身就是可信度。它的价值不是被点击，是它存在。
              挪进页脚 = 从「我请你查」变成「你想查自己找」，那是两种人格。 -->
-        <div class="ledger-actions">
-        <a class="ledger-verify" href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">
-          <div class="lv-title">在 GitHub 验证台账</div>
-          <div class="lv-note">每个交易日的读数，每日收盘自动更新提交，带 GitHub 时间戳，事后不可改写，GitHub 精确可查</div>
-          ${fwdN != null ? `<div class="lv-count"><span>前向台账：第</span> <b>${fwdN}</b> <span>个交易日 · 自 2026-07-13 起</span></div>` : ""}
-        </a>
-        </div>
-        <!-- 2026-07-25：头版唯一的送达入口。与 7·16 撤掉的付费 primary 不是一回事：
-             那个是「创始价 $9.9」按钮（价格 + 紧挨净值曲线），本行只说送达、无价格、非按钮，
-             且净值曲线已于 7·17 撤离头版。沿用 LEAPS 页同一句，D 键已存在。
-             放在「在 GitHub 验证台账」之后：先给验证，再说送达，顺序即立场。
-             2026-07-26：本行升级为今日判读卡（teaser 新鲜时）：同一位置、同一动线终点（pricing），
-             卡内正文中英双渲染靠 CSS 按 html[lang] 切换（teaser 是逐日动态文本，进不了 D 字典）。
-             teaser 过期（>6 天）自动回退回这行纯送达行。 -->
+        <!-- 2026-07-25：头版唯一的送达入口（fallback 行）。与 7·16 撤掉的付费 primary 不是一回事：
+             那个是「创始价 $9.9」按钮（价格 + 紧挨净值曲线），本行只说送达、无价格、非按钮。
+             2026-07-26：升级为今日判读卡（teaser 新鲜时），中英双渲染靠 CSS 按 html[lang] 切换；
+             teaser 过期（>6 天）自动回退纯送达行。
+             2026-07-26 晚（§42 用户裁）：判读卡升到验证行之上（样品先行），推翻 07-25「先验证再送达」
+             的排序；验证卡同批从盒子压成一行小字（宽度即正文列宽）。分隔符用「·」不用全角逗号 ——
+             这行在 EN 态是整键替换 + 裸标点，全角逗号会复现 §40 的英文态全角标点残留。 -->
         ${jtFresh ? `
         <div class="judgment-teaser">
           <div class="jt-label"><span>最新一期判读 · 每个交易日盘前更新</span> · ${jt.date}</div>
@@ -2372,6 +2365,7 @@
           <p class="jt-lock"><span>完整判读只进订户邮箱</span> → <a href="pricing">盘前数据简报</a></p>
         </div>` : `
         <p class="ledger-note">这一页的读数，每个交易日盘前送进邮箱 → <a href="pricing">盘前数据简报</a></p>`}
+        <p class="ledger-note lv-line"><a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener"><span>在 GitHub 验证台账</span></a> · <span>每个交易日的读数，每日收盘自动更新提交，带 GitHub 时间戳，事后不可改写，GitHub 精确可查</span>${fwdN != null ? ` · <span>前向台账：第</span> <b class="fwd-n">${fwdN}</b> <span>个交易日 · 自 2026-07-13 起</span>` : ""}</p>
       </div>`;
     }
 
