@@ -2332,8 +2332,9 @@
           </div>
         </div>
         <!-- 2026-07-17 头版瘦身（用户裁）：落点图+净值曲线两张 15 年图撤回各自的家（K 页/恐惧的标价页），
-             原位只留一行文字链。「净值曲线与付费 CTA 相邻」悬案随撤图自动结案。 -->
-        <p class="ledger-note">15 年台账与全部输赢（包括跑输的那部分）→ <a href="kindex">K 指数</a> · <a href="leaps">恐惧的标价</a></p>
+             原位只留一行文字链。「净值曲线与付费 CTA 相邻」悬案随撤图自动结案。
+             2026-07-26（§42 追补，用户裁）：该行下移到验证行之后 —— 台账区收成
+             「数字卡 → 判读样品 → 验证背书 → 深链」一条线，两行小字（验证/深链）归拢在尾部。 -->
         <!-- 2026-07-16：删掉这里的付费 primary（原「盘前数据简报 · 创始价 $9.9」）。三个理由：
              ① $9.9 是邮件预约制（方案 C 两扇门：陌生人自助 $29 / 信任者预约），在头版对所有人喊 9.9 = 那扇门不存在了；
                 且数字本身已过期（创始码 dsc_01kxjqmtb40e8bsy2zqtkqxk0e 是 $99/年 不是 $9.9/月）。
@@ -2366,6 +2367,7 @@
         </div>` : `
         <p class="ledger-note">这一页的读数，每个交易日盘前送进邮箱 → <a href="pricing">盘前数据简报</a></p>`}
         <p class="ledger-note lv-line"><a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener"><span>在 GitHub 验证台账</span></a> · <span>每个交易日的读数，每日收盘自动更新提交，带 GitHub 时间戳，事后不可改写，GitHub 精确可查</span>${fwdN != null ? ` · <span>前向台账：第</span> <b class="fwd-n">${fwdN}</b> <span>个交易日 · 自 2026-07-13 起</span>` : ""}</p>
+        <p class="ledger-note">15 年台账与全部输赢（包括跑输的那部分）→ <a href="kindex">K 指数</a> · <a href="leaps">恐惧的标价</a></p>
       </div>`;
     }
 
