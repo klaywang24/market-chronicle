@@ -2328,7 +2328,7 @@
             <div class="lc-name">最近战报 <span>按信号首日纳指 100 收盘价计</span></div>
             <div class="lc-row"><span class="lc-tag">K</span> <span class="lc-date">${lastK.start}</span> <span>至今</span> <b class="${lastK.fwd_to_date >= 0 ? "pos" : "neg"}">${fmt(lastK.fwd_to_date)}</b></div>
             <div class="lc-row"><span class="lc-tag">LEAPS</span> <span class="lc-date">${lastL.start}</span> <span>至今</span> <b class="${lastLRet >= 0 ? "pos" : "neg"}">${fmt(lastLRet)}</b></div>
-            <div class="lc-meta"><span>每一次的逐条结果，见上方「K 指数 · 台账」与「恐惧的标价 · 台账」</span></div>
+            <!-- 2026-07-26 用户裁：删「每一次的逐条结果，见上方…」提示行 —— 与卡下方深链行重复 -->
           </div>
         </div>
         <!-- 2026-07-17 头版瘦身（用户裁）：落点图+净值曲线两张 15 年图撤回各自的家（K 页/恐惧的标价页），
