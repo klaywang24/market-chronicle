@@ -300,6 +300,15 @@
   };
   const safeTicker = (t) => t.toLowerCase().replace(".", "-");
 
+  // 标点也得跟着语言走：全角括号/顿号/全角空格只属于中文，英文态必须半角。
+  // 2026-07-26 四层扫描（执行 formatter 看输出那一层）抓到 EN 下真渲染出「1（20%）」
+  // 与全角空格 —— 这类字符藏在 formatter 函数体和 textContent 的拼接胶水里，
+  // i18nOption 只翻译字符串值、D 字典也扫不进函数体，所以只能在这里按语言选。
+  const enPunct = () => !!(window.MC_I18N && MC_I18N.lang && MC_I18N.lang() === "en");
+  const paren = (s) => (enPunct() ? ` (${s})` : `（${s}）`);
+  const joinList = (a) => a.join(enPunct() ? ", " : "、");
+  const wideGap = () => (enPunct() ? "  " : "　");
+
   // logo 三级加载链：自托管 logos/（scripts/fetch_logos.py 每周同步，与站点同源、
   // 不受客户端拦截影响：iPad 曾整站拦掉 parqet 直连）→ parqet 直连（新 ticker 兜底）→ 首字母圆章
   window.__logoErr = function (img) {
@@ -3053,7 +3062,7 @@
         },
         label: { show: true, position: "right", color: p.muted, fontSize: 11,
           fontFamily: "JetBrains Mono",
-          formatter: (x) => x.value.toFixed(0) + "（" + rows[x.dataIndex].ratio.toFixed(0) + "%）" },
+          formatter: (x) => x.value.toFixed(0) + paren(rows[x.dataIndex].ratio.toFixed(0) + "%") },
         markLine: { silent: true, symbol: "none",
           lineStyle: { color: p.ink, type: "dashed", width: 1 },
           label: { color: p.ink, formatter: "50 中性", fontSize: 10, fontFamily: "JetBrains Mono" },
@@ -3089,7 +3098,7 @@
         (crossMode === "flow" ? T("当日做空成交占比在自身三年历史中的位置。这是流量，与另外两档的存量口径不同。")
          : crossMode === "dtc" ? T("补仓天数 = 做空持仓 ÷ 日均成交量，除掉了规模，读的是相对拥挤度。")
          : T("持仓股数的分位。注意它有非平稳问题：多数票同时逼近高位，多半是尺子的问题不是市场的问题。"))
-        + (miss.length ? "　" + T("未显示：") + miss.join("、") + T("（历史不足，不给百分位：宁可不出数，也不出假数）") : "");
+        + (miss.length ? wideGap() + T("未显示：") + joinList(miss) + T("（历史不足，不给百分位：宁可不出数，也不出假数）") : "");
     }
     if (!rows.length) {
       return { title: { text: T("历史积累中"), left: "center", top: "middle",
@@ -3115,7 +3124,7 @@
         },
         label: { show: true, position: "right", color: p.muted, fontSize: 11,
           fontFamily: "JetBrains Mono",
-          formatter: (x) => x.value.toFixed(0) + (rows[x.dataIndex].extra ? "（" + rows[x.dataIndex].extra + "）" : "") },
+          formatter: (x) => x.value.toFixed(0) + (rows[x.dataIndex].extra ? paren(rows[x.dataIndex].extra) : "") },
         markLine: { silent: true, symbol: "none",
           lineStyle: { color: p.ink, type: "dashed", width: 1 },
           label: { color: p.ink, formatter: isEN ? "50 neutral" : "50 中性", fontSize: 10, fontFamily: "JetBrains Mono" },
@@ -3218,7 +3227,7 @@
       }));
     }
     return {
-      tooltip: Object.assign(tip(p), { formatter: (o) => `${o.data.tk} ${o.data.d}<br>${o.data.value[0]}　${o.data.value[1]}%` }),
+      tooltip: Object.assign(tip(p), { formatter: (o) => `${o.data.tk} ${o.data.d}<br>${o.data.value[0]}${wideGap()}${o.data.value[1]}%` }),
       grid: { left: 56, right: 20, top: 22, bottom: 46 },
       xAxis: Object.assign({ type: "value", scale: true,
         name: scMode === "lvl" ? (isEN ? "flow: avg percentile" : "流量：当期做空占比的平均分位")
