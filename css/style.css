@@ -834,11 +834,13 @@ html:not([lang^="zh"]) .toc a { font-size: 11.5px; }
    .tabs 一并撤销，否则无目录时 tab 栏还停在为目录让位的起点上，与正文左缘错开。 */
 @media (min-width: 1280px) {
   html.no-toc .container { margin-left: auto; margin-right: auto; }
-  /* tab 栏跟着正文左缘走，沿用既有公式：tab 左距 = 正文左距 − 芯片内偏移（中文 11px / 英文 7px，
-     见本文件 782 与 828 行）。此前误写 margin-left:0，结果 tab 停在 x=24 而正文在 203，差 179px。
-     EN 那条特异性 (0,3,1) 需高于 828 行的 (0,2,1) 才能压住它。 */
-  html.no-toc .tabs { margin-left: calc((100vw - 1180px) / 2 - 11px); }
-  html:not([lang^="zh"]).no-toc .tabs { margin-left: calc((100vw - 1180px) / 2 - 7px); }
+  /* 🚨 这里**不要**再给 .tabs 加 margin 覆盖。踩过两次：
+     ① `margin-left:0` → tab 停在 x=24，与正文（203）错位 179px；
+     ② `calc((100vw-1180px)/2 - 11px)` → 去掉了原公式里的 `max(214px, …)` 下限，
+        而那个下限的存在正是为了给**绝对定位的品牌名**让位（实测品牌宽 200px，占 24→224）。
+        结果 1600px 时 tab 左 223 与品牌右 224 重叠 1px；1280px 时 tab 会跑到 x=63，重叠 161px。
+     原公式（本文件 782 / 828 行）自带该下限，无目录时沿用即可：正文居中、tab 保持让位起点，
+     两者相差约 11px —— 这点偏差换的是「永远不压住品牌」，值得。 */
 }
 .toc a:hover { color: var(--ink); background: var(--bg-card-hover); }
 .toc a.active {
