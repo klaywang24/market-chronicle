@@ -1,7 +1,7 @@
 {
   "_note": "今日判读样品（头版卡）。契约：digest 收口时更新本文件并随当日提交 push；zh/en 各只取正文开头的现象句（原文照录，不改写），判断句永远留在断点之后；date 为 digest 发送日。超过 6 天未更新时头版自动回退为纯送达行，不会烂在站上。",
-  "date": "2026-07-24",
-  "data_date": "2026-07-23",
-  "zh": "昨天英伟达盘中冒出两笔超大买单，一分钟内相邻打出，每笔都是 8 万张级别，当时看着像有人重仓押它涨。我们没急着下结论，说好等隔夜的真实持仓数据。",
-  "en": "Nvidia had two huge buy orders yesterday, side by side within a minute, each around 80,000 contracts — it looked like someone loading up bullish. We waited for the overnight positions instead of guessing."
+  "date": "2026-07-28",
+  "data_date": "2026-07-27",
+  "zh": "停火的消息比开盘铃早到了几个小时，也早早定完了价。07-27 期指全线高开，半导体排在队伍最前面：闪迪盘前 +4.81%，美光 +3.33%，AMD +3.21%。",
+  "en": "The ceasefire arrived hours before the opening bell, and so did its price. Futures gapped up into the 07-27 open with semiconductors at the front of the line: SanDisk +4.81% pre-market, Micron +3.33%, AMD +3.21%."
 }
