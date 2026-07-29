@@ -1,7 +1,7 @@
 {
   "_note": "今日判读样品（头版卡）。契约：digest 收口时更新本文件并随当日提交 push；zh/en 各只取正文开头的现象句（原文照录，不改写），判断句永远留在断点之后；date 为 digest 发送日。超过 6 天未更新时头版自动回退为纯送达行，不会烂在站上。",
-  "date": "2026-07-28",
-  "data_date": "2026-07-27",
-  "zh": "停火的消息比开盘铃早到了几个小时，也早早定完了价。07-27 期指全线高开，半导体排在队伍最前面：闪迪盘前 +4.81%，美光 +3.33%，AMD +3.21%。",
-  "en": "The ceasefire arrived hours before the opening bell, and so did its price. Futures gapped up into the 07-27 open with semiconductors at the front of the line: SanDisk +4.81% pre-market, Micron +3.33%, AMD +3.21%."
+  "date": "2026-07-29",
+  "data_date": "2026-07-28",
+  "zh": "07.27 盘前，半导体 7 只全红对平台 6 只全绿；07.28 收盘，格局基本没变：半导体 1 微绿 6 红，平台 4 绿 2 微红。谷歌 +2.19%、微软 +1.09% 站在一边；另一边是闪迪 −14.25%、美光 −8.85%、AMD −8.15%、英特尔 −5.86%。",
+  "en": "Pre-market on 07.27 it was seven chips red against six platforms green. At the 07.28 close, chips were one barely green and six red, platforms four green and two barely red. Alphabet +2.19% and Microsoft +1.09% on one side; SanDisk −14.25%, Micron −8.85%, AMD −8.15%, Intel −5.86% on the other."
 }
