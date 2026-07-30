@@ -2476,3 +2476,19 @@ Klay 问：「任何时候计算/回测，和我自己跑的是一样的啊，�
 恐惧的标价那张图上，**7/10 → 7/13 之间有个视觉断口，但数据是连续的**（周五→周一，中间只是周末）。根因在 `js/app.js:2499`：回测与前向是**两条独立 series**（`dt < fs` / `dt >= fs`）且**都设了 `connectNulls: false`**，这两个点分属两条线、没有任何一条负责连接；普通周末因在同一条线内部会被自动连上，所以全图只有这一处露缺口。
 **修法（桥点）**：让前向 series 也包含 `07-10`（回测段最后一天）作为起点、并把该点 `symbolSize: 0` 隐藏，红线即接住绿线末端，而圆点仍从 07-13 起。需改 `js/app.js` + bump `?v=`。
 **反方意见**：现状的断口是「诚实的接缝」，明示此处换了性质。**Klay 07-26 决定：先不动。**
+
+## §49 07-30：16 个路由页平铺落地 —— /pricing 从「结构上不可能被索引」到有自己的身份
+
+**起因**：Search Console 07-27 邮件 + Cloudflare 30 天数据互证：SPA 对所有路径回同一份 index.html，canonical 硬指首页，Google 眼里 16 个路由全是首页复本，/pricing 上线以来搜索零可见。
+
+**方案**：`scripts/build_route_pages.py` 从 index.html 生成 16 份平铺路由页（pricing.html、kindex.html 等），每份只改头部六行身份（title / description / canonical / og:url / og:title / og:description），正文逐字节同首页。另补真实 robots.txt + sitemap.xml（此前这俩被 SPA 兜底吞掉，返回的是 HTML）。
+
+**为什么是平铺文件不是目录**：Pages 对目录页强制加尾斜杠（/welcome 线上实测 308 → /welcome/），与 _redirects 里 `/pricing/ → /pricing` 的 301 对撞成无限循环；平铺 foo.html 服务在 /foo 无斜杠，与现有规则同向。**永远不要**把路由页改成 `foo/index.html` 目录形式。
+
+**🚨 维护铁律新增一条**：改 index.html 之后**必须**重跑 `python3 scripts/build_route_pages.py`，否则 16 个路由页与首页漂移。脚本锚串校验很严，index.html 头部那六行变了措辞脚本会直接报错——那是提醒你同步锚串，不是让你绕过它。
+
+**不进 sitemap 的**：/pulse（首页别名，app.js 里 canonical 归 /，故意不生成路由页）；/pay /welcome /check-inbox /confirmed（noindex 转化页，有意排除）。
+
+**验证记录（07-30 生产实测）**：16 路由全 200 + 各自 canonical；/pricing/ 一跳 301 无循环；/pricing.html 308 归位；css/js/data 资源 content-type 未被盖；验证时 5 个路由短暂显示旧标题是本次验证自己的 curl 边缘缓存（max-age=0 must-revalidate，穿透后全对），不是故障。
+
+**留给用户的手工步骤**：GSC 提交 sitemap（chronicle 资源下提交 https://chronicle.klay-wang.com/sitemap.xml）。
