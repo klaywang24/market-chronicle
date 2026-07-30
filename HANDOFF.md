@@ -2491,4 +2491,9 @@ Klay 问：「任何时候计算/回测，和我自己跑的是一样的啊，�
 
 **验证记录（07-30 生产实测）**：16 路由全 200 + 各自 canonical；/pricing/ 一跳 301 无循环；/pricing.html 308 归位；css/js/data 资源 content-type 未被盖；验证时 5 个路由短暂显示旧标题是本次验证自己的 curl 边缘缓存（max-age=0 must-revalidate，穿透后全对），不是故障。
 
-**留给用户的手工步骤**：GSC 提交 sitemap（chronicle 资源下提交 https://chronicle.klay-wang.com/sitemap.xml）。
+**手工步骤已全部完成（2026-07-30 03:03 EDT 终检快照）**：
+- GSC 已提交 sitemap（chronicle 资源），Google 当场读出 17 页 = 首页 + 16 路由，一条不多不少。
+- /pricing 与 /kindex 已走「请求编入索引」进优先抓取队列；**/leaps 终检时已被 Google 收录**，且 GSC 识别出页内 3 项 Dataset 结构化数据（新头部身份被完整读懂的直接证据）。
+- 终检全绿：16 路由 200+自指 canonical；robots.txt/sitemap.xml 真文件正确 content-type；/pricing/ 一跳 301；/pulse 仍走 SPA 兜底；四个 noindex 转化页未被波及；css/js/data 资源 content-type 无恙。
+- 同日姊妹修复（klay-site 仓，非本仓）：四静态页 canonical + /category/shares 301 + **www→apex 308 已在 Vercel 后台设好并实测**（首页与深链均一跳归位）。
+- 后续无人工动作：告警报告等 Google 重爬自动转绿；验收判据 = 两三周后 `site:chronicle.klay-wang.com` 结果里出现 /pricing。⚠️ 近几天 GSC 若再发告警邮件，多半是重爬滞后报的旧状态，对照本节清单再判断。
