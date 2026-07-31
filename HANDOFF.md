@@ -2,7 +2,7 @@
 
 > 本文档面向未来的维护者（包括未来的我和任何 AI 助手）。
 > 读完本文即可独立维护、修改、扩展本站的一切。
-> **最后更新：2026-07-31 EDT｜线上现行 `v=20260731b`（bump：style.css + docs-i18n.js）｜最新章节：第五十二节（§52，支付行带 logo 搬家 + 定价三档自然高度 + Paddle→Buttondown 管道代码落仓）**
+> **最后更新：2026-07-31 EDT｜线上现行 `v=20260731c`｜最新章节：第五十三节（§53，三档恢复等高＝Klay 裁定统一长宽高，胖框改两手治；logo 换彩色白徽章底）**
 > ⚠️ **改本文正文时，必须同时改上面这行。** 它已经过期过多次（07-16 三行全错；07-18 停在 §22 却已到 §30；07-19 停在 §34 却已到 §36）。抬头是读者判断"这文档还算不算数"的唯一依据，过期比没有更糟。
 > ⚠️ **本文按时间追加，越靠后越新。与前文冲突处，一律以编号最大的那节为准。**
 
@@ -2521,3 +2521,9 @@ Klay 问：「任何时候计算/回测，和我自己跑的是一样的啊，�
 2. **定价三档「胖框」根治**：`.pricing-tiers` 加 `align-items: start`。病根＝grid 默认 stretch 把免费档拉到与中档同高，内容短的免费档中段一大片空白（EN 版更甚）。自然高度后各档各取所需，middle 档最高属正常。
 3. **版本 bump `v=20260731b`**（style.css + docs-i18n.js 双改），`build_route_pages.py` 16 页重跑。
 4. **Paddle→Buttondown 履约管道代码落仓** `api/paddle-buttondown/`（worker.js + README 开通指南）：webhook 验签（HMAC ts:body）→ subscription.created/activated 加订户打 paid、canceled 换 churned（不删订户）；每周一 cron 对账闸＝Paddle 活跃集合 vs Buttondown paid 集合双向差集，Discord 播报（邮箱打码）。**代码零密钥可公开；部署需 Klay 在 CF 后台粘贴 + 亲手填 4 个 Secret + Paddle 挂 destination**，步骤见该目录 README。⚠️ 验收全过之后记得把定价页「订阅后 24 小时内开通（手动）」改成「付款后即时开通」——那句是自动化的转化收益所在。
+
+## §53 07-31：三档恢复等高（Klay 裁定统一长宽高）+ 彩色 logo 白徽章底 —— §52 的自然高度方案被推翻
+
+**Klay 原话**：为什么一个粗一个细？尤其英文版太丑，统一所有的长宽高；logo 黑白换彩色。
+**教训**：§52 用 align-items:start 治「胖框」，治好了空白却制造了参差——**用户要的是等高 + 不空**，两个约束都要满足，砍掉任何一个都不算解。
+**二改方案**：①恢复 grid stretch 等高；②「胖」改两手治：EN 开通说明精简（压矮最高的中档）+ `.ptier-list { justify-content: space-between }`（剩余空间摊进行距，不再攒成整块空白）；③logo 换 simple-icons 彩色原色，`.pay-ico` 加白色小徽章底（border+圆角），暗色主题下彩色 logo 也立得住；银联文字徽标改品牌蓝 #00508E（仍不山寨其三色商标）。④bump `v=20260731c`，16 路由页重跑。
