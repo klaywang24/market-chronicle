@@ -2,7 +2,7 @@
 
 > 本文档面向未来的维护者（包括未来的我和任何 AI 助手）。
 > 读完本文即可独立维护、修改、扩展本站的一切。
-> **最后更新：2026-07-31 EDT｜线上现行 `v=20260731a`（本次 bump：docs-i18n.js 改动）｜最新章节：第五十节（§50，定价页支付方式明示行——三名 CN 访客弃购后的第一修）**
+> **最后更新：2026-07-31 EDT｜线上现行 `v=20260731a`｜最新章节：第五十一节（§51，部署链路一锤定音：生产=CF Pages，§129 的 GitHub Pages 记述作废）**
 > ⚠️ **改本文正文时，必须同时改上面这行。** 它已经过期过多次（07-16 三行全错；07-18 停在 §22 却已到 §30；07-19 停在 §34 却已到 §36）。抬头是读者判断"这文档还算不算数"的唯一依据，过期比没有更糟。
 > ⚠️ **本文按时间追加，越靠后越新。与前文冲突处，一律以编号最大的那节为准。**
 
@@ -2505,3 +2505,12 @@ Klay 问：「任何时候计算/回测，和我自己跑的是一样的啊，�
 **改动**（Klay 口述原文照录）：定价页合规段之后新增一行：**支付方式：支持 Visa / Mastercard / PayPal / Apple Pay / 银联信用卡，不支持支付宝 / 微信 / 银联借记卡。** 中英同改（EN 在 `js/docs-i18n.js` 的 pricing EN 模板同位）。`docs-i18n.js` 属 JS 改动 ⇒ bump `?v=20260731a`；`index.html` 改后已重跑 `scripts/build_route_pages.py` 全 16 页（§49 规矩：index 改动必须重跑，否则路由页漂移）。
 
 **教训指针**：Paddle 收银台是托管浮层，Cloudflare Analytics 看不见 ⇒「/pricing 零访问」曾低估漏斗；漏斗观测以 Paddle Customers/Transactions 为准。另：Paddle（收钱）与 Buttondown（发信）之间无自动履约管道，webhook→Worker→Buttondown API + 每周对账闸已立项未建，见④线记忆 market-chronicle-business。
+
+## §51 07-31：部署链路一锤定音 —— 生产 = Cloudflare Pages，本文 §129 一带的 GitHub Pages 记述作废
+
+**实证（2026-07-31 支付方式行上线时踩出来的）**：
+- **生产源头 = Cloudflare Pages 项目 `market-chronicle`**（Workers 和 Pages 下，域名 chronicle.klay-wang.com + market-chronicle.pages.dev，自动部署已启用，跟踪 main 分支）。
+- 仓库同时还开着 GitHub Pages（`pages build and deployment` workflow 每次 push 也会跑）——**那是无人使用的副线**，它 success 不代表线上更新。本文早期「Pages：main 分支根目录直出」的记述指的是它，作废。
+- **故障形态**：CF Pages 对 commit `b881634` 首次构建失败（部署列表红色感叹号 + No deployment available），站上持续吐旧页 30 分钟；zone 层 Purge Everything 无效（源头旧，非缓存旧）。**修法＝部署列表该行 ⋯ → Retry deployment**，重建 18s 成功即刻生效。
+- **排障顺序（下次直接抄）**：① 线上 curl 关键字 ② `gh run list` 看到的 pages-build 是副线、别被它的 success 骗 ③ 真部署状态看 CF 后台 Workers 和 Pages → market-chronicle → Deployments ④ 最新一条不是你的 commit → Retry；连清缓存都试过还旧 = 一定是这里。
+- 每日数据能自动上线 = daily workflow push → CF Pages 自动构建，链路健康与否看 CF 部署列表最新一条的时间。
