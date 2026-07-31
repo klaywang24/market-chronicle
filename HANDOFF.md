@@ -2,7 +2,7 @@
 
 > 本文档面向未来的维护者（包括未来的我和任何 AI 助手）。
 > 读完本文即可独立维护、修改、扩展本站的一切。
-> **最后更新：2026-07-31 EDT｜线上现行 `v=20260731a`｜最新章节：第五十一节（§51，部署链路一锤定音：生产=CF Pages，§129 的 GitHub Pages 记述作废）**
+> **最后更新：2026-07-31 EDT｜线上现行 `v=20260731b`（bump：style.css + docs-i18n.js）｜最新章节：第五十二节（§52，支付行带 logo 搬家 + 定价三档自然高度 + Paddle→Buttondown 管道代码落仓）**
 > ⚠️ **改本文正文时，必须同时改上面这行。** 它已经过期过多次（07-16 三行全错；07-18 停在 §22 却已到 §30；07-19 停在 §34 却已到 §36）。抬头是读者判断"这文档还算不算数"的唯一依据，过期比没有更糟。
 > ⚠️ **本文按时间追加，越靠后越新。与前文冲突处，一律以编号最大的那节为准。**
 
@@ -2514,3 +2514,10 @@ Klay 问：「任何时候计算/回测，和我自己跑的是一样的啊，�
 - **故障形态**：CF Pages 对 commit `b881634` 首次构建失败（部署列表红色感叹号 + No deployment available），站上持续吐旧页 30 分钟；zone 层 Purge Everything 无效（源头旧，非缓存旧）。**修法＝部署列表该行 ⋯ → Retry deployment**，重建 18s 成功即刻生效。
 - **排障顺序（下次直接抄）**：① 线上 curl 关键字 ② `gh run list` 看到的 pages-build 是副线、别被它的 success 骗 ③ 真部署状态看 CF 后台 Workers 和 Pages → market-chronicle → Deployments ④ 最新一条不是你的 commit → Retry；连清缓存都试过还旧 = 一定是这里。
 - 每日数据能自动上线 = daily workflow push → CF Pages 自动构建，链路健康与否看 CF 部署列表最新一条的时间。
+
+## §52 07-31：支付行带 logo 搬家 + 定价三档自然高度 + Paddle→Buttondown 管道落仓（Klay 三连令）
+
+1. **支付方式行搬家 + 卡组织 logo**：从合规段之后挪到**三档方框正下方第一行**（中英同改，`.pay-methods`）。logo 走 simple-icons 灰度版（#8a8580）自托管于 `icons/pay/`（visa/mastercard/paypal/applepay 四个 SVG）；**UnionPay 不在 simple-icons 库，不山寨其商标**，用与卡片系统同款的灰描边文字徽标 `unionpay.svg`（圆角框「银联」）。
+2. **定价三档「胖框」根治**：`.pricing-tiers` 加 `align-items: start`。病根＝grid 默认 stretch 把免费档拉到与中档同高，内容短的免费档中段一大片空白（EN 版更甚）。自然高度后各档各取所需，middle 档最高属正常。
+3. **版本 bump `v=20260731b`**（style.css + docs-i18n.js 双改），`build_route_pages.py` 16 页重跑。
+4. **Paddle→Buttondown 履约管道代码落仓** `api/paddle-buttondown/`（worker.js + README 开通指南）：webhook 验签（HMAC ts:body）→ subscription.created/activated 加订户打 paid、canceled 换 churned（不删订户）；每周一 cron 对账闸＝Paddle 活跃集合 vs Buttondown paid 集合双向差集，Discord 播报（邮箱打码）。**代码零密钥可公开；部署需 Klay 在 CF 后台粘贴 + 亲手填 4 个 Secret + Paddle 挂 destination**，步骤见该目录 README。⚠️ 验收全过之后记得把定价页「订阅后 24 小时内开通（手动）」改成「付款后即时开通」——那句是自动化的转化收益所在。
