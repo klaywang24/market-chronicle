@@ -2,7 +2,7 @@
 
 > 本文档面向未来的维护者（包括未来的我和任何 AI 助手）。
 > 读完本文即可独立维护、修改、扩展本站的一切。
-> **最后更新：2026-07-26 EDT｜线上现行 `v=20260726ag`（本次未 bump：只动 scripts/workflow/data，未碰 JS/CSS）｜最新章节：第四十八节（§48，口径自检 verify_gauge_math 上线——自核从「值没被改写」扩到「值仍由同一把尺算出」）**
+> **最后更新：2026-07-31 EDT｜线上现行 `v=20260731a`（本次 bump：docs-i18n.js 改动）｜最新章节：第五十节（§50，定价页支付方式明示行——三名 CN 访客弃购后的第一修）**
 > ⚠️ **改本文正文时，必须同时改上面这行。** 它已经过期过多次（07-16 三行全错；07-18 停在 §22 却已到 §30；07-19 停在 §34 却已到 §36）。抬头是读者判断"这文档还算不算数"的唯一依据，过期比没有更糟。
 > ⚠️ **本文按时间追加，越靠后越新。与前文冲突处，一律以编号最大的那节为准。**
 
@@ -2497,3 +2497,11 @@ Klay 问：「任何时候计算/回测，和我自己跑的是一样的啊，�
 - 终检全绿：16 路由 200+自指 canonical；robots.txt/sitemap.xml 真文件正确 content-type；/pricing/ 一跳 301；/pulse 仍走 SPA 兜底；四个 noindex 转化页未被波及；css/js/data 资源 content-type 无恙。
 - 同日姊妹修复（klay-site 仓，非本仓）：四静态页 canonical + /category/shares 301 + **www→apex 308 已在 Vercel 后台设好并实测**（首页与深链均一跳归位）。
 - 后续无人工动作：告警报告等 Google 重爬自动转绿；验收判据 = 两三周后 `site:chronicle.klay-wang.com` 结果里出现 /pricing。⚠️ 近几天 GSC 若再发告警邮件，多半是重爬滞后报的旧状态，对照本节清单再判断。
+
+## §50 07-31：定价页支付方式明示行 —— 三名 CN 访客收银台弃购后的第一修
+
+**背景**：Paddle 后台 2026-07-31 核实：上线以来 3 名陌生访客（全 QQ 邮箱、地址 CN）走到收银台填了邮箱后全部弃购，其中 07-31 那单交易金额 $29 状态 Incomplete。真实付费收入至今 $0（此前「首个付费用户」为 Klay 自测，两笔 $0.00，发布台账已加更正行）。头号嫌疑＝大陆访客到支付表单才发现没有支付宝/微信。
+
+**改动**（Klay 口述原文照录）：定价页合规段之后新增一行：**支付方式：支持 Visa / Mastercard / PayPal / Apple Pay / 银联信用卡，不支持支付宝 / 微信 / 银联借记卡。** 中英同改（EN 在 `js/docs-i18n.js` 的 pricing EN 模板同位）。`docs-i18n.js` 属 JS 改动 ⇒ bump `?v=20260731a`；`index.html` 改后已重跑 `scripts/build_route_pages.py` 全 16 页（§49 规矩：index 改动必须重跑，否则路由页漂移）。
+
+**教训指针**：Paddle 收银台是托管浮层，Cloudflare Analytics 看不见 ⇒「/pricing 零访问」曾低估漏斗；漏斗观测以 Paddle Customers/Transactions 为准。另：Paddle（收钱）与 Buttondown（发信）之间无自动履约管道，webhook→Worker→Buttondown API + 每周对账闸已立项未建，见④线记忆 market-chronicle-business。

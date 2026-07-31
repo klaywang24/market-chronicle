@@ -205,6 +205,7 @@
 <p><strong>The numbers are everywhere, free forever.</strong> The archive earns its keep on every selloff that comes after — that morning, you are already holding a reading whose method has not changed in fifteen years.</p>
 <p class="pricing-inst"><strong>Institutional / data licensing</strong> (series licensing, index licensing, redistribution) — <a href="contact">contact us</a>; unpriced.</p>
 <p>Annual = 10 months' price ($290 / $990) · 14-day no-questions refund, no trial (the free tier is the trial) · cancel anytime via the manage link in your subscription email. Orders and payments are handled by a Merchant of Record, whose name will appear on your statement. <strong>Data and information only; not investment advice; no buy or sell recommendations.</strong></p>
+<p><strong>Payment methods</strong>: Visa / Mastercard / PayPal / Apple Pay / UnionPay credit cards. Alipay, WeChat Pay and UnionPay debit cards are not supported.</p>
 <p class="doc-fineprint">Pro and API are later plans, not a final commitment; launch dates TBD.</p>` },
     },
   };
