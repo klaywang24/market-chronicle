@@ -2527,3 +2527,21 @@ Klay 问：「任何时候计算/回测，和我自己跑的是一样的啊，�
 **Klay 原话**：为什么一个粗一个细？尤其英文版太丑，统一所有的长宽高；logo 黑白换彩色。
 **教训**：§52 用 align-items:start 治「胖框」，治好了空白却制造了参差——**用户要的是等高 + 不空**，两个约束都要满足，砍掉任何一个都不算解。
 **二改方案**：①恢复 grid stretch 等高；②「胖」改两手治：EN 开通说明精简（压矮最高的中档）+ `.ptier-list { justify-content: space-between }`（剩余空间摊进行距，不再攒成整块空白）；③logo 换 simple-icons 彩色原色，`.pay-ico` 加白色小徽章底（border+圆角），暗色主题下彩色 logo 也立得住；银联文字徽标改品牌蓝 #00508E（仍不山寨其三色商标）。④bump `v=20260731c`，16 路由页重跑。
+
+## §54 08-02：Person 实体合并 —— 17 页 68 处匿名 Person 收敛成一个带 @id 与 sameAs 的节点
+
+**起因**：Klay 问 AI 时代怎么被搜到、被引用。审计两站结构化数据时发现，本站的 Person 只作为 `publisher`/`creator` 嵌在各 `@graph` 里，**17 页 × 4 处 = 68 处，全是 `{"@type":"Person","name":"Klay Wang","url":"https://klay-wang.com/"}`，既没有 `@id` 也没有 `sameAs`（0 处）**。
+
+**为什么这是问题**：没有 `@id` 时，爬虫看到的是 68 个「碰巧都叫 Klay Wang 的人」，而不是同一个人。个人站那边同时也存在这个问题（85 篇文章各自声明一个 Person），已在 klay-wang.com 仓同日修掉。两站不合并，各平台积累的信任度就无法互相加成。
+
+**改法**：
+- 68 处全部改为按 id 引用：`{"@id":"https://klay-wang.com/#person"}`
+- 每个文件的 `@graph` 开头插入**一份**完整定义（`@id` + `name` + `url` + 6 条 `sameAs`），全站只此一处展开，不重复 sameAs 数组
+- `@id` 用 `https://klay-wang.com/#person`，**与个人站 `app/page.js` 里的 PERSON_ID 逐字相同** —— 这是两站 Person 能被合并成一个实体的唯一依据，任何一边改了另一边必须同步
+
+**为什么 `@id` 用个人站的域名而不是本站**：个人站是这个人的主页，本站是他的项目。实体的规范位置在前者。
+
+**Kaggle 那条特别说明**：handle 是 `klaywong`（w-o-n-g），与姓名不符且 **Kaggle 不支持修改用户名**。它只能靠 `sameAs` 被归到本人名下 —— 这条是 sameAs 在本站的主要价值，别当冗余删掉。
+
+**验收**：落盘前后各跑一次 `json.loads`，17 块 JSON-LD 全部可解析；复验 17 个展开的 Person 节点，`@id` 与 6 条 sameAs 齐全。
+**未动**：无 JS/CSS 改动，故不需要 bump `?v=`。仓内另有其他会话未提交的 `logos/*`，只 `git add *.html`，未碰。
