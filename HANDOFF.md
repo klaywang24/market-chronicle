@@ -2584,3 +2584,8 @@ Klay 问：「任何时候计算/回测，和我自己跑的是一样的啊，�
 - **body 复制 16 份不修**。要让每页只留自己那段，得让生成器裁剪 body，而 catch-all 路由依赖整站 DOM（见「永不加 404.html 否则深链全挂」）。收益中等、风险是深链全挂，**不值**。
 
 **08-02 全盘体检结果（新基线）**：三仓工作区干净无未推；两站 8 个端点全 200；`PERSON_ID` 两仓逐字相同且线上双站实测一致；17 页 body 指纹仅 1 种（无漂移）。
+
+---
+
+**📗 SEO/GEO 操作手册（跨两站，不在本仓）**：`个人网站：klay-wang-site/seo/SEO-GEO 维护手册.md`（+ .docx）
+本仓相关的内容都收在里面 —— Person `@id` 与个人站的同步约束、英文定义为什么要放 `<noscript>`、`.gitattributes` 与 `ROUTES` 的联动、以及**明确不做的三件**（加 404.html / 让生成器裁剪 body / 回退路由改造）。自检 `seo/geo-selfcheck.sh`（26 项自检，`bash "$HOME/Documents/个人 Agent/个人网站：klay-wang-site/seo/geo-selfcheck.sh"`）。
