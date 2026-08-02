@@ -81,15 +81,63 @@
     return o;
   }
 
+  /* 🔴 2026-08-02 修：图表内容画到绘图区外面（Klay 截图点名，恐惧的标价台账那张
+     前向段整条 15 个点全在 grid 之外，末点溢出 219px；杠杆基金净头寸等多张同病）。
+
+     **不是样式问题，是 ECharts 记的容器宽度是旧的。** 实测：`inst.getWidth()` = 1086，
+     而 `el.clientWidth` = 867 —— 坐标系按 1086 算，画出来自然冲出右边界 219px（1086/867 ≈ 1.25）。
+
+     站上本来就有两处 resize（切面板后 app.js:200、window.resize app.js:254），为什么不管用：
+     两处都是**在某个时刻主动调一次**，而容器宽度是在那之后才稳定下来的（tab 从 display:none
+     切出来、字体加载、滚动揭示的过渡、侧栏/目录出现都会改宽度）。**时点式的 resize 治不了
+     时点之后发生的布局变化。**
+
+     正解是让它**由尺寸变化本身驱动**：给每个图表容器挂 ResizeObserver，宽度一变就重算。
+     两个护栏：① `clientWidth > 0` —— 面板 display:none 时宽度为 0，此时 resize 会把图表
+     压成 0 宽，切回来就是空白；② 差值 > 1px 才动 —— 否则 resize 引起的重绘可能反过来
+     再触发观察者，形成循环。 */
+  const sizeObs = new Map();      // elId -> ResizeObserver
+
+  function observeSize(elId, el) {
+    if (!window.ResizeObserver) return;      // 老浏览器退回原有的两处 resize
+    if (sizeObs.has(elId)) { sizeObs.get(elId).disconnect(); }
+    let raf = 0;
+    const obs = new ResizeObserver(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const c = built.get(elId);
+        if (!c || c.isDisposed()) return;
+        if (el.clientWidth > 0 && Math.abs(c.getWidth() - el.clientWidth) > 1) c.resize();
+      });
+    });
+    obs.observe(el);
+    sizeObs.set(elId, obs);
+  }
+
+  /* 兜底：页面从后台切回前台时，把所有图表的尺寸校一遍。
+     Why：`requestAnimationFrame` 在页面隐藏时被浏览器整体暂停（实测 `visibilityState:"hidden"`
+     下 rAF 与 ResizeObserver 回调都不执行）。如果用户在别的标签页时这边完成了布局变化，
+     观察者的那次回调可能排在队列里没跑完；切回来时尺寸已经不再变化，观察者也就不会再响。
+     这一条与 ResizeObserver 是两层保险，谁先到算谁的（差值 ≤1px 时两者都不会白做功）。 */
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) return;
+    built.forEach((c, id) => {
+      const el = document.getElementById(id);
+      if (el && el.clientWidth > 0 && !c.isDisposed() && Math.abs(c.getWidth() - el.clientWidth) > 1) c.resize();
+    });
+  });
+
   async function buildOne(elId, build) {
     const el = document.getElementById(elId);
     if (!el) return;
     if (built.has(elId)) { built.get(elId).dispose(); }
+    if (sizeObs.has(elId)) { sizeObs.get(elId).disconnect(); sizeObs.delete(elId); }
     try {
       const option = i18nOption(await build(pal()));
       const inst = echarts.init(el, null, { renderer: "canvas" });
       built.set(elId, inst);
       inst.setOption(option);
+      observeSize(elId, el);
     } catch (e) {
       // 数据尚未生成/拉取失败：给出可见占位，而不是无声空白
       built.delete(elId);
