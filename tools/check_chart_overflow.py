@@ -28,8 +28,10 @@ Klay 截图点名：恐惧的标价台账那张，猩红的前向段**整条 15 
 headless Chrome 里页面是 visible 的，才测得准。
 
 ## 用法
-    python3 tools/check_chart_overflow.py                       # 默认本地 8123
-    python3 tools/check_chart_overflow.py https://chronicle.klay-wang.com/
+    python3 tools/check_chart_overflow.py            # 本地预览（先 preview_start chronicle2）
+
+⚠️ **只能对本地跑**：探针要写进 index.html 的临时副本再同源打开，线上目录写不了。
+   本地跑的就是将要 push 的同一份 js/app.js，所以本地全绿 + 线上版本戳核对一致 = 线上也对。
 """
 import json, os, re, subprocess, sys
 
@@ -104,7 +106,8 @@ def main():
         os.remove(tmp)
     m = re.search(r'id="OV">@@(.*?)@@', html, re.S)
     if not m:
-        print("🔴 探针没回话 —— 页面没加载起来或 .tab 结构变了。这不等于合格。")
+        print("🔴 探针没回话 —— 这不等于合格。最常见原因：把线上地址传进来了；")
+        print("   本脚本只能对本地预览跑（探针要写进站点目录）。先 preview_start chronicle2，再不带参数运行。")
         sys.exit(1)
     res = json.loads(m.group(1))
 
