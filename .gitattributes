@@ -1,0 +1,23 @@
+# 这些 .html 由 scripts/build_route_pages.py 从 index.html 生成，不是手写源码。
+# 标 linguist-generated 有两个作用：
+#   1. GitHub 语言统计不再把 16 份重复拷贝算进去 —— 否则 HTML 会以 17 倍体量
+#      压过真正的源码，把一个日更数据项目显示成「78.5% HTML」。
+#   2. diff 里默认折叠 —— index.html 改一行不会再显示成 17 个文件全变。
+# index.html 是源文件，不在此列。清单取自生成器的 ROUTES，改路由时同步这里。
+
+about.html linguist-generated=true
+consumer.html linguist-generated=true
+contact.html linguist-generated=true
+fin.html linguist-generated=true
+kindex.html linguist-generated=true
+leaps.html linguist-generated=true
+luxury.html linguist-generated=true
+macro.html linguist-generated=true
+methodology.html linguist-generated=true
+pricing.html linguist-generated=true
+privacy.html linguist-generated=true
+qqq.html linguist-generated=true
+refunds.html linguist-generated=true
+spy.html linguist-generated=true
+tech.html linguist-generated=true
+terms.html linguist-generated=true
