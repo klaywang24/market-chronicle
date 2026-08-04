@@ -21,7 +21,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "见证链看板.html"
+# 默认写到**项目文件夹**（仓库外，和 访客数据/访客看板.html 同一层级的用法）：
+#   …/美股编年史：market-chronicle/见证链看板.html
+# 放仓外而不是仓内，是因为它是本地运维工具 —— 运维状态公开挂着，
+# 红的时候会变成别人的弹药。仓内那份的 .gitignore 条目保留作兜底。
+PROJECT = ROOT.parent.parent                     # KAPX/ 的上一层
+OUT = (PROJECT / "见证链看板.html") if PROJECT.is_dir() else (ROOT / "见证链看板.html")
 RAW = "https://raw.githubusercontent.com/klaywang24/market-chronicle/main"
 REPO = "https://github.com/klaywang24/market-chronicle"
 
@@ -193,8 +198,13 @@ function card(name,st,detail,why){
 
 
 def main() -> None:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", help="输出路径（默认写到项目文件夹）")
+    out = Path(ap.parse_args().out) if ap.parse_args().out else OUT
     html = HTML.replace("RAW_URL", RAW).replace("REPO_URL", REPO)
-    OUT.write_text(html, encoding="utf-8")
+    out.write_text(html, encoding="utf-8")
+    globals()["OUT"] = out
     print(f"✅ 已生成 {OUT}")
     print(f"   {datetime.now(timezone.utc).astimezone():%Y-%m-%d %H:%M %Z}")
     print("   双击打开即可；页面每次打开自动拉最新数据，不必重跑本脚本。")

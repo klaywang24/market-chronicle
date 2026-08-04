@@ -32,23 +32,29 @@ jobs:
         with:
           python-version: '3.12'
 
+      # 🔴 2026-08-04 修（首次实跑就栽了）：
+      #    初版在 `set -e` 恢复之后又跑了一遍脚本，而**「不健康」的退出码就是 1** ——
+      #    于是「检测到问题」被当成「脚本崩了」，整步失败、开 Issue 那步被跳过，
+      #    Klay 收到的是 GitHub 通用的「Run failed」邮件，不是我设计的那封体检报告。
+      #    🔑 教训：退出码 1 在这里是**正常输出**不是错误。凡是「非零=有发现」的脚本，
+      #       都不能直接放进默认 fail-fast 的 CI 步骤里。
+      #    ∴ ①只跑一次，两种格式各存一份 ②`|| true` 吞掉预期的非零
+      #      ③判据从 JSON 里读 overall，不靠 $?（它已被 || true 吃掉）
       - name: witness health check
         id: health
         run: |
-          set +e
-          python scripts/check_witness_health.py --json > /tmp/health.json
-          echo "exit=$?" >> "$GITHUB_OUTPUT"
-          set -e
-          cat /tmp/health.json
-          {
-            echo 'report<<HEALTH_EOF'
-            python scripts/check_witness_health.py
-            echo 'HEALTH_EOF'
-          } >> "$GITHUB_OUTPUT"
+          python scripts/check_witness_health.py --json > /tmp/health.json 2>/dev/null || true
+          python scripts/check_witness_health.py      > /tmp/health.txt  2>&1 || true
+          cat /tmp/health.txt
+          # 脚本真崩了（JSON 都没写出来）才让本步失败 —— 那才是真错误
+          OVERALL=$(python -c "import json;print(json.load(open('/tmp/health.json'))['overall'])")
+          echo "overall=$OVERALL" >> "$GITHUB_OUTPUT"
+          { echo 'report<<HEALTH_EOF'; cat /tmp/health.txt; echo 'HEALTH_EOF'; } >> "$GITHUB_OUTPUT"
 
       # 不健康 → 开 issue（同一天重复运行只更新，不刷屏）
       - name: open or update issue
-        if: steps.health.outputs.exit != '0'
+        # always()：本步失败时也要能开 Issue —— 少了它，这次就是被静默跳过的
+        if: always() && steps.health.outputs.overall == 'bad'
         uses: actions/github-script@v7
         with:
           script: |
@@ -84,7 +90,7 @@ jobs:
 
       # 恢复了就自动关掉，免得旧 issue 一直挂着让人麻木
       - name: close issue when healthy
-        if: steps.health.outputs.exit == '0'
+        if: always() && steps.health.outputs.overall == 'ok'
         uses: actions/github-script@v7
         with:
           script: |
