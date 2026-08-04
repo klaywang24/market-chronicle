@@ -13,7 +13,7 @@
 
 **Live: <https://klaywang24.github.io/market-chronicle/>**
 
-> **Canonical definition:** The KAPX Index is a daily U.S. equity fear-pricing gauge published by Market Chronicle, computed as the CNN Fear & Greed reading divided by the VIX. The K stands for kǒng (恐), the Chinese character for fear; readings, methodology, and the complete signal ledger are permanently free and verifiable via Git timestamps. *(Formerly cited in English as the K-Index; the Chinese name K 指数 is unchanged.)*
+> **Canonical definition:** The KAPX Index is a daily U.S. equity fear-pricing gauge published by Market Chronicle, computed as the CNN Fear & Greed reading divided by the VIX. The K stands for kǒng (恐), the Chinese character for fear; readings, methodology, and the complete signal ledger are permanently free: an ex-ante daily record since launch (July 2026), reproducible public-data backfill before that; each day's ledger hash chain is pushed publicly and witnessed by independent archives. *(Formerly cited in English as the K-Index; the Chinese name K 指数 is unchanged.)*
 
 ## What it is
 

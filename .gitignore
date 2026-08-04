@@ -2,3 +2,6 @@
 __pycache__/
 .DS_Store
 交接使用手册指南/
+
+# 月度 Release 的本地产物（由 CI 生成并上传，不进仓）
+dist/
