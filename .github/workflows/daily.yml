@@ -66,35 +66,26 @@ jobs:
       # 锚定：把「公开可查」做成机制——git 日期本地可伪造，第三方存档不能。
       # 存当日 commit 的 GitHub 页（见证提交历史状态）+ 站点 + 两个台账 JSON。
       # Wayback 不稳定属常态：任何失败都不许影响管线与告警（continue-on-error + 逐条 || true）。
+      # 🔴 2026-08-04 重写（原内联 bash 有三个叠加 bug，见 scripts/anchor_wayback.py 头注）：
+      #    A. curl -sS 不带 -f，HTTP 429/503 退出码仍是 0 → 被限流计成成功
+      #    B. 本步排在 commit data 之后，写完 anchor_log.jsonl runner 就销毁
+      #       →「随下次 commit 提交」永远不会发生，该文件从未存在过一次
+      #    C. 只记 ok/fail 计数，证明不了「它存下来了」
+      #    实测后果：链头 ledger_hashes.jsonl 的快照 8 次全在 7 月、08-01 起断供三天，
+      #    而 CI 每天照报「成功 5/5」。
+      # ⚠️ 本步仍须排在 commit 之后（要锚 commit 页 + 等 CF Pages 部署），
+      #    所以它**自己提交自己的日志**，不再指望别人的 commit 带上它。
       - name: anchor to Wayback
         continue-on-error: true
         run: |
-          SHA=$(git rev-parse HEAD)
-          # 🔴 锚定是整条证据链的效力来源，而本步是 continue-on-error（故意的：Wayback
-          #    抽风不该阻塞管线）。但那意味着**锚丢了不会有人知道**——十年后无法回答
-          #    「哪些天有锚、哪些天没有」。故逐条记结果，下一次 commit 会把它带上。
-          OK=0; FAIL=0; LOG="data/anchor_log.jsonl"
-          for u in \
-            "https://github.com/${{ github.repository }}/commit/$SHA" \
-            "https://chronicle.klay-wang.com/" \
-            "https://chronicle.klay-wang.com/data/kindex.json" \
-            "https://chronicle.klay-wang.com/data/leaps_gauge.json" \
-            "https://chronicle.klay-wang.com/data/ledger_hashes.jsonl"; do
-            if curl -sS -m 60 "https://web.archive.org/save/$u" -o /dev/null; then
-              OK=$((OK+1))
-            else
-              FAIL=$((FAIL+1)); echo "  ⚠️ 锚定失败: $u"
-            fi
-            sleep 5
-          done
-          printf '{"date":"%s","sha":"%s","ok":%d,"fail":%d}\n' \
-            "$(date -u +%F)" "$SHA" "$OK" "$FAIL" >> "$LOG"
-          echo "锚定结果：成功 $OK / 失败 $FAIL（已记入 $LOG，随下次 commit 提交）"
-          # 全部失败 = 当天完全没有独立见证，值得知道
-          [ "$OK" -eq 0 ] && echo "::warning::当日 Wayback 锚定全部失败，该日无独立见证" || true
-      # ⚠️ if: always() 是故意的——失败时也要发通知。但必须把 job 状态传进去，
-      # 否则脚本会读到磁盘上的旧 pulse.json，发出一条「看起来一切正常」的播报，
-      # 把失败静默掉。2026-07-12→14 管线死了 4 天没人发现，就是栽在这里。
+          python scripts/anchor_wayback.py --sha "$(git rev-parse HEAD)"
+          if [ -n "$(git status --porcelain data/anchor_log.jsonl)" ]; then
+            git add data/anchor_log.jsonl
+            git commit -m "anchor: wayback log $(date -u +%F)"
+            git pull --rebase -q origin main || true
+            git push
+          fi
+
       - name: notify Discord
         if: always()
         run: python scripts/notify_discord.py

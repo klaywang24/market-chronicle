@@ -45,6 +45,10 @@ LEDGER_FILES = [
 ]
 CHAIN_FILES = ["ledger_hashes.jsonl", "anchor_log.jsonl"]
 
+# concept DOI 永远指向最新版，可写死进包；**版本 DOI 铸于发版之后，包内无法自知** ——
+# 所以 VERIFY.md 只能告诉读者「去 Zenodo 记录页取本版的 version DOI」，不能假装知道它。
+CONCEPT_DOI = "10.5281/zenodo.21783004"
+
 
 def sha256_file(p: Path) -> str:
     h = hashlib.sha256()
@@ -126,6 +130,17 @@ job ran. Cutting at the month-end commit means this DOI always resolves to the s
 
 The chain is cumulative and append-only, so it contains every row up to that commit, not only rows
 dated inside {month}. The exact range is printed below.
+
+## 0b. Citing this bundle
+
+Two DOIs, two uses:
+
+- **Concept DOI `10.5281/zenodo.21783004`** — always resolves to the latest edition. Use it for general citation.
+- **Version DOI of this specific edition** — printed on this edition's Zenodo record, and it never
+  moves. Use it for due diligence or audit, where the exact bytes are the point. It is not printed
+  here because it is minted after this bundle is built; take it from the Zenodo record.
+
+Citing only the concept DOI in an audit is ambiguous: later it resolves to a different edition.
 
 ## 1. The chain
 
@@ -213,7 +228,7 @@ def main() -> None:
     present = list(blobs)
 
     zip_path = DIST / f"kapx-ledger-{month}.zip"
-    manifest = {"month": month, "packaged_on": packaged_on,
+    manifest = {"month": month, "packaged_on": packaged_on, "concept_doi": CONCEPT_DOI,
                 "cut_at_commit": sha, "cut_at_time": cut,
                 "packaged_from_chain_rows": len(rows),
                 "chain_head": rows[-1]["chain"] if rows else None,

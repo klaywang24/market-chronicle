@@ -47,6 +47,13 @@ jobs:
           echo "month=$M" >> "$GITHUB_OUTPUT"
           echo "sha=$(cat dist/CUT_SHA-$M.txt)" >> "$GITHUB_OUTPUT"
 
+      # 🔴 发版必过闸（2026-08-04 Klay 定）：用一个**刻意不 import 项目代码**的实现
+      #    照 VERIFY.md 印出来的公式复算一遍。两边用同一份实现发现不了任何东西。
+      #    由来：08-03 首个包的 VERIFY.md 链公式写错，照它验会得出「链断了」——
+      #    发布一份错的验证方法，比不发验证方法更糟。
+      - name: independent re-verification
+        run: python scripts/verify_release.py "$(ls dist/kapx-ledger-*.zip | head -1)"
+
       # 幂等：同月重跑不炸，改为覆盖资产（手动补发/修元数据时会用到）
       - name: publish release
         env:
