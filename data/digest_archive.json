@@ -2,6 +2,15 @@
   "_note": "头版「每周对账 · 公开归档」墙。🔴 只收周对账与月复盘，每日 digest 永不进本表 —— 公开度按品类切（周报免费拉新／日更付费独占），这是 2026-07-26 定的分法，改它等于改定价承诺。契约：周报发出后在 issues 头部插一行（date=发送日 / title=邮件标题原样照录 / url=Buttondown 存档页真实链接），随当日提交 push；标题与链接必须取自存档页实况，绝不手编。数组为空时头版整块不渲染，不会留空壳。",
   "archive_index": "https://buttondown.com/klay24/archive/",
   "issues": [
-    { "date": "2026-07-26", "title": "美股跌到位了吗？· 7.20-7.24 本周回顾", "url": "https://buttondown.com/klay24/archive/u7f8e-u80a1-u8dcc-u5230-u4f4d-u4e86-u5417-720-724/" }
+    {
+      "date": "2026-08-02",
+      "title": "美股七月赚钱了吗？· 7月收官 & 回顾",
+      "url": "https://buttondown.com/klay24/archive/u7f8e-u80a1-u4e03-u6708-u8d5a-u94b1-u4e86-u5417/"
+    },
+    {
+      "date": "2026-07-26",
+      "title": "美股跌到位了吗？· 7.20-7.24 本周回顾",
+      "url": "https://buttondown.com/klay24/archive/u7f8e-u80a1-u8dcc-u5230-u4f4d-u4e86-u5417-720-724/"
+    }
   ]
 }
