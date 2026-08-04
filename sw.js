@@ -12,7 +12,10 @@
  *     访问时的旧壳，旧壳内联的是旧 priceId：不 bump 就是放任回访者按旧价结账（账实不符）。
  *  2) 验收站上改动必须硬刷新或无痕窗口 —— 回访看到的外壳永远滞后一次部署，
  *     正常刷新看到旧版不是部署失败（07-26 已实际骗过一次验收）。 */
-const CACHE = "mc-v5";
+// 2026-08-03 → mc-v6：定价三档等宽修复。不属于上面 §11 的「改价必 bump」，是主动 bump——
+// 外壳缓存优先，不 bump 的话回访者还要再看一次错版（Klay 是当 bug 报的，不能等下一次访问）。
+// 代价只有一次冷加载。
+const CACHE = "mc-v6";
 const CDN_HOSTS = new Set(["cdn.jsdelivr.net", "fonts.googleapis.com", "fonts.gstatic.com"]);
 
 self.addEventListener("install", () => self.skipWaiting());
