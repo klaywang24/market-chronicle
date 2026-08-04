@@ -1825,8 +1825,9 @@ y 轴照常显示 0/20/40/60/80——**合成刻度标出来会被读成百分�
    （本文档自己写死「TRACKED 加文件只往后加、改口径＝另起新链」），故留给用户决定。
 2. **`notify_discord.py:11` 的 `SITE` 仍是 `klaywang24.github.io`**（还活着但非 canonical），
    每日推送的链接都指向它。一行的事，但不在今晚的清单里。
-3. **Kaggle / Hugging Face 上的 KAPX 数据集标的是 CC BY 4.0**——那是衍生读数（K=CNN÷VIX），
-   比原始值站得住，但与今晚改的 `_notice` 口径值得对齐一次。
+3. ~~**Kaggle / Hugging Face 上的 KAPX 数据集标的是 CC BY 4.0**——那是衍生读数（K=CNN÷VIX），
+   比原始值站得住，但与今晚改的 `_notice` 口径值得对齐一次。~~
+   ✅ **2026-08-03 已完成，见 §48.1**（不改许可、改表述；统一到 `_notice` 的三分法）。
 
 ### 35.8 待办（用户已选、明天做）
 新增三个功能：**行业暴露（按权重）**（`SPY.funds_data.sector_weightings`，实测 **1 次调用**
@@ -2589,3 +2590,59 @@ Klay 问：「任何时候计算/回测，和我自己跑的是一样的啊，�
 
 **📗 SEO/GEO 操作手册（跨两站，不在本仓）**：`个人网站：klay-wang-site/seo/SEO-GEO 维护手册.md`（+ .docx）
 本仓相关的内容都收在里面 —— Person `@id` 与个人站的同步约束、英文定义为什么要放 `<noscript>`、`.gitattributes` 与 `ROUTES` 的联动、以及**明确不做的三件**（加 404.html / 让生成器裁剪 body / 回退路由改造）。自检 `seo/geo-selfcheck.sh`（26 项自检，`bash "$HOME/Documents/个人 Agent/个人网站：klay-wang-site/seo/geo-selfcheck.sh"`）。
+
+---
+
+## §48 2026-08-03：许可边界 + canonical 口径 + 月度 Release（本节最新，与前文冲突处以本节为准）
+
+三件都不是新决定，是**执行既有铁律里漏做的部分**。
+
+### 48.1 §35.7 第 3 件事已完成（挂起 07-20 → 08-03）
+原文：「Kaggle / HF 上的 KAPX 数据集标的是 CC BY 4.0……与 `_notice` 口径值得对齐一次」。
+- **不改许可，改表述**。CC BY 是 §21.3 的刻意设计（Kaggle/HF = GEO 漏斗 S0，藏起来等于掐掉那条路），
+  且 CC BY 4.0 **不可撤销** —— 已发出去的授权收不回，所以唯一诚实的动作就是把边界说准。
+- 统一到 `build_data.py` NOTICE（07-19）已经做对的**三分法**：
+  编排/衍生计算/台账结构 = 我们的（PolyForm NC）· 原始数值 = 公开源的事实（不主张所有权）
+  · Kaggle/HF 季度切片 = 单独 CC BY 4.0，**只覆盖那两个平台上的切片**。
+- 落点：`llms.txt` Datasets 段 + Attribution 段。README 未提数据集，不需改。
+- 一句话口径：**数字本来就该跑出去，台账不是。**
+
+### 48.2 canonical 定义句改两段式（§425 命门铁律 + §25 定论的补做）
+原句「完整信号台账永久免费公开，Git 时间戳可验证 / verifiable via Git timestamps」同时违反：
+- **§425**：可验证性表述必须按时段拆分，绝不能让 Git 时间戳盖住回填段；
+- **§25**：git 日期本地可伪造，改不了的是**公开推送被第三方见证**。
+
+§26.1 已按 §25 改过护身符段，**canonical 句漏网** —— 而它恰是全站被引用最多的一句
+（`llms.txt` / `README.md` / `README.zh.md` / `index.html` ×3（首页 ledger-intro、方法论、EN noscript）
+/ `js/i18n.js` D 键 / `js/docs-i18n.js`）。
+🔑 教训：**规矩定过之后要按「所有同类句子」清一遍，不是只改被点名那一句。**
+
+新句点名真正的效力来源：上线起=逐日事前记录；2011→上线前=公开数据回填、可独立复现；
+每日台账哈希链公开推送，并由第三方存档见证。
+⚠️ 改这句必换 i18n D 键（§26.1），**静默失败模式 = 英文态掉回中文**，改完必须运行时中英各验一次。
+
+### 48.3 月度 Release + Zenodo（证据链第三层）
+三层各答一个问题：哈希链=没被改也没被偷删 · Wayback 每日锚=链头那天被外人看见过 ·
+**月度 Release=某月台账被冻结成一个可引用的版本**。补的是前两者都不给的「能写进参考文献的版本号」，
+且 Release 时间由 GitHub 服务端记录，本地 `git commit --date=` 伪造不了。
+
+- `scripts/make_release_bundle.py`：**只打包与描述，对台账只读、不重算任何数值**
+  （重算会让版本包与链不一致，而版本包的全部意义就是与链一致）。
+- `.github/workflows/monthly-release.yml`：每月 2 号（留一天缓冲让上月末交易日入链）；
+  🔴 **打包前先 `anchor_hashes.py --verify`** —— 链断了还发版 = 给坏证据盖官方图章；
+  同月重跑幂等（`--clobber`）；Release 页自身也存一份进 Wayback。
+- `.zenodo.json`：DOI 元数据，描述里**写死两条边界**（回填段不是事前记录；链的起点晚于上线日）。
+
+🚨 **本轮自造错，记住别重犯**：`VERIFY.md` 初稿把链公式写成
+`sha256(prev + concat(sorted file hashes))`，真实是 `sha256(prev + 按键排序的紧凑 JSON)`。
+照初稿验会得出「链断了」。**发布一份错的验证方法，比不发验证方法更糟。**
+→ 已加规矩：发布验证方法前，**必须用一个不 import 项目代码的独立实现照着它复算一遍**。
+
+### 48.4 ⚠️ 留给 Klay 的一次性手工步骤（我不做建账号类操作）
+**Zenodo 授权**：登录 <https://zenodo.org> → 用 GitHub 账号授权 → 在 Repositories 列表里把
+`klaywang24/market-chronicle` 的开关打开。**只有在打开之后创建的 Release 才会拿到 DOI**，
+此前的不会追溯。打开后可用 workflow_dispatch 手动跑一次 monthly-release 验证全链路。
+
+### 48.5 同批修的三个前端 bug（详见 `KAPX/站点踩坑与纠错记录.md` A/D 两类）
+定价页三列不等宽（`1fr` → `minmax(0,1fr)`）· 中文末行孤字（`text-wrap: balance`，**pretty 对中文无效**）
+· 以英文加载后切回简体的中英混排（`docs-i18n.js` 快照前先按 `n.__zh` 还原）。
