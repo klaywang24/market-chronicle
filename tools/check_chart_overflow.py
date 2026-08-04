@@ -105,7 +105,24 @@ PROBE = r"""
     var p=panels[i++];
     var t=[].find.call(document.querySelectorAll('.tab'), function(x){return x.dataset.panel===p;});
     if(t) t.click();
-    setTimeout(function(){ res[p]=scan(); step(); }, 2600);
+    // 🔴 不能固定等一个时长就扫：实测偶发报 3 张溢出、重跑又全绿 ——
+    //    扫到的是「图表刚建好、resize 还没跑」的**瞬态**，不是 bug。
+    //    **一道会随机报红的闸比没有闸更糟**（人会开始无视它）。
+    //    改成等布局稳定：所有容器宽度的签名连续两次不变，才算稳。
+    //    注意这里等的是**容器宽度**不再变，不是等 getWidth() 与它相等 ——
+    //    后者会变成自我实现的预言，等到它对为止，那就什么都测不出来了。
+    stable(function(){ res[p]=scan(); step(); }, 20);
+  }
+  function sig(){
+    return [].map.call(document.querySelectorAll('[id^="ch-"]'),
+                       function(e){return e.clientWidth;}).join(',');
+  }
+  function stable(cb, tries){
+    var prev = sig();
+    setTimeout(function(){
+      if (sig() === prev || tries <= 0) setTimeout(cb, 400);   // 再给 resize 一帧的余量
+      else stable(cb, tries - 1);
+    }, 400);
   }
   setTimeout(step, 2500);
 })();
