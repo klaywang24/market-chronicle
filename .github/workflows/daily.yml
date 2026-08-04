@@ -43,6 +43,18 @@ jobs:
       #    剩下的照样验证通过；链把每天绑在前一天上，删任何一天其后 chain 全部对不上。
       - name: anchor hashes
         run: python scripts/anchor_hashes.py
+      # 图表溢出自检（2026-08-02 接线）。
+      # 起因：全站图表画到绘图区外面（恐惧的标价台账那张末点溢出 219px，多个面板同病），
+      # 根因是 ECharts 记的容器宽度是旧的（getWidth()=1086 而 clientWidth=867）。
+      # 已改用 ResizeObserver 由尺寸变化驱动 resize；这一步是那条修复的守门人。
+      # 🔑 之所以必须挂在 CI 而不是「记得手动跑」：同一天里已经吃过两次亏 ——
+      #    闸⑥ 建好却没写进 gate_all 的 run 行，于是十几次「六闸全绿」实际只跑了五闸。
+      #    **规矩没变成自动跑的动作，就等于没有。**
+      # 脚本自带临时 http server，只需要一个 Chrome。ubuntu-latest 预装 Google Chrome。
+      - name: verify chart overflow
+        run: python tools/check_chart_overflow.py
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       - name: commit data
         run: |
           git config user.name "klaywang24"

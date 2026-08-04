@@ -28,15 +28,42 @@ Klay 截图点名：恐惧的标价台账那张，猩红的前向段**整条 15 
 headless Chrome 里页面是 visible 的，才测得准。
 
 ## 用法
-    python3 tools/check_chart_overflow.py            # 本地预览（先 preview_start chronicle2）
+    python3 tools/check_chart_overflow.py
 
-⚠️ **只能对本地跑**：探针要写进 index.html 的临时副本再同源打开，线上目录写不了。
-   本地跑的就是将要 push 的同一份 js/app.js，所以本地全绿 + 线上版本戳核对一致 = 线上也对。
+**自给自足**：脚本自己起一个临时 http server（随机端口）指向仓库根目录，跑完关掉。
+不需要 preview_start，也不需要先开别的服务；本地和 CI 用同一条命令。
+
+⚠️ **测的是仓库里的文件，不是线上**：探针要写进 index.html 的临时副本再同源打开，
+线上目录写不了。而仓库里就是将要 push 的同一份 `js/app.js` ⇒ **本地绿 + 线上版本戳核对一致 = 线上也对**。
+
+Chrome 路径：优先环境变量 `CHROME_BIN`，否则按 macOS / Linux 常见位置依次探测（CI 用 Linux 那一支）。
 """
-import json, os, re, subprocess, sys
+import functools, http.server, json, os, re, shutil, socketserver, subprocess, sys, threading
 
-CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-BASE = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8123/"
+def find_chrome():
+    # CHROME_BIN 只是**首选**，不是断言：CI 上路径万一变了要能自己找下去，
+    # 否则一条写死的路径会让整条流水线红在一个与图表无关的原因上。
+    cands = [os.environ.get("CHROME_BIN"),
+             "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+             "/usr/bin/google-chrome", "google-chrome", "google-chrome-stable",
+             "chromium-browser", "chromium"]
+    cands = [c for c in cands if c]
+    for c in cands:
+        if os.path.isfile(c) or shutil.which(c):
+            return c if os.path.isfile(c) else shutil.which(c)
+    sys.exit("🔴 找不到 Chrome。设 CHROME_BIN 环境变量指向可执行文件。")
+
+CHROME = find_chrome()
+
+
+def serve(root):
+    """起一个只服务本仓库的临时 http server，返回 (httpd, port)。
+    必须是 http 而不是 file://：站点用 fetch 拉 data/*.json，file:// 下会被同源策略拦掉。"""
+    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=root)
+    handler.log_message = lambda *a, **k: None
+    httpd = socketserver.TCPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    return httpd, httpd.server_address[1]
 
 PROBE = r"""
 <script>
@@ -96,18 +123,21 @@ def main():
     tmp_name = "index.__overflowprobe.html"
     tmp = os.path.join(here, tmp_name)
     open(tmp, "w", encoding="utf-8").write(src[:i] + PROBE + src[i:])
-    url = BASE.rstrip("/") + "/" + tmp_name
+    httpd, port = serve(here)
+    url = "http://127.0.0.1:%d/%s" % (port, tmp_name)
     try:
         html = subprocess.run(
-            [CHROME, "--headless=new", "--window-size=1440,1000", "--hide-scrollbars",
+            [CHROME, "--headless=new", "--no-sandbox", "--disable-gpu",
+             "--window-size=1440,1000", "--hide-scrollbars",
              "--virtual-time-budget=120000", "--dump-dom", url],
             capture_output=True, text=True, timeout=240).stdout
     finally:
         os.remove(tmp)
+        httpd.shutdown()
     m = re.search(r'id="OV">@@(.*?)@@', html, re.S)
     if not m:
-        print("🔴 探针没回话 —— 这不等于合格。最常见原因：把线上地址传进来了；")
-        print("   本脚本只能对本地预览跑（探针要写进站点目录）。先 preview_start chronicle2，再不带参数运行。")
+        print("🔴 探针没回话 —— 这不等于合格（区别于「查过了没问题」）。")
+        print("   排查：Chrome 起没起来（CHROME_BIN）、.tab 结构是否改过、页面 JS 是否报错。")
         sys.exit(1)
     res = json.loads(m.group(1))
 
