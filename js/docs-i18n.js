@@ -215,7 +215,29 @@
     return p && p.querySelector(".doc-page");
   }
   const origin = {};
-  IDS.forEach((id) => { const el = docPage(id); if (el) origin[id] = el.innerHTML; }); // 缓存简体原文
+
+  /* 🚨 2026-08-03 修：以英文加载页面后再点「简」，会得到中英混排（标题还是 Pricing、
+     按钮还是 Subscribe free、清单有两条是英文），而全新中文访问一切正常。
+
+     成因是两套翻译机制的时序：
+       i18n.js（先加载）  按 D 字典逐个文本节点就地替换：「免费订阅」→ Subscribe free
+       docs-i18n.js（后） 整块替换 7 个文档页，靠下面这份 origin 快照切回简体
+     以 en 加载时，i18n.js 的 applyTo 已经把节点改成英文了，本文件这一步才去拍
+     「简体原文」—— 拍到的是一份半英文的 DOM。点「简」时忠实地把这份脏快照贴回去，
+     于是残留项恰好一个不多一个不少全是 D 字典里的 key。
+
+     修法：i18n.js 在翻译前会把中文原文存在文本节点的 n.__zh 上（i18n.js:1157），
+     所以拍照前先按 __zh 还原一遍即可。
+     🔑 这个写法在两种时序下都对：翻译已发生 → 撤销；翻译还没发生 → __zh 全是
+     undefined，整个循环是 no-op，快照本来就干净。∴ 不依赖「applyTo 到底在本文件
+     之前还是之后跑」这个判断，改动 i18n.js 的加载时机也不会把它弄坏。
+     ⚠️ 依赖 i18n.js 的 __zh 私有约定：那边改字段名，这里必须同步（会静默失效）。 */
+  function restoreZhText(root) {
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let n;
+    while ((n = w.nextNode())) if (n.__zh !== undefined && n.nodeValue !== n.__zh) n.nodeValue = n.__zh;
+  }
+  IDS.forEach((id) => { const el = docPage(id); if (!el) return; restoreZhText(el); origin[id] = el.innerHTML; }); // 缓存简体原文
 
   function build(tr) {
     return `<div class="hero"><div class="kicker">${tr.kicker}</div><h1>${tr.h1}</h1><p class="dek">${tr.dek}</p></div>` +
