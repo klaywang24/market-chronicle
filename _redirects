@@ -32,3 +32,17 @@
 #
 # 🚨 与之配套的硬规矩：**永远不要往仓库根加 404.html**。
 # 加了就会把 Pages 从「SPA 兜底」切到「404 页」分支，所有深链（/spy 这类）当场全挂。
+
+# ── 渠道短路径（2026-08-02 建）──
+# 为什么存在：雪球 bio 拒绝带 query 参数的链接（报「非法链接」），UTM 挂不上去。
+# 短路径对平台是干净 URL，到站后 302 展开成带 utm_source 的首页，归因不丢。
+# 与板块真路径共用命名空间：xq/xhs/mm/ft/lb/li/rd/wx 均不与上方任何真路径撞车；
+# 新增板块路径前先看这张表，反之亦然。302 不用 301：渠道对应关系可能会调。
+/xq   /?utm_source=xueqiu     302
+/xhs  /?utm_source=xhs        302
+/mm   /?utm_source=moomoo     302
+/ft   /?utm_source=futu       302
+/lb   /?utm_source=longbridge 302
+/li   /?utm_source=li         302
+/rd   /?utm_source=reddit     302
+/wx   /?utm_source=wechat     302
