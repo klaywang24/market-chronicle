@@ -86,6 +86,17 @@ jobs:
             git push
           fi
 
+      # 体检结果进 GITHUB_ENV → notify_discord 当天推 Discord。
+      # ⚠️ 这是「当天可见」那条通道；**它不能替代 witness-watchdog.yml** ——
+      #    本步在 daily 内部，daily 死了它也一起没了（7·12 的教训）。两条都要。
+      - name: witness health
+        continue-on-error: true
+        run: |
+          set +e
+          python scripts/check_witness_health.py
+          echo "WITNESS_HEALTH=$([ $? -eq 0 ] && echo ok || echo bad)" >> "$GITHUB_ENV"
+          set -e
+
       - name: notify Discord
         if: always()
         run: python scripts/notify_discord.py

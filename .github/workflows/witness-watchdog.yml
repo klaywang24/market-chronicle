@@ -1,0 +1,104 @@
+name: witness-watchdog
+# 见证链看门狗（2026-08-04 新建）。
+#
+# 🔑 为什么它必须是**独立 workflow、独立时刻**，而不是 daily.yml 里的一步：
+#    daily 里的告警有个致命前提 —— daily 自己还活着。2026-07-12→14 那次正是
+#    daily 整个死掉 4 天没人发现，于是「失败告警」也跟着一起没了。
+#    本 workflow 专门从**产物**倒推（data/kindex.json 多久没更新了），
+#    所以 daily 死掉时它照样会响。看守看守人的那一层。
+#
+# 🔑 为什么报警走 GitHub Issue 而不是 print：
+#    2026-08-04 修完锚定 bug 后我加了 `::warning::`，随即意识到自己重建了
+#    7·12 的同一个失败模式 —— **告警只进 Actions 日志，而没人每天读日志**。
+#    Issue 会自动发邮件、会留在列表里直到被处理，**不会被下一次运行冲掉**。
+#    没有送达通道的告警等于没有告警。
+on:
+  schedule:
+    - cron: '0 13 * * *'   # 每天 UTC 13:00 ≈ 美东 09:00，与 daily(22:00 UTC) 错开半天
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  issues: write            # 只要开 issue 的权限，不给写仓库
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # fetch-depth: 0 —— check_daily_alive 要读 data/kindex.json 的提交历史，
+      # 浅克隆会让它只看见一个 commit 然后给出一个「看起来很正常」的数字
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: witness health check
+        id: health
+        run: |
+          set +e
+          python scripts/check_witness_health.py --json > /tmp/health.json
+          echo "exit=$?" >> "$GITHUB_OUTPUT"
+          set -e
+          cat /tmp/health.json
+          {
+            echo 'report<<HEALTH_EOF'
+            python scripts/check_witness_health.py
+            echo 'HEALTH_EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      # 不健康 → 开 issue（同一天重复运行只更新，不刷屏）
+      - name: open or update issue
+        if: steps.health.outputs.exit != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🔴 见证链体检未通过';
+            const body = [
+              '证据链自动体检发现异常。**这不是站点故障，是「证明站点没被改过」那套机制出了问题** ——',
+              '它坏了不会影响读者看到的任何东西，所以只能靠这条告警发现。',
+              '',
+              '```',
+              `${{ steps.health.outputs.report }}`,
+              '```',
+              '',
+              `运行：${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              '',
+              '本地复现：`python3 scripts/check_witness_health.py`',
+              '背景：`HANDOFF.md` §48.7',
+            ].join('\n');
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'witness-chain',
+            });
+            if (open.data.length) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: open.data[0].number, body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: ['witness-chain'],
+              });
+            }
+
+      # 恢复了就自动关掉，免得旧 issue 一直挂着让人麻木
+      - name: close issue when healthy
+        if: steps.health.outputs.exit == '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'witness-chain',
+            });
+            for (const i of open.data) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: i.number, body: '✅ 体检已恢复正常，自动关闭。',
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: i.number, state: 'closed',
+              });
+            }

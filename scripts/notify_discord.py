@@ -116,6 +116,16 @@ def main():
     #    此前这些失败只 print 进 Actions 日志，而没有人每天读日志——2026-07-12→14 静默死
     #    4 天就是这个形态。job 整体仍是 success，所以①②③都不会响，必须单独看这个字段。
     meta = load("meta") or {}
+    # ⑤ 见证链体检（2026-08-04 加）：锚定/哈希链/daily 存活四项里有 bad 就报。
+    #    判据取 env 不读磁盘文件 —— 同③的理由：文件可能是上一次的，会发平安播报。
+    #    ⚠️ 这条只是「当天可见」；真正兜底的是独立的 witness-watchdog.yml（开 Issue）。
+    if os.environ.get("WITNESS_HEALTH") == "bad":
+        alert(url, "🔴 见证链体检未通过",
+              "锚定 / 哈希链 / daily 存活 四项中有异常。\n"
+              "**这不影响读者看到的东西，只影响「证明没被改过」那套机制** —— "
+              "所以坏了只能靠这条告警发现。\n"
+              f"本地复现：`python3 scripts/check_witness_health.py`\n日志：{run_url}")
+
     failures = meta.get("failures") or []
     if failures:
         lines = [f'· **{f.get("section")}**：{f.get("error")}' for f in failures]
