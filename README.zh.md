@@ -6,6 +6,7 @@
 
 [![每日行情更新](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml)
 [![每周基本面更新](https://github.com/klaywang24/market-chronicle/actions/workflows/weekly.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/weekly.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21783004.svg)](https://doi.org/10.5281/zenodo.21783004)
 [![License](https://img.shields.io/badge/license-PolyForm--Noncommercial--1.0.0-4a5d3a)](LICENSE)
 [![在线访问](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E8%AE%BF%E9%97%AE-klaywang24.github.io-a0392f)](https://klaywang24.github.io/market-chronicle/)
 [![数据集](https://img.shields.io/badge/%E9%A2%84%E7%94%9F%E6%88%90%E6%95%B0%E6%8D%AE%E9%9B%86-250%2B%20JSON-b8893e)](data/)

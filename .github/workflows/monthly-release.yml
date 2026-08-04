@@ -58,11 +58,19 @@ jobs:
             gh release upload "$TAG" "dist/kapx-ledger-$M.zip" --clobber
             gh release edit "$TAG" --notes-file "dist/RELEASE_NOTES-$M.md"
           else
-            # 🔴 --target 是月末那个 commit，不是 HEAD。Zenodo 不看 Release 附件，
-            #    它抓 tag 所指 commit 的整仓 zipball —— tag 打错地方，DOI 里存的
-            #    就是发版当天的仓库状态，与标签月份对不上，且 DOI 永久改不了。
+            # 🔴 两步，顺序不能换。先用 git 推 tag，再从「已存在的 tag」建 release。
+            #    ① tag 必须指向月末 commit：Zenodo 不看 Release 附件，它抓 tag 所指
+            #       commit 的整仓 zipball。tag 打在 HEAD 上，DOI 存的就是发版当天的
+            #       仓库状态，与标签月份对不上 —— 而 DOI 永久改不了（2026-08-03 实测
+            #       首个 7 月版就是这么错的：链 13 行、覆盖到 08-03）。
+            #    ② 不能用 `gh release create --target <sha>` 一步到位：那会让 REST API
+            #       同时建 tag + 建 release，GITHUB_TOKEN 对此回 403
+            #       "Resource not accessible by integration"（同一 workflow、同样
+            #       Contents: write，不带 --target 时却成功 —— 权限日志两轮都是
+            #       Contents: write，差别只在 --target）。走 git 协议推 tag 不受此限。
+            git tag "$TAG" "${{ steps.bundle.outputs.sha }}"
+            git push origin "$TAG"
             gh release create "$TAG" "dist/kapx-ledger-$M.zip" \
-              --target "${{ steps.bundle.outputs.sha }}" \
               --title "KAPX ledger snapshot $M" \
               --notes-file "dist/RELEASE_NOTES-$M.md"
           fi
