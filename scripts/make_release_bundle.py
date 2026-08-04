@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 import zipfile
 from datetime import date
 from pathlib import Path
@@ -58,14 +59,44 @@ def prev_month(today: date) -> str:
     return f"{y:04d}-{m:02d}"
 
 
-def read_chain() -> list[dict]:
-    p = DATA / "ledger_hashes.jsonl"
-    if not p.exists():
+def month_end_commit(month: str) -> str:
+    """该月最后一个提交的 SHA。
+
+    🔑 为什么必须按月底切、而不是拿当前工作区打包（2026-08-03 改）：
+    data/*.json 每个交易日被重写，链每天追加一行。若拿「今天」的内容贴上「2026-07」的
+    标签，这个包的内容就取决于 CI 碰巧哪天跑 —— 而它要去换一个**永久 DOI**。
+    实测差异：2026-07 月底链 12 行（07-19→07-31），08-03 已是 13 行。
+    ∴ 「7 月版」必须是 7 月最后一个提交那一刻的字节，不是别的。
+
+    UTC 边界：daily.yml 在 22:00 UTC 跑，提交都落在同一自然日的 22:00~23:59 UTC，
+    所以按 UTC 月界切不会把某天切错边。
+    """
+    y, m = int(month[:4]), int(month[5:7])
+    ny, nm = (y + 1, 1) if m == 12 else (y, m + 1)
+    out = subprocess.run(
+        ["git", "rev-list", "-1", f"--before={ny:04d}-{nm:02d}-01T00:00:00Z", "HEAD"],
+        cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    if not out:
+        raise SystemExit(f"🔴 {month} 之前没有任何提交，无法切出该月版本")
+    return out
+
+
+def read_at(sha: str, name: str) -> bytes | None:
+    """读某提交那一刻的文件字节。用 git show 而非 checkout：不碰工作区，
+    并行会话正在同一个仓里干活时也安全。"""
+    r = subprocess.run(["git", "show", f"{sha}:data/{name}"],
+                       cwd=ROOT, capture_output=True)
+    return r.stdout if r.returncode == 0 else None
+
+
+def read_chain_bytes(blob: bytes | None) -> list[dict]:
+    if not blob:
         return []
-    return [json.loads(ln) for ln in p.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    return [json.loads(ln) for ln in blob.decode("utf-8").splitlines() if ln.strip()]
 
 
-def verify_md(month: str, rows: list[dict], present: list[str]) -> str:
+def verify_md(month: str, packaged_on: str, sha: str, cut: str,
+              rows: list[dict], present: list[str]) -> str:
     head = rows[-1] if rows else {}
     first = rows[0] if rows else {}
     # ⚠️ 下面这段公式必须与 anchor_hashes.chain_value 逐字一致。
@@ -83,6 +114,18 @@ def verify_md(month: str, rows: list[dict], present: list[str]) -> str:
     return f"""# How to verify this bundle
 
 This archive is **evidence, not a data product**. Nothing here asks you to trust us.
+
+## 0. What "{month}" means on the label
+
+This is **the ledger as it stood at the end of {month}**, taken from commit `{sha}`
+({cut}). Every file here is the bytes at that commit, not today's.
+
+That matters for a citable artifact: the ledger is rewritten every trading day, so packaging
+"July" from whatever happens to be on disk in August would make the contents depend on when the
+job ran. Cutting at the month-end commit means this DOI always resolves to the same ledger.
+
+The chain is cumulative and append-only, so it contains every row up to that commit, not only rows
+dated inside {month}. The exact range is printed below.
 
 ## 1. The chain
 
@@ -150,46 +193,59 @@ def main() -> None:
 
     today = date.fromisoformat(args.today) if args.today else date.today()
     month = args.month or prev_month(today)
+    packaged_on = today.isoformat()
 
-    rows = read_chain()
+    # 按该月最后一个提交切，而不是拿当前工作区（见 month_end_commit 的注释）
+    sha = month_end_commit(month)
+    cut = subprocess.run(["git", "log", "-1", "--format=%cI", sha],
+                         cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    rows = read_chain_bytes(read_at(sha, "ledger_hashes.jsonl"))
     DIST.mkdir(exist_ok=True)
 
-    present: list[str] = []
+    blobs: dict[str, bytes] = {}
     for name in CHAIN_FILES + LEDGER_FILES:
-        if (DATA / name).exists():
-            present.append(name)
+        b = read_at(sha, name)
+        if b is None:
+            # 缺文件不是致命错，但必须说出来：静默少打一个＝包与链对不上而没人知道
+            print(f"  ⚠️ {month} 月末尚无 {name}，本包不含它")
         else:
-            # 缺文件不是致命错，但必须说出来：静默少打一个文件＝包与链对不上而没人知道
-            print(f"  ⚠️ 缺 {name}，本包不含它")
+            blobs[name] = b
+    present = list(blobs)
 
     zip_path = DIST / f"kapx-ledger-{month}.zip"
-    manifest = {"month": month, "packaged_from_chain_rows": len(rows),
+    manifest = {"month": month, "packaged_on": packaged_on,
+                "cut_at_commit": sha, "cut_at_time": cut,
+                "packaged_from_chain_rows": len(rows),
                 "chain_head": rows[-1]["chain"] if rows else None,
                 "last_ledger_date": rows[-1]["date"] if rows else None,
-                "files": {}}
-    for name in present:
-        manifest["files"][name] = sha256_file(DATA / name)
+                "files": {n: hashlib.sha256(b).hexdigest() for n, b in blobs.items()}}
 
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
-        for name in present:
-            z.write(DATA / name, f"kapx-ledger-{month}/data/{name}")
-        z.writestr(f"kapx-ledger-{month}/VERIFY.md", verify_md(month, rows, present))
+        for name, b in blobs.items():
+            z.writestr(f"kapx-ledger-{month}/data/{name}", b)
+        z.writestr(f"kapx-ledger-{month}/VERIFY.md",
+                   verify_md(month, packaged_on, sha, cut, rows, present))
         z.writestr(f"kapx-ledger-{month}/MANIFEST.json", json.dumps(manifest, indent=2))
         z.write(ROOT / "LICENSE", f"kapx-ledger-{month}/LICENSE")
 
     head = rows[-1] if rows else {}
     first = rows[0] if rows else {}
-    notes = f"""KAPX ledger snapshot — {month}
+    notes = f"""KAPX ledger snapshot \u2014 {month}
+
+**The ledger as it stood at the end of {month}**, cut at commit `{sha[:10]}` ({cut}).
+Contents are the bytes at that commit, not today's \u2014 so this DOI always resolves to the same
+ledger regardless of when the packaging job happened to run.
 
 A frozen, citable copy of the public ledger, with the hash chain that makes silent edits and
-silent deletions detectable. **Evidence, not a data product** — see `VERIFY.md` inside the zip
+silent deletions detectable. **Evidence, not a data product** \u2014 see `VERIFY.md` inside the zip
 for how to check it yourself without trusting us.
 
 | | |
 |---|---|
 | chain rows | {len(rows)} |
-| chain covers | {first.get('date', 'n/a')} → {head.get('date', 'n/a')} |
+| chain covers | {first.get('date', 'n/a')} \u2192 {head.get('date', 'n/a')} |
 | chain head | `{head.get('chain', 'n/a')}` |
+| cut at | `{sha[:10]}` &middot; {cut} |
 
 **What this proves**: the packaged files hash to the values recorded in the chain, and no day can
 be removed or altered without breaking every later `chain` value.
@@ -205,8 +261,10 @@ released under CC BY 4.0.
 """
     (DIST / f"RELEASE_NOTES-{month}.md").write_text(notes, encoding="utf-8")
 
-    print(f"✅ {zip_path.relative_to(ROOT)}  （链 {len(rows)} 行，末日 {head.get('date','n/a')}）")
-    print(f"✅ {(DIST / f'RELEASE_NOTES-{month}.md').relative_to(ROOT)}")
+    print(f"\u2705 {zip_path.relative_to(ROOT)}")
+    print(f"   \u5207\u4e8e {sha[:10]} ({cut})\uff0c\u94fe {len(rows)} \u884c\uff0c"
+          f"\u8986\u76d6 {first.get('date','n/a')} \u2192 {head.get('date','n/a')}")
+    print(f"\u2705 {(DIST / f'RELEASE_NOTES-{month}.md').relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
