@@ -1405,7 +1405,7 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
    剩余空间统一沉到底部块之前（.ptier-list 的 flex:1 已经把页脚推到底），
    于是三张卡「标题/价格/说明/清单」逐行对齐，CTA 也在同一水平线上。 */
 .ptier-list { justify-content: flex-start; }
-.pay-methods { font-size: 13px; color: var(--ink-soft); }
+.pay-methods { font-size: 13px; color: var(--ink-soft); text-wrap: balance; }
 .pay-methods .pay-ico { height: 14px; width: auto; vertical-align: -4px; margin-right: 4px;
   background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 2px 4px; box-sizing: content-box; }
 .ptier { border: 1px solid var(--border); border-radius: 12px; padding: 22px 20px; background: var(--bg-card); display: flex; flex-direction: column; position: relative; }
@@ -1422,9 +1422,12 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
 .ptier-tag { font-size: 12px; line-height: 1.4; color: var(--ink-muted); margin-bottom: 14px; min-height: 34px; }
 .ptier-tag b { color: var(--accent); }
 .ptier-list { list-style: none; padding: 0; margin: 0 0 16px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
-/* break-word + pretty：EN 在窄列里最容易出「单词溢出」和「末行只剩一个词」两种丑，
-   中文不受影响（CJK 本来就任意点可断）。 */
-.ptier-list li { font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; padding-left: 18px; position: relative; overflow-wrap: break-word; hyphens: none; text-wrap: pretty; }
+/* 2026-08-03：这里刻意「三种都不用」。pretty 对中文无效（见下面 §中文孤字）；
+   balance 有效但代价更大 —— 实测它把「方法论」断成「方法/论」、「数据导出」断成
+   「数据导/出」，即为了消灭末行孤字而在别处制造词内断裂，比原来更难看。
+   清单条目原本的末行是「下载」「通知」这类完整双字词，读起来没有问题：
+   🔑 真正丑的不是「末行短」，是「末行是半个词」。别再往这行加 text-wrap。 */
+.ptier-list li { font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; padding-left: 18px; position: relative; overflow-wrap: break-word; hyphens: none; }
 .ptier-list li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
 .ptier-list li b { color: var(--ink); }
 /* ⚠️ 必须带 .doc-body 前缀：定价面板在 .doc-body 里，而 :796 的 `.doc-body a` 特异性 (0,1,1)
@@ -1432,7 +1435,20 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
    并强加 border-bottom。这里用 (0,2,1) 拿回控制权。改这两条前先看 :796。 */
 .doc-body a.ptier-cta { display: block; text-align: center; font-size: 13px; font-weight: 700; color: #fff; background: var(--accent); border-radius: 8px; padding: 9px 12px; text-decoration: none; border-bottom: none; }
 .doc-body a.ptier-cta:hover { background: var(--accent-deep); color: #fff; border-bottom: none; }
-.ptier-soon { font-size: 11.5px; color: var(--ink-muted); text-align: center; border: 1px dashed var(--border); border-radius: 8px; padding: 8px; }
+.ptier-soon { font-size: 11.5px; color: var(--ink-muted); text-align: center; border: 1px dashed var(--border); border-radius: 8px; padding: 8px; text-wrap: balance; }
+
+/* ===== 中文孤字（末行只剩一两个字）2026-08-03 Klay 报 =====
+   现象：「…可全额退 / 款。」「…没换过口径的读 / 数。」
+   ⚠️ 别用 text-wrap: pretty —— 我先试的就是它，CSS.supports 报 true 但毫无作用：
+   Chrome 的 pretty 只管西文的短末行，中文任意两字之间都可断，它不参与。
+   实测方法（结论不是推断出来的）：把 .doc-page 宽度从 560 扫到 780，每 20px
+   量一次各元素末行字数，≤3 字记为孤字。pretty 下五个宽度（620/680/700/720/740）
+   一个都没治好；balance 下全区间零孤字，且生产宽度(760)行数与卡片高度均不变，
+   顺带把「年付 = 10 个月价」那段的末行从 6 字拉到 35 字。
+   🚨 复查这条时必须扫宽度区间：1440 视口下这三处本来就不换行，只量一个宽度会得出
+   「本来就没问题」的假结论（我第一次量就是这样）。
+   balance 在 Chrome 有行数上限（超过约 6 行不生效），长段落自然退化，无副作用。 */
+.doc-body p { text-wrap: balance; }
 /* 次级 CTA：创始价走邮件预约（$9.9 不在 Paddle 自助结账里，故与主按钮分开、不同视觉层级） */
 /* 次级 CTA：创始价走邮件预约（$9.9 不在 Paddle 自助结账里，故与主按钮分开、不同视觉层级）。
    同样要 .doc-body 前缀压过 :796，否则会被强加 border-bottom。 */
