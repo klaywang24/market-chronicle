@@ -45,6 +45,7 @@ jobs:
           fi
           M=$(ls dist/kapx-ledger-*.zip | head -1 | sed 's|.*kapx-ledger-\(.*\)\.zip|\1|')
           echo "month=$M" >> "$GITHUB_OUTPUT"
+          echo "sha=$(cat dist/CUT_SHA-$M.txt)" >> "$GITHUB_OUTPUT"
 
       # 幂等：同月重跑不炸，改为覆盖资产（手动补发/修元数据时会用到）
       - name: publish release
@@ -57,7 +58,11 @@ jobs:
             gh release upload "$TAG" "dist/kapx-ledger-$M.zip" --clobber
             gh release edit "$TAG" --notes-file "dist/RELEASE_NOTES-$M.md"
           else
+            # 🔴 --target 是月末那个 commit，不是 HEAD。Zenodo 不看 Release 附件，
+            #    它抓 tag 所指 commit 的整仓 zipball —— tag 打错地方，DOI 里存的
+            #    就是发版当天的仓库状态，与标签月份对不上，且 DOI 永久改不了。
             gh release create "$TAG" "dist/kapx-ledger-$M.zip" \
+              --target "${{ steps.bundle.outputs.sha }}" \
               --title "KAPX ledger snapshot $M" \
               --notes-file "dist/RELEASE_NOTES-$M.md"
           fi

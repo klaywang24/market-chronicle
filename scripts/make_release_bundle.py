@@ -260,6 +260,12 @@ carry no ownership claim from us. The quarterly extracts on Kaggle / Hugging Fac
 released under CC BY 4.0.
 """
     (DIST / f"RELEASE_NOTES-{month}.md").write_text(notes, encoding="utf-8")
+    # 给 workflow 用：tag 必须打在这个 commit 上，不能打在 HEAD 上。
+    # 🔴 理由（2026-08-03 实测发现）：Zenodo 的 GitHub 集成**不看 Release 附件**，
+    #    它自己去抓「tag 所指 commit 的整仓 zipball」。tag 打在 HEAD 上，DOI 存下来的
+    #    就是发版当天的整仓（首个 7 月版实测：链 13 行、覆盖到 08-03），
+    #    与标签上的月份对不上 —— 而 DOI 是永久的。
+    (DIST / f"CUT_SHA-{month}.txt").write_text(sha + "\n", encoding="utf-8")
 
     print(f"\u2705 {zip_path.relative_to(ROOT)}")
     print(f"   \u5207\u4e8e {sha[:10]} ({cut})\uff0c\u94fe {len(rows)} \u884c\uff0c"
