@@ -1,0 +1,73 @@
+name: monthly-release
+# 月度台账快照：给哈希链加一层「第三方登记的版本记录」。
+# 为什么需要它（daily.yml 已有链 + Wayback）：链是流水、Wayback 是散点快照，
+# 两者都不方便被别人写进参考文献。Release 给出一个可引用的版本号，且发布时间
+# 由 GitHub 服务端记录 —— 本地 `git commit --date=` 伪造不了它。
+# 接上 Zenodo 后每个 Release 自动拿一个 DOI（一次性手工授权，见 .zenodo.json 注释）。
+on:
+  schedule:
+    - cron: '0 6 2 * *'   # 每月 2 号 UTC 06:00：留一天缓冲，确保上月最后一个交易日的 daily 已入链
+  workflow_dispatch:
+    inputs:
+      month:
+        description: 'YYYY-MM（留空=上一个自然月）'
+        required: false
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # fetch-depth: 0 与 daily.yml 同理——浅克隆会让任何基于历史的检查瞎着跑还给出干净数字
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 🔴 先验链再打包。链断了还发版 = 把一份坏证据盖上official 图章，
+      #    比不发版严重得多。anchor_hashes.py --verify 自身失败会让本步非零退出。
+      - name: verify chain before packaging
+        run: python scripts/anchor_hashes.py --verify
+
+      # 走 env + shell 判空，不用 `${{ inputs.x && format(...) }}`：
+      # schedule 触发时 inputs 不存在，那种写法可能渲染成字面量 false 传给脚本。
+      - name: build bundle
+        id: bundle
+        env:
+          MONTH: ${{ github.event.inputs.month }}
+        run: |
+          if [ -n "$MONTH" ]; then
+            python scripts/make_release_bundle.py --month "$MONTH"
+          else
+            python scripts/make_release_bundle.py
+          fi
+          M=$(ls dist/kapx-ledger-*.zip | head -1 | sed 's|.*kapx-ledger-\(.*\)\.zip|\1|')
+          echo "month=$M" >> "$GITHUB_OUTPUT"
+
+      # 幂等：同月重跑不炸，改为覆盖资产（手动补发/修元数据时会用到）
+      - name: publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          M="${{ steps.bundle.outputs.month }}"
+          TAG="ledger-$M"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "dist/kapx-ledger-$M.zip" --clobber
+            gh release edit "$TAG" --notes-file "dist/RELEASE_NOTES-$M.md"
+          else
+            gh release create "$TAG" "dist/kapx-ledger-$M.zip" \
+              --title "KAPX ledger snapshot $M" \
+              --notes-file "dist/RELEASE_NOTES-$M.md"
+          fi
+
+      # 版本记录本身也存一份进 Wayback：与 daily.yml 同一条逻辑——
+      # 我们自己的服务器上的时间戳不算数，别人存过的才算。
+      - name: anchor the release page
+        continue-on-error: true
+        run: |
+          U="https://github.com/${{ github.repository }}/releases/tag/ledger-${{ steps.bundle.outputs.month }}"
+          curl -sS -m 60 "https://web.archive.org/save/$U" -o /dev/null \
+            && echo "已存档 $U" \
+            || echo "::warning::Release 页 Wayback 存档失败，该版本无独立见证"
