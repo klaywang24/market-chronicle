@@ -53,6 +53,10 @@ def targets(sha: str | None) -> list[str]:
     t = [
         f"{SITE}/data/ledger_hashes.jsonl",   # 链头 —— 最重要，永远排第一
         f"{SITE}/data/kindex.json",
+        f"{SITE}/data/options_page.json",     # 期权判断台账的公开投影（2026-08-05 加）：
+                                              # 人的判断比机械读数更需要第三方见证——
+                                              # 「抄走的快照没有时间戳」这句话要对期权页成立，
+                                              # 前提就是这里每天有人作证。排第三：判断层优先于门面。
         f"{SITE}/",
         f"{SITE}/data/leaps_gauge.json",
     ]
