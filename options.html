@@ -18,6 +18,10 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 .op-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; }
 .op-brand { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 19px; font-weight: 700; color: var(--ink); text-decoration: none; }
 .op-top a.op-sub { font-size: 13px; font-weight: 600; color: #fff; background: var(--accent); border-radius: 20px; padding: 6px 16px; text-decoration: none; }
+.op-nav { display: flex; flex-wrap: wrap; gap: 26px; padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.op-nav a, .op-nav .on { font-size: 14.5px; color: var(--ink-soft); text-decoration: none; padding: 2px 0; }
+.op-nav a:hover { color: var(--ink); }
+.op-nav .on { color: var(--ink); font-weight: 700; border-bottom: 2px solid var(--accent); }
 .op-chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0 18px; }
 .op-chip { font-size: 12.5px; padding: 5px 12px; border: 1px solid var(--border); border-radius: 16px; background: var(--bg-card); color: var(--ink-soft); cursor: pointer; font-family: 'JetBrains Mono',monospace; }
 .op-chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
@@ -59,9 +63,12 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 .op-score .sc.next b { font-size: 14px; padding-top: 4px; }
 .op-toc { display: none; }
 @media (min-width: 1280px) {
-  .op-toc { display: block; position: fixed; left: 22px; top: 120px; width: 168px; font-size: 12.5px; }
-  .op-toc-h { font-size: 11px; color: var(--ink-muted); letter-spacing: .08em; padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
-  .op-toc a { display: block; color: var(--ink-soft); text-decoration: none; padding: 4px 0 4px 10px; border-left: 2px solid transparent; line-height: 1.5; }
+  /* 2026-08-05 Klay：字太小、位置要和正文对齐。
+     left 跟随内容列（.op-wrap max-width 1290 居中），不再贴死视口左缘；
+     top 由 JS 在渲染后量 kicker 的实际位置对齐（写死像素在不同标题高度下会漂）。 */
+  .op-toc { display: block; position: fixed; left: max(20px, calc((100vw - 1290px) / 2 + 20px)); top: 128px; width: 176px; font-size: 14px; }
+  .op-toc-h { font-size: 12px; color: var(--ink-muted); letter-spacing: .08em; padding-bottom: 9px; border-bottom: 1px solid var(--border); margin-bottom: 9px; }
+  .op-toc a { display: block; color: var(--ink-soft); text-decoration: none; padding: 5px 0 5px 10px; border-left: 2px solid transparent; line-height: 1.55; }
   .op-toc a:hover { color: var(--ink); }
   .op-toc a.on { color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
   .op-wrap { padding-left: 210px; max-width: 1290px; }
@@ -76,6 +83,13 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
   <a class="op-brand" href="/">美股编年史</a>
   <a class="op-sub" href="/pricing">订阅</a>
 </div>
+<nav class="op-nav">
+  <a href="/">今日</a>
+  <a href="/kindex">K 指数 · 台账</a>
+  <a href="/leaps">恐惧的标价 · 台账</a>
+  <span class="on">期权异动</span>
+  <a href="/spy">百年档案</a>
+</nav>
 
 <div class="hero">
   <div class="kicker">OPTIONS · 期权异动 &amp; 分析</div>
@@ -461,6 +475,15 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
       toc.querySelectorAll("a").forEach(a => a.classList.toggle("on", a.dataset.ch === e.target.id));
   }), { rootMargin: "-15% 0px -70% 0px" });
   CH.forEach(([id]) => { const el = document.getElementById(id); if (el) spy.observe(el); });
+  // 对齐正文 kicker。⚠️ 不能只在加载时量一次：页面若在后台标签页加载，
+  //  视口宽高是 0，那次测量无效（2026-08-05 实测）——resize 时重算兜底。
+  const alignToc = () => {
+    const k = document.querySelector(".kicker");
+    if (k && innerWidth >= 1280) toc.style.top = Math.max(90, k.getBoundingClientRect().top + scrollY) + "px";
+  };
+  alignToc();
+  addEventListener("resize", alignToc);
+  document.addEventListener("visibilitychange", alignToc);
 })();
 </script>
 </body>
