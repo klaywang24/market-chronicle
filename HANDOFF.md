@@ -2775,3 +2775,55 @@ EN 顶栏 900–1379px 本就贴边）· 去 noindex · 进 sitemap · **英文�
 `option-data-pipeline`：**私有**（`private=true`），185 个文件对外不存在 ——
 原始 CSV 从未上网，许可红线完好。
 ∴ **唯一真实威胁面是自己的 GitHub 凭据**（2FA + token 不外泄），别的路都是死的。
+
+### 49.6 凭据侧审计收口（2026-08-05 22:40 EDT）——把 §49.5 那句「唯一威胁面」逐项查实
+
+**① 2FA 已确认，且是最优档**（Klay 截图实证）：`Enabled` · 首选 **Passkeys** · Authenticator app `Configured` ·
+**SMS 刻意未加**（可被 SIM 交换攻破，GitHub 自己标 Less secure）· Recovery codes `Viewed`。
+⇒ 全局唯一没有技术兜底的一环，守住了。
+🟡 唯一剩余提示：**「看过」不等于「存好了」**。恢复码的用途是「passkey 设备 + Authenticator 两条路同时断掉」，
+必须存在密码管理器或实体处 —— **不能只存在那台唯一能过 2FA 的手机里，那是循环依赖**。
+账号锁死比被攻击更难救：仓库、CI、Zenodo 会一起失去控制权。
+
+**② 三类 GitHub 凭据在不同页面 —— 我第一次指错了页。**
+`ghp_`=classic PAT · `github_pat_`=fine-grained → 都在 **Developer settings**（你自己签发的）；
+**`gho_`=OAuth App 授权 → `Settings → Applications → Authorized OAuth Apps`**（你授权给别人的）。
+本机实况：`gh` 用的是 `gho_`（GitHub CLI 授权，存 macOS 钥匙串），
+Developer settings 里两个 classic PAT **均已 Jun 7 2026 过期且 Never used = 零风险**，fine-grained 为空。
+🔑 **判据命令 `gh auth token | cut -c1-4`**，看前缀一秒定位，别猜页面。
+
+**③ `delete_repo` 定级下调：红色警报 → 卫生项。**
+持有该 token 的人本就有 `repo`＝已能强推清空内容；`delete_repo` 多给的只是「整个删掉」这一下，
+而本项目恰好有**三层备份能救回来**（本地完整克隆 + Zenodo DOI 存档 + Wayback 逐日快照）。
+要收只能整个撤销 OAuth 授权再重授（scope 在 UI 里不可选择性编辑，`gh auth refresh` 只能加不能减）：
+`gh auth login --scopes "repo,workflow" --hostname github.com --web`。
+更省事的替代 = **remote 从 https 换 SSH**（`~/.ssh/id_ed25519.pub` 已存在），日常 push 就不再动这个 token。
+CI 全程不受影响（用的是 GitHub 自发的 `GITHUB_TOKEN`）。
+🔑 **定级要按「相对于攻击者已有能力的边际增量」算，不按权限名字听起来多可怕算。**
+
+**④ 撤销「把 Action 锁 commit SHA」——查完发现它对本仓是空的防护。**
+实况：全部 workflow 只用 `actions/checkout@v4` `actions/setup-python@v5` `actions/github-script@v7`，
+**清一色 GitHub 官方、零第三方**。锁 SHA 防的是「上游作者投毒」，而这里上游就是 GitHub 自己；
+GitHub 若被攻破，仓库/CI/凭据一起没了，锁不锁毫无差别。**代价却是实的**：
+锁死后收不到自动安全补丁，需手动升级 —— 对单人维护项目，代价大于收益。
+🔑 **每写一条安全建议，先回答「它防的那个具体攻击者是谁，在这个项目里存在吗」**，答不上来就是照搬通用清单。
+
+**⑤ 三项待办定案与顺序纠正（我原先排错了）**
+
+| 项 | 定案 | 工时 |
+|---|---|---|
+| 锁 Action commit SHA | **不做**（本节 ④） | — |
+| 期权页 EOD 生成器 | **要做，唯一读者看得见的一项**；归**管线会话**（原始数据在私有管线仓） | 2-3h |
+| `options_page.json` 进哈希链 TRACKED | **必须排在生成器之后** | 15min + 观察一天 |
+
+🚨 **顺序为什么不能反**：`ls scripts/ | grep -i option` = **0 个脚本** ——
+那份 35KB / 8 段的 JSON 是会话里**手工造出来的**。现在入链＝锁定一份手工产物的指纹，
+等生成器写出来重算，值必有细微差别（分组 / 口径 / 舍入任一处），链立刻报「历史被改写」
+＝**一次自己造出来的最高级别假警报**。
+🔑 **单向门的前置条件是被承诺的对象已经可被机械复现。**
+生成器须产出 8 段：`structure` / `flip_history` / `two_lives` / `cm_history`（各 17 只）·
+`flagged` / `ledger`（累计只增）各 10 条 · `net_premium` 5 条 · `meta`。**页面数据现冻在 08.04。**
+🔑 连带的铁律补丁：**产物持久化 ≠ 生产方法持久化**。对每个产物问两遍 ——
+**它还在吗？它还能被重新造出来吗？** 第二问才是「会话必死铁律」真正要问的。
+
+完整教训见 `KAPX/站点踩坑与纠错记录.md` 新增 **K. 凭据与供应链**（3 行）。
