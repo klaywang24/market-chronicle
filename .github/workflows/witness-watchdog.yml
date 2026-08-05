@@ -88,9 +88,14 @@ jobs:
               });
             }
 
-      # 恢复了就自动关掉，免得旧 issue 一直挂着让人麻木
+      # 恢复了就自动关掉，免得旧 issue 一直挂着让人麻木。
+      # 🔴 2026-08-05 修：关闭判据从 ==ok 改成 !=bad。首次实跑抓到的真空档：
+      #    IA 限流时「链头快照」项是 unknown → 总体 unknown → 开(==bad)关(==ok)两头都不沾，
+      #    告警永远挂着 —— 恰恰造成本注释第一行要防的「挂着让人麻木」。
+      #    量不到 ≠ 出事；真出事时 daily-alive（本地 git 判断，几乎不会 unknown）会变 bad 兜底。
+      #    outputs 为空（脚本真崩）时两步都不跑、run 本身红 → GitHub 自己会发失败邮件。
       - name: close issue when healthy
-        if: always() && steps.health.outputs.overall == 'ok'
+        if: always() && steps.health.outputs.overall != 'bad' && steps.health.outputs.overall != ''
         uses: actions/github-script@v7
         with:
           script: |
@@ -101,7 +106,8 @@ jobs:
             for (const i of open.data) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner, repo: context.repo.repo,
-                issue_number: i.number, body: '✅ 体检已恢复正常，自动关闭。',
+                issue_number: i.number,
+                body: '✅ 体检已无异常项，自动关闭。\n\n```\n' + `${{ steps.health.outputs.report }}` + '\n```',
               });
               await github.rest.issues.update({
                 owner: context.repo.owner, repo: context.repo.repo,
