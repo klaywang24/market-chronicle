@@ -23,6 +23,8 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 .op-chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0 18px; }
 .op-chip { font-size: 12.5px; padding: 5px 12px; border: 1px solid var(--border); border-radius: 16px; background: var(--bg-card); color: var(--ink-soft); cursor: pointer; font-family: 'JetBrains Mono',monospace; }
 .op-chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.op-chip img { width: 15px; height: 15px; border-radius: 4px; vertical-align: -3px; margin-right: 5px; background: #fff; }
+.op-logo { width: 18px; height: 18px; border-radius: 4px; vertical-align: -4px; margin-right: 7px; background: #fff; }
 .op-chart { width: 100%; height: 300px; }
 .op-chart.tall { height: 420px; }
 .op-note { font-size: 12.5px; color: var(--ink-muted); margin: 8px 0 0; }
@@ -47,6 +49,12 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 .op-cta { margin: 26px 0 0; font-size: 14px; }
 .op-cta a { color: var(--accent); }
 .op-load { text-align: center; color: var(--ink-muted); padding: 60px 0; font-size: 14px; }
+.op-score { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 4px; }
+.op-score .sc { border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; background: var(--bg-card); }
+.op-score .sc b { display: block; font-size: 22px; font-weight: 800; font-family: 'JetBrains Mono',monospace; color: var(--ink); line-height: 1.2; }
+.op-score .sc span { font-size: 11.5px; color: var(--ink-muted); }
+.op-score .sc.next { border-style: dashed; }
+.op-score .sc.next b { font-size: 14px; padding-top: 4px; }
 .op-toc { display: none; }
 @media (min-width: 1280px) {
   .op-toc { display: block; position: fixed; left: 22px; top: 120px; width: 168px; font-size: 12.5px; }
@@ -85,13 +93,15 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 <!-- Ⅱ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch2"><span class="chapter-no">第二章</span><h2>一根轴 · <span class="op-cur">—</span></h2></div>
 <p class="op-note">一只票的所有关键价位钉在同一根价格轴上：两面墙、多空分界、期权定价的本周波动区间、现价。点票切换，悬停看读数。</p>
-<div class="op-chips" id="op-chips"></div>
+<div class="op-chips op-tkchips" id="op-chips"></div>
 <p class="op-note" id="op-em-note" style="margin:0 0 2px"></p>
 <div class="op-chart" id="ch-axis"></div>
 
 <!-- Ⅲ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch3"><span class="chapter-no">第三章</span><h2>昨天的钱，今天还在不在</h2></div>
-<p class="op-note" style="margin-bottom:10px">我们对异动的每一次判断都先立案、再按约定条件开奖，错了原样留着。点行展开看立案原文与验证条件。这张表每天只会变厚，不会被改写。</p>
+<p class="op-note" style="margin-bottom:10px">这是本页的信用来源：第四章那些归因凭什么可信？凭我们对异动的每一次判断都<b>先立案、按约定条件开奖、错了原样留着</b>。台账只会变厚，不会被改写。点行展开看立案原文与验证条件。</p>
+<div id="op-score" class="op-score"></div>
+<div class="op-chips" id="op-lfilter" style="margin:10px 0 12px"></div>
 <table class="op-table" id="op-ledger"></table>
 
 <!-- Ⅳ ──────────────────────────────── -->
@@ -104,6 +114,7 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 <!-- Ⅴ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch5"><span class="chapter-no">第五章</span><h2>墙在动 · <span class="op-cur">—</span></h2></div>
 <p class="op-note">四条线放在一起：官方收盘价、多空分界、下墙与上墙的逐日位置。每天打开一眼看到：价格在墙上方还是下方，墙自己有没有搬家。用第二章的票签切换。记录只会越攒越长。</p>
+<div class="op-chips op-tkchips"></div>
 <div class="op-chart" id="ch-flip"></div>
 
 <!-- Ⅵ ──────────────────────────────── -->
@@ -114,6 +125,7 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 <!-- Ⅶ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch7"><span class="chapter-no">第七章</span><h2>一年期的怕，逐日 · <span class="op-cur">—</span></h2></div>
 <p class="op-note">同一只票的一年期恐慌读数逐日连成线，短期的 30 天读数放在旁边对照。事件来了短线跳、长线不动 = 市场只怕眼前；长线也抬头 = 怕的东西变成了故事本身。恒定期限口径自 07.28 起记录，每天加长一格。用第二章的票签切换。</p>
+<div class="op-chips op-tkchips"></div>
 <div class="op-chart" id="ch-cmhist"></div>
 
 <!-- 口径说明 ──────────────────────── -->
@@ -143,6 +155,9 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
         GOLD = "#B8893E";
   const fmt$ = v => v >= 1e6 ? (v/1e6).toFixed(1) + "M" : Math.round(v/1e3) + "K";
   const dot = d => d.slice(5).replace("-", ".");          // 2026-08-04 → 08.04
+  // ⚠️ 必须定义在所有用它的渲染代码之前（墙位表比票签区块先执行；const 有暂时性死区，
+  //    放后面=ReferenceError 整段脚本死——2026-08-05 实测，症状是动态区全空但静态框架都在）
+  const logo = (tk, cls) => `<img class="${cls}" src="logos/${tk.toLowerCase()}.png" alt="" loading="lazy" onerror="this.remove()">`;
 
   let D;
   try {
@@ -178,7 +193,7 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
       const lo = (t.spot - t.put_wall) / t.spot * 100, hi = (t.call_wall - t.spot) / t.spot * 100;
       const pos = Math.max(2, Math.min(98, (t.spot - t.put_wall) / (t.call_wall - t.put_wall) * 100));
       const pm = t.spot_kind !== "close" ? "<span title='当日尚未收盘'>*</span>" : "";
-      return `<tr><td><b>${t.ticker}</b></td><td class=n>${t.spot.toFixed(2)}${pm}</td>` +
+      return `<tr><td>${logo(t.ticker, "op-logo")}<b>${t.ticker}</b></td><td class=n>${t.spot.toFixed(2)}${pm}</td>` +
         `<td class=n style="color:${RED}">${t.put_wall}</td><td class=n style="color:${GREEN}">${t.call_wall}</td>` +
         `<td class=n>${lo.toFixed(1)}%</td><td class=n>${hi.toFixed(1)}%</td>` +
         `<td><div class="op-pos"><i style="left:${pos}%"></i></div></td></tr>`;
@@ -188,8 +203,9 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 
   /* ── Ⅱ 一根轴（chip 联动 Ⅴ）── */
   let cur = S[0] ? S[0].ticker : D.structure[0].ticker;
-  $("op-chips").innerHTML = D.structure.map(t =>
-    `<button class="op-chip${t.ticker === cur ? " on" : ""}" data-t="${t.ticker}">${t.ticker}</button>`).join("");
+  const chipHtml = D.structure.map(t =>
+    `<button class="op-chip${t.ticker === cur ? " on" : ""}" data-t="${t.ticker}">${logo(t.ticker, "")}${t.ticker}</button>`).join("");
+  document.querySelectorAll(".op-tkchips").forEach(el => el.innerHTML = chipHtml);
   const axisC = mkChart("ch-axis"), flipC = mkChart("ch-flip"), cmC = mkChart("ch-cmhist");
 
   function drawCm(tk) {
@@ -207,50 +223,80 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
     }, true);
   }
 
+  function niceStep(span) {
+    const raw = span / 11, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    for (const m of [1, 2, 2.5, 5, 10]) if (raw <= m * mag) return m * mag;
+    return 10 * mag;
+  }
+  const lbl = v => (+(+v).toFixed(2)).toString();
+
+  /* 一根轴 v2（Klay 三轮反馈后重画）：
+     · 每个价位 = 一根钉在轴上的针：箭头脚踩在精确位置，竖线拉到标签 —— 位置一眼可读
+     · 预期区间压成轴面上的一条丝带（高度 13%），标签全部悬在上方空白区，
+       不再有文字横跨色带边缘的情况（AAPL/AVGO/META 三票实测病例）
+     · 刻度整步取整 + 小刻度加密，端点不再出现 288.891875 这种毛数字 */
   function drawAxis(tk) {
     const t = D.structure.find(x => x.ticker === tk);
     if (!t) return;
     $("op-em-note").innerHTML = (t.em_lo && t.em_hi)
-      ? `<span style="color:${GOLD}">■</span> 米色底 = 本周预期区间 ${t.em_lo.toFixed(1)} ~ ${t.em_hi.toFixed(1)}（期权定价隐含）` : "";
-    const pts = [
+      ? `<span style="color:${GOLD}">■</span> 轴面米色丝带 = 本周预期区间 ${lbl(t.em_lo)} ~ ${lbl(t.em_hi)}（期权定价隐含）` : "";
+    const raw = [
       t.put_wall && { v: t.put_wall, n: "下墙 put", c: RED },
       t.flip && { v: t.flip, n: "多空分界", c: GOLD },
       t.max_pain && { v: t.max_pain, n: "最大痛点", c: MUTED },
       t.call_wall && { v: t.call_wall, n: "上墙 call", c: GREEN },
-      t.spot && { v: t.spot, n: t.spot_kind === "premarket" ? "现价(盘前)" : "现价", c: INK },
+      t.spot && { v: t.spot, n: t.spot_kind === "close" ? "现价" : "现价(未收盘)", c: INK },
     ].filter(Boolean);
-    const vals = pts.map(p => p.v).concat([t.em_lo, t.em_hi].filter(Boolean));
-    const lo = Math.min(...vals), hi = Math.max(...vals), pad = (hi - lo) * .13;
-    // 标签互压防护，两级（AAPL 实测病例：上墙=痛点=310 同点、现价 309.38 贴脸）：
-    // ① 同值合并成一个点，名字并排；② 聚簇内梯次错位 上近/下近/上远/下远
-    pts.sort((a, b) => a.v - b.v);
-    const merged = [];
-    pts.forEach(p => {
-      const m = merged[merged.length - 1];
-      if (m && Math.abs(p.v - m.v) < (hi - lo) * .004) { m.n += " · " + p.n; }
-      else merged.push({ ...p });
+    const vals = raw.map(p => p.v).concat([t.em_lo, t.em_hi].filter(Boolean));
+    const lo0 = Math.min(...vals), hi0 = Math.max(...vals), span = (hi0 - lo0) || 1;
+    raw.sort((a, b) => a.v - b.v);
+    const pts = [];
+    raw.forEach(p => {                       // 同值合并（上墙=痛点同价的病例）
+      const m = pts[pts.length - 1];
+      if (m && Math.abs(p.v - m.v) < span * .004) m.n += " · " + p.n;
+      else pts.push({ ...p });
     });
-    const SLOT = [["top", 14], ["bottom", 14], ["top", 44], ["bottom", 44]];
-    let lastV = -Infinity, slot = 0;
-    merged.forEach(p => {
-      slot = (p.v - lastV) < (hi - lo) * .09 ? (slot + 1) % 4 : 0;
-      [p.pos, p.dist] = SLOT[slot]; lastV = p.v;
-    });
-    pts.length = 0; merged.forEach(p => pts.push(p));
+    const H = [.40, .62, .84];               // 针高三档：脚全在轴上，头错落 ⇒ 标签永不互压
+    let lastV = -Infinity, hi_i = 0;
+    pts.forEach(p => { hi_i = (p.v - lastV) < span * .085 ? (hi_i + 1) % 3 : 0; p.h = H[hi_i]; lastV = p.v; });
+    const step = niceStep(span * 1.26),
+          min = Math.floor((lo0 - span * .13) / step) * step,
+          max = Math.ceil((hi0 + span * .13) / step) * step;
+    const fmtTick = v => step % 1 === 0 ? Math.round(v).toString() : (+v.toFixed(1)).toString();
     axisC.setOption({
-      grid: { left: 56, right: 56, top: 66, bottom: 66 },
-      tooltip: { trigger: "item", formatter: p => p.data.n + "：" + p.data.value[0] },
-      xAxis: { type: "value", min: lo - pad, max: hi + pad, ...axisBase, splitLine: { show: false } },
+      grid: { left: 44, right: 44, top: 20, bottom: 34 },
+      tooltip: { trigger: "item", formatter: p => Array.isArray(p.value) ? p.value[2] + "：" + lbl(p.value[0]) : "" },
+      xAxis: { type: "value", min, max, interval: step, ...axisBase,
+        axisLabel: { color: MUTED, fontSize: 11, formatter: fmtTick },
+        axisTick: { show: true, lineStyle: { color: BORDER } },
+        minorTick: { show: true, splitNumber: 5, lineStyle: { color: BORDER, opacity: .6 } },
+        splitLine: { show: false } },
       yAxis: { type: "value", min: 0, max: 1, show: false },
       series: [
-        (t.em_lo && t.em_hi) ? {
-          type: "line", data: [], silent: true, markArea: {
-            itemStyle: { color: dark ? "rgba(184,137,62,.14)" : "rgba(184,137,62,.12)" },
-            data: [[{ xAxis: t.em_lo, yAxis: 0 }, { xAxis: t.em_hi, yAxis: 1 }]] } } : null,
-        { type: "scatter", symbolSize: 16, data: pts.map(p => ({
-            value: [p.v, .5], n: p.n, itemStyle: { color: p.c },
-            label: { show: true, position: p.pos, distance: p.dist, color: p.c,
-                     fontSize: 12, formatter: p.n + "\n" + p.v } })) },
+        (t.em_lo && t.em_hi) ? { type: "line", data: [], silent: true, markArea: {
+            itemStyle: { color: dark ? "rgba(184,137,62,.22)" : "rgba(184,137,62,.18)" },
+            data: [[{ xAxis: t.em_lo, yAxis: 0 }, { xAxis: t.em_hi, yAxis: 0.13 }]] } } : null,
+        { type: "custom",
+          data: pts.map(p => [p.v, p.h, p.n, p.c]),
+          renderItem: (params, api) => {
+            const v = api.value(0), h = api.value(1), n = api.value(2), c = api.value(3);
+            const [x, y0] = api.coord([v, 0]), y1 = api.coord([v, h])[1];
+            const gx = params.coordSys.x, gw = params.coordSys.width;
+            const nearR = x > gx + gw - 76, nearL = x < gx + 76;
+            return { type: "group", children: [
+              { type: "line", shape: { x1: x, y1: y0 - 7, x2: x, y2: y1 },
+                style: { stroke: c, lineWidth: 1.5, opacity: .5 } },
+              { type: "polygon",                              // 箭头：尖踩在轴上的精确价位
+                shape: { points: [[x - 4.5, y0 - 8], [x + 4.5, y0 - 8], [x, y0 - 1]] },
+                style: { fill: c } },
+              { type: "circle", shape: { cx: x, cy: y1, r: 5 }, style: { fill: c } },
+              { type: "text", style: { x: nearR ? x + 8 : (nearL ? x - 8 : x), y: y1 - 9,
+                  text: n + "\n" + lbl(v),
+                  textAlign: nearR ? "right" : (nearL ? "left" : "center"),
+                  textVerticalAlign: "bottom", fill: c, fontSize: 12, lineHeight: 16,
+                  fontFamily: "'JetBrains Mono',monospace" } },
+            ] };
+          } },
       ].filter(Boolean),
     }, true);
   }
@@ -272,29 +318,62 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
     }, true);
   }
 
-  $("op-chips").addEventListener("click", e => {
+  document.querySelectorAll(".op-tkchips").forEach(el => el.addEventListener("click", e => {
     const b = e.target.closest(".op-chip"); if (!b) return;
     cur = b.dataset.t;
-    document.querySelectorAll(".op-chip").forEach(x => x.classList.toggle("on", x.dataset.t === cur));
+    document.querySelectorAll(".op-tkchips .op-chip").forEach(x => x.classList.toggle("on", x.dataset.t === cur));
     document.querySelectorAll(".op-cur").forEach(x => x.textContent = cur);
     drawAxis(cur); drawFlip(cur); drawCm(cur);
-  });
+  }));
   document.querySelectorAll(".op-cur").forEach(x => x.textContent = cur);
   drawAxis(cur); drawFlip(cur); drawCm(cur);
 
   /* ── Ⅲ 开奖台账（行展开 + 深链 #MM-DD 高亮）── */
+  const isWrong = c => /错/.test(c.outcome);
   const badge = c => c.status === "待开奖" ? `<span class="op-badge wait">待开奖</span>` :
-    /对|不变=错|错/.test(c.outcome) && /错/.test(c.outcome) ?
-    `<span class="op-badge wrong">已开奖</span>` : `<span class="op-badge done">已开奖</span>`;
-  $("op-ledger").innerHTML =
-    "<tr><th>立案日</th><th>标的</th><th style='width:52%'>判断</th><th>状态</th><th>结果</th></tr>" +
-    D.ledger.map((c, i) => {
-      const f = c.events[0];
-      return `<tr class="op-case" data-i="${i}" id="case-${f.date.slice(5)}">` +
-        `<td>${dot(f.date)}</td><td>${c.ticker}</td>` +
-        `<td class="zh">${f.judgment.length > 60 ? f.judgment.slice(0, 60) + "…" : f.judgment}</td>` +
-        `<td>${badge(c)}</td><td class="zh">${c.outcome || "—"}</td></tr>`;
-    }).join("");
+    isWrong(c) ? `<span class="op-badge wrong">已开奖</span>` : `<span class="op-badge done">已开奖</span>`;
+
+  // 记分牌：历史感（累计数字只会涨）+ 时效性（数据日动静 + 下一个开奖）
+  const done = D.ledger.filter(c => c.status === "已开奖"),
+        wait = D.ledger.filter(c => c.status === "待开奖"),
+        wrong = done.filter(isWrong).length,
+        todayNew = D.ledger.filter(c => c.events[0].date === D.meta.data_date).length,
+        nextUp = wait.map(c => ({ c, d: c.events[0].expected })).filter(x => x.d)
+                     .sort((a, b) => a.d < b.d ? -1 : 1)[0];
+  $("op-score").innerHTML =
+    `<div class="sc"><b>${D.ledger.length}</b><span>累计立案（自 ${dot(D.meta.ledger_since)}）</span></div>` +
+    `<div class="sc"><b>${done.length - wrong} 对 · ${wrong} 错</b><span>已开奖 ${done.length} 案，输赢都在账上</span></div>` +
+    `<div class="sc"><b>${wait.length}</b><span>待开奖${todayNew ? " · 数据日新立案 " + todayNew : ""}</span></div>` +
+    (nextUp ? `<div class="sc next"><b>${nextUp.c.ticker} · 预计 ${dot(nextUp.d)}</b><span>下一个开奖，回来对答案</span></div>` : "");
+
+  // 过滤 + 渲染：待开奖排前（它们是「还没完的事」），已开奖按日期倒序归档
+  let lf = "all";
+  const order = c => (c.status === "待开奖" ? "0" : "1") + c.events[0].date;
+  function renderLedger() {
+    const rows = D.ledger.filter(c => lf === "all" || c.status === lf)
+      .sort((a, b) => a.status === b.status ? (a.events[0].date < b.events[0].date ? 1 : -1)
+                                            : (a.status === "待开奖" ? -1 : 1));
+    $("op-ledger").innerHTML =
+      "<tr><th>立案日</th><th>标的</th><th style='width:46%'>判断</th><th>状态</th><th>开奖</th></tr>" +
+      rows.map(c => {
+        const f = c.events[0], i = D.ledger.indexOf(c);
+        const open = c.status === "待开奖" ? (f.expected ? "预计 " + dot(f.expected) : "—")
+                                           : (c.outcome || "—");
+        return `<tr class="op-case" data-i="${i}" id="case-${f.date.slice(5)}">` +
+          `<td>${dot(f.date)}</td><td>${c.ticker}</td>` +
+          `<td class="zh">${f.judgment.length > 60 ? f.judgment.slice(0, 60) + "…" : f.judgment}</td>` +
+          `<td>${badge(c)}</td><td class="zh">${open}</td></tr>`;
+      }).join("");
+  }
+  $("op-lfilter").innerHTML = [["all", "全部"], ["待开奖", "待开奖"], ["已开奖", "已开奖"]]
+    .map(([v, n]) => `<button class="op-chip${v === "all" ? " on" : ""}" data-f="${v}">${n}</button>`).join("");
+  $("op-lfilter").addEventListener("click", e => {
+    const b = e.target.closest(".op-chip"); if (!b) return;
+    lf = b.dataset.f;
+    $("op-lfilter").querySelectorAll(".op-chip").forEach(x => x.classList.toggle("on", x.dataset.f === lf));
+    renderLedger();
+  });
+  renderLedger();
   $("op-ledger").addEventListener("click", e => {
     const tr = e.target.closest(".op-case"); if (!tr) return;
     const nxt = tr.nextElementSibling;
@@ -321,7 +400,7 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
   $("op-board").innerHTML =
     "<tr><th>标的</th><th class=n>到期</th><th class=n>行权价</th><th class=n>类型</th><th class=n>今日量</th><th class=n>既有持仓</th><th class=n>权利金换手</th><th>归因（纯算术）</th></tr>" +
     D.flagged.map(r =>
-      `<tr><td><b>${r.ticker}</b></td><td class=n>${dot(r.expiry)}</td><td class=n>${r.strike}</td>` +
+      `<tr><td>${logo(r.ticker, "op-logo")}<b>${r.ticker}</b></td><td class=n>${dot(r.expiry)}</td><td class=n>${r.strike}</td>` +
       `<td class=n style="color:${r.type === "P" ? RED : GREEN}">${r.type === "P" ? "put" : "call"}</td>` +
       `<td class=n>${Math.round(r.volume)}</td><td class=n>${Math.round(r.oi)}</td>` +
       `<td class=n><b>$${fmt$(r.premium)}</b></td><td class="zh">${r.attribution}</td></tr>`).join("");
