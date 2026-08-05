@@ -212,7 +212,12 @@ html .topbar-navband nav.tabs { margin-left: 0; }
   border-radius: 8px; white-space: nowrap;
   transition: border-color .3s ease, background-color .3s ease, color .3s ease, transform .3s cubic-bezier(.22,.61,.36,1);
 }
-.tab-trigger::after { content: "▾"; margin-left: 6px; font-size: 11px; opacity: .65; }
+.tab-trigger::after { content: "▾"; margin-left: 6px; font-size: 14px; opacity: 1; }
+/* 2026-08-05 Klay：四个内容 tab 都带向下三角引导点击（加大加深；此前只有百年档案有、
+   11px/65% 透明度没人注意到能打开）。用属性选择器挂 ::after，零 HTML 改动 ——
+   与上面 :207 同一理由：i18n D 键按整个文本节点精确匹配，▾ 混进文本就全崩。 */
+.tab[data-panel="kindex"]::after, .tab[data-panel="leaps"]::after, a.tab-ext::after {
+  content: "▾"; margin-left: 5px; font-size: 14px; }
 .tab-trigger:hover { color: var(--ink); background: var(--bg-card-hover);
   border-color: var(--accent); transform: translateY(-1px); }
 .tab-trigger[aria-expanded="true"]::after { opacity: 1; }
