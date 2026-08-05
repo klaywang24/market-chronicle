@@ -15,7 +15,7 @@
 // 2026-08-03 → mc-v6：定价三档等宽修复。不属于上面 §11 的「改价必 bump」，是主动 bump——
 // 外壳缓存优先，不 bump 的话回访者还要再看一次错版（Klay 是当 bug 报的，不能等下一次访问）。
 // 代价只有一次冷加载。
-const CACHE = "mc-v16";
+const CACHE = "mc-v17";
 const CDN_HOSTS = new Set(["cdn.jsdelivr.net", "fonts.googleapis.com", "fonts.gstatic.com"]);
 
 self.addEventListener("install", () => self.skipWaiting());
