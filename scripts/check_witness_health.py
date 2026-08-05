@@ -137,10 +137,33 @@ def check_daily_alive() -> dict:
             "detail": f"daily 最后一次更新数据 {out[:10]}（{age} 天前）", "age": age}
 
 
+def check_archive_match() -> dict:
+    """与第三方存档逐字对账 —— 唯一能挡住「全链重造」的一项（2026-08-05 渗透审计后加）。
+
+    其余各项检查的都是「内部自洽」：攻击者拿到写权限后把整条链从创世重算一遍，
+    verify_ledger / anchor_hashes / 快照新鲜度三项**全部放行**（实测推演）。
+    只有把 Wayback 存的旧内容下下来逐字比，才会现形。
+    Wayback 的内容攻击者改不了 —— 这就是「第三方见证」四个字真正兑现的地方。
+    """
+    try:
+        out = subprocess.run([sys.executable, str(ROOT / "scripts" / "verify_against_archive.py")],
+                             cwd=ROOT, capture_output=True, text=True, timeout=180)
+    except Exception as e:
+        return {"status": "unknown", "detail": f"对账脚本执行失败：{str(e)[:60]}"}
+    tail = [l for l in out.stdout.strip().splitlines() if l.strip()]
+    last = tail[-1] if tail else ""
+    if out.returncode != 0:
+        return {"status": "bad", "detail": "🔴 已发布的历史与第三方存档不符 —— " + last[:90]}
+    if "未能" in out.stdout or "没测到" in out.stdout:
+        return {"status": "unknown", "detail": "本次未能取得存档（IA 限流）"}
+    return {"status": "ok", "detail": last[:90]}
+
+
 CHECKS = {
     "链最后一行": check_chain_row,
     "锚定日志": check_anchor_log,
     "链头快照(直接问IA)": check_snapshot_live,
+    "与存档逐字对账": check_archive_match,
     "daily是否还活着": check_daily_alive,
 }
 
