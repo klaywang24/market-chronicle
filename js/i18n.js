@@ -175,6 +175,7 @@
     "百年档案": ["The Archive", "Les archives", "Das Archiv", "El archivo"],
     "K 指数 · 台账": ["KAPX · Ledger", "KAPX · Registre", "KAPX · Journal", "KAPX · Registro"],
     "恐惧的标价 · 台账": ["The Price of Fear · Ledger", "Le prix de la peur · Registre", "Der Preis der Angst · Journal", "El precio del miedo · Registro"],
+    "期权异动": ["Options", "Options", "Optionen", "Opciones"],
     "LEAPS 窗口": ["LEAPS Window", "Fenêtre LEAPS", "LEAPS-Fenster", "Ventana LEAPS"],
     // ---- 恐惧的标价指数（LEAPS 贵贱温度计） ----
     "恐惧的标价": ["Fear's Price Tag", "", "", ""],

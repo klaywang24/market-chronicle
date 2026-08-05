@@ -234,6 +234,9 @@ html .topbar-navband nav.tabs { margin-left: 0; }
 html.dark-mode .tab-menu { box-shadow: 0 10px 28px rgba(0,0,0,.5); }
 .tab-menu[hidden] { display: none; }   /* 必须显式写：display:flex 会盖掉 hidden 属性 */
 .tab-menu .tab { border-color: transparent; background: transparent; text-align: left; width: 100%; }
+/* 链接式 tab（期权页等平铺独立页入口）：对齐 button.tab 的观感 */
+a.tab-ext { text-decoration: none; display: inline-flex; align-items: center; color: inherit; border-bottom: none; }
+a.tab-ext:hover { color: var(--ink); border-bottom: none; }
 .tab-menu .tab:hover { transform: none; background: var(--bg-card-hover); }
 
 /* 菜单的横向位置由 JS 打开时按视口夹取（app.js 的 place()）：顶栏在窄屏会换行，
