@@ -11,7 +11,7 @@
 try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) document.documentElement.classList.add("dark-mode"); } catch (e) {}
 </script>
 <style>html{background:#FFFFFF}html.dark-mode{background:#111111}</style>
-<link rel="stylesheet" href="css/style.css?v=20260805c">
+<link rel="stylesheet" href="css/style.css?v=20260805d">
 <style>
 /* 页面私有样式一律 op- 前缀，只借主站的 :root 变量与字体，不碰主站类 */
 .op-wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 80px; }
@@ -20,7 +20,8 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 .op-top a.op-sub { font-size: 13px; font-weight: 600; color: #fff; background: var(--accent); border-radius: 20px; padding: 6px 16px; text-decoration: none; }
 .op-langbtn { font-size: 12.5px; color: var(--ink-soft); background: transparent; border: 1px solid var(--border); border-radius: 20px; padding: 5px 13px; cursor: pointer; }
 .op-langbtn:hover { color: var(--ink); border-color: var(--ink-muted); }
-.op-nav { display: flex; flex-wrap: wrap; gap: 26px; padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.op-nav { display: flex; flex-wrap: wrap; gap: 26px; align-items: center; padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.op-navctl { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .op-nav a, .op-nav .on { font-size: 14.5px; color: var(--ink-soft); text-decoration: none; padding: 2px 0; }
 .op-nav a:hover { color: var(--ink); }
 .op-nav .on { color: var(--ink); font-weight: 700; border-bottom: 2px solid var(--accent); }
@@ -83,11 +84,6 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 
 <div class="op-top">
   <a class="op-brand" href="/">美股编年史</a>
-  <div style="display:flex;align-items:center;gap:10px">
-    <a class="op-sub" href="/pricing">订阅</a>
-    <button class="op-langbtn" id="op-lang" title="切换语言 / Switch language"></button>
-    <button class="theme-toggle" id="op-theme" title="日夜切换">☀</button>
-  </div>
 </div>
 <nav class="op-nav">
   <a href="/">今日</a>
@@ -95,6 +91,11 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
   <a href="/leaps">恐惧的标价 · 台账</a>
   <span class="on">期权异动</span>
   <a href="/spy">百年档案</a>
+  <div class="op-navctl">
+    <a class="op-sub" href="/pricing">订阅</a>
+    <button class="op-langbtn" id="op-lang" title="切换语言 / Switch language"></button>
+    <button class="theme-toggle" id="op-theme" title="日夜切换">☀</button>
+  </div>
 </nav>
 
 <div class="hero">

@@ -72,7 +72,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260805c">
+<link rel="stylesheet" href="css/style.css?v=20260805d">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -94,11 +94,6 @@
   <div class="topbar-mast">
    <div class="topbar-row">
     <a class="brand" href="." aria-label="回到首页 · Back to home">美股编年史<em>Market Chronicle</em></a>
-    <div class="top-controls">
-      <a class="topbar-sub" href="pricing">订阅</a>
-      <div class="lang-switch" id="lang-switch"></div>
-      <button class="theme-toggle" id="theme-toggle" title="日夜切换">☀</button>
-    </div>
    </div>
   </div>
   <div class="topbar-navband">
@@ -134,6 +129,13 @@
         </div>
       </div>
     </nav>
+    <!-- 2026-08-05 Klay：切换器瘦成单按钮后省出位置，订阅/语言/日夜并入 tab 行右端，
+         报头行只留刊名——页头从两行控件收成一行。元素只挪不改：id/文本节点原样，i18n 零影响。 -->
+    <div class="top-controls">
+      <a class="topbar-sub" href="pricing">订阅</a>
+      <div class="lang-switch" id="lang-switch"></div>
+      <button class="theme-toggle" id="theme-toggle" title="日夜切换">☀</button>
+    </div>
    </div>
   </div>
 </header>

@@ -110,6 +110,11 @@ html.dark-mode .topbar-navband { background: var(--bg); }
    实为 (0,2,1) 而非 (0,2,0)。只写 `.topbar-navband nav.tabs`（同为 0,2,1）会同分、按顺序输给它，
    实测英文下 tab 左缘仍偏 196–247px。故补 html 前缀抬到 (0,2,2)。 */
 html .topbar-navband nav.tabs { margin-left: 0; }
+/* 2026-08-05 控件并入导航带：nav 占左，控件贴右；窄屏挤不下时控件整组折行仍靠右 */
+.topbar-navband .topbar-row { align-items: center; }
+/* ⚠️ 与 :105 同族：基础 .top-controls（~274 行方案C）是 flex:0 0 100% + order:3，
+   挪进导航带必须原地中和，否则控件条独占一整行折到 tab 下方（2026-08-05 实测 1132px）。 */
+.topbar-navband .top-controls { margin-left: auto; display: flex; align-items: center; gap: 10px; flex: 0 0 auto; order: 0; }
 
 /* 导航带里的 tab：去边框去背景 → 纯文字（彭博/WSJ/FT 一致做法；带框方块＝组件库默认值观感）。
    选中态＝文字提亮 + 底部 2px 砖红线，不再用填充块，避免与右上「订阅」实心按钮抢视觉。 */
