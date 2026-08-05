@@ -22,6 +22,10 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 .op-chip { font-size: 12.5px; padding: 5px 12px; border: 1px solid var(--border); border-radius: 16px; background: var(--bg-card); color: var(--ink-soft); cursor: pointer; font-family: 'JetBrains Mono',monospace; }
 .op-chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .op-chip img { width: 15px; height: 15px; border-radius: 4px; vertical-align: -3px; margin-right: 5px; background: #fff; }
+.op-chiprow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; }
+.op-tkchips { row-gap: 10px; }
+.op-cgl { font-size: 11px; color: var(--ink-muted); letter-spacing: .04em; min-width: 84px; }
+@media (max-width: 640px) { .op-cgl { min-width: 100%; margin-bottom: -2px; } }
 .op-logo { width: 18px; height: 18px; border-radius: 4px; vertical-align: -4px; margin-right: 7px; background: #fff; }
 .op-chart { width: 100%; height: 300px; }
 .op-chart.tall { height: 420px; }
@@ -201,8 +205,22 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 
   /* ── Ⅱ 一根轴（chip 联动 Ⅴ）── */
   let cur = S[0] ? S[0].ticker : D.structure[0].ticker;
-  const chipHtml = D.structure.map(t =>
-    `<button class="op-chip${t.ticker === cur ? " on" : ""}" data-t="${t.ticker}">${logo(t.ticker, "")}${t.ticker}</button>`).join("");
+  // 票签三行分组（2026-08-05 Klay 定）。AMD 归半导体行；
+  // 🔑 不在任何组里的票自动落到末行 —— 管线以后加票不会静默消失（空集假阴性同族教训）
+  const GROUPS = [
+    ["指数", ["SPY", "QQQ"]],
+    ["七巨头 · SPCX", ["AAPL", "AMZN", "GOOG", "GOOGL", "META", "MSFT", "NVDA", "TSLA", "SPCX"]],
+    ["半导体 · 存储", ["AVGO", "TSM", "AMD", "INTC", "MU", "SNDK"]],
+  ];
+  const have = new Set(D.structure.map(t => t.ticker));
+  const grouped = new Set(GROUPS.flatMap(g => g[1]));
+  const rest = [...have].filter(t => !grouped.has(t)).sort();
+  if (rest.length) GROUPS[GROUPS.length - 1][1].push(...rest);
+  const chip = tk => `<button class="op-chip${tk === cur ? " on" : ""}" data-t="${tk}">${logo(tk, "")}${tk}</button>`;
+  const chipHtml = GROUPS
+    .map(([n, ts]) => { const row = ts.filter(t => have.has(t)).map(chip).join("");
+                       return row ? `<div class="op-chiprow"><span class="op-cgl">${n}</span>${row}</div>` : ""; })
+    .join("");
   document.querySelectorAll(".op-tkchips").forEach(el => el.innerHTML = chipHtml);
   const axisC = mkChart("ch-axis"), flipC = mkChart("ch-flip"), cmC = mkChart("ch-cmhist");
 
