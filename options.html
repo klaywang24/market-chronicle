@@ -47,6 +47,15 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 .op-cta { margin: 26px 0 0; font-size: 14px; }
 .op-cta a { color: var(--accent); }
 .op-load { text-align: center; color: var(--ink-muted); padding: 60px 0; font-size: 14px; }
+.op-toc { display: none; }
+@media (min-width: 1280px) {
+  .op-toc { display: block; position: fixed; left: 22px; top: 120px; width: 168px; font-size: 12.5px; }
+  .op-toc-h { font-size: 11px; color: var(--ink-muted); letter-spacing: .08em; padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+  .op-toc a { display: block; color: var(--ink-soft); text-decoration: none; padding: 4px 0 4px 10px; border-left: 2px solid transparent; line-height: 1.5; }
+  .op-toc a:hover { color: var(--ink); }
+  .op-toc a.on { color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+  .op-wrap { padding-left: 210px; max-width: 1290px; }
+}
 @media (max-width: 700px) { .op-chart { height: 260px; } .op-chart.tall { height: 340px; } .op-table { font-size: 12px; } }
 </style>
 </head>
@@ -69,40 +78,41 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 <div id="op-main" style="display:none">
 
 <!-- Ⅰ ──────────────────────────────── -->
-<div class="chapter-head"><span class="chapter-no">第一章</span><h2>今天，谁贴着自己的墙</h2></div>
+<div class="chapter-head" id="op-ch1"><span class="chapter-no">第一章</span><h2>今天，谁贴着自己的墙</h2></div>
 <p class="op-note" style="margin-bottom:10px">墙 = 期权持仓最厚的价位：下方的厚 put 是别人付过保费的保护层，上方的厚 call 是别人付过定金的目标价。价格离墙越近，那笔已经付出去的钱越有话语权。圆点 = 现价在两墙之间的位置。</p>
 <table class="op-table" id="op-walls"></table>
 
 <!-- Ⅱ ──────────────────────────────── -->
-<div class="chapter-head"><span class="chapter-no">第二章</span><h2>一根轴</h2></div>
+<div class="chapter-head" id="op-ch2"><span class="chapter-no">第二章</span><h2>一根轴 · <span class="op-cur">—</span></h2></div>
 <p class="op-note">一只票的所有关键价位钉在同一根价格轴上：两面墙、多空分界、期权定价的本周波动区间、现价。点票切换，悬停看读数。</p>
 <div class="op-chips" id="op-chips"></div>
+<p class="op-note" id="op-em-note" style="margin:0 0 2px"></p>
 <div class="op-chart" id="ch-axis"></div>
 
 <!-- Ⅲ ──────────────────────────────── -->
-<div class="chapter-head"><span class="chapter-no">第三章</span><h2>昨天的钱，今天还在不在</h2></div>
+<div class="chapter-head" id="op-ch3"><span class="chapter-no">第三章</span><h2>昨天的钱，今天还在不在</h2></div>
 <p class="op-note" style="margin-bottom:10px">我们对异动的每一次判断都先立案、再按约定条件开奖，错了原样留着。点行展开看立案原文与验证条件。这张表每天只会变厚，不会被改写。</p>
 <table class="op-table" id="op-ledger"></table>
 
 <!-- Ⅳ ──────────────────────────────── -->
-<div class="chapter-head"><span class="chapter-no">第四章</span><h2>大单榜：今天最贵的注</h2></div>
+<div class="chapter-head" id="op-ch4"><span class="chapter-no">第四章</span><h2>大单榜：今天最贵的注</h2></div>
 <p class="op-note" style="margin-bottom:10px">只列我们逐条复核后的 A 级异动，按权利金换手额排序。我们看不见每一笔是谁买谁卖，所以只说换手了多少钱、落在哪个价位、以及一条纯算术的归因。</p>
 <table class="op-table" id="op-board"></table>
 <p class="op-note" style="margin:18px 0 6px">同一天按标的汇总，call 与 put 各自的权利金换手额：</p>
 <div class="op-chart" id="ch-net"></div>
 
 <!-- Ⅴ ──────────────────────────────── -->
-<div class="chapter-head"><span class="chapter-no">第五章</span><h2>墙在动</h2></div>
+<div class="chapter-head" id="op-ch5"><span class="chapter-no">第五章</span><h2>墙在动 · <span class="op-cur">—</span></h2></div>
 <p class="op-note">四条线放在一起：官方收盘价、多空分界、下墙与上墙的逐日位置。每天打开一眼看到：价格在墙上方还是下方，墙自己有没有搬家。用第二章的票签切换。记录只会越攒越长。</p>
 <div class="op-chart" id="ch-flip"></div>
 
 <!-- Ⅵ ──────────────────────────────── -->
-<div class="chapter-head"><span class="chapter-no">第六章</span><h2>一只票的两条命</h2></div>
+<div class="chapter-head" id="op-ch6"><span class="chapter-no">第六章</span><h2>一只票的两条命</h2></div>
 <p class="op-note">同一只票，30 天期权和一年期权各有一个恐慌读数。短命的那条为眼前的事件定价，长命的那条为整段故事定价。两条差得越远，市场越是只怕眼前。</p>
 <div class="op-chart tall" id="ch-lives"></div>
 
 <!-- Ⅶ ──────────────────────────────── -->
-<div class="chapter-head"><span class="chapter-no">第七章</span><h2>一年期的怕，逐日</h2></div>
+<div class="chapter-head" id="op-ch7"><span class="chapter-no">第七章</span><h2>一年期的怕，逐日 · <span class="op-cur">—</span></h2></div>
 <p class="op-note">同一只票的一年期恐慌读数逐日连成线，短期的 30 天读数放在旁边对照。事件来了短线跳、长线不动 = 市场只怕眼前；长线也抬头 = 怕的东西变成了故事本身。恒定期限口径自 07.28 起记录，每天加长一格。用第二章的票签切换。</p>
 <div class="op-chart" id="ch-cmhist"></div>
 
@@ -200,6 +210,8 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
   function drawAxis(tk) {
     const t = D.structure.find(x => x.ticker === tk);
     if (!t) return;
+    $("op-em-note").innerHTML = (t.em_lo && t.em_hi)
+      ? `<span style="color:${GOLD}">■</span> 米色底 = 本周预期区间 ${t.em_lo.toFixed(1)} ~ ${t.em_hi.toFixed(1)}（期权定价隐含）` : "";
     const pts = [
       t.put_wall && { v: t.put_wall, n: "下墙 put", c: RED },
       t.flip && { v: t.flip, n: "多空分界", c: GOLD },
@@ -208,7 +220,7 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
       t.spot && { v: t.spot, n: t.spot_kind === "premarket" ? "现价(盘前)" : "现价", c: INK },
     ].filter(Boolean);
     const vals = pts.map(p => p.v).concat([t.em_lo, t.em_hi].filter(Boolean));
-    const lo = Math.min(...vals), hi = Math.max(...vals), pad = (hi - lo) * .08;
+    const lo = Math.min(...vals), hi = Math.max(...vals), pad = (hi - lo) * .13;
     // 标签互压防护，两级（AAPL 实测病例：上墙=痛点=310 同点、现价 309.38 贴脸）：
     // ① 同值合并成一个点，名字并排；② 聚簇内梯次错位 上近/下近/上远/下远
     pts.sort((a, b) => a.v - b.v);
@@ -226,7 +238,7 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
     });
     pts.length = 0; merged.forEach(p => pts.push(p));
     axisC.setOption({
-      grid: { left: 30, right: 30, top: 66, bottom: 66 },
+      grid: { left: 56, right: 56, top: 66, bottom: 66 },
       tooltip: { trigger: "item", formatter: p => p.data.n + "：" + p.data.value[0] },
       xAxis: { type: "value", min: lo - pad, max: hi + pad, ...axisBase, splitLine: { show: false } },
       yAxis: { type: "value", min: 0, max: 1, show: false },
@@ -234,8 +246,6 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
         (t.em_lo && t.em_hi) ? {
           type: "line", data: [], silent: true, markArea: {
             itemStyle: { color: dark ? "rgba(184,137,62,.14)" : "rgba(184,137,62,.12)" },
-            label: { show: true, position: "insideTop", color: GOLD, fontSize: 11,
-                     formatter: "本周预期区间 " + t.em_lo.toFixed(1) + " ~ " + t.em_hi.toFixed(1) },
             data: [[{ xAxis: t.em_lo, yAxis: 0 }, { xAxis: t.em_hi, yAxis: 1 }]] } } : null,
         { type: "scatter", symbolSize: 16, data: pts.map(p => ({
             value: [p.v, .5], n: p.n, itemStyle: { color: p.c },
@@ -266,8 +276,10 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
     const b = e.target.closest(".op-chip"); if (!b) return;
     cur = b.dataset.t;
     document.querySelectorAll(".op-chip").forEach(x => x.classList.toggle("on", x.dataset.t === cur));
+    document.querySelectorAll(".op-cur").forEach(x => x.textContent = cur);
     drawAxis(cur); drawFlip(cur); drawCm(cur);
   });
+  document.querySelectorAll(".op-cur").forEach(x => x.textContent = cur);
   drawAxis(cur); drawFlip(cur); drawCm(cur);
 
   /* ── Ⅲ 开奖台账（行展开 + 深链 #MM-DD 高亮）── */
@@ -307,10 +319,10 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 
   /* ── Ⅳ 大单榜 + 换手额汇总 ── */
   $("op-board").innerHTML =
-    "<tr><th>标的</th><th>到期</th><th class=n>行权价</th><th>类型</th><th class=n>今日量</th><th class=n>既有持仓</th><th class=n>权利金换手</th><th>归因（纯算术）</th></tr>" +
+    "<tr><th>标的</th><th class=n>到期</th><th class=n>行权价</th><th class=n>类型</th><th class=n>今日量</th><th class=n>既有持仓</th><th class=n>权利金换手</th><th>归因（纯算术）</th></tr>" +
     D.flagged.map(r =>
-      `<tr><td><b>${r.ticker}</b></td><td>${dot(r.expiry)}</td><td class=n>${r.strike}</td>` +
-      `<td style="color:${r.type === "P" ? RED : GREEN}">${r.type === "P" ? "put" : "call"}</td>` +
+      `<tr><td><b>${r.ticker}</b></td><td class=n>${dot(r.expiry)}</td><td class=n>${r.strike}</td>` +
+      `<td class=n style="color:${r.type === "P" ? RED : GREEN}">${r.type === "P" ? "put" : "call"}</td>` +
       `<td class=n>${Math.round(r.volume)}</td><td class=n>${Math.round(r.oi)}</td>` +
       `<td class=n><b>$${fmt$(r.premium)}</b></td><td class="zh">${r.attribution}</td></tr>`).join("");
   const NP = D.net_premium.slice(0, 10).reverse();
@@ -341,6 +353,19 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
       { name: "一年", type: "bar", data: TL.map(r => r.iv365), itemStyle: { color: dark ? "#8a867e" : "#5a5a5a" }, barWidth: 10 },
     ],
   });
+  /* 左侧目录（≥1280px 桌面，滚动高亮） */
+  const CH = [["op-ch1","Ⅰ 谁贴着自己的墙"],["op-ch2","Ⅱ 一根轴"],["op-ch3","Ⅲ 昨天的钱在不在"],
+              ["op-ch4","Ⅳ 大单榜"],["op-ch5","Ⅴ 墙在动"],["op-ch6","Ⅵ 两条命"],["op-ch7","Ⅶ 一年期的怕"]];
+  const toc = document.createElement("nav");
+  toc.className = "op-toc";
+  toc.innerHTML = "<div class='op-toc-h'>本页章节</div>" +
+    CH.map(([id, n]) => `<a href="#${id}" data-ch="${id}">${n}</a>`).join("");
+  document.body.appendChild(toc);
+  const spy = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting)
+      toc.querySelectorAll("a").forEach(a => a.classList.toggle("on", a.dataset.ch === e.target.id));
+  }), { rootMargin: "-15% 0px -70% 0px" });
+  CH.forEach(([id]) => { const el = document.getElementById(id); if (el) spy.observe(el); });
 })();
 </script>
 </body>
