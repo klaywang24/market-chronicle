@@ -1186,9 +1186,11 @@
 
   const host = document.getElementById("lang-switch");
   function renderSwitch() {
-    host.innerHTML = Object.entries(LANG_META).map(([k, m]) =>
-      `<span class="${k === cur ? "active" : ""}" data-lang="${k}">${m.label}</span>`
-    ).join('<span class="sep">·</span>');
+    // 单按钮（2026-08-05 Klay：像个人站那样一个按钮点击切换，顶栏省出一个位置）。
+    // 按钮显示的是「切过去会变成的语言」：简体态显示 EN、英文态显示 简 ——
+    // 与个人站 klay-wang.com 的交互一致。旧的「简 · EN」两段式退役。
+    const next = cur === "zh" ? "en" : "zh";
+    host.innerHTML = `<span data-lang="${next}" title="切换语言 / Switch language">${LANG_META[next].label}</span>`;
   }
   host.addEventListener("click", async (e) => {
     const el = e.target.closest("[data-lang]");

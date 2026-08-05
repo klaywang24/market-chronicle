@@ -18,6 +18,8 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 .op-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; }
 .op-brand { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 19px; font-weight: 700; color: var(--ink); text-decoration: none; }
 .op-top a.op-sub { font-size: 13px; font-weight: 600; color: #fff; background: var(--accent); border-radius: 20px; padding: 6px 16px; text-decoration: none; }
+.op-langbtn { font-size: 12.5px; color: var(--ink-soft); background: transparent; border: 1px solid var(--border); border-radius: 20px; padding: 5px 13px; cursor: pointer; }
+.op-langbtn:hover { color: var(--ink); border-color: var(--ink-muted); }
 .op-nav { display: flex; flex-wrap: wrap; gap: 26px; padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
 .op-nav a, .op-nav .on { font-size: 14.5px; color: var(--ink-soft); text-decoration: none; padding: 2px 0; }
 .op-nav a:hover { color: var(--ink); }
@@ -81,7 +83,10 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 
 <div class="op-top">
   <a class="op-brand" href="/">美股编年史</a>
-  <a class="op-sub" href="/pricing">订阅</a>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="op-langbtn" id="op-lang" title="切换语言 / Switch language"></button>
+    <a class="op-sub" href="/pricing">订阅</a>
+  </div>
 </div>
 <nav class="op-nav">
   <a href="/">今日</a>
@@ -94,7 +99,7 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 <div class="hero">
   <div class="kicker">OPTIONS · 期权异动 &amp; 分析</div>
   <h1>期权异动 &amp; 分析</h1>
-  <p class="dek">期权是付了钱的观点：做保护要付保费，赌上涨要付定金，付出去就不退。喊话不用花钱，下注要。这一页不数几涨几跌，只看三件事：真金白银今天落在哪些价位，那些价位离现价还有多远，以及我们昨天立案的判断今天开奖了没有。每个交易日收盘后更新，数据延迟、绝不实时。</p>
+  <p class="dek" id="op-dek">期权是付了钱的观点：做保护要付保费，赌上涨要付定金，付出去就不退。喊话不用花钱，下注要。这一页不数几涨几跌，只看三件事：真金白银今天落在哪些价位，那些价位离现价还有多远，以及我们昨天立案的判断今天开奖了没有。每个交易日收盘后更新，数据延迟、绝不实时。</p>
   <p class="op-note" id="op-updated">读取中…</p>
 </div>
 
@@ -115,7 +120,7 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 
 <!-- Ⅲ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch3"><span class="chapter-no">第三章</span><h2>昨天的钱，今天还在不在</h2></div>
-<p class="op-note" style="margin-bottom:10px">这是本页的信用来源：第四章那些归因凭什么可信？凭我们对异动的每一次判断都<b>先立案、按约定条件开奖、错了原样留着</b>。台账只会变厚，不会被改写。点行展开看立案原文与验证条件。</p>
+<p class="op-note" style="margin-bottom:10px" id="op-n3">这是本页的信用来源：第四章那些归因凭什么可信？凭我们对异动的每一次判断都<b>先立案、按约定条件开奖、错了原样留着</b>。台账只会变厚，不会被改写。点行展开看立案原文与验证条件。</p>
 <div id="op-score" class="op-score"></div>
 <div class="op-chips" id="op-lfilter" style="margin:10px 0 12px"></div>
 <table class="op-table" id="op-ledger"></table>
@@ -145,7 +150,7 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 <div class="op-chart" id="ch-cmhist"></div>
 
 <!-- 口径说明 ──────────────────────── -->
-<div class="op-caliber">
+<div class="op-caliber" id="op-cal">
   <b>口径说明（读数前必看）</b><br>
   · 本页一行 = 一个合约<b>当天的累计</b>，不是一笔交易。我们没有逐笔时间戳，也没有主动买卖方向，所以权利金只说<b>换手额</b>，不说买入额或卖出额：谁买谁卖，我们看不见，也不猜。<br>
   · 所有读数来自<b>两把独立的尺子</b>逐字核对，收盘后更新一次；任何看起来会动的东西都不是实时。<br>
@@ -165,6 +170,67 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 (async function () {
   "use strict";
   const $ = id => document.getElementById(id);
+  /* 中英切换 = 存 mc-lang + 整页刷新（2026-08-05）。刷新制而非热切换：
+     本页所有内容一次渲染完，热切换要把十几个渲染点全改成可重入函数，
+     复杂度换不来什么（切语言是低频动作），刷新一次最稳。
+     mc-lang 与主站同一把钥匙：从主站带语言态过来，这页自动跟。 */
+  const L = localStorage.getItem("mc-lang") === "en" ? "en" : "zh";
+  const tr = (zh, en) => L === "en" ? en : zh;
+  if (L === "en") document.documentElement.lang = "en";
+  const langBtn = $("op-lang");
+  langBtn.textContent = L === "zh" ? "EN" : "简";
+  langBtn.addEventListener("click", () => {
+    localStorage.setItem("mc-lang", L === "zh" ? "en" : "zh");
+    location.reload();
+  });
+  if (L === "en") {
+    document.title = "Options Flow & Analysis · Market Chronicle";
+    const TR = {
+      "美股编年史": "Market Chronicle", "订阅": "Subscribe",
+      "今日": "Today", "K 指数 · 台账": "KAPX · Ledger",
+      "恐惧的标价 · 台账": "The Price of Fear · Ledger",
+      "期权异动": "Options", "百年档案": "The Archive",
+      "OPTIONS · 期权异动 & 分析": "OPTIONS · FLOW & ANALYSIS",
+      "期权异动 & 分析": "Options Flow & Analysis",
+      "正在读取当日数据…": "Loading today's data…",
+      "第一章": "Chapter Ⅰ", "第二章": "Chapter Ⅱ", "第三章": "Chapter Ⅲ", "第四章": "Chapter Ⅳ",
+      "第五章": "Chapter Ⅴ", "第六章": "Chapter Ⅵ", "第七章": "Chapter Ⅶ",
+      "今天，谁贴着自己的墙": "Who is hugging their wall today",
+      "一根轴 ·": "One axis ·",
+      "昨天的钱，今天还在不在": "Is yesterday's money still there",
+      "大单榜：今天最贵的注": "The big board: today's priciest bets",
+      "墙在动 ·": "Walls in motion ·",
+      "一只票的两条命": "One name, two lives",
+      "一年期的怕，逐日 ·": "One-year fear, daily ·",
+      "墙 = 期权持仓最厚的价位：下方的厚 put 是别人付过保费的保护层，上方的厚 call 是别人付过定金的目标价。价格离墙越近，那笔已经付出去的钱越有话语权。圆点 = 现价在两墙之间的位置。":
+        "A wall is the strike carrying the heaviest open interest: the thick puts below are protection someone already paid premium for; the thick calls above are targets someone already put a deposit on. The closer price sits to a wall, the louder that money speaks. Dot = where spot sits between the two walls.",
+      "一只票的所有关键价位钉在同一根价格轴上：两面墙、多空分界、期权定价的本周波动区间、现价。点票切换，悬停看读数。":
+        "Every key level of one name, pinned on a single price axis: both walls, the flip level, the option-implied range for this week, and spot. Click a ticker to switch; hover for readings.",
+      "只列我们逐条复核后的 A 级异动，按权利金换手额排序。我们看不见每一笔是谁买谁卖，所以只说换手了多少钱、落在哪个价位、以及一条纯算术的归因。":
+        "Only A-grade anomalies that survived our line-by-line recheck, ranked by premium traded. We cannot see who bought or sold, so we state only how much money changed hands, at which strike, plus one purely arithmetic attribution.",
+      "同一天按标的汇总，call 与 put 各自的权利金换手额：":
+        "Same day, summed by ticker: premium traded on calls vs puts.",
+      "四条线放在一起：官方收盘价、多空分界、下墙与上墙的逐日位置。每天打开一眼看到：价格在墙上方还是下方，墙自己有没有搬家。用第二章的票签切换。记录只会越攒越长。":
+        "Four lines together: official close, flip level, put wall and call wall, day by day. One glance answers: is price above or below the walls, and have the walls themselves moved. Switch tickers with the chips. The record only grows longer.",
+      "同一只票，30 天期权和一年期权各有一个恐慌读数。短命的那条为眼前的事件定价，长命的那条为整段故事定价。两条差得越远，市场越是只怕眼前。":
+        "One name, two fear gauges: 30-day options price the event in front of them; one-year options price the whole story. The wider the gap, the more the market fears only what is immediate.",
+      "同一只票的一年期恐慌读数逐日连成线，短期的 30 天读数放在旁边对照。事件来了短线跳、长线不动 = 市场只怕眼前；长线也抬头 = 怕的东西变成了故事本身。恒定期限口径自 07.28 起记录，每天加长一格。用第二章的票签切换。":
+        "One name's one-year fear reading, day by day, with the 30-day reading alongside. When an event hits and the short line jumps while the long line stays flat, the market fears only the moment; when the long line rises too, the fear has become the story itself. Constant-maturity series recorded since 07.28, one notch longer per day.",
+      "这页的读数与判断，每个交易日盘前送进邮箱 →": "These readings and judgments land in subscriber inboxes before every open →",
+      "盘前数据简报": "The pre-market brief",
+    };
+    const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let nd; while ((nd = w.nextNode())) { const t = nd.data.trim(); if (TR[t]) nd.data = nd.data.replace(t, TR[t]); }
+    $("op-dek").textContent = "An option is an opinion with money behind it: protection costs premium, upside costs a deposit, and neither is refundable. Talk is free; positions are not. This page never counts how many names rose or fell. It watches three things: where real money landed today, how far those strikes sit from spot, and whether the judgments we filed yesterday have been settled. Updated after each trading day's close. Delayed data, never real-time.";
+    $("op-n3").innerHTML = "This is the page's source of credit: why believe Chapter IV's attributions? Because every judgment we make is <b>filed first, settled by pre-agreed conditions, and left standing when wrong</b>. The ledger only grows thicker; it is never rewritten. Click a row for the original filing and its verification terms. Judgments are archived in their original Chinese.";
+    $("op-cal").innerHTML = "<b>How to read this page (calibration first)</b><br>" +
+      "· One row = one contract's <b>full-day total</b>, not a single trade. We have no per-trade timestamps and no aggressor side, so premium is stated as <b>traded</b>, never as bought or sold: who bought and who sold, we cannot see and do not guess.<br>" +
+      "· Every reading is cross-checked verbatim against <b>two independent sources</b> and updated once after the close; nothing here is real-time.<br>" +
+      "· Attribution is arithmetic only: volume at least twice the open interest reads <b>likely new</b>; volume above OI reads <b>leans new</b>; volume below OI reads <b>inconclusive</b>. No direction-guessing, no storytelling.<br>" +
+      "· Spot: the official close is the only source of truth; before the close we show an intraday snapshot, clearly labeled.<br>" +
+      "· The big board lists only rechecked A-grade rows. It is not the full dataset, and raw data is not provided on this page.<br>" +
+      "· <b>Data and information only; not investment advice; no buy or sell recommendations.</b>";
+  }
   const dark = document.documentElement.classList.contains("dark-mode");
   const INK = dark ? "#e8e4dc" : "#1a1a1a", MUTED = dark ? "#8a867e" : "#8a8a8a",
         BORDER = dark ? "#3a3833" : "#e5e0d8", RED = "#FF2400", GREEN = dark ? "#34D96C" : "#00A86B",
@@ -181,12 +247,13 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
     if (!r.ok) throw 0;
     D = await r.json();
   } catch (e) {
-    $("op-loading").textContent = "数据读取失败。本页每个交易日收盘后更新，稍后再试。";
+    $("op-loading").textContent = tr("数据读取失败。本页每个交易日收盘后更新，稍后再试。", "Failed to load. This page updates after each trading day close; try again later.");
     return;
   }
 
-  $("op-updated").textContent = "数据日 " + dot(D.meta.data_date) + " · 台账自 " +
-    dot(D.meta.ledger_since) + " 起 " + D.ledger.length + " 案 · 覆盖 " + D.meta.n_tickers + " 只标的";
+  $("op-updated").textContent = tr(
+    "数据日 " + dot(D.meta.data_date) + " · 台账自 " + dot(D.meta.ledger_since) + " 起 " + D.ledger.length + " 案 · 覆盖 " + D.meta.n_tickers + " 只标的",
+    "Data date " + dot(D.meta.data_date) + " · ledger since " + dot(D.meta.ledger_since) + ", " + D.ledger.length + " cases · " + D.meta.n_tickers + " names");
   $("op-loading").style.display = "none";
   $("op-main").style.display = "";
 
@@ -204,27 +271,28 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
   /* ── Ⅰ 墙位总览 ── */
   const S = D.structure.filter(t => t.put_wall && t.call_wall && t.spot);
   $("op-walls").innerHTML =
-    "<tr><th>标的</th><th class=n>现价</th><th class=n>下墙(put)</th><th class=n>上墙(call)</th><th class=n>距下墙</th><th class=n>距上墙</th><th>位置</th></tr>" +
+    `<tr><th>${tr("标的","Name")}</th><th class=n>${tr("现价","Spot")}</th><th class=n>${tr("下墙(put)","Put wall")}</th><th class=n>${tr("上墙(call)","Call wall")}</th><th class=n>${tr("距下墙","To put")}</th><th class=n>${tr("距上墙","To call")}</th><th>${tr("位置","Position")}</th></tr>` +
     S.map(t => {
       const lo = (t.spot - t.put_wall) / t.spot * 100, hi = (t.call_wall - t.spot) / t.spot * 100;
       const pos = Math.max(2, Math.min(98, (t.spot - t.put_wall) / (t.call_wall - t.put_wall) * 100));
-      const pm = t.spot_kind !== "close" ? "<span title='当日尚未收盘'>*</span>" : "";
+      const pm = t.spot_kind !== "close" ? `<span title="${tr("当日尚未收盘","not yet closed today")}">*</span>` : "";
       return `<tr><td>${logo(t.ticker, "op-logo")}<b>${t.ticker}</b></td><td class=n>${t.spot.toFixed(2)}${pm}</td>` +
         `<td class=n style="color:${RED}">${t.put_wall}</td><td class=n style="color:${GREEN}">${t.call_wall}</td>` +
         `<td class=n>${lo.toFixed(1)}%</td><td class=n>${hi.toFixed(1)}%</td>` +
         `<td><div class="op-pos"><i style="left:${pos}%"></i></div></td></tr>`;
     }).join("");
   if (S.some(t => t.spot_kind !== "close"))
-    $("op-walls").insertAdjacentHTML("afterend", "<p class='op-note'>* 当日尚未收盘，现价为盘中或盘前读数；收盘后自动换成官方收盘价。官方收盘是本页唯一的最终口径。</p>");
+    $("op-walls").insertAdjacentHTML("afterend", "<p class='op-note'>" + tr("* 当日尚未收盘，现价为盘中或盘前读数；收盘后自动换成官方收盘价。官方收盘是本页唯一的最终口径。",
+      "* Not yet closed today: spot is an intraday or pre-market reading, replaced by the official close automatically. The official close is this page's only final source of truth.") + "</p>");
 
   /* ── Ⅱ 一根轴（chip 联动 Ⅴ）── */
   let cur = S[0] ? S[0].ticker : D.structure[0].ticker;
   // 票签三行分组（2026-08-05 Klay 定）。AMD 归半导体行；
   // 🔑 不在任何组里的票自动落到末行 —— 管线以后加票不会静默消失（空集假阴性同族教训）
   const GROUPS = [
-    ["指数", ["SPY", "QQQ"]],
-    ["七巨头 · SPCX", ["AAPL", "AMZN", "GOOG", "GOOGL", "META", "MSFT", "NVDA", "TSLA", "SPCX"]],
-    ["半导体 · 存储", ["AVGO", "TSM", "AMD", "INTC", "MU", "SNDK"]],
+    [tr("指数", "Index"), ["SPY", "QQQ"]],
+    [tr("七巨头 · SPCX", "Mag 7 · SPCX"), ["AAPL", "AMZN", "GOOG", "GOOGL", "META", "MSFT", "NVDA", "TSLA", "SPCX"]],
+    [tr("半导体 · 存储", "Semis · Memory"), ["AVGO", "TSM", "AMD", "INTC", "MU", "SNDK"]],
   ];
   const have = new Set(D.structure.map(t => t.ticker));
   const grouped = new Set(GROUPS.flatMap(g => g[1]));
@@ -242,13 +310,13 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
     const h = D.cm_history[tk] || [];
     cmC.setOption({
       grid: { left: 60, right: 24, top: 36, bottom: 34 },
-      legend: { data: ["一年期", "30 天"], textStyle: { color: MUTED }, top: 4 },
+      legend: { data: [tr("一年期","1-year"), tr("30 天","30-day")], textStyle: { color: MUTED }, top: 4 },
       tooltip: { trigger: "axis", valueFormatter: v => v + "%" },
       xAxis: { type: "category", data: h.map(r => dot(r.date)), ...axisBase },
-      yAxis: { type: "value", name: "隐含波动率 %", nameTextStyle: { color: MUTED }, scale: true, ...axisBase },
+      yAxis: { type: "value", name: tr("隐含波动率 %","Implied vol %"), nameTextStyle: { color: MUTED }, scale: true, ...axisBase },
       series: [
-        { name: "一年期", type: "line", data: h.map(r => r.iv365), lineStyle: { color: INK, width: 2.5 }, itemStyle: { color: INK }, z: 5 },
-        { name: "30 天", type: "line", data: h.map(r => r.iv30), lineStyle: { color: RED, width: 1.5, type: "dashed" }, itemStyle: { color: RED } },
+        { name: tr("一年期","1-year"), type: "line", data: h.map(r => r.iv365), lineStyle: { color: INK, width: 2.5 }, itemStyle: { color: INK }, z: 5 },
+        { name: tr("30 天","30-day"), type: "line", data: h.map(r => r.iv30), lineStyle: { color: RED, width: 1.5, type: "dashed" }, itemStyle: { color: RED } },
       ],
     }, true);
   }
@@ -269,13 +337,14 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
     const t = D.structure.find(x => x.ticker === tk);
     if (!t) return;
     $("op-em-note").innerHTML = (t.em_lo && t.em_hi)
-      ? `<span style="color:${GOLD}">■</span> 轴面米色丝带 = 本周预期区间 ${lbl(t.em_lo)} ~ ${lbl(t.em_hi)}（期权定价隐含）` : "";
+      ? `<span style="color:${GOLD}">■</span> ` + tr(`轴面米色丝带 = 本周预期区间 ${lbl(t.em_lo)} ~ ${lbl(t.em_hi)}（期权定价隐含）`,
+          `Beige ribbon on the axis = this week's option-implied range ${lbl(t.em_lo)} ~ ${lbl(t.em_hi)}`) : "";
     const raw = [
-      t.put_wall && { v: t.put_wall, n: "下墙 put", c: RED },
-      t.flip && { v: t.flip, n: "多空分界", c: GOLD },
-      t.max_pain && { v: t.max_pain, n: "最大痛点", c: MUTED },
-      t.call_wall && { v: t.call_wall, n: "上墙 call", c: GREEN },
-      t.spot && { v: t.spot, n: t.spot_kind === "close" ? "现价" : "现价(未收盘)", c: INK },
+      t.put_wall && { v: t.put_wall, n: tr("下墙 put","Put wall"), c: RED },
+      t.flip && { v: t.flip, n: tr("多空分界","Flip"), c: GOLD },
+      t.max_pain && { v: t.max_pain, n: tr("最大痛点","Max pain"), c: MUTED },
+      t.call_wall && { v: t.call_wall, n: tr("上墙 call","Call wall"), c: GREEN },
+      t.spot && { v: t.spot, n: t.spot_kind === "close" ? tr("现价","Spot") : tr("现价(未收盘)","Spot (intraday)"), c: INK },
     ].filter(Boolean);
     const vals = raw.map(p => p.v).concat([t.em_lo, t.em_hi].filter(Boolean));
     const lo0 = Math.min(...vals), hi0 = Math.max(...vals), span = (hi0 - lo0) || 1;
@@ -335,15 +404,15 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
     const h = (D.flip_history[tk] || []).filter(r => r.flip || r.pw || r.cw);
     flipC.setOption({
       grid: { left: 60, right: 24, top: 36, bottom: 34 },
-      legend: { data: ["官方收盘", "多空分界", "下墙 put", "上墙 call"], textStyle: { color: MUTED }, top: 4 },
+      legend: { data: [tr("官方收盘","Close"), tr("多空分界","Flip"), tr("下墙 put","Put wall"), tr("上墙 call","Call wall")], textStyle: { color: MUTED }, top: 4 },
       tooltip: { trigger: "axis" },
       xAxis: { type: "category", data: h.map(r => dot(r.date)), ...axisBase },
       yAxis: { type: "value", scale: true, ...axisBase },
       series: [
-        { name: "官方收盘", type: "line", data: h.map(r => r.close), lineStyle: { color: INK, width: 2.5 }, itemStyle: { color: INK }, connectNulls: true, z: 5 },
-        { name: "多空分界", type: "line", data: h.map(r => r.flip), lineStyle: { color: GOLD, width: 1.5, type: "dashed" }, itemStyle: { color: GOLD }, connectNulls: true },
-        { name: "下墙 put", type: "line", step: "middle", data: h.map(r => r.pw), lineStyle: { color: RED, width: 1.5 }, itemStyle: { color: RED }, symbol: "none", connectNulls: true },
-        { name: "上墙 call", type: "line", step: "middle", data: h.map(r => r.cw), lineStyle: { color: GREEN, width: 1.5 }, itemStyle: { color: GREEN }, symbol: "none", connectNulls: true },
+        { name: tr("官方收盘","Close"), type: "line", data: h.map(r => r.close), lineStyle: { color: INK, width: 2.5 }, itemStyle: { color: INK }, connectNulls: true, z: 5 },
+        { name: tr("多空分界","Flip"), type: "line", data: h.map(r => r.flip), lineStyle: { color: GOLD, width: 1.5, type: "dashed" }, itemStyle: { color: GOLD }, connectNulls: true },
+        { name: tr("下墙 put","Put wall"), type: "line", step: "middle", data: h.map(r => r.pw), lineStyle: { color: RED, width: 1.5 }, itemStyle: { color: RED }, symbol: "none", connectNulls: true },
+        { name: tr("上墙 call","Call wall"), type: "line", step: "middle", data: h.map(r => r.cw), lineStyle: { color: GREEN, width: 1.5 }, itemStyle: { color: GREEN }, symbol: "none", connectNulls: true },
       ],
     }, true);
   }
@@ -360,8 +429,8 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
 
   /* ── Ⅲ 开奖台账（行展开 + 深链 #MM-DD 高亮）── */
   const isWrong = c => /错/.test(c.outcome);
-  const badge = c => c.status === "待开奖" ? `<span class="op-badge wait">待开奖</span>` :
-    isWrong(c) ? `<span class="op-badge wrong">已开奖</span>` : `<span class="op-badge done">已开奖</span>`;
+  const badge = c => c.status === "待开奖" ? `<span class="op-badge wait">${tr("待开奖","Open")}</span>` :
+    isWrong(c) ? `<span class="op-badge wrong">${tr("已开奖","Settled")}</span>` : `<span class="op-badge done">${tr("已开奖","Settled")}</span>`;
 
   // 记分牌：历史感（累计数字只会涨）+ 时效性（数据日动静 + 下一个开奖）
   const done = D.ledger.filter(c => c.status === "已开奖"),
@@ -371,10 +440,10 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
         nextUp = wait.map(c => ({ c, d: c.events[0].expected })).filter(x => x.d)
                      .sort((a, b) => a.d < b.d ? -1 : 1)[0];
   $("op-score").innerHTML =
-    `<div class="sc"><b>${D.ledger.length}</b><span>累计立案（自 ${dot(D.meta.ledger_since)}）</span></div>` +
-    `<div class="sc"><b>${done.length - wrong} 对 · ${wrong} 错</b><span>已开奖 ${done.length} 案，输赢都在账上</span></div>` +
-    `<div class="sc"><b>${wait.length}</b><span>待开奖${todayNew ? " · 数据日新立案 " + todayNew : ""}</span></div>` +
-    (nextUp ? `<div class="sc next"><b>${nextUp.c.ticker} · 预计 ${dot(nextUp.d)}</b><span>下一个开奖，回来对答案</span></div>` : "");
+    `<div class="sc"><b>${D.ledger.length}</b><span>${tr("累计立案（自 " + dot(D.meta.ledger_since) + "）", "Cases filed since " + dot(D.meta.ledger_since))}</span></div>` +
+    `<div class="sc"><b>${tr(`${done.length - wrong} 对 · ${wrong} 错`, `${done.length - wrong} right · ${wrong} wrong`)}</b><span>${tr("已开奖 " + done.length + " 案，输赢都在账上", done.length + " settled, wins and losses alike")}</span></div>` +
+    `<div class="sc"><b>${wait.length}</b><span>${tr("待开奖","Open")}${todayNew ? tr(" · 数据日新立案 " + todayNew, " · filed on data date: " + todayNew) : ""}</span></div>` +
+    (nextUp ? `<div class="sc next"><b>${nextUp.c.ticker} · ${tr("预计 ","est. ")}${dot(nextUp.d)}</b><span>${tr("下一个开奖，回来对答案","Next settlement: come back and check")}</span></div>` : "");
 
   // 过滤 + 渲染：待开奖排前（它们是「还没完的事」），已开奖按日期倒序归档
   let lf = "all";
@@ -384,10 +453,10 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
       .sort((a, b) => a.status === b.status ? (a.events[0].date < b.events[0].date ? 1 : -1)
                                             : (a.status === "待开奖" ? -1 : 1));
     $("op-ledger").innerHTML =
-      "<tr><th>立案日</th><th>标的</th><th style='width:46%'>判断</th><th>状态</th><th>开奖</th></tr>" +
+      `<tr><th>${tr("立案日","Filed")}</th><th>${tr("标的","Name")}</th><th style="width:46%">${tr("判断","Judgment")}</th><th>${tr("状态","Status")}</th><th>${tr("开奖","Settlement")}</th></tr>` +
       rows.map(c => {
         const f = c.events[0], i = D.ledger.indexOf(c);
-        const open = c.status === "待开奖" ? (f.expected ? "预计 " + dot(f.expected) : "—")
+        const open = c.status === "待开奖" ? (f.expected ? tr("预计 ","est. ") + dot(f.expected) : "—")
                                            : (c.outcome || "—");
         return `<tr class="op-case" data-i="${i}" id="case-${f.date.slice(5)}">` +
           `<td>${dot(f.date)}</td><td>${c.ticker}</td>` +
@@ -395,7 +464,7 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
           `<td>${badge(c)}</td><td class="zh">${open}</td></tr>`;
       }).join("");
   }
-  $("op-lfilter").innerHTML = [["all", "全部"], ["待开奖", "待开奖"], ["已开奖", "已开奖"]]
+  $("op-lfilter").innerHTML = [["all", tr("全部","All")], ["待开奖", tr("待开奖","Open")], ["已开奖", tr("已开奖","Settled")]]
     .map(([v, n]) => `<button class="op-chip${v === "all" ? " on" : ""}" data-f="${v}">${n}</button>`).join("");
   $("op-lfilter").addEventListener("click", e => {
     const b = e.target.closest(".op-chip"); if (!b) return;
@@ -411,8 +480,8 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
     document.querySelectorAll(".op-detail").forEach(x => x.remove());
     const c = D.ledger[+tr.dataset.i];
     const html = c.events.map(ev =>
-      `<div class="ev"><b>${dot(ev.date)} ${ev.type}</b>（置信度：${ev.confidence || "—"}）<br>` +
-      `${ev.judgment}<br>验证条件：${ev.verify || "—"}${ev.result ? "<br>结果：" + ev.result : ""}</div>`).join("");
+      `<div class="ev"><b>${dot(ev.date)} ${tr(ev.type, ({"立案":"Filed","开奖":"Settled","更正":"Corrected"})[ev.type] || ev.type)}</b>（${tr("置信度","confidence")}：${ev.confidence || "—"}）<br>` +
+      `${ev.judgment}<br>${tr("验证条件","Verify")}：${ev.verify || "—"}${ev.result ? "<br>" + tr("结果","Result") + "：" + ev.result : ""}</div>`).join("");
     tr.insertAdjacentHTML("afterend", `<tr class="op-detail"><td colspan="5">${html}</td></tr>`);
   });
   // 深链：/options#08-01 → 滚到台账并高亮当日立案
@@ -427,24 +496,31 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
   }
 
   /* ── Ⅳ 大单榜 + 换手额汇总 ── */
+  // 归因短语是生成器产出的封闭集合，整句映射；映射不到的原样保留（宁可露中文不硬翻）
+  const ATTR_EN = {
+    "更像新增：今日量至少两倍于既有持仓": "Likely new: volume at least 2x existing OI",
+    "倾向新增：今日量超过既有持仓": "Leans new: volume exceeds existing OI",
+    "无法归因：量小于存量，可能只是换手": "Inconclusive: volume below OI, may be churn",
+  };
+  const trAttr = a => L === "en" ? (ATTR_EN[a] || a) : a;
   $("op-board").innerHTML =
-    "<tr><th>标的</th><th class=n>到期</th><th class=n>行权价</th><th class=n>类型</th><th class=n>今日量</th><th class=n>既有持仓</th><th class=n>权利金换手</th><th>归因（纯算术）</th></tr>" +
+    `<tr><th>${tr("标的","Name")}</th><th class=n>${tr("到期","Expiry")}</th><th class=n>${tr("行权价","Strike")}</th><th class=n>${tr("类型","Type")}</th><th class=n>${tr("今日量","Volume")}</th><th class=n>${tr("既有持仓","Open int.")}</th><th class=n>${tr("权利金换手","Premium")}</th><th class=n>${tr("归因（纯算术）","Attribution (arithmetic)")}</th></tr>` +
     D.flagged.map(r =>
       `<tr><td>${logo(r.ticker, "op-logo")}<b>${r.ticker}</b></td><td class=n>${dot(r.expiry)}</td><td class=n>${r.strike}</td>` +
       `<td class=n style="color:${r.type === "P" ? RED : GREEN}">${r.type === "P" ? "put" : "call"}</td>` +
       `<td class=n>${Math.round(r.volume)}</td><td class=n>${Math.round(r.oi)}</td>` +
-      `<td class=n><b>$${fmt$(r.premium)}</b></td><td class="zh">${r.attribution}</td></tr>`).join("");
+      `<td class=n><b>$${fmt$(r.premium)}</b></td><td class="zh n">${trAttr(r.attribution)}</td></tr>`).join("");
   const NP = D.net_premium.slice(0, 10).reverse();
   mkChart("ch-net").setOption({
     grid: { left: 70, right: 60, top: 30, bottom: 30 },
-    legend: { data: ["call 换手", "put 换手"], textStyle: { color: MUTED }, top: 0 },
+    legend: { data: [tr("call 换手","Calls traded"), tr("put 换手","Puts traded")], textStyle: { color: MUTED }, top: 0 },
     tooltip: { trigger: "axis", axisPointer: { type: "shadow" },
                valueFormatter: v => "$" + fmt$(v) },
     xAxis: { type: "value", ...axisBase, axisLabel: { color: MUTED, fontSize: 11, formatter: v => "$" + fmt$(v) } },
     yAxis: { type: "category", data: NP.map(r => r.ticker), ...axisBase, splitLine: { show: false } },
     series: [
-      { name: "call 换手", type: "bar", data: NP.map(r => r.call), itemStyle: { color: GREEN }, barWidth: 9 },
-      { name: "put 换手", type: "bar", data: NP.map(r => r.put), itemStyle: { color: RED }, barWidth: 9 },
+      { name: tr("call 换手","Calls traded"), type: "bar", data: NP.map(r => r.call), itemStyle: { color: GREEN }, barWidth: 9 },
+      { name: tr("put 换手","Puts traded"), type: "bar", data: NP.map(r => r.put), itemStyle: { color: RED }, barWidth: 9 },
     ],
   });
 
@@ -452,22 +528,22 @@ try { if (localStorage.getItem("mc-theme") === "dark") document.documentElement.
   const TL = D.two_lives;
   mkChart("ch-lives").setOption({
     grid: { left: 60, right: 24, top: 36, bottom: 60 },
-    legend: { data: ["30 天", "一年"], textStyle: { color: MUTED }, top: 4 },
+    legend: { data: [tr("30 天","30-day"), tr("一年","1-year")], textStyle: { color: MUTED }, top: 4 },
     tooltip: { trigger: "axis", valueFormatter: v => v + "%" },
     xAxis: { type: "category", data: TL.map(r => r.ticker), ...axisBase,
              axisLabel: { color: MUTED, fontSize: 11, rotate: 45 } },
-    yAxis: { type: "value", name: "隐含波动率 %", nameTextStyle: { color: MUTED }, ...axisBase },
+    yAxis: { type: "value", name: tr("隐含波动率 %","Implied vol %"), nameTextStyle: { color: MUTED }, ...axisBase },
     series: [
-      { name: "30 天", type: "bar", data: TL.map(r => r.iv30), itemStyle: { color: RED }, barWidth: 10 },
-      { name: "一年", type: "bar", data: TL.map(r => r.iv365), itemStyle: { color: dark ? "#8a867e" : "#5a5a5a" }, barWidth: 10 },
+      { name: tr("30 天","30-day"), type: "bar", data: TL.map(r => r.iv30), itemStyle: { color: RED }, barWidth: 10 },
+      { name: tr("一年","1-year"), type: "bar", data: TL.map(r => r.iv365), itemStyle: { color: dark ? "#8a867e" : "#5a5a5a" }, barWidth: 10 },
     ],
   });
   /* 左侧目录（≥1280px 桌面，滚动高亮） */
-  const CH = [["op-ch1","Ⅰ 谁贴着自己的墙"],["op-ch2","Ⅱ 一根轴"],["op-ch3","Ⅲ 昨天的钱在不在"],
-              ["op-ch4","Ⅳ 大单榜"],["op-ch5","Ⅴ 墙在动"],["op-ch6","Ⅵ 两条命"],["op-ch7","Ⅶ 一年期的怕"]];
+  const CH = [["op-ch1",tr("Ⅰ 谁贴着自己的墙","I Hugging the wall")],["op-ch2",tr("Ⅱ 一根轴","II One axis")],["op-ch3",tr("Ⅲ 昨天的钱在不在","III Yesterday's money")],
+              ["op-ch4",tr("Ⅳ 大单榜","IV Big board")],["op-ch5",tr("Ⅴ 墙在动","V Walls in motion")],["op-ch6",tr("Ⅵ 两条命","VI Two lives")],["op-ch7",tr("Ⅶ 一年期的怕","VII One-year fear")]];
   const toc = document.createElement("nav");
   toc.className = "op-toc";
-  toc.innerHTML = "<div class='op-toc-h'>本页章节</div>" +
+  toc.innerHTML = "<div class='op-toc-h'>" + tr("本页章节","On this page") + "</div>" +
     CH.map(([id, n]) => `<a href="#${id}" data-ch="${id}">${n}</a>`).join("");
   document.body.appendChild(toc);
   const spy = new IntersectionObserver(es => es.forEach(e => {
