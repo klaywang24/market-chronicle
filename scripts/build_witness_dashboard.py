@@ -157,8 +157,10 @@ function card(name,st,detail,why){
       d:"<b>anchor_log.jsonl 还不存在</b>",
       w:"第一条记录由 daily 生成；若长期不出现说明自我提交那步没生效"})}
 
-  // ③ 链头快照 —— 浏览器跨域查不了 IA，给直达链接，不假装查过
-  out.push({n:"链头快照（去 Wayback 自己看）",s:"unknown",
+  // ③ 链头快照 —— 浏览器跨域查不了 IA，给直达链接，不假装查过。
+  //    manual:true = 不计入总体状态（2026-08-05 修：它永远是 ❔，算进去的话
+  //    横幅永远显示「部分未查到」，绿灯永远够不着 —— 永远黄的横幅=没有横幅）
+  out.push({n:"链头快照（去 Wayback 自己看）",s:"unknown",manual:true,
     d:`<a href="https://web.archive.org/web/2026*/chronicle.klay-wang.com/data/ledger_hashes.jsonl" target="_blank">点这里看日历 →</a> 最近一格应在 3 天内`,
     w:"浏览器跨域查不了 Internet Archive；假装查过比不查更糟。CI 每天替你查并记进②"});
 
@@ -172,7 +174,8 @@ function card(name,st,detail,why){
 
   document.getElementById("cards").innerHTML=out.map(o=>card(o.n,o.s,o.d,o.w)).join("");
 
-  const bad=out.filter(o=>o.s==="bad"), unk=out.filter(o=>o.s==="unknown");
+  const auto=out.filter(o=>!o.manual);
+  const bad=auto.filter(o=>o.s==="bad"), unk=auto.filter(o=>o.s==="unknown");
   const st=bad.length?"bad":(unk.length?"unknown":"ok");
   const T={ok:["一切正常","四项体检全绿，见证链在正常工作。"],
            bad:[`${bad.length} 项异常`,"见证链有问题，往下看「红了怎么办」。异常："+bad.map(b=>b.n).join("、")],
