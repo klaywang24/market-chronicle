@@ -16,6 +16,16 @@ Release 的发布时间由 GitHub 服务端记录（本地 `git commit --date=` 
    任何「顺手修一下数据」的念头都不该写进这里：那会让版本包与链不一致，
    而版本包存在的全部意义就是与链一致。
 
+🔴 **需要修订某个月的包怎么办（2026-08-06 定）：永远新增，不改旧的。**
+另起 tag `ledger-YYYY-MM-r2`（Zenodo 会形成一个新 version），旧版原样留着 + 公开勘误。
+与哈希链「错行不改、配可独立复核的勘误」是同一条原则。
+`monthly-release.yml` 已改为 **fail-closed**：同月重跑时只做只读校验
+（远端 tag 是否仍指向月末 commit + 线上已发布附件能否通过独立复算），
+两条都过就 **no-op**，任何一条不过就**硬失败**——**绝不覆盖已发布的字节**。
+⚠️ 判据刻意**不是**「新旧 ZIP 字节相同」：本包**不是可复现构建**
+（`packaged_on` 每天不同；`z.writestr()` 不带显式 ZipInfo ⇒ 条目时间戳取当前时刻），
+拿 checksum 比会天天误报，而**会误报的闸比没闸更糟**。
+
 用法：
     python3 scripts/make_release_bundle.py              # 上一个自然月
     python3 scripts/make_release_bundle.py --month 2026-07

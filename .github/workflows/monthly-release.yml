@@ -54,16 +54,66 @@ jobs:
       - name: independent re-verification
         run: python scripts/verify_release.py "$(ls dist/kapx-ledger-*.zip | head -1)"
 
-      # 幂等：同月重跑不炸，改为覆盖资产（手动补发/修元数据时会用到）
+      # 🔴🔴 2026-08-06 热修：**删掉 `--clobber`，改为 fail-closed**
+      #
+      # ━━ 原来那行是什么 ━━
+      #     gh release upload "$TAG" ... --clobber
+      #     gh release edit  "$TAG" --notes-file ...
+      # 「同月重跑不炸」的代价是：**同一个已公开的证据地址，字节可以被悄悄换掉**，
+      # 而 Zenodo/DOI 不会因此形成新版本 ⇒ 引用同一个 DOI 的人，前后拿到的可能是
+      # 不同内容。这直接违反本项目的立身之本：**只追加、绝不重写**。
+      # 没有人真的这么干过，但**手动重跑同月 workflow 就会触发**，属于「哪天会烧」。
+      #
+      # ━━ 为什么判据不是「新旧 ZIP 字节相同就放行」━━
+      # 因为**本包不是可复现构建**（实测）：`make_release_bundle.py` 的
+      # `packaged_on = today.isoformat()` 进了 MANIFEST/VERIFY.md，且 `z.writestr()`
+      # 不带显式 ZipInfo ⇒ 每个条目的时间戳取当前时刻。**同样的数据两次打包字节必然不同**。
+      # 拿 checksum 比会天天误报 ⇒ 「会误报的闸比没闸更糟」。
+      # ∴ 判据改为验**有效性**而不是**字节同一性**：
+      #     ① 远端 tag 必须仍指向本次算出的月末 commit（CUT_SHA）——防 tag 被挪
+      #     ② 把**线上那份已发布的附件**下下来，用不 import 项目代码的独立实现验一遍
+      #   两条都过 ⇒ 已发布的证据是有效的 ⇒ **什么都不碰（no-op）**
+      #   任何一条不过 ⇒ **硬失败**，绝不覆盖，留给人处理
+      #
+      # ━━ 需要修订怎么办 ━━
+      # **永远新增，不改旧的**：另起 tag `ledger-YYYY-MM-r2`（Zenodo 会形成新 version），
+      # 旧版原样留着 + 公开勘误。与链的「错行不改、配勘误」同一条原则。
       - name: publish release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           M="${{ steps.bundle.outputs.month }}"
           TAG="ledger-$M"
+          CUT_SHA="${{ steps.bundle.outputs.sha }}"
           if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "dist/kapx-ledger-$M.zip" --clobber
-            gh release edit "$TAG" --notes-file "dist/RELEASE_NOTES-$M.md"
+            echo "::notice::$TAG 已存在 —— 进入只读校验路径，绝不覆盖已发布证据"
+
+            # ① 远端 tag 必须仍指向本次算出的月末 commit
+            REMOTE_SHA="$(git ls-remote origin "refs/tags/$TAG" | cut -f1)"
+            # 注解 tag 的 ls-remote 给的是 tag 对象；用 rev-parse 解到 commit
+            git fetch --tags -q origin || true
+            RESOLVED="$(git rev-parse "$TAG^{commit}" 2>/dev/null || echo "$REMOTE_SHA")"
+            if [ "$RESOLVED" != "$CUT_SHA" ]; then
+              echo "::error::tag $TAG 指向 $RESOLVED，但本次算出的月末 commit 是 $CUT_SHA"
+              echo "已发布的证据与当前计算不一致 —— 拒绝任何写操作。修订请另起 $TAG-r2。"
+              exit 1
+            fi
+
+            # ② 下载线上那份已发布的附件，用独立实现验它（不是验我们刚打的那份）
+            rm -rf dist/_published && mkdir -p dist/_published
+            # 目录上一行已 rm -rf，不需要 --clobber；**刻意不留这个词**，
+            # 免得将来 grep 的人以为覆盖逻辑还在
+            gh release download "$TAG" -D dist/_published -p '*.zip'
+            PUB="$(ls dist/_published/*.zip | head -1)"
+            if [ -z "$PUB" ]; then
+              echo "::error::$TAG 没有可下载的 zip 附件 —— 拒绝写入，请人工处理"
+              exit 1
+            fi
+            python scripts/verify_release.py "$PUB"
+
+            echo "::notice::已发布附件通过独立复算、tag 指向正确 ⇒ 本次 no-op，不上传不改 notes"
+            exit 0
           else
             # 🔴 两步，顺序不能换。先用 git 推 tag，再从「已存在的 tag」建 release。
             #    ① tag 必须指向月末 commit：Zenodo 不看 Release 附件，它抓 tag 所指
