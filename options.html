@@ -45,8 +45,14 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 /* ⚠️ text-wrap 别忘：新建段落类**必须**跟着加，否则又是一处中文孤字。
    2026-08-05 本类刚建就漏过一次（末行只剩「收盘。」三字，四章同时中招）——
    同型漏改在本仓已是第 N 次，判据是「新增任何承载中文正文的类，同次加 balance」。 */
-.op-fresh { font-size: 11.5px; color: var(--ink-muted); margin: 10px 0 0;
-            padding-left: 10px; border-left: 2px solid var(--border); line-height: 1.65;
+/* 🔴 2026-08-05 修（Klay 截图点名「都挤在一起了」）：初版 `margin: 10px 0 0` ——
+   下边距 0，而 `.chapter-head` 的上边距也是 0 ⇒ **实测间距 0px**，这行字直接贴在下一章标题上。
+   🔑 教训：新插入的块级元素**必须自己负责与后继元素的间距**，不能假设后面那个有上边距；
+      「本章最后一个元素」这个位置以前一直由表格/图表占着，它们各自的下边距把间隔撑住了。
+   下边距 40px 与行高 1.8 都不是新拍的数 —— 沿用本页 `.op-caliber` 已有的「大间隔」节奏，
+   免得再多一套自造尺寸。字号 11.5→12px：它是全页最小的字，读起来偏吃力。 */
+.op-fresh { font-size: 12px; color: var(--ink-muted); margin: 14px 0 40px;
+            padding-left: 11px; border-left: 2px solid var(--border); line-height: 1.8;
             text-wrap: balance; }
 .op-fresh b { color: var(--ink-soft); font-weight: 600; }
 .op-table { width: 100%; border-collapse: collapse; font-size: 13px; }
