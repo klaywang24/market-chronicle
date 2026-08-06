@@ -74,6 +74,54 @@ def fetch_history(ticker: str, retries: int = 3) -> pd.DataFrame:
     raise RuntimeError(f"failed to fetch {ticker}")
 
 
+# 价格全史的自家后备源（2026-08-06 加）。各取自家已发布过的最长那份。
+_PRICE_FALLBACK = {
+    "^GSPC": ("sp500_century.json", "close"),   # 1927 起，比 kindex 的 spx 更长
+    "^IXIC": ("ixic_century.json", "close"),    # 1971 起
+    "^NDX":  ("kindex.json", "ndx"),            # 这两条本来就只回溯到 2011
+    "^VIX":  ("kindex.json", "vix"),
+}
+
+
+def fetch_close_or_own(ticker: str) -> pd.Series:
+    """取全史收盘序列；上游（Yahoo）全挂时回退**自家已发布过的同一序列**。
+
+    ━━ 为什么价格也需要后备（2026-08-06 Klay 追问后补，与恐贪那半对称）━━
+    `fetch_history` 取的是**全史**，不是今天一个点。Yahoo 挂掉时丢的不是一天，
+    而是**重建整条序列的能力** —— 而 main() 开头那四行是**裸调**：任何一条抛错，
+    整轮 daily 在第一步就死，后面所有 _guard 保护的小节一个都跑不到。
+
+    ━━ 这不违反「永不编造」，界线在这里 ━━
+      · 回退**历史**：拿回我们自己发布过、且已被哈希链与 Wayback 见证的值 → 合法
+      · 伪造**今天**：拿昨天的价格冒充今天 → 绝不做
+    后备序列止于最后一次发布日，**今天那一格自然缺席**；build_kindex 的
+    `.dropna()` 会让合并框跟着止于同一天，所以**不会凭空多出一行**。
+    缺格就是缺格，写明、不回填（同期权页第七章那条）。
+
+    降级绝不静默：写进 _FAILURES → meta.json.failures → Discord 当天告警。
+    """
+    try:
+        return fetch_history(ticker)["Close"]
+    except Exception as e:
+        src = _PRICE_FALLBACK.get(ticker)
+        if not src:
+            raise
+        fname, key = src
+        try:
+            d = json.loads((DATA / fname).read_text(encoding="utf-8"))
+            s = pd.Series(d[key], index=pd.to_datetime(d["dates"]), dtype=float).dropna()
+            if len(s) < 100:
+                raise ValueError(f"自家后备只有 {len(s)} 点，不足以重建")
+            _FAILURES.append({"section": f"价格全史上游不可达（{ticker}）",
+                              "error": f"{type(e).__name__}: {str(e)[:110]}"
+                                       f" → 已回退自家 {fname} 的 {len(s)} 点历史（止于 "
+                                       f"{s.index[-1]:%Y-%m-%d}），今日缺格、不回填"})
+            print(f"  🟠 {ticker} 上游不可达，回退自家 {fname} {len(s)} 点（止于 {s.index[-1]:%Y-%m-%d}）")
+            return s
+        except Exception as e2:
+            raise RuntimeError(f"{ticker} 上游不可达且自家后备也读不到：{e} / {e2}") from e
+
+
 def dates(idx) -> list:
     return [d.strftime("%Y-%m-%d") for d in idx]
 
@@ -2023,10 +2071,12 @@ def _guard(label: str, fn, *args, **kwargs) -> bool:
 
 def main():
     print("fetching prices …")
-    gspc = fetch_history("^GSPC")["Close"]
-    ixic = fetch_history("^IXIC")["Close"]
-    ndx = fetch_history("^NDX")["Close"]
-    vix = fetch_history("^VIX")["Close"]
+    # 四条都走「上游优先、自家已发布历史兜底」（见 fetch_close_or_own 头注）。
+    # 此前是裸调 fetch_history：任一条抛错，整轮在第一步就死、后面 _guard 全都跑不到。
+    gspc = fetch_close_or_own("^GSPC")
+    ixic = fetch_close_or_own("^IXIC")
+    ndx = fetch_close_or_own("^NDX")
+    vix = fetch_close_or_own("^VIX")
     try:
         vxn = fetch_history("^VXN")["Close"]
     except RuntimeError:
