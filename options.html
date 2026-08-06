@@ -36,12 +36,35 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 .op-logo { width: 18px; height: 18px; border-radius: 4px; vertical-align: -4px; margin-right: 7px; background: #fff; }
 .op-chart { width: 100%; height: 300px; }
 .op-chart.tall { height: 420px; }
-.op-note { font-size: 12.5px; color: var(--ink-muted); margin: 8px 0 0; }
+/* text-wrap: balance —— 中文末行孤字防护。⚠️ 别换成 pretty：CSS.supports 报 true
+   但对中文完全不参与（2026-08-03 定价页实测五个宽度全无效）。 */
+.op-note { font-size: 12.5px; color: var(--ink-muted); margin: 8px 0 0; text-wrap: balance; }
+
+/* 每章末尾的「这数据怎么更新、现在是哪天的」一行（2026-08-05 Klay 提）。
+   内容全部由 JS 从 meta 现算，不写死日期 —— 写死的日期一定会过期变成谎话。 */
+/* ⚠️ text-wrap 别忘：新建段落类**必须**跟着加，否则又是一处中文孤字。
+   2026-08-05 本类刚建就漏过一次（末行只剩「收盘。」三字，四章同时中招）——
+   同型漏改在本仓已是第 N 次，判据是「新增任何承载中文正文的类，同次加 balance」。 */
+.op-fresh { font-size: 11.5px; color: var(--ink-muted); margin: 10px 0 0;
+            padding-left: 10px; border-left: 2px solid var(--border); line-height: 1.65;
+            text-wrap: balance; }
+.op-fresh b { color: var(--ink-soft); font-weight: 600; }
 .op-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .op-table th { text-align: left; font-size: 11.5px; color: var(--ink-muted); font-weight: 600; padding: 6px 8px; border-bottom: 2px solid var(--ink); white-space: nowrap; }
 .op-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono',monospace; font-size: 12.5px; }
 .op-table td.zh { font-family: inherit; font-size: 13px; }
 .op-table th.n, .op-table td.n { text-align: right; }
+
+/* 🔴 2026-08-05 修：台账表「表头在左、内容在右」（Klay 截图点名）。
+   根因是两条规则对撞 —— 全站约定 `td { text-align: right }`（css/style.css:488，
+   给数字表用的），而本页 `.op-table th` 又强制左对齐；两者一撞就错开。
+   op-walls / op-board 之所以没露馅，只因它们的数字列都带 `.n`，被上面那条又拉回右对齐；
+   **台账表一个 .n 都没有，于是全表 th 左、td 右**，最宽的一列差 143px。
+   🔑 教训：只覆盖 th 不覆盖 td，等于把一张表的两半交给两套约定。
+   方向选左：「判断」那列是长中文散文，右对齐会让左边界参差、比右边参差更难读；
+   只有末列（对／错／预计 xx）保持右对齐，便于纵向扫读结果。 */
+#op-ledger th, #op-ledger td { text-align: left; }
+#op-ledger th:last-child, #op-ledger td:last-child { text-align: right; }
 .op-pos { position: relative; height: 8px; min-width: 120px; background: linear-gradient(90deg, color-mix(in srgb, #FF2400 18%, transparent), color-mix(in srgb, #00A86B 18%, transparent)); border-radius: 4px; }
 .op-pos i { position: absolute; top: 50%; transform: translate(-50%,-50%); width: 9px; height: 9px; border-radius: 50%; background: var(--ink); border: 2px solid var(--bg); }
 .op-badge { display: inline-block; font-size: 11px; font-weight: 600; border-radius: 10px; padding: 2px 9px; font-family: inherit; }
@@ -112,6 +135,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 <div class="chapter-head" id="op-ch1"><span class="chapter-no">第一章</span><h2>今天，谁贴着自己的墙</h2></div>
 <p class="op-note" style="margin-bottom:10px">墙 = 期权持仓最厚的价位：下方的厚 put 是别人付过保费的保护层，上方的厚 call 是别人付过定金的目标价。价格离墙越近，那笔已经付出去的钱越有话语权。圆点 = 现价在两墙之间的位置。</p>
 <table class="op-table" id="op-walls"></table>
+<p class="op-fresh" id="fr1"></p>
 
 <!-- Ⅱ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch2"><span class="chapter-no">第二章</span><h2>一根轴 · <span class="op-cur">—</span></h2></div>
@@ -119,6 +143,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 <div class="op-chips op-tkchips" id="op-chips"></div>
 <p class="op-note" id="op-em-note" style="margin:0 0 2px"></p>
 <div class="op-chart" id="ch-axis"></div>
+<p class="op-fresh" id="fr2"></p>
 
 <!-- Ⅲ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch3"><span class="chapter-no">第三章</span><h2>昨天的钱，今天还在不在</h2></div>
@@ -126,6 +151,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 <div id="op-score" class="op-score"></div>
 <div class="op-chips" id="op-lfilter" style="margin:10px 0 12px"></div>
 <table class="op-table" id="op-ledger"></table>
+<p class="op-fresh" id="fr3"></p>
 
 <!-- Ⅳ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch4"><span class="chapter-no">第四章</span><h2>大单榜：今天最贵的注</h2></div>
@@ -133,23 +159,27 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 <table class="op-table" id="op-board"></table>
 <p class="op-note" style="margin:18px 0 6px">同一天按标的汇总，call 与 put 各自的权利金换手额：</p>
 <div class="op-chart" id="ch-net"></div>
+<p class="op-fresh" id="fr4"></p>
 
 <!-- Ⅴ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch5"><span class="chapter-no">第五章</span><h2>墙在动 · <span class="op-cur">—</span></h2></div>
 <p class="op-note">四条线放在一起：官方收盘价、多空分界、下墙与上墙的逐日位置。每天打开一眼看到：价格在墙上方还是下方，墙自己有没有搬家。用第二章的票签切换。记录只会越攒越长。</p>
 <div class="op-chips op-tkchips"></div>
 <div class="op-chart" id="ch-flip"></div>
+<p class="op-fresh" id="fr5"></p>
 
 <!-- Ⅵ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch6"><span class="chapter-no">第六章</span><h2>一只票的两条命</h2></div>
 <p class="op-note">同一只票，30 天期权和一年期权各有一个恐慌读数。短命的那条为眼前的事件定价，长命的那条为整段故事定价。两条差得越远，市场越是只怕眼前。</p>
 <div class="op-chart tall" id="ch-lives"></div>
+<p class="op-fresh" id="fr6"></p>
 
 <!-- Ⅶ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch7"><span class="chapter-no">第七章</span><h2>一年期的怕，逐日 · <span class="op-cur">—</span></h2></div>
 <p class="op-note">同一只票的一年期恐慌读数逐日连成线，短期的 30 天读数放在旁边对照。事件来了短线跳、长线不动 = 市场只怕眼前；长线也抬头 = 怕的东西变成了故事本身。恒定期限口径自 07.28 起记录，每天加长一格。用第二章的票签切换。</p>
 <div class="op-chips op-tkchips"></div>
 <div class="op-chart" id="ch-cmhist"></div>
+<p class="op-fresh" id="fr7"></p>
 
 <!-- 口径说明 ──────────────────────── -->
 <div class="op-caliber" id="op-cal">
@@ -266,6 +296,63 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
     "Data date " + dot(D.meta.data_date) + " · ledger since " + dot(D.meta.ledger_since) + ", " + D.ledger.length + " cases · " + D.meta.n_tickers + " names");
   $("op-loading").style.display = "none";
   $("op-main").style.display = "";
+
+  /* ── 每章末尾一行「这数据怎么更新、现在是哪天的」（2026-08-05 Klay 提）──
+     🔑 三条自律：
+     ① **一个日期都不写死**，全部从 D.meta / D 现算 —— 写死的日期一定会过期变成谎话，
+        而「页面上写着的更新承诺」过期比数据本身过期更伤（承诺·机制·勘误准则）。
+     ② **不做流程自述**：只说「每个交易日收盘后」，不写几点几分、不提任何内部环节名。
+        读者要的是「这数是哪天的」，不是我们的排班表。
+     ③ 第三章刻意与其他章不同措辞 —— 它**本来就不该天天变**，
+        写成「每日更新」反而是谎；它变厚的条件只有两个：新立案、或旧案到开奖日。 */
+  (function fresh() {
+    const days = obj => {           // 时间序列跨了多少个交易日（按全票日期取并集）
+      const s = new Set();
+      Object.values(obj || {}).forEach(a => (a || []).forEach(r => r && r.date && s.add(r.date)));
+      return [...s].sort();
+    };
+    const dd = dot(D.meta.data_date);
+    const prov = D.meta.provisional
+      ? tr("（当前为盘中临时读数，收盘后会被覆盖）", " (intraday provisional; overwritten after the close)")
+      : "";
+    const daily = tr("每个交易日收盘后更新，数据延迟、绝不实时。当前是 <b>" + dd + "</b> 收盘。",
+                     "Updated after each trading day's close, delayed, never real time. Currently showing the <b>" + dd + "</b> close.") + prov;
+
+    const fl = days(D.flip_history), cm = days(D.cm_history);
+    const filed = D.ledger.reduce((m, c) => (c.events && c.events[0] && c.events[0].date > m ? c.events[0].date : m), "");
+    /* 🔴 2026-08-05：初版这里写「每个交易日在右端加一格」，**那是过度承诺** ——
+       第七章的序列实测缺 07.29 / 07.30 两格（当天没取到）。
+       页面上的承诺比数据本身更不能撒谎，且按「承诺·机制·勘误准则」，
+       **缺格要自己说出来、原样留着不回填**；缺口写在明面上反而是可信度资产。
+       ∴ 缺格数由 meta.dates 与实际日期取差现算，不写死。 */
+    const grow = a => {
+      if (!a.length) return daily;
+      const span = (D.meta.dates || []).filter(x => x >= a[0] && x <= a[a.length - 1]);
+      const miss = span.filter(x => !a.includes(x));
+      const head = tr("每个交易日在右端加一格，已记 <b>" + a.length + "</b> 日（" + dot(a[0]) + " → " + dot(a[a.length - 1]) + "）。",
+                      "One more point per trading day; <b>" + a.length + "</b> sessions recorded (" + dot(a[0]) + " → " + dot(a[a.length - 1]) + ").");
+      return head + (miss.length
+        ? tr("其中 <b>" + miss.length + "</b> 天当天没取到（" + miss.map(dot).join("、") + "），缺格原样留着、不回填。",
+             " <b>" + miss.length + "</b> session(s) were not captured that day (" + miss.map(dot).join(", ") + "); the gaps are left as-is and never backfilled.")
+        : tr("没有缺格，只会越攒越长。", " No gaps; append-only."));
+    };
+
+    const txt = {
+      fr1: daily,
+      fr2: daily,
+      fr3: tr("<b>不是每日更新</b>，也不该是：它只在两种时候变 —— 有新判断立案，或旧判断到了约定的开奖日。"
+              + "累计 <b>" + D.ledger.length + "</b> 案（自 " + dot(D.meta.ledger_since) + "）"
+              + (filed ? "，最近一次立案 " + dot(filed) : "") + "。已写下的从不改写。",
+              "<b>Not a daily feed</b>, by design: it changes only when a new call is filed, or a filed call reaches its agreed settlement date. "
+              + "<b>" + D.ledger.length + "</b> cases since " + dot(D.meta.ledger_since)
+              + (filed ? ", last filed " + dot(filed) : "") + ". Nothing already written is ever rewritten."),
+      fr4: daily,
+      fr5: grow(fl),
+      fr6: daily,
+      fr7: grow(cm),
+    };
+    Object.entries(txt).forEach(([id, v]) => { const el = $(id); if (el) el.innerHTML = v; });
+  })();
 
   /* ── 图表基建：一开始就 ResizeObserver 驱动（站上 §D 踩坑：时点式 resize 治不了后续布局变化）── */
   const charts = [];
