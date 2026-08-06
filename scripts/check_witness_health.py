@@ -34,6 +34,7 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -47,6 +48,7 @@ SLA = {
     "anchor_log": 4,     # 锚定日志最后一条
     "snapshot": 3,       # 链头的 Wayback 快照
     "daily_run": 4,      # daily 最后一次提交数据（看守看守人）
+    "options_page": 4,   # 期权页数据（本机 launchd 产、推上来的，见 check_options_page）
 }
 
 
@@ -159,12 +161,53 @@ def check_archive_match() -> dict:
     return {"status": "ok", "detail": last[:90]}
 
 
+def check_options_page() -> dict:
+    """期权页数据是否还在更新（2026-08-05 接线当天加）。
+
+    ━━ 为什么这一项属于「见证链体检」而不是别处 ━━
+    表面上它查的是一个页面的数据新鲜度，实际上它是**整条本机链路的唯一送达通道**。
+    这份 JSON 由本机 launchd（`com.klay.eod-scan`）在收盘后生成并 push 上来，
+    途中任何一环断掉都会让它停止更新：launchd 挂了 / 生成器抛异常 / 站仓 push
+    凭据失效 / rebase 冲突留在本地。**这些全发生在 CI 之外，GitHub 一侧完全看不见。**
+    ∴ 唯一能发现它们的办法就是从**产物**倒推 —— 与 `check_daily_alive` 同一手法：
+    不问「有没有收到失败通知」（那要求失败方还活着），只问「东西多久没更新了」。
+    🔑 家规：没有送达通道的告警等于没有告警。本项就是那条通道。
+
+    判据用 `meta.data_date`（数据对应的交易日）而不是 `generated_at`：
+    重跑一次旧数据会刷新 generated_at 却不代表页面变新了 —— **那正是最该被抓住的假绿**。
+    """
+    p = DATA / "options_page.json"
+    if not p.exists():
+        return {"status": "bad", "detail": "options_page.json 不存在 —— 期权页无数据可读"}
+    try:
+        meta = json.loads(p.read_text(encoding="utf-8")).get("meta") or {}
+    except Exception as e:
+        return {"status": "bad", "detail": f"options_page.json 解析失败：{str(e)[:60]}"}
+    d = meta.get("data_date")
+    # ⚠️ 这里刻意不用 days_since()：它按 UTC 今天算，而 data_date 是**美东交易日**。
+    #    两把尺子不同源 ⇒ 美东傍晚之后 UTC 已跨天，昨天的数据会被读成「2 天前」。
+    #    SLA=4 掩得住，不会误报，但读数会让人以为漏了一天 —— 量尺不同源就先对齐再比。
+    age = None
+    if d:
+        try:
+            t = datetime.strptime(str(d)[:10], "%Y-%m-%d").date()
+            age = (datetime.now(ZoneInfo("America/New_York")).date() - t).days
+        except ValueError:
+            age = None
+    if age is None:
+        return {"status": "unknown", "detail": "meta.data_date 缺失或无法解析"}
+    prov = "（盘中临时读数）" if meta.get("provisional") else ""
+    return {"status": "ok" if age <= SLA["options_page"] else "bad",
+            "detail": f"期权页数据 {d}{prov}（{age} 天前）", "age": age}
+
+
 CHECKS = {
     "链最后一行": check_chain_row,
     "锚定日志": check_anchor_log,
     "链头快照(直接问IA)": check_snapshot_live,
     "与存档逐字对账": check_archive_match,
     "daily是否还活着": check_daily_alive,
+    "期权页是否在更新": check_options_page,
 }
 
 
