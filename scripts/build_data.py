@@ -95,10 +95,33 @@ def fetch_fng():
     fear_and_greed_historical 才是官方逐日定稿序列，且每条自带 rating。
     口径：官方定稿序列优先；它只覆盖滚动一年，更早的历史仍由 whit3rabbit 存档提供。
     """
-    csv = requests.get(FNG_ARCHIVE, headers=UA, timeout=30)
-    csv.raise_for_status()
     from io import StringIO
-    fng = pd.read_csv(StringIO(csv.text), parse_dates=["Date"]).set_index("Date")["Fear Greed"]
+    archive_note = ""
+    try:
+        csv = requests.get(FNG_ARCHIVE, headers=UA, timeout=30)
+        csv.raise_for_status()
+        fng = pd.read_csv(StringIO(csv.text), parse_dates=["Date"]).set_index("Date")["Fear Greed"]
+    except Exception as e:
+        # 🔑 后备：回退到**我们自己上次发布的** kindex.json 里的恐贪历史（2026-08-06 加）。
+        # ━━ 为什么需要 ━━
+        # 2011→去年这 13 年的恐贪值只有 FNG_ARCHIVE 这一条路（CNN 官方接口只覆盖滚动一年）。
+        # 它是**第三方个人仓库**：真实风险不是投毒（verify_ledger 会抓历史被改），
+        # 而是**弃养/删仓** —— 原来一个 raise_for_status 就让整轮 daily 死掉。
+        # ━━ 为什么用自家副本而不是另存一份上游拷贝 ━━
+        # 自家 kindex.json 已含全部 3896 天恐贪历史，且它**在 git 里、进哈希链、被 Wayback 见证**，
+        # 来源比上游更硬：上游随时可被静默改写且我们事后无从得知，自家的改了 verify_ledger 当天抓。
+        # ⚠️ 降级必须说出来（家规：机器坏了不要晒给读者，但绝不能对自己静默）：
+        #    写进 _FAILURES → meta.json.failures → Discord 当天告警，并在产物里标注来源。
+        try:
+            prev = json.loads((DATA / "kindex.json").read_text(encoding="utf-8"))
+            fng = pd.Series(prev["cnn"], index=pd.to_datetime(prev["dates"]), dtype=float).dropna()
+            archive_note = f"archive_unreachable_used_own_last_published:{type(e).__name__}"
+            _FAILURES.append({"section": "恐贪历史存档不可达",
+                              "error": f"{type(e).__name__}: {str(e)[:120]}"
+                                       f" → 已回退用自家上次发布的 {len(fng)} 天历史继续，站上非陈旧但来源已降级"})
+            print(f"  🟠 恐贪存档不可达（{type(e).__name__}），回退自家上次发布值 {len(fng)} 天")
+        except Exception as e2:
+            raise RuntimeError(f"恐贪存档不可达且自家后备也读不到：{e} / {e2}") from e
     live_note = ""
     try:
         hist = requests.get(FNG_LIVE, headers=UA, timeout=30).json()["fear_and_greed_historical"]["data"]
@@ -110,12 +133,63 @@ def fetch_fng():
         live_note = str(off["rating"].iloc[-1])
     except Exception as e:
         print(f"  CNN official daily series unavailable, archive only: {e}")
+    if archive_note:
+        live_note = (live_note + " | " if live_note else "") + archive_note
     return fng[~fng.index.duplicated(keep="last")].sort_index(), live_note
+
+
+def sanity_kindex_inputs(fng: pd.Series, vix: pd.Series) -> list[str]:
+    """K 指数两个输入的合理性守卫（2026-08-06 新建 · 攻击者视角审计产物）。
+
+    ━━ 为什么需要它 ━━
+    K 指数 = 恐贪 ÷ VIX，而恐贪的 2011→去年这 13 年**每天从一个第三方个人仓库
+    重新下载**（CNN 官方接口只覆盖滚动一年）。既有两道防线都盖不住「污染今天的新值」：
+      · verify_ledger 比的是「以前发布过的值有没有被改」—— 新值没有历史可比，它放过
+      · verify_gauge_math 用**同一份被污染的输入**重算 —— 它也放过
+    ∴ 唯一能拦的是「这个数在物理上可能吗」。14 个数据源里此前只有 AIAE 有这层
+    （见 build_aiae 的 sane_check），本函数按同一形状补上旗舰读数。
+
+    ━━ 阈值怎么定的：由 15 年实测分布推出，不是拍的 ━━
+      恐贪 实测 min 0 / max 97（定义域本就是 0-100）· 日跳幅 中位 2.6 / p99 15.8 / 史上最大 35.0
+      VIX  实测 min 9.14 / max 82.69            · 日跳幅 中位 0.67 / p99 6.60 / 史上最大 24.86
+    取「史上最大 × 约 1.3-1.4 倍」作阈值 —— 本函数的职责是抓**物理上不可能的值**
+    （投毒 / 单位错 / 换错数据源），**不是抓极端行情**。
+    🔑 家规：会误报的闸比没有闸更糟。真出现史上最猛的一天也不该响，只有明显不可能才响。
+
+    只报不拦：返回问题清单交给 _FAILURES → meta.json.failures → Discord 当天告警。
+    绝不因此中止管线 —— 真实的极端行情不该让整站停更。
+    """
+    problems: list[str] = []
+    if fng is not None and len(fng.dropna()):
+        f = fng.dropna()
+        oob = f[(f < 0) | (f > 100)]
+        if len(oob):
+            problems.append(f"恐贪有 {len(oob)} 个值落在定义域 0-100 之外"
+                            f"（例：{oob.index[0]:%Y-%m-%d}={oob.iloc[0]}）")
+        jm = f.diff().abs().max()
+        if pd.notna(jm) and jm > 45:          # 史上最大 35.0，留约 1.3 倍余量
+            d = f.diff().abs().idxmax()
+            problems.append(f"恐贪单日跳幅 {jm:.1f}（{d:%Y-%m-%d}）超过史上最大 35 的 1.3 倍，疑似源被换或被污染")
+    if vix is not None and len(vix.dropna()):
+        v = vix.dropna()
+        oob = v[(v <= 0) | (v > 200)]         # 1987 年那次约 150，200 是物理上限量级
+        if len(oob):
+            problems.append(f"VIX 有 {len(oob)} 个值不在 (0,200]"
+                            f"（例：{oob.index[0]:%Y-%m-%d}={oob.iloc[0]}）")
+        jm = v.diff().abs().max()
+        if pd.notna(jm) and jm > 35:          # 史上最大 24.86，留约 1.4 倍余量
+            d = v.diff().abs().idxmax()
+            problems.append(f"VIX 单日跳幅 {jm:.2f}（{d:%Y-%m-%d}）超过史上最大 24.9 的 1.4 倍，疑似单位错或源被换")
+    return problems
 
 
 def build_kindex(ndx_close: pd.Series, spx_close: pd.Series, vix_close: pd.Series):
     print("== K 指数")
     fng, live_note = fetch_fng()
+    # 输入合理性守卫（只报不拦，见 sanity_kindex_inputs 头注）
+    for msg in sanity_kindex_inputs(fng, vix_close):
+        _FAILURES.append({"section": "K 指数输入合理性", "error": msg})
+        print(f"  🔴 输入守卫：{msg}")
     df = pd.DataFrame({"cnn": fng, "vix": vix_close, "ndx": ndx_close, "spx": spx_close}).dropna()
     df = df[df.index >= "2011-01-01"]  # 恐贪存档 2011 起 → KAPX 回溯至此（历史回填，非事前记录）
     df["k"] = df["cnn"] / df["vix"]
