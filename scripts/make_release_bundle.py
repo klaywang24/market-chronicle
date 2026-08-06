@@ -144,7 +144,12 @@ Citing only the concept DOI in an audit is ambiguous: later it resolves to a dif
 
 ## 1. The chain
 
-`ledger_hashes.jsonl` has one append-only row per publication day:
+`ledger_hashes.jsonl` is append-only; **each row is one snapshot event** (normally one per
+trading day; a same-day re-run that changed the tracked files appends another row). `date` is the
+snapshot's US-Eastern calendar day since 2026-08-06 (UTC before that; two early rows carry a
+mislabel, documented with independently checkable evidence in `data/README.md` of the repo) and is
+a label only -- it does **not** enter the chain math. Row order and `generated_at` are the
+authoritative ordering; `date` is not guaranteed strictly increasing across the historical rows.
 
 ```
 {{"date": ..., "generated_at": ..., "files": {{"<name>": "<sha256>", ...}}, "prev": "<chain-1>", "chain": "<chain>"}}

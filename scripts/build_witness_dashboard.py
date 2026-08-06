@@ -118,7 +118,7 @@ a{color:var(--bad)}
 <script>
 const RAW="RAW_URL", REPO="REPO_URL";
 const ICON={ok:"✓",bad:"!",unknown:"?"}, COLOR={ok:"var(--ok)",bad:"var(--bad)",unknown:"var(--unk)"};
-const SLA={chain:4, anchor:4, snap:3, daily:4};
+const SLA={chain:4, anchor:4, snap:3, daily:4, opt:4};   // opt=期权页，与 check_witness_health 同值
 const days=s=>{if(!s)return null;const t=s.length>8?Date.parse(s.slice(0,10)):
   Date.parse(s.slice(0,4)+"-"+s.slice(4,6)+"-"+s.slice(6,8));
   return isNaN(t)?null:Math.floor((Date.now()-t)/864e5)};
@@ -172,12 +172,30 @@ function card(name,st,detail,why){
       w:"最严重的一项：2026-07-12 那次 daily 整个死掉 4 天没人发现"});
   }catch(e){out.push({n:"daily 是否还活着",s:"unknown",d:"GitHub API 拉取失败",w:"没查到 ≠ 没问题"})}
 
+  // ⑤ 期权页是否在更新（2026-08-05 晚新增，与体检第六项同判据）
+  //    这一项查的是**本机那条链路**：launchd → 生成器 → push 站仓。
+  //    整段在 CI 之外，GitHub 一侧看不见；任何一环断掉都只表现为「页面停止更新」。
+  //    🔑 判据用 meta.data_date 不用 generated_at —— 重跑旧数据会刷新后者却不代表页面变新，
+  //       那正是最该被抓住的假绿。
+  try{const r=await fetch("https://chronicle.klay-wang.com/data/options_page.json",{cache:"no-store"});
+    const m=(await r.json()).meta||{};const a=days(m.data_date);
+    out.push({n:"期权页是否在更新",s:a<=SLA.opt?"ok":"bad",
+      d:`数据日 ${m.data_date}（${a} 天前）${m.provisional?" · 盘中临时读数":""} · ${m.n_tickers} 只标的`,
+      w:"本机 launchd 那条链路的唯一体温计：它停了说明定时任务/生成器/推送里有一环断了"});
+  }catch(e){out.push({n:"期权页是否在更新",s:"unknown",d:"拉取失败",w:"没查到 ≠ 没问题"})}
+
+  // ⑥ 与存档逐字对账 —— 浏览器做不了（跨域 + 要下整份存档字节），给命令，不假装查过。
+  //    manual:true ⇒ 不计入总体状态，理由同③（永远黄的横幅等于没有横幅）。
+  out.push({n:"与存档逐字对账（要跑命令）",s:"unknown",manual:true,
+    d:`<code>python3 scripts/verify_against_archive.py</code>`,
+    w:"唯一能挡住「全链重造」的一项：把 Wayback 存的旧内容下下来逐字比。浏览器跨域做不到，CI 每天替你跑并计入体检"});
+
   document.getElementById("cards").innerHTML=out.map(o=>card(o.n,o.s,o.d,o.w)).join("");
 
   const auto=out.filter(o=>!o.manual);
   const bad=auto.filter(o=>o.s==="bad"), unk=auto.filter(o=>o.s==="unknown");
   const st=bad.length?"bad":(unk.length?"unknown":"ok");
-  const T={ok:["一切正常","四项体检全绿，见证链在正常工作。"],
+  const T={ok:["一切正常",`${auto.length} 项自动体检全绿，见证链在正常工作。另有 ${out.length-auto.length} 项需手动跑（卡片里有命令/链接）。`],
            bad:[`${bad.length} 项异常`,"见证链有问题，往下看「红了怎么办」。异常："+bad.map(b=>b.n).join("、")],
            unknown:["部分未查到","不是故障，但本次结果不完整："+unk.map(b=>b.n).join("、")]}[st];
   const big=document.getElementById("big");
