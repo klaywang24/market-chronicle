@@ -89,13 +89,24 @@ jobs:
       # 体检结果进 GITHUB_ENV → notify_discord 当天推 Discord。
       # ⚠️ 这是「当天可见」那条通道；**它不能替代 witness-watchdog.yml** ——
       #    本步在 daily 内部，daily 死了它也一起没了（7·12 的教训）。两条都要。
+      # --record：把各项状态追加进 data/health_log.jsonl 并自提交。
+      # 🔑 为什么需要这份日志（2026-08-06 加）：「持续测不到」要能升级成故障，
+      #    就必须知道「上次成功是哪天」—— 那是跨运行的状态，只能落盘。
+      #    自提交范式照抄上面 anchor to Wayback 那步（家规 §26 先用现成做法）；
+      #    看门狗只读它不写（它的权限就是 contents: read）。
       - name: witness health
         continue-on-error: true
         run: |
           set +e
-          python scripts/check_witness_health.py
+          python scripts/check_witness_health.py --record
           echo "WITNESS_HEALTH=$([ $? -eq 0 ] && echo ok || echo bad)" >> "$GITHUB_ENV"
           set -e
+          if [ -n "$(git status --porcelain data/health_log.jsonl)" ]; then
+            git add data/health_log.jsonl
+            git commit -m "health: log $(TZ=America/New_York date +%F)"
+            git pull --rebase -q origin main || true
+            git push
+          fi
 
       - name: notify Discord
         if: always()

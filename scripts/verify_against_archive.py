@@ -61,30 +61,69 @@ def _get(url: str, timeout: int = 60) -> tuple[int, str]:
 
 
 def snapshot_timestamps(limit: int) -> list[str]:
-    """列出该 URL 的存档时间戳（新→旧）。sparkline 端点实测比 availability 可靠。"""
+    """列出可用于对账的存档时间戳（新→旧）。
+
+    🔴 2026-08-06 大改（攻击者视角审计发现这道闸从建成起从未成功跑过一次）
+    ━━ 病因不是限流，是「找」和「取」两条路命运不同 ━━
+    实测（同一时刻、同一网络）：
+        web.archive.org 首页            → 200  可达
+        /__wb/sparkline（找时间戳）      → 498
+        /wayback/available（找）         → 000
+        /cdx/search/cdx（找）            → 000
+        /web/<ts>id_/<url>（**取内容**）→ 200，45KB 真链内容
+    三条「发现」路全断，而「取内容」那条完好。旧实现把发现放在第一步，
+    于是每次都在第一步返回空 → 报 unknown → 看门狗把 unknown 当「无异常」
+    → **这道唯一能挡「全链重造」的闸，实际是一场仪式**（本文件头注早写过这句话，
+    却应在了自己身上）。
+
+    ━━ 修法：时间戳我们自己有，不必问 IA ━━
+    `data/anchor_log.jsonl` 每天记着当日**确认过**的链头快照时间戳。
+    拿它当发现源，IA 的发现端点降为备用。
+    ⚠️ 有人会问：用自家日志当输入，攻击者删掉它不就躲过对账了吗？
+       答：时间戳只是**去哪儿看**的线索，效力来自**IA 服务的那份内容**（他改不了）。
+       删线索会让本项测不到 → 而「持续测不到」本身已被 check_witness_health
+       升级为 bad（见那边 STALE_OK_DAYS），删线索也躲不过，只是换了个警报响。
+    """
+    out: list[str] = []
+    log = ROOT / "data" / "anchor_log.jsonl"
+    if log.exists():
+        for line in reversed(log.read_text(encoding="utf-8").splitlines()):
+            if not line.strip():
+                continue
+            try:
+                rec = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            for res in (rec.get("results") or []):
+                if "ledger_hashes" in str(res.get("url", "")) and res.get("timestamp"):
+                    if res["timestamp"] not in out:
+                        out.append(res["timestamp"])
+            if len(out) >= limit:
+                return out[:limit]
+    if out:
+        return out[:limit]
+
+    # 备用：IA 自己的发现端点（2026-08-06 实测三条全断，留着以防它们哪天复活）
     q = ("https://web.archive.org/__wb/sparkline?output=json&collection=web&url="
          + urllib.parse.quote(TARGET_URL, safe=""))
     code, body = _get(q, timeout=45)
-    if code != 200 or not body:
-        return []
-    try:
-        d = json.loads(body)
-    except json.JSONDecodeError:
-        return []
-    # sparkline 只给 first/last；要全部时间戳走 CDX（限流更凶，故仅 --all 时才用）
-    ts = [t for t in (d.get("last_ts"), d.get("first_ts")) if t]
-    if limit <= len(ts):
-        return ts[:limit]
-    cdx = ("http://web.archive.org/cdx/search/cdx?output=json&fl=timestamp&limit=-40&url="
-           + urllib.parse.quote(TARGET_URL, safe=""))
-    code, body = _get(cdx, timeout=60)
-    if code == 200 and body.strip().startswith("["):
+    if code == 200 and body:
         try:
-            rows = json.loads(body)[1:]
-            return sorted({r[0] for r in rows}, reverse=True)[:limit]
-        except Exception:
+            d = json.loads(body)
+            out = [x for x in (d.get("last_ts"), d.get("first_ts")) if x]
+        except json.JSONDecodeError:
             pass
-    return ts
+    if len(out) < limit:
+        cdx = ("http://web.archive.org/cdx/search/cdx?output=json&fl=timestamp&limit=-40&url="
+               + urllib.parse.quote(TARGET_URL, safe=""))
+        code, body = _get(cdx, timeout=60)
+        if code == 200 and body.strip().startswith("["):
+            try:
+                rows = json.loads(body)[1:]
+                out = sorted({r[0] for r in rows} | set(out), reverse=True)
+            except Exception:
+                pass
+    return out[:limit]
 
 
 def fetch_archived(ts: str) -> list[dict] | None:

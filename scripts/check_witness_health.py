@@ -27,6 +27,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import subprocess
 import sys
@@ -49,7 +50,12 @@ SLA = {
     "snapshot": 3,       # 链头的 Wayback 快照
     "daily_run": 4,      # daily 最后一次提交数据（看守看守人）
     "options_page": 4,   # 期权页数据（本机 launchd 产、推上来的，见 check_options_page）
+    # 🔴 2026-08-06 加：「持续测不到」多久算故障。
+    # 病因见 check_archive_match 头注 —— unknown 此前永不升级，等于给攻击者
+    # 留了一个「弄断探测源就能无声关掉警报」的开关，而 IA 的坏端点已免费替他按下。
+    "stale_ok": 5,       # 某项连续 5 天没有成功过 → 由 unknown 升级为 bad
 }
+HEALTH_LOG = DATA / "health_log.jsonl"   # 每次 --record 追加一行，供「上次成功」判据用
 
 
 ET = ZoneInfo("America/New_York")
@@ -85,6 +91,62 @@ def last_line_json(p: Path) -> dict | None:
     return json.loads(lines[-1]) if lines else None
 
 
+def days_since_last_ok(name: str) -> int | None:
+    """该体检项上次报 ok 距今几天（美东日历日）。查不到返回 None。
+
+    数据来自 `data/health_log.jsonl`：daily 每天用 `--record` 追加一行并自提交
+    （与 `anchor_wayback.py` 自提交锚定日志同一范式 —— 家规 §26 先用现成做法）。
+    看门狗只读不写（它的权限就是 contents: read）。
+    """
+    if not HEALTH_LOG.exists():
+        return None
+    for line in reversed(HEALTH_LOG.read_text(encoding="utf-8").splitlines()):
+        if not line.strip():
+            continue
+        try:
+            rec = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if (rec.get("checks") or {}).get(name) == "ok":
+            return days_since(rec.get("date", ""), et=True)
+    return None
+
+
+def escalate_if_stale(name: str, res: dict) -> dict:
+    """unknown 可以短暂容忍，不能无限期 —— 超期即升 bad（2026-08-06 新规）。
+
+    🔑 家规 §46 说「报测量失败和报绿一样危险」。此前**展示层**遵守了（显示 ❔），
+       **升级层**没有：unknown 不管持续多久都不开 Issue、不发邮件，
+       而看门狗的关闭判据是 `!= bad`，于是 unknown 还会把真告警自动关掉。
+       实证：08-05 15:15 那次看门狗日志原文写着「✅ 体检已无异常项，自动关闭」，
+       而当时「与存档逐字对账」从建成起一次都没成功过。
+    ⇒ 只要某项连续 STALE 天没有 ok 过，就当故障处理。ok 会重置计数。
+    """
+    if res.get("status") != "unknown":
+        return res
+    age = days_since_last_ok(name)
+    lim = SLA["stale_ok"]
+    if age is None:
+        # 没有任何成功记录：给日志本身留出建立期，按日志首行年龄判
+        first = None
+        if HEALTH_LOG.exists():
+            for line in HEALTH_LOG.read_text(encoding="utf-8").splitlines():
+                if line.strip():
+                    try:
+                        first = days_since(json.loads(line).get("date", ""), et=True)
+                    except json.JSONDecodeError:
+                        pass
+                    break
+        if first is not None and first > lim:
+            res = dict(res, status="bad",
+                       detail=res["detail"] + f" · 🔴 建档 {first} 天以来从未成功过一次，按故障处理")
+        return res
+    if age > lim:
+        res = dict(res, status="bad",
+                   detail=res["detail"] + f" · 🔴 已连续 {age} 天没有成功过（上限 {lim}），按故障处理")
+    return res
+
+
 def check_chain_row() -> dict:
     row = last_line_json(CHAIN)
     if not row:
@@ -115,19 +177,35 @@ def check_anchor_log() -> dict:
 
 
 def check_snapshot_live() -> dict:
-    """直接问 Internet Archive —— 不信任本地日志，独立复核一次。"""
-    q = ("https://web.archive.org/__wb/sparkline?output=json&collection=web&url="
-         + urllib.parse.quote(SITE_CHAIN_URL, safe=""))
+    """直接问 Internet Archive —— 不信任本地日志，独立复核一次。
+
+    🔴 2026-08-06 重写（此项从建成起从未成功过一次，而没人发现）
+    ━━ 病根：单探针，没有兜底 ━━
+    旧实现只打 `__wb/sparkline`，而该端点已返回 498（实测多次确认）。
+    `anchor_wayback.latest_snapshot` 早就有**两级探针**（sparkline → availability），
+    所以它一直正常、每天记下真时间戳；本项自己另写了一份单级查询，就此永久失明。
+    🔑 家规「一处判据只能有一个实现」—— 两份实现迟早分叉，这次分叉的代价是
+       一个永远 unknown 的探测器，而 unknown 此前从不升级（见 escalate_if_stale）。
+    ∴ 本项不再自己写查询，**直接复用那个已经带兜底的函数**（§26 先用现成做法）。
+
+    ⚠️ 顺带记一次我自己的量尺错误：我曾用 `curl http://archive.org/wayback/available`
+       实测得 HTTP 000，据此宣布「三个发现端点全死」。**协议错了** —— 同一端点走
+       https 返回 200。判据：报「端点死了」之前，先确认自己用的 scheme 与代码里一致。
+    """
     try:
-        req = urllib.request.Request(q, headers={"User-Agent": "market-chronicle-health/1.0"})
-        with urllib.request.urlopen(req, timeout=45) as r:
-            d = json.loads(r.read().decode("utf-8", "replace"))
+        spec = importlib.util.spec_from_file_location(
+            "_aw", str(ROOT / "scripts" / "anchor_wayback.py"))
+        aw = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(aw)
+        st, snap = aw.latest_snapshot(SITE_CHAIN_URL, retries=2)
     except Exception as e:
-        return {"status": "unknown", "detail": f"查证失败（多半是 IA 限流）：{str(e)[:60]}"}
-    last = d.get("last_ts")
-    if not last:
+        return {"status": "unknown", "detail": f"探针执行失败：{str(e)[:60]}"}
+    if st == "unknown":
+        return {"status": "unknown", "detail": "两级探针都没答上来（IA 限流或端点变动）"}
+    if st == "none" or not snap:
         return {"status": "bad", "detail": "Internet Archive 上查不到链头的任何快照"}
-    age = days_since(last)
+    last = snap.get("timestamp")
+    age = days_since(last)          # Wayback 时间戳本就是 UTC，这里刻意不换美东
     return {"status": "ok" if age is not None and age <= SLA["snapshot"] else "bad",
             "detail": f"链头最近快照 {last}（{age} 天前）", "age": age}
 
@@ -221,12 +299,23 @@ CHECKS = {
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--record", action="store_true",
+                    help="把本次各项状态追加进 data/health_log.jsonl（只在 daily 用，供「上次成功」判据）")
     args = ap.parse_args()
 
-    results = {name: fn() for name, fn in CHECKS.items()}
+    results = {name: escalate_if_stale(name, fn()) for name, fn in CHECKS.items()}
     bad = [n for n, r in results.items() if r["status"] == "bad"]
     unk = [n for n, r in results.items() if r["status"] == "unknown"]
     overall = "bad" if bad else ("unknown" if unk else "ok")
+
+    if args.record:
+        # 只记状态、不记 detail：detail 每天都不同，会让这份日志变成噪音
+        rec = {"date": datetime.now(ET).strftime("%Y-%m-%d"),
+               "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+               "overall": overall,
+               "checks": {k: v["status"] for k, v in results.items()}}
+        with open(HEALTH_LOG, "a", encoding="utf-8") as f:
+            f.write(json.dumps(rec, ensure_ascii=False, separators=(",", ":")) + "\n")
 
     if args.json:
         print(json.dumps({"overall": overall, "bad": bad, "unknown": unk,

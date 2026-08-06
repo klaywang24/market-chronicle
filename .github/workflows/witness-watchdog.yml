@@ -107,7 +107,7 @@ jobs:
               await github.rest.issues.createComment({
                 owner: context.repo.owner, repo: context.repo.repo,
                 issue_number: i.number,
-                body: '✅ 体检已无异常项，自动关闭。\n\n```\n' + `${{ steps.health.outputs.report }}` + '\n```',
+                body: '✅ 已无 🔴 异常项，自动关闭。⚠️ 本判据是「没有 bad」，**不等于每项都成功测到**；❔ 未测到的项若连续超期未成功，会被升级为 bad 再次开单（2026-08-06 起）。\n\n```\n' + `${{ steps.health.outputs.report }}` + '\n```',
               });
               await github.rest.issues.update({
                 owner: context.repo.owner, repo: context.repo.repo,
