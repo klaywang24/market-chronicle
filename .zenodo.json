@@ -1,6 +1,6 @@
 {
-  "title": "KAPX Index — Market Chronicle ledger snapshot",
-  "description": "<p>Monthly frozen snapshot of the public KAPX Index ledger published by Market Chronicle (chronicle.klay-wang.com), together with the append-only hash chain that makes silent edits and silent deletions detectable.</p><p><strong>Evidence, not a data product.</strong> Each bundle contains VERIFY.md with the exact chain formula so anyone can recompute it without trusting the publisher.</p><p><strong>Stated boundaries:</strong> readings dated before the site's launch (July 2026) are reproducible backfill computed from public data with the published formula, not an ex-ante record; and the hash chain itself begins later than the launch date. Both are disclosed inside every bundle rather than left for a reader to discover.</p><p>KAPX = CNN Fear &amp; Greed Index / VIX. Data and information only; not investment advice.</p>",
+  "title": "Market Chronicle Public Indicator Ledger — Monthly Snapshot",
+  "description": "<p>Monthly frozen snapshot of the public indicator ledger published by Market Chronicle (chronicle.klay-wang.com), together with the append-only hash chain that makes silent edits and silent deletions detectable.</p><p><strong>Two gauges and one ledger of outcomes.</strong> Each bundle carries the daily series of the KAPX Index and of the Fear-Price Index, plus the reconciled outcome ledger and its audit file. Editions before 2026-08 were titled after the KAPX Index alone; the contents were always broader. The title was corrected going forward and the earlier records were left as published, which is the same rule this project applies to the chain itself.</p><p><strong>Evidence, not a data product.</strong> Each bundle contains VERIFY.md with the exact chain formula so anyone can recompute it without trusting the publisher.</p><p><strong>Stated boundaries:</strong> readings dated before the site's launch (July 2026) are reproducible backfill computed from public data with the published formula, not an ex-ante record; and the hash chain itself begins later than the launch date. Both are disclosed inside every bundle rather than left for a reader to discover.</p><p>The archive filename keeps the historical <code>kapx-</code> prefix so that links published in earlier editions keep resolving. It is a project-level prefix and does not mean the bundle contains only the KAPX Index.</p><p>KAPX Index = CNN Fear &amp; Greed Index / VIX. Fear-Price Index = three-year rolling percentile of VIX1Y, the one-year implied volatility of the S&amp;P 500. Data and information only; not investment advice.</p>",
   "upload_type": "dataset",
   "access_right": "open",
   "license": "other-nc",
@@ -12,9 +12,12 @@
   ],
   "keywords": [
     "KAPX Index",
+    "Fear-Price Index",
     "Market Chronicle",
     "market sentiment",
     "VIX",
+    "VIX1Y",
+    "implied volatility",
     "CNN Fear and Greed",
     "US equities",
     "hash chain",

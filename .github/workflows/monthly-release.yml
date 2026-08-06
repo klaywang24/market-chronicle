@@ -125,10 +125,21 @@ jobs:
             #       "Resource not accessible by integration"（同一 workflow、同样
             #       Contents: write，不带 --target 时却成功 —— 权限日志两轮都是
             #       Contents: write，差别只在 --target）。走 git 协议推 tag 不受此限。
+            # 🔴 2026-08-06 加的防线：Zenodo 读的是 **tag 所指 commit 里的**
+            #    .zenodo.json，不是 HEAD 里的。7 月版就栽在这：那个文件 08-03 才进仓，
+            #    晚于 07-31 的月末 commit ⇒ Zenodo 读不到、退回用 GitHub 仓库元数据，
+            #    标题变成仓名、作者列进了 github-actions[bot]，而**铸出的 DOI 改不回来**。
+            #    光把文件改对不够，得有个动作去证明它在（§48：规矩要变成一个动作）。
+            if ! git cat-file -e "${{ steps.bundle.outputs.sha }}:.zenodo.json" 2>/dev/null; then
+              echo "::error::月末 commit ${{ steps.bundle.outputs.sha }} 里没有 .zenodo.json —— Zenodo 会退回 GitHub 元数据，铸出的 DOI 元数据永久错误。拒绝发版。"
+              exit 1
+            fi
+            echo "::notice::.zenodo.json 存在于月末 commit ⇒ Zenodo 会读到我们自己的元数据"
+
             git tag "$TAG" "${{ steps.bundle.outputs.sha }}"
             git push origin "$TAG"
             gh release create "$TAG" "dist/kapx-ledger-$M.zip" \
-              --title "KAPX ledger snapshot $M" \
+              --title "Market Chronicle indicator ledger $M" \
               --notes-file "dist/RELEASE_NOTES-$M.md"
           fi
 

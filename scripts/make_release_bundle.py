@@ -141,6 +141,18 @@ job ran. Cutting at the month-end commit means this DOI always resolves to the s
 The chain is cumulative and append-only, so it contains every row up to that commit, not only rows
 dated inside {month}. The exact range is printed below.
 
+## 0a. About the filename
+
+The archive is named `kapx-ledger-<YYYY-MM>.zip`. `kapx-` is a project-level prefix, not a
+statement of contents: every edition carries two gauges and one ledger of outcomes -- the KAPX
+Index (`kindex*.json`), the Fear-Price Index (`leaps*.json`, `gauge_math.json`), and the
+volatility family, short-flow, short-interest and audit files.
+
+The prefix is deliberately not renamed. Published bytes and published addresses are never
+rewritten here, which is the same rule applied to a mislabeled row in the chain: leave it as
+published and state the correction separately. From the 2026-08 edition the Zenodo record title
+covers both flagships; the filename stays as it was so earlier links keep resolving.
+
 ## 0b. Citing this bundle
 
 Two DOIs, two uses:
