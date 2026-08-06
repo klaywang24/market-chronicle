@@ -13,6 +13,9 @@ import sys
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+ET = ZoneInfo("America/New_York")  # 2026-08-06 Klay 拍板：日期标签一律=数据的美东交易日，now() 不许推日期（UTC 案勘误）
 
 import numpy as np
 import pandas as pd
@@ -973,7 +976,7 @@ def build_leaps_index(gspc_close: pd.Series, vix_close: pd.Series):
     )
 
     # 降级状态写进 meta：站上据此显示「数据源中断」，绝不白屏，也绝不假装数据是新鲜的
-    stale_days = (pd.Timestamp.utcnow().tz_localize(None).normalize() - vix1y.index[-1]).days
+    stale_days = (pd.Timestamp(datetime.now(ET).date()) - vix1y.index[-1].normalize()).days  # 2026-08-06 UTC 案同族修
     out["meta"]["sources"] = dict(_SOURCE_TRACE)
     out["meta"]["headline_source"] = _SOURCE_TRACE.get("VIX1Y", "unknown")
     out["meta"]["stale_days"] = int(stale_days)
@@ -1022,7 +1025,9 @@ def _vx_curve_on(day) -> list:
 def build_vx_curve(vix_close: pd.Series):
     """VIX 期货逐月结算曲线（真钱轨，与指数轨互证）→ data/vx_curve.json。历史逐日累积。"""
     print("== VX 期货期限结构")
-    today = datetime.now(timezone.utc).date()
+    # 2026-08-06 修（UTC 案）：美东 20:00 后 UTC 已是次日，而 Cboe 端点对未结算日期也回吐最近数据
+    # ⇒ 08-05 结算被错标 asof=08-06（本地台账同日实证）。日期起点必须用美东日历。
+    today = datetime.now(ET).date()
     asof, curve = None, []
     for back in range(6):  # 当晚结算未发布/周末则回退到最近有数的交易日
         d = today - timedelta(days=back)
@@ -1229,7 +1234,7 @@ def build_short_flow(max_backfill: int = 3):
         except Exception:
             old = {}
 
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(ET).date()  # 2026-08-06 UTC 案同族修：回退起点用美东日历
     added, tried = 0, 0
     d = today
     while tried < max_backfill * 2 and added < max_backfill:
@@ -1365,7 +1370,7 @@ def build_short_interest():
         except Exception:
             old_by, old_rev = {}, []
 
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = datetime.now(ET).strftime("%Y-%m-%d")  # 2026-08-06 UTC 案同族修：记录日=美东
     cuts, added, revised = {}, 0, 0
     for tk in SHORT_INT_TICKERS:
         try:
