@@ -279,8 +279,19 @@ Contents are the bytes at that commit, not today's \u2014 so this DOI always res
 ledger regardless of when the packaging job happened to run.
 
 A frozen, citable copy of the public ledger, with the hash chain that makes silent edits and
-silent deletions detectable. **Evidence, not a data product** \u2014 see `VERIFY.md` inside the zip
-for how to check it yourself without trusting us.
+silent deletions detectable. **Evidence, not a data product.**
+
+**Two different archives, and they are not the same file** \u2014 check whichever one you hold:
+
+- **This GitHub release** attaches `kapx-ledger-{month}.zip` (about 0.3 MB): only the ledger files,
+  the chain, a `MANIFEST.json`, and a `VERIFY.md` that states the chain formula in full.
+- **The Zenodo / DOI record** archives the repository's own source zipball at the same commit
+  (about 5 MB), so it holds the entire site rather than a curated bundle. The chain and data are
+  under `data/`, and the recipe for recomputing them is in `data/README.md`. It contains **no**
+  `VERIFY.md`; that file exists only in the release bundle above.
+
+Either one is enough to recompute the chain: both carry `data/ledger_hashes.jsonl` and the tracked
+data files as they stood at that commit.
 
 | | |
 |---|---|
