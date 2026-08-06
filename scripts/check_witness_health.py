@@ -52,14 +52,27 @@ SLA = {
 }
 
 
-def days_since(d: str) -> int | None:
-    """接受 2026-08-04 与 20260804 两种写法（链用前者，Wayback 时间戳用后者）。"""
+ET = ZoneInfo("America/New_York")
+
+
+def days_since(d: str, et: bool = False) -> int | None:
+    """接受 2026-08-04 与 20260804 两种写法（链用前者，Wayback 时间戳用后者）。
+
+    🔑 `et=True` 用于**日历日期**（交易日、提交日）—— 这些日子是按美东记的，
+       而 `datetime.now(utc).date()` 在美东傍晚之后已经跨天，直接相减会把
+       「昨天」读成「2 天前」。SLA 有 4 天余量所以从不误报，**但读数会骗人**，
+       而「看起来对的错读数」正是家规里最危险的那一种量尺问题。
+       2026-08-05 接线当天发现：`期权页` 一项按美东算显示 0 天，
+       而同一天的 `链最后一行` 按 UTC 算显示 2 天 —— 同一份事实两个读数。
+    `et=False`（默认）留给 Wayback 时间戳：那个本来就是 UTC，换成美东才是错的。
+    """
     if not d:
         return None
+    tz = ET if et else timezone.utc
     for cut, fmt in ((10, "%Y-%m-%d"), (8, "%Y%m%d")):
         try:
-            t = datetime.strptime(d[:cut], fmt).replace(tzinfo=timezone.utc)
-            return (datetime.now(timezone.utc) - t).days
+            t = datetime.strptime(d[:cut], fmt).date()
+            return (datetime.now(tz).date() - t).days
         except ValueError:
             continue
     return None
@@ -76,7 +89,7 @@ def check_chain_row() -> dict:
     row = last_line_json(CHAIN)
     if not row:
         return {"status": "bad", "detail": "ledger_hashes.jsonl 缺失或为空"}
-    age = days_since(row["date"])
+    age = days_since(row["date"], et=True)      # 交易日按美东记
     return {"status": "ok" if age is not None and age <= SLA["chain_row"] else "bad",
             "detail": f"链最后一行 {row['date']}（{age} 天前）", "age": age}
 
@@ -86,7 +99,7 @@ def check_anchor_log() -> dict:
         # 🔴 这正是 08-04 之前的状态：文件从未存在过，而没有任何人发现
         return {"status": "bad", "detail": "anchor_log.jsonl 不存在 —— 锚定结果从未被留档"}
     rec = last_line_json(ANCHOR_LOG)
-    age = days_since(rec.get("date", "")) if rec else None
+    age = days_since(rec.get("date", ""), et=True) if rec else None   # 同链，交易日
     if age is None:
         return {"status": "unknown", "detail": "anchor_log 最后一条无法解析日期"}
     if age > SLA["anchor_log"]:
@@ -130,11 +143,14 @@ def check_daily_alive() -> dict:
         out = subprocess.run(
             ["git", "log", "-1", "--format=%cI", "--", "data/kindex.json"],
             cwd=ROOT, capture_output=True, text=True, timeout=30).stdout.strip()
+        # %cI 带时区偏移（CI 里是 +00:00）。**先换算到美东再取日期**：
+        # 21:00 ET 的提交在 UTC 已是次日，直接切 [:10] 会让 age 变成负数。
+        out = datetime.fromisoformat(out).astimezone(ET).strftime("%Y-%m-%d") if out else out
     except Exception as e:
         return {"status": "unknown", "detail": f"读 git 历史失败：{str(e)[:60]}"}
     if not out:
         return {"status": "unknown", "detail": "查不到 data/kindex.json 的提交记录"}
-    age = days_since(out[:10])
+    age = days_since(out, et=True)
     return {"status": "ok" if age is not None and age <= SLA["daily_run"] else "bad",
             "detail": f"daily 最后一次更新数据 {out[:10]}（{age} 天前）", "age": age}
 
@@ -184,16 +200,7 @@ def check_options_page() -> dict:
     except Exception as e:
         return {"status": "bad", "detail": f"options_page.json 解析失败：{str(e)[:60]}"}
     d = meta.get("data_date")
-    # ⚠️ 这里刻意不用 days_since()：它按 UTC 今天算，而 data_date 是**美东交易日**。
-    #    两把尺子不同源 ⇒ 美东傍晚之后 UTC 已跨天，昨天的数据会被读成「2 天前」。
-    #    SLA=4 掩得住，不会误报，但读数会让人以为漏了一天 —— 量尺不同源就先对齐再比。
-    age = None
-    if d:
-        try:
-            t = datetime.strptime(str(d)[:10], "%Y-%m-%d").date()
-            age = (datetime.now(ZoneInfo("America/New_York")).date() - t).days
-        except ValueError:
-            age = None
+    age = days_since(str(d), et=True) if d else None    # data_date 是美东交易日
     if age is None:
         return {"status": "unknown", "detail": "meta.data_date 缺失或无法解析"}
     prov = "（盘中临时读数）" if meta.get("provisional") else ""
