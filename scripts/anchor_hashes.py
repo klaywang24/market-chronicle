@@ -20,7 +20,8 @@
 真正改不了的是「公开推送后被 Wayback 存档」这个社会事实。∴ daily.yml 里锚定步
 必须把本文件也存进 Wayback，缺了那一步，这条链只是自己给自己盖章。
 
-只追加、绝不重写历史行：JSONL 每天一行，主键 date。
+只追加、绝不重写历史行。**一行 = 一次快照事件，不是一个日历格子**（2026-08-06 起明确）：
+date 是快照的美东日历日、只是标签不进哈希；同一天内容变了可以有多行；行序即链序。
 
 ━━ 🔴 一处已被推翻的旧判断（2026-07-19 改正，别退回去）━━
 本文件初版写着「绝不追溯补链，补出来的链是说法不是证据」。**那是把两种不同的保护
@@ -45,6 +46,18 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+# 行标签用美东日历日（2026-08-06 起，Klay 拍板）。
+# ━━ 为什么是美东、为什么曾经错 ━━
+# date 只是标签、**不参与哈希**（chain = sha256(prev + files)，见 chain_value），
+# 但它此前取 UTC 当天，而数据是美东交易日 —— 定时轮 22:00 UTC 恰好两边同日，
+# 潜伏 17 天；只有美东晚 8 点后的手跑会踩：15 行里 2 行标签写错
+# （07-20 那行实摄于美东 07-19 深夜；08-06 那行实摄于美东 08-05 21:03，装的是 08-05 收盘）。
+# 错行**不改**（已被 Wayback 见证，改＝触发自家对账警报）→ 勘误见 data/README.md。
+# generated_at 保持 UTC 精确时刻不动 —— 时刻本就该用 UTC，改它才是错的；
+# 也正因每行带 generated_at，上面那条勘误**任何外人都可独立复核**，不必信我们的说法。
+ET = ZoneInfo("America/New_York")
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -125,7 +138,7 @@ def genesis() -> int:
         return 1
     prev = rows[-1]["chain"] if rows else GENESIS
     rec = {
-        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "date": datetime.now(ET).strftime("%Y-%m-%d"),   # 同每日行：标签=美东（2026-08-06 起）
         "kind": "genesis_snapshot",
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "proves": "自本记录被公开锚定之时起，对以下任一文件的任何改动都可被检测。",
@@ -149,11 +162,6 @@ def main() -> int:
         return genesis()
 
     rows = read_chain()
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    if rows and rows[-1]["date"] == today:
-        print(f"{today} 已在链上，跳过（只追加，绝不重写历史行）")
-        return 0
-
     files = {}
     for name in TRACKED:
         p = DATA / name
@@ -163,6 +171,18 @@ def main() -> int:
         print("没有可锚定的文件，放弃（宁可不写，也不写半真的行）")
         return 1
 
+    # 跳过判据＝「内容没变」，不再比日期（2026-08-06 改，Klay 拍板）。
+    # 旧判据 `rows[-1].date == today` 把行当成了日历格子 —— 而行是**事件**：
+    # 拍了一次指纹。内容没变，再写一行是废话；内容变了，同一天写第二行完全正当
+    # （08-05 事故的形状：闸误报拦掉落库→深夜重跑，旧判据会让次日真收盘被跳过）。
+    # 🔑 与 publish_options_page 的 generated_at 教训同一条：**去重按内容，不按标签**。
+    # ⚠️ 前置条件：verify_against_archive 已改「按前缀逐行比」——按日期查表的旧对账
+    #    遇到同日两行会误报「历史被改写」，这两处必须同一批落地，顺序不能反。
+    if rows and rows[-1].get("files") == files:
+        print(f"内容与链上末行（{rows[-1]['date']}）一致，跳过（只在内容变化时追加）")
+        return 0
+
+    today = datetime.now(ET).strftime("%Y-%m-%d")   # 标签=美东日历日，与数据同一把尺子
     prev = rows[-1]["chain"] if rows else GENESIS
     rec = {
         "date": today,

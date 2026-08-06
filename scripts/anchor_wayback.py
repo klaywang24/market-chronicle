@@ -41,6 +41,7 @@ import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent.parent
 LOG = ROOT / "data" / "anchor_log.jsonl"
@@ -164,7 +165,9 @@ def main() -> int:
     ap.add_argument("--check-only", action="store_true", help="只查现状不发起存档")
     args = ap.parse_args()
 
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    # 日志行标签=美东日历日（2026-08-06 改，与链行同一把尺子；体检按美东读它，
+    # 此前按 UTC 写 ⇒ 美东晚 8 点后手跑会差一天，同 anchor_hashes 的病）
+    today = datetime.now(ZoneInfo("America/New_York")).strftime("%Y-%m-%d")
     results, fresh, stale, unknown = [], 0, 0, 0
 
     for u in targets(args.sha):

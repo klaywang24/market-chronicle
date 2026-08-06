@@ -100,22 +100,27 @@ def fetch_archived(ts: str) -> list[dict] | None:
 
 
 def compare(archived: list[dict], local: list[dict]) -> tuple[str, list[str]]:
-    """存档是历史的一个前缀快照：本地必须**逐字包含**它。
+    """存档必须是本地的**前缀**：第 i 行对第 i 行，逐行逐字段比。
 
-    本地更长 = 正常追加；本地更短或某行不同 = 历史被改写或被删。
+    🔴 2026-08-06 改（改跳过判据之前的**前置条件**，顺序不能反）：
+    初版按 `date` 建字典查表 —— 同一天出现两行时后者覆盖前者，存档里的旧行会被
+    拿去和当天的新行比 ⇒ 误报「历史被改写」＝我们自己造的最高级别假警报（推演实证）。
+    而「同日两行」马上会真实存在：行是**事件**（拍了一次指纹）不是日历格子，
+    内容变了当天重跑就该再写一行。
+    「前缀」本来就是只追加链的本征不变量：**存档那一刻的每一行，必须原封不动地
+    出现在本地的相同位置上** —— 比按日期查表更强（连行序都锁死），且天然容忍同日多行。
+    `date` 也纳入比对：行不可变，标签同样不许事后改。
     """
     problems: list[str] = []
-    by_date = {r.get("date"): r for r in local}
-    for a in archived:
-        d = a.get("date")
-        l = by_date.get(d)
-        if l is None:
-            problems.append(f"{d}：存档里有、**本地已消失**（删除历史）")
-            continue
-        for k in ("chain", "prev", "files"):
-            if a.get(k) != l.get(k):
-                problems.append(f"{d}：字段 `{k}` 与存档不符（历史被改写）")
-                break
+    if len(archived) > len(local):
+        problems.append(f"存档 {len(archived)} 行 > 本地 {len(local)} 行（历史被截断或删除）")
+    for i, a in enumerate(archived):
+        if i >= len(local):
+            break
+        l = local[i]
+        bad = [k for k in ("date", "chain", "prev", "files") if a.get(k) != l.get(k)]
+        if bad:
+            problems.append(f"第 {i+1} 行（存档日期 {a.get('date')}）：字段 {'/'.join(bad)} 与存档不符（历史被改写）")
     return ("bad" if problems else "ok"), problems
 
 
