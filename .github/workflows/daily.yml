@@ -61,6 +61,13 @@ jobs:
       # exit 2 = 测量失败（解析漂移），与红同样挡住流水线，绝不算绿。
       - name: verify i18n no duplicate keys
         run: python tools/check_i18n_dupes.py
+      # 禁词闸（2026-08-07 命名线接线，见 HANDOFF §58）。
+      # 「恐慌指数」是 VIX 的中文俗名：自称它 = 把检索流量捐给 Cboe，且与自家
+      # 「恐惧的标价指数」撞名。但归属性提及 VIX 本身放行（行情条标签「VIX 恐慌指数」
+      # 与本站指数并列反而形成消歧）。判据 = 前 4 字内须有 VIX，机器可判不靠自觉。
+      # 建闸当天已用负向样本实测报红（植入一处→exit 1→还原→复绿），不是只写不验。
+      - name: verify banned terms
+        run: python tools/check_banned_terms.py
       - name: commit data
         run: |
           git config user.name "klaywang24"
