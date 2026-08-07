@@ -55,6 +55,16 @@ jobs:
       #    照 VERIFY.md 印出来的公式复算一遍。两边用同一份实现发现不了任何东西。
       #    由来：08-03 首个包的 VERIFY.md 链公式写错，照它验会得出「链断了」——
       #    发布一份错的验证方法，比不发验证方法更糟。
+      # 闸的自测先于闸的使用：现场造 6 类坏样本喂给验证器，任何一个被放行就中止发版。
+      # 为什么进 CI 而不是留在 commit message：人工负向测试没人会重跑（§50②），
+      # 而 2026-08-07 实测证明验证器可以瞎四天没人知道。
+      - name: gate self-test (negative samples)
+        run: >
+          python scripts/test_release_gate.py
+          "dist/kapx-ledger-${{ steps.bundle.outputs.month }}.zip"
+          "${{ steps.bundle.outputs.month }}"
+          "${{ steps.bundle.outputs.sha }}"
+
       - name: independent re-verification
         run: python scripts/verify_release.py "dist/kapx-ledger-${{ steps.bundle.outputs.month }}.zip" --expect-month "${{ steps.bundle.outputs.month }}" --expect-cut "${{ steps.bundle.outputs.sha }}"
 

@@ -67,9 +67,14 @@ CHAIN = DATA / "ledger_hashes.jsonl"
 # 2026-07-20 加 short_interest.json：它 07-18 建库时进了 verify_ledger 但漏进本链。
 #   本脚本按 TRACKED「当天现算」写每日新行、绝不回改历史行（main:149-150），所以加它
 #   只让**今后**的行多含它一项，链只声明「从今天起受保护」，不追溯——符合家规。
+# 2026-08-07 加 leaps.json / gauge_math.json：外部审计的负向样本证明「不在链里的
+#   台账文件可被篡改而链照样自洽」。月度包的 MANIFEST 层已兜住单包完整性，但链层的
+#   历史保护（删改任何一天必断后续所有 chain）只覆盖 TRACKED —— 旗舰的主数据文件
+#   不该是二等公民。同上：只影响今后的行，不追溯。
 TRACKED = ["kindex.json", "leaps_gauge.json", "vol_family.json",
            "short_flow.json", "short_interest.json",
-           "kindex_signals.json", "ledger_audit.json"]
+           "kindex_signals.json", "ledger_audit.json",
+           "leaps.json", "gauge_math.json"]
 GENESIS = "0" * 64
 
 

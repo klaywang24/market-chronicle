@@ -3194,3 +3194,15 @@ The Price of Fear。**以后改名的边界：加短码/加品牌=可以；换�
 
 ⏳ 建议 Klay 在 GitHub 仓库设置里开 Immutable Releases（发布后 tag 与附件平台级不可改，
 自动生成 attestation）—— 只保护未来版本，7 月版仍靠摘要监控。设置在 repo Settings。
+
+### §49.16 审计清单最后两项闭环（2026-08-07 深夜 · commit 8345dc9）
+
+① **leaps.json + gauge_math.json 入链**（TRACKED 7→9）。负向样本溜过去的根源之一就是
+「旗舰主数据不在链里」。只影响今后的行，不追溯（与 short_interest 案同一家规）。
+**验收：下一次 daily 跑完后链末行应有 9 个文件。**
+② **负向测试自动化**：scripts/test_release_gate.py 进 CI（monthly-release 发版前一步）。
+现场造 6 类坏样本喂验证器，任何一个被放行即中止发版 —— 闸每次先证明自己没瞎。
+实跑 7/7。为什么进 CI：人工负向测试没人重跑（§50②），验证器瞎四天没人知道就是实证。
+
+审计清单至此全部闭环。剩余非代码项：Klay 开 GitHub Immutable Releases（Settings）；
+i18n 14 个重复 key 独立会话在修（task chip 已领走）。
