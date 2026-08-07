@@ -40,7 +40,7 @@ ROUTES = {
         "恐惧的标价指数 · LEAPS 成本刻度",
         "长期期权（LEAPS）现在贵不贵：以一年期隐含波动率 VIX1Y 的三年分位为主读数，"
         "辅以波动率风险溢价、期限阶梯、SKEW 与实际利率，回填至 2007 年，每个交易日留痕。"
-        "纯描述性刻度，不构成交易信号。Fear's Price Tag: a cost gauge for LEAPS.",
+        "纯描述性刻度，不构成交易信号。Fear-Price Index: a cost gauge for LEAPS, formerly Fear's Price Tag.",
     ),
     "spy": (
         "标普 500 · 一个世纪的形状",
@@ -80,7 +80,7 @@ ROUTES = {
     "methodology": (
         "方法论 · 两把刻度，一本结果账",
         "K 指数与恐惧的标价指数的完整方法论：口径定义、数据来源、对账规则，"
-        "以及为什么每条读数都要留下可验证的时间戳。Methodology of the KAPX Index and Fear's Price Tag.",
+        "以及为什么每条读数都要留下可验证的时间戳。Methodology of the KAPX Index and the Fear-Price Index.",
     ),
     "pricing": (
         "定价与订阅",

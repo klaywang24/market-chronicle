@@ -18,10 +18,10 @@
 <title>恐惧的标价指数 · LEAPS 成本刻度 · 美股编年史 Market Chronicle</title>
 <!-- SEO / GEO：主推域名 canonical + 摘要 + 社交卡片 + 结构化数据 -->
 <link rel="canonical" href="https://chronicle.klay-wang.com/leaps">
-<meta name="description" content="长期期权（LEAPS）现在贵不贵：以一年期隐含波动率 VIX1Y 的三年分位为主读数，辅以波动率风险溢价、期限阶梯、SKEW 与实际利率，回填至 2007 年，每个交易日留痕。纯描述性刻度，不构成交易信号。Fear's Price Tag: a cost gauge for LEAPS.">
+<meta name="description" content="长期期权（LEAPS）现在贵不贵：以一年期隐含波动率 VIX1Y 的三年分位为主读数，辅以波动率风险溢价、期限阶梯、SKEW 与实际利率，回填至 2007 年，每个交易日留痕。纯描述性刻度，不构成交易信号。Fear-Price Index: a cost gauge for LEAPS, formerly Fear's Price Tag.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="恐惧的标价指数 · LEAPS 成本刻度 · 美股编年史 Market Chronicle">
-<meta property="og:description" content="长期期权（LEAPS）现在贵不贵：以一年期隐含波动率 VIX1Y 的三年分位为主读数，辅以波动率风险溢价、期限阶梯、SKEW 与实际利率，回填至 2007 年，每个交易日留痕。纯描述性刻度，不构成交易信号。Fear's Price Tag: a cost gauge for LEAPS.">
+<meta property="og:description" content="长期期权（LEAPS）现在贵不贵：以一年期隐含波动率 VIX1Y 的三年分位为主读数，辅以波动率风险溢价、期限阶梯、SKEW 与实际利率，回填至 2007 年，每个交易日留痕。纯描述性刻度，不构成交易信号。Fear-Price Index: a cost gauge for LEAPS, formerly Fear's Price Tag.">
 <meta property="og:url" content="https://chronicle.klay-wang.com/leaps">
 <meta property="og:image" content="https://chronicle.klay-wang.com/icons/icon-512.png">
 <meta name="twitter:card" content="summary">
@@ -31,7 +31,7 @@
  {"@type":"Person","@id":"https://klay-wang.com/#person","name":"Klay Wang","url":"https://klay-wang.com/","sameAs":["https://klay-wang.com/","https://x.com/_Klay24_","https://github.com/klaywang24","https://www.linkedin.com/in/klay-w-a593bb101/","https://www.kaggle.com/klaywong","https://huggingface.co/klay24"]},
  
  {"@type":"WebSite","name":"Market Chronicle 美股编年史","alternateName":"美股编年史","url":"https://chronicle.klay-wang.com/","inLanguage":["zh-CN","en"],
-  "description":"A free, self-updating archive of a century of US market history, plus two original gauges and one public ledger of outcomes: the KAPX Index and the Fear-Price Index (Fear's Price Tag), every reading reconciled daily.",
+  "description":"A free, self-updating archive of a century of US market history, plus two original gauges and one public ledger of outcomes: the KAPX Index and the Fear-Price Index (formerly Fear's Price Tag), every reading reconciled daily.",
   "publisher":{"@id":"https://klay-wang.com/#person"}},
  {"@type":"Dataset","name":"KAPX Index daily series (CNN Fear & Greed ÷ VIX)","alternateName":["K 指数","K-Index","KAPX"],
   "description":"The KAPX Index is an original contrarian US equity sentiment indicator: K = CNN Fear & Greed Index ÷ VIX. K < 1 marks extreme-fear signals. Daily values plus a public ledger reconciling every signal since 2011 against forward Nasdaq-100 returns — wins and losses alike. Updated each trading day by an automated pipeline; readings since the site's July 2026 launch are timestamped ex-ante in the public GitHub commit log, while the ledger back to 2011 is backfilled from public data and independently reproducible.",
@@ -47,7 +47,7 @@
   "creator":{"@id":"https://klay-wang.com/#person"},
   "license":"https://polyformproject.org/licenses/noncommercial/1.0.0/",
   "distribution":[{"@type":"DataDownload","encodingFormat":"application/json","contentUrl":"https://chronicle.klay-wang.com/data/leaps.json"}]},
- {"@type":"Dataset","name":"恐惧的标价指数 · LEAPS Cost Gauge (VIX1Y expensiveness)","alternateName":["恐惧的标价指数","LEAPS Cost Gauge","Fear's Price Tag"],
+ {"@type":"Dataset","name":"恐惧的标价指数 · Fear-Price Index (VIX1Y expensiveness)","alternateName":["恐惧的标价指数","LEAPS Cost Gauge","Fear's Price Tag","The Price of Fear"],
   "description":"A descriptive cost thermometer for long-dated options (LEAPS): the headline is the percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years — higher means options are historically more expensive (0=cheapest, 100=priciest). Context: the volatility risk premium (VRP), the VIX9D→VIX1Y term ladder, SKEW, and the 10-year real rate. Backfilled to 2007 and reproducible; the forward ledger is recorded each trading day and timestamped in the public GitHub commit log since 2026-07-13. Descriptive only — not a trading signal, never return-tested.",
   "url":"https://chronicle.klay-wang.com/leaps","isAccessibleForFree":true,
   "creator":{"@id":"https://klay-wang.com/#person"},
@@ -1125,9 +1125,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260805b"></script>
+<script src="js/i18n.js?v=20260807a"></script>
 <script src="js/app.js?v=20260805a"></script>
-<script src="js/docs-i18n.js?v=20260805b"></script>
+<script src="js/docs-i18n.js?v=20260807a"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 // Paddle 结账（Standard 档自助订阅）。零后端：付款事件走 Paddle 的 Email notification destination。
