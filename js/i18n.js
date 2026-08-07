@@ -64,7 +64,6 @@
     // 2026-07-26 §45：TV 热力图撤换（自有板块涨跌图）+ 往期存档墙（时间墙模型）
     "今天热在哪 · 各板块涨跌家数（标普 500 全成分股 · 自有数据，每日收盘后更新）": ["Where today ran hot · advancers vs decliners by sector (all S&P 500 members · our own data, updated after each close)", "", "", ""],
     "每周对账 · 公开归档": ["Weekly reconciliations · public archive", "", "", ""],
-    "全部往期，公开可查，越攒越厚": ["Every past issue, public and growing", "", "", ""],
     "当日完整判读只进订户邮箱": ["Today's full read goes only to subscribers' inboxes", "", "", ""],
     "完整判读只进订户邮箱": ["The full read goes only to subscribers' inboxes", "", "", ""],
     "前向台账：第": ["Forward ledger: day", "", "", ""],

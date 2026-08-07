@@ -2425,8 +2425,7 @@
         ${arch && arch.issues && arch.issues.length ? `
         <div class="digest-archive">
           <div class="da-head"><span>每周对账 · 公开归档</span></div>
-          ${arch.issues.slice(0, 6).map((i) => `<a class="da-row" href="${i.url}" target="_blank" rel="noopener"><span class="da-date">${i.date.slice(5)}</span><span class="da-title">${i.title}</span></a>`).join("")}
-          <a class="da-all" href="${arch.archive_index}" target="_blank" rel="noopener"><span>全部往期，公开可查，越攒越厚</span> →</a>
+          ${arch.issues.slice(0, 3).map((i) => `<a class="da-row" href="${i.url}" target="_blank" rel="noopener"><span class="da-date">${i.date.slice(5)}</span><span class="da-title">${i.title}</span></a>`).join("")}
         </div>` : ""}
         <p class="ledger-note lv-line"><a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener"><span>在 GitHub 验证台账</span></a> · <span>每个交易日的读数，每日收盘自动更新提交，带 GitHub 时间戳，事后不可改写，GitHub 精确可查</span>${fwdN != null ? ` · <span>前向台账：第</span> <b class="fwd-n">${fwdN}</b> <span>个交易日 · 自 2026-07-13 起</span>` : ""}</p>
         <p class="ledger-note">15 年台账与全部输赢（包括跑输的那部分）→ <a href="kindex">K 指数</a> · <a href="leaps">恐惧的标价</a></p>
