@@ -2,7 +2,7 @@
 
 > 本文档面向未来的维护者（包括未来的我和任何 AI 助手）。
 > 读完本文即可独立维护、修改、扩展本站的一切。
-> **最后更新：2026-08-06 EDT｜线上现行 ｜最新章节：第57节（§57，UTC 日期案第二半：build_data 五处美东尺+vx_curve 勘误）**
+> **最后更新：2026-08-07 EDT｜线上现行 i18n.js?v=20260808c · app.js?v=20260808a · style.css?v=20260808b · sw mc-v29｜最新章节：第58节（§58，命名落地三项：恐惧的标价指数 canonical 块 + series_id + llms.txt 归一）**
 > ⚠️ **改本文正文时，必须同时改上面这行。** 它已经过期过多次（07-16 三行全错；07-18 停在 §22 却已到 §30；07-19 停在 §34 却已到 §36）。抬头是读者判断"这文档还算不算数"的唯一依据，过期比没有更糟。
 > ⚠️ **本文按时间追加，越靠后越新。与前文冲突处，一律以编号最大的那节为准。**
 
@@ -3258,3 +3258,31 @@ querySelectorAll 会看到两份 .digest-archive，是架构不是 bug，别当�
 链末行应出现 leaps.json + gauge_math.json；8 月底 monthly-release 新闸链（含 7/7 自测）首战。
 命名线正在本仓落它的五项（canonical 块/series_id/llms.txt/撞车措辞/禁词闸），勿动
 index.html、js/i18n.js、llms.txt 的它未提交改动。
+
+---
+
+## §58 命名落地三项：恐惧的标价指数 canonical 块 + series_id + llms.txt 归一（2026-08-07 01:0x EDT·命名线会话·本节最新，与前文冲突以本节为准）
+
+**背景**：08-06 命名线收口（约 160 候选、10 轮、3 个 agent 交叉审）定案 = **KAPX 永久只指 K 指数；恐惧的标价指数英文名 Fear-Price Index，公开短码永久为无**（CNN 恐贪 / Buffett Indicator / Case-Shiller 皆无短码；**可交易才需要 ticker，引用资产的代码就是名字本身**）。本节落其中三项，另两项见文末"未做"。
+
+### 做了什么
+1. **leaps 面板三层 canonical 块**（`index.html` hero 之后，对齐 kindex 的 `ledger-intro` 写法）：中文名 + 英文名 Fear-Price Index + 技术定义（VIX1Y 三年滚动百分位，0-100，高即贵）+ series_id + 三个旧英文名收编 + **明写与 KAPX 是两条独立序列、互不派生**。中文段进 `js/i18n.js` 的 D（key = 中文原文），另配 `<noscript>` 英文版。
+2. **series_id 落 JSON-LD**：两个 Dataset 各加 `"identifier":{"@type":"PropertyValue","propertyID":"series_id","value":…}` = `mc.kapx.cnn_vix.v1` / `mc.fear_price.vix1y_pct3y.v1`。**身份在 series_id，名字只是门牌**：将来显示名可加可换，序列身份不动；改公式绝不叫改名，必须另立 v2。
+3. **llms.txt 归一**：原文停在"KAPX Index + LEAPS Window 两个 indicator"的旧口径、**全文 0 次 Fear-Price Index**。改为"两把刻度（KAPX Index + Fear-Price Index）+ LEAPS Window 事件台账"，数据条目补 series_id 与三个 legacy alias，Pages 条目写明 **`/leaps` 是 canonical、`/fear-price` 是永久别名**（与 `ce447bb` 已上线的跳转方向一致），Attribution 改为按序列分别署名并给出 series_id、明写"两条序列绝不可互换引用、均无 ticker 式短码（by design）"。
+
+### 验证（全部实跑，非记忆）
+- `tools/check_i18n_dupes.py`：**D 共 842 key，重复 0**（新 key 未撞）
+- **i18n key 与页面中文串逐字节比对**：两侧长度 301、sha1 同为 `d1d026376787` ⇒ 英文层必命中，**不会 fallback 成中文**。🔑 这是本仓最容易静默失败的一环（改中文不同步 key ⇒ 英文读者看到中文），已用哈希证明而非肉眼
+- **JSON-LD 四页独立解析**（index/about/kindex/leaps）：均合法、5 节点、2 个 Dataset 带 series_id
+- `scripts/build_route_pages.py` 重跑 16 页 ⇒ 含新块 **17/17**、新戳 **17/17**、旧戳残留 **0**
+- 禁词：`恐慌指数` 全站均紧跟 `VIX`（归属性用法，指 VIX 本身），被否的 `Fear-Price Gauge` **0 处**，`Fear-Price Index` 77 处
+- 版本戳：`i18n.js?v=20260808b→20260808c`、`sw CACHE mc-v28→mc-v29`（app.js / style.css / docs-i18n.js 未改故未 bump）
+
+### ❌ 本节未做，交下一手
+- **撞车措辞（待 Klay 裁定，勿擅自动）**：KAPX 现描述为「美股恐惧**定价**指标」/ "fear-pricing gauge"，与「恐惧的**标价**指数」/ "Fear-Price Index" 近乎同词。裁定建议 = 中文改「恐惧**情绪**指标」、英文改 "fear-**sentiment ratio**"（KAPX 是情绪比值、不读任何价格，改后更准；公式/名字/序列身份三样不动，不违 canonical 承诺）。**源头分布**：`index.html` 152/156/973、`js/i18n.js:46`（整句是 key，改中文必 key+值同改）、`js/docs-i18n.js:120`、`llms.txt:5`、`README.md:17`。
+  🚨 **跨平台连带（决定性）**：HF 数据集标题实测就是 "KAPX Index — Daily Fear-Pricing Gauge for US Equities"，Kaggle 的 **URL slug 本身**含 `fear-pricing-gauge`。⇒ 建议**只改描述、标题与 slug 一律不动**（链接稳定 > 措辞整洁），并在数据集描述里写明改述原因。标题/描述需 Klay 在平台 UI 改，代码侧改不动。
+- **禁词闸未建**：本仓无统一的渲染层禁词入口。规矩应变成一个动作 = 正则「`恐慌指数` 前必须紧跟 `VIX`，否则报红」，建议挂 `daily.yml`。🔑 **新闸必须先用实测负向样本证明它会报红才算存在**，别只写不验。
+- **项目地图打卡回填**：站点线欠账，仍未补。
+
+### 🚨 顺带发现一处日期漂移（未改，留给下一手判）
+本次操作时 **ET = 2026-08-07 01:08、UTC = 2026-08-07 05:08，两者都是 08-07**，但站上既有版本戳是 `20260808a/b`。戳只是缓存破坏符、功能无害（我为保持单调递增跟用了 `20260808c`），但这与 §57 刚收口的「日期标签只来自数据的美东交易日、now() 不推日期」同族。**若版本戳被任何脚本当日期读，就会重演 §57**；建议下一手确认戳是纯人工递增还是有脚本参与。
