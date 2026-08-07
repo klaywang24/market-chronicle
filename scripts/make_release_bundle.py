@@ -268,7 +268,11 @@ def main() -> None:
         z.writestr(f"kapx-ledger-{month}/VERIFY.md",
                    verify_md(month, packaged_on, sha, cut, rows, present))
         z.writestr(f"kapx-ledger-{month}/MANIFEST.json", json.dumps(manifest, indent=2))
-        z.write(ROOT / "LICENSE", f"kapx-ledger-{month}/LICENSE")
+        # 2026-08-07 修：LICENSE 也必须是 CUT_SHA 那一刻的字节 —— 包里其余全部来自
+        # 月末 commit，唯独它取当前工作区的话，「本包=该 commit 的快照」这句就不再为真
+        lic = subprocess.run(["git", "show", f"{sha}:LICENSE"],
+                             cwd=ROOT, capture_output=True, check=True).stdout
+        z.writestr(f"kapx-ledger-{month}/LICENSE", lic)
 
     head = rows[-1] if rows else {}
     first = rows[0] if rows else {}

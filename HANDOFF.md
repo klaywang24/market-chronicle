@@ -3160,3 +3160,37 @@ Fear's Price Tag / LEAPS Cost Gauge / **The Price of Fear**（第三个是执行
 Dataset alternateName 四元素。?v=20260807a、sw mc-v22、路由页重跑 16 页。
 教训：①options.html 有自带小字典，全站改名必查 ②?v= 替换先长后短（子串包含）
 ③i18n 同 key 多分区，grep 全文件。
+
+### §49.15 验收闸大修：另一会话审计的六个洞全部复现属实、全部堵上（2026-08-07 深夜）
+
+另一会话对 --clobber 热修做攻击性验收，用负向样本证明**我的验收闸本身会错误报绿**。
+我逐条复现，全部属实，全是我的代码：
+
+| 洞 | 复现 | 修法 |
+|---|---|---|
+| 篡改包内 leaps.json 仍 ✅ | 属实 | 根因=旧验证器只验链末行的 7 个文件，MANIFEST 列了 10 个但**从没验过 MANIFEST.files**。新增：逐文件验哈希 + 成员集精确相等 + 重名走私检测 + 链⊆MANIFEST 一致 |
+| MANIFEST.cut_at_commit 改成别的仍 ✅ | 属实 | 旧版只查「有没有」不查「是不是」。新增 --expect-month/--expect-cut，CI 必传，把包钉死在「这个月这个 commit」 |
+| 远端 tag 被挪仍放行 | 属实（本地 tag 优先回退） | 只信 git ls-remote 真值（^{} 剥注解 tag），查询失败也 fail-closed |
+| '*.zip'+head -1 可被多传的 zip 劫持 | 属实 | 按精确名 kapx-ledger-$M.zip 下载与校验 |
+| LICENSE 取当前工作区 | 属实 | git show $CUT_SHA:LICENSE |
+| tag 已推、Release 创建失败的中间态卡死 | 属实 | 四状态恢复：远端 tag 在且正确⇒复用只补 Release；在但错⇒硬失败 |
+
+另加 concurrency 锁（排队不取消）。验收：六个负向样本全红、clean+绑定参数全绿。
+
+🔑 教训（§50③的续篇）：**「闸存在」和「闸闭环」是两回事。我上一轮验的是闸会不会误拦
+（正向）和 tag 被挪（一个负向），没验「包内容被换」这一整类。验收闸自己也需要被
+攻击性验收 —— 让另一个实现、另一双眼睛来打，比自己给自己写负向样本强。**
+
+顺手发现并立单（task chip）：i18n.js 一个大字典里 19 个重复 key、14 个值不同=
+静默覆盖 bug（「恐惧的标价」那 3 处已在收编轮去重）。显示层问题，另开会话修。
+
+命名终局（另一会话改判、与已投产事实一致）：**英文名保留 Fear-Price Index 不再改**
+（Buttondown/Longbridge/LinkedIn 已投产带外部时间戳；它确实是 0-100 百分位指数不失真；
+为 Gauge 的轻微语义优势制造第五个名字得不偿失）。Gauge 只作产品描述词。
+身份台账：中文=恐惧的标价指数 · EN=Fear-Price Index · URL=/fear-price · 短码=无 ·
+数据=/data/leaps_gauge.json · legacy aliases=Fear's Price Tag / LEAPS Cost Gauge /
+The Price of Fear。**以后改名的边界：加短码/加品牌=可以；换显示名=可以但旧名永远留档；
+改公式口径=不叫改名，必须起 v2 新序列。永不可变的是 序列身份+公式版本+历史谱系。**
+
+⏳ 建议 Klay 在 GitHub 仓库设置里开 Immutable Releases（发布后 tag 与附件平台级不可改，
+自动生成 attestation）—— 只保护未来版本，7 月版仍靠摘要监控。设置在 repo Settings。

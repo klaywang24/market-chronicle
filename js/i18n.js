@@ -107,7 +107,6 @@
     "标普 胜率": ["S&P win rate", "", "", ""],
     "标普 平均收益": ["S&P average", "", "", ""],
     "标普 中位收益": ["S&P median", "", "", ""],
-    "恐惧的标价": ["Fear-Price Index", "", "", ""],
     "保费越贵，之后的赔付越大吗？": ["Does dearer fear pay out more later?", "", "", ""],
     "窗口开启日的 VIX × 12 个月后的纳指": ["VIX on the window's first day × the Nasdaq 12 months later", "", "", ""],
     "每个点是一次窗口：横轴 = 开窗当日 VIX（恐慌的保费水位），纵轴 = 12 个月后纳指涨跌幅；绿 = 涨、红 = 跌 · 点任意点看当次窗口": ["Each dot is one window: x = VIX on the opening day (the premium of panic), y = Nasdaq change 12 months later; green = up, red = down · tap any dot for that window", "", "", ""],
@@ -178,7 +177,6 @@
     "期权异动": ["Options", "Options", "Optionen", "Opciones"],
     "LEAPS 窗口": ["LEAPS Window", "Fenêtre LEAPS", "LEAPS-Fenster", "Ventana LEAPS"],
     // ---- 恐惧的标价指数（LEAPS 贵贱温度计） ----
-    "恐惧的标价": ["Fear-Price Index", "", "", ""],
     "LEAPS · 贵贱温度计": ["LEAPS · COST THERMOMETER", "", "", ""],
     "恐惧的标价指数": ["Fear-Price Index", "", "", ""],
     "今天贵不贵": ["Expensive today?", "", "", ""],

@@ -14,6 +14,10 @@ on:
         required: false
 permissions:
   contents: write
+# 同月两个实例并行 = 竞态写入已发布证据的温床；排队而非取消（取消会留半成品状态）
+concurrency:
+  group: monthly-release
+  cancel-in-progress: false
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -52,7 +56,7 @@ jobs:
       #    由来：08-03 首个包的 VERIFY.md 链公式写错，照它验会得出「链断了」——
       #    发布一份错的验证方法，比不发验证方法更糟。
       - name: independent re-verification
-        run: python scripts/verify_release.py "$(ls dist/kapx-ledger-*.zip | head -1)"
+        run: python scripts/verify_release.py "dist/kapx-ledger-${{ steps.bundle.outputs.month }}.zip" --expect-month "${{ steps.bundle.outputs.month }}" --expect-cut "${{ steps.bundle.outputs.sha }}"
 
       # 🔴🔴 2026-08-06 热修：**删掉 `--clobber`，改为 fail-closed**
       #
@@ -89,13 +93,18 @@ jobs:
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "::notice::$TAG 已存在 —— 进入只读校验路径，绝不覆盖已发布证据"
 
-            # ① 远端 tag 必须仍指向本次算出的月末 commit
-            REMOTE_SHA="$(git ls-remote origin "refs/tags/$TAG" | cut -f1)"
-            # 注解 tag 的 ls-remote 给的是 tag 对象；用 rev-parse 解到 commit
-            git fetch --tags -q origin || true
-            RESOLVED="$(git rev-parse "$TAG^{commit}" 2>/dev/null || echo "$REMOTE_SHA")"
+            # ① 远端 tag 必须仍指向本次算出的月末 commit。
+            # 🔴 2026-08-07 修：只信 git ls-remote 的远端真值，**绝不回退到本地 tag** ——
+            #    负向实测：远端 tag 被挪、本地还是旧值时，旧写法（rev-parse 本地 tag）会放行。
+            #    ^{} 取注解 tag 剥壳后的 commit；轻量 tag 无 ^{} 行，取原行即 commit。
+            RESOLVED="$(git ls-remote origin "refs/tags/$TAG^{}" | cut -f1)"
+            [ -z "$RESOLVED" ] && RESOLVED="$(git ls-remote origin "refs/tags/$TAG" | cut -f1)"
+            if [ -z "$RESOLVED" ]; then
+              echo "::error::查询远端 tag $TAG 失败（网络？）—— 状态不明时拒绝任何写入"
+              exit 1
+            fi
             if [ "$RESOLVED" != "$CUT_SHA" ]; then
-              echo "::error::tag $TAG 指向 $RESOLVED，但本次算出的月末 commit 是 $CUT_SHA"
+              echo "::error::远端 tag $TAG 指向 $RESOLVED，但本次算出的月末 commit 是 $CUT_SHA"
               echo "已发布的证据与当前计算不一致 —— 拒绝任何写操作。修订请另起 $TAG-r2。"
               exit 1
             fi
@@ -103,14 +112,18 @@ jobs:
             # ② 下载线上那份已发布的附件，用独立实现验它（不是验我们刚打的那份）
             rm -rf dist/_published && mkdir -p dist/_published
             # 目录上一行已 rm -rf，不需要 --clobber；**刻意不留这个词**，
-            # 免得将来 grep 的人以为覆盖逻辑还在
-            gh release download "$TAG" -D dist/_published -p '*.zip'
-            PUB="$(ls dist/_published/*.zip | head -1)"
-            if [ -z "$PUB" ]; then
-              echo "::error::$TAG 没有可下载的 zip 附件 —— 拒绝写入，请人工处理"
+            # 免得将来 grep 的人以为覆盖逻辑还在。
+            # 🔴 2026-08-07 修：按**精确文件名**下载 —— '*.zip'+head -1 会被
+            #    「Release 上多传一个 zip」劫持成验错对象。
+            gh release download "$TAG" -D dist/_published -p "kapx-ledger-$M.zip"
+            PUB="dist/_published/kapx-ledger-$M.zip"
+            if [ ! -f "$PUB" ]; then
+              echo "::error::$TAG 没有名为 kapx-ledger-$M.zip 的附件 —— 拒绝写入，请人工处理"
               exit 1
             fi
-            python scripts/verify_release.py "$PUB"
+            # --expect-*：把「这个包」钉死在「这个月、这个 commit」上（负向实测：
+            # 不钉的话错月份包、错 cut_at_commit 的包都能过）
+            python scripts/verify_release.py "$PUB" --expect-month "$M" --expect-cut "$CUT_SHA"
 
             echo "::notice::已发布附件通过独立复算、tag 指向正确 ⇒ 本次 no-op，不上传不改 notes"
             exit 0
@@ -136,8 +149,21 @@ jobs:
             fi
             echo "::notice::.zenodo.json 存在于月末 commit ⇒ Zenodo 会读到我们自己的元数据"
 
-            git tag "$TAG" "${{ steps.bundle.outputs.sha }}"
-            git push origin "$TAG"
+            # 🔴 2026-08-07 补：四状态里此前漏了「tag 已推送、Release 创建失败」的中间态 ——
+            #    重跑会在 git push 处炸掉，留在坏状态里出不来。先看远端有没有 tag：
+            #    有且指向正确 ⇒ 跳过建 tag，只补 Release；有但指向错误 ⇒ 硬失败；没有 ⇒ 正常建。
+            EXISTING="$(git ls-remote origin "refs/tags/$TAG^{}" | cut -f1)"
+            [ -z "$EXISTING" ] && EXISTING="$(git ls-remote origin "refs/tags/$TAG" | cut -f1)"
+            if [ -n "$EXISTING" ] && [ "$EXISTING" != "${{ steps.bundle.outputs.sha }}" ]; then
+              echo "::error::远端已有 tag $TAG 指向 $EXISTING ≠ 月末 commit —— 拒绝复用，请人工处理"
+              exit 1
+            fi
+            if [ -z "$EXISTING" ]; then
+              git tag "$TAG" "${{ steps.bundle.outputs.sha }}"
+              git push origin "$TAG"
+            else
+              echo "::notice::远端 tag $TAG 已存在且指向正确（上次断在建 Release）—— 复用，只补 Release"
+            fi
             gh release create "$TAG" "dist/kapx-ledger-$M.zip" \
               --title "Market Chronicle indicator ledger $M" \
               --notes-file "dist/RELEASE_NOTES-$M.md"
