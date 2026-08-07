@@ -3150,3 +3150,13 @@ sw CACHE mc-v20→v21（外壳变了，回访者靠它拿新版）。build_route
 自检六项全过，含负向样本（挖掉新词检查器确实报红）。
 
 **①旧英文名收编（79 处）刻意未动**——留给下一个会话，与本次改动不冲突。
+
+### §49.14 ①旧英文名收编（2026-08-07 晚 · commit 37af569 · 命名系列收官）
+
+站上英文名从此只有 Fear-Price Index。收编了三个旧名（比台账多一个）：
+Fear's Price Tag / LEAPS Cost Gauge / **The Price of Fear**（第三个是执行中发现的：
+台账 tab 四语名、i18n 两个分区、options.html 自带导航字典）。收编判据＝旧名只允许
+活在带 alternateName 或 formerly 的行里，自检逐行扫 18 个 html + 两个 i18n，0 处裸露。
+Dataset alternateName 四元素。?v=20260807a、sw mc-v22、路由页重跑 16 页。
+教训：①options.html 有自带小字典，全站改名必查 ②?v= 替换先长后短（子串包含）
+③i18n 同 key 多分区，grep 全文件。
