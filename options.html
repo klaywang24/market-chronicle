@@ -38,7 +38,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 .op-chart.tall { height: 420px; }
 /* text-wrap: balance —— 中文末行孤字防护。⚠️ 别换成 pretty：CSS.supports 报 true
    但对中文完全不参与（2026-08-03 定价页实测五个宽度全无效）。 */
-.op-note { font-size: 12.5px; color: var(--ink-muted); margin: 8px 0 0; text-wrap: balance; }
+.op-note { font-size: 12.5px; color: var(--ink-muted); margin: 8px 0 0; } /* 2026-08-08 撤掉 text-wrap:balance：balance 会把放得下一行的句子均分成两截，Klay 定宽屏一行展示；窄屏仍按默认自然折行 */
 
 /* 每章末尾的「这数据怎么更新、现在是哪天的」一行（2026-08-05 Klay 提）。
    内容全部由 JS 从 meta 现算，不写死日期 —— 写死的日期一定会过期变成谎话。 */
