@@ -55,6 +55,12 @@ jobs:
         run: python tools/check_chart_overflow.py
         env:
           CHROME_BIN: /usr/bin/google-chrome
+      # i18n 重复 key 自检（2026-08-07 接线）。
+      # 起因：词典 D 里 22 处重复 key（JS 后者静默覆盖前者），行业暴露图的 GICS 全名版
+      # 被旧短名版压了 18 天没人发现。已去重归零，这一步防复发。
+      # exit 2 = 测量失败（解析漂移），与红同样挡住流水线，绝不算绿。
+      - name: verify i18n no duplicate keys
+        run: python tools/check_i18n_dupes.py
       - name: commit data
         run: |
           git config user.name "klaywang24"

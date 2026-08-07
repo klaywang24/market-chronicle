@@ -3206,3 +3206,34 @@ The Price of Fear。**以后改名的边界：加短码/加品牌=可以；换�
 
 审计清单至此全部闭环。剩余非代码项：Klay 开 GitHub Immutable Releases（Settings）；
 i18n 14 个重复 key 独立会话在修（task chip 已领走）。
+
+### §49.16 i18n 字典去重：22 处重复 key 全清零 + 防复发闸接进 CI（2026-08-07 深夜）
+
+§49.15 立单的显示层问题，本节收口。js/i18n.js 词典 D 是 JS 对象字面量，重复 key
+后者静默覆盖前者。审计报 19 处；本次全量重扫（逐 key 正则扫全文本）实为 **22 处**：
+审计的扫法按行取第一个 key，而 D 里有一行多 key 的写法（温度计 hero 区），
+少数了 30天/6月/1年 三个。**教训归 §56 检查器骗我族：数重复之前先确认扫描器
+见得到每一个 key，一行多 key 的文件按行扫＝分母就错了。**
+
+逐组裁定（要点）：
+- **真语义冲突只有 3月/6月**：月份名（Mar/Jun，seasonChart 月份轴在用）撞旧期限档
+  （3m/6m）。查全站：期限阶梯实际渲染的是带空格的 3 月 / 6 月（另有独立 key），
+  无空格期限版零渲染点＝死键，删；月份版保留。**不需要动查表机制。**
+- **GICS 板块名 9 个**（医疗保健/通信服务/可选消费/必需消费/房地产/原材料/工业/能源/
+  公用事业）：2026-07-20 随行业暴露环形图写入的全名版，从写入起就被更靠后的旧短名版
+  压着、18 天从未生效（数据源 sector_weights JSON 里就是中文名，走 D 查表）。裁定按
+  写入意图用全名，删短名版。headless 实测 EN 态环形图边缘余量左右各 ~165px，零溢出。
+- **科技**归顶栏 tab 区（Technology，EN 态从 Tech 变 Technology）；金融 两处 EN 同为
+  Financials，收编到板块区一份。
+- 其余为大小写/措辞差异，保留当前生效或更准确的一版：滚动年化=Rolling Returns（章节
+  标题版）、历史中位=historical median、最新结算=Latest settlement、全史百分位=
+  full-history percentile、CNN 恐贪卡标题保留 since 2011 版。
+- 值全同的纯冗余（9天/30天/数据截至/1年/工业/能源/公用事业）各删一份。
+
+防复发闸：`tools/check_i18n_dupes.py` 已接进 daily.yml（verify chart overflow 之后）。
+按 §56 规矩建的：①输出分母（现 841 key，守卫线 500，分母坍塌 exit 2 不算绿）
+②测量失败与红是两种声音 ③建闸时用负向样本实测报红（注入重复 key → exit 1 ✓）。
+
+配套：index.html 的 i18n.js?v= bump 到 20260807c，sw.js CACHE bump 到 mc-v24，
+build_route_pages.py 已重跑 16 页。验证：EN 态查表逐 key 核对全部按裁定生效、
+console 零错误、体检脚本归零（841 key / 0 重复）。
