@@ -47,3 +47,10 @@
 /rd   /?utm_source=reddit     302
 /wx   /?utm_source=wechat     302
 /options/  /options  301
+
+# ── 对外别名（2026-08-07 建）──
+# 恐惧的标价指数的对外网址。内部 panel 名叫 leaps（app.js registry 46 处，改名成本高且无收益），
+# 对外发的链接用 /fear-price，一跳 301 到真页 /leaps —— SEO 权重全部归并到已有身份页。
+# 301 不用 302：这是命名定案后的永久别名，不是会调整的渠道映射。
+/fear-price/  /leaps  301
+/fear-price   /leaps  301

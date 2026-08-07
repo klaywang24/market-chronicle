@@ -18,10 +18,10 @@
 <title>美股编年史 · Market Chronicle</title>
 <!-- SEO / GEO：主推域名 canonical + 摘要 + 社交卡片 + 结构化数据 -->
 <link rel="canonical" href="https://chronicle.klay-wang.com/">
-<meta name="description" content="美股编年史 Market Chronicle — 每个交易日自动更新的美股百年图表档案与读数台账：K 指数（CNN 恐贪 ÷ VIX）、LEAPS 极端恐惧窗口，逐次公开对账。A century of US market history plus the KAPX Index sentiment reading ledger, reconciled daily.">
+<meta name="description" content="美股编年史 Market Chronicle：每个交易日自动更新的美股百年图表档案，加两把自研刻度与一本结果账。K 指数（CNN 恐贪 ÷ VIX）测市场怕不怕，恐惧的标价指数（VIX1Y 三年分位）测恐惧现在值多少钱，每条读数事后逐笔公开对账。A century of US market history plus two original gauges and one reconciled ledger.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="美股编年史 · Market Chronicle">
-<meta property="og:description" content="每个交易日自动更新的美股百年图表档案与读数台账：K 指数（CNN 恐贪 ÷ VIX）与 LEAPS 极端恐惧窗口，历史逐次公开对账，包括亏损的那几次。">
+<meta property="og:description" content="每个交易日自动更新的美股百年图表档案，加两把自研刻度与一本结果账：K 指数测市场怕不怕，恐惧的标价指数测恐惧现在值多少钱，历史逐笔公开对账，包括亏损的那几次。">
 <meta property="og:url" content="https://chronicle.klay-wang.com/">
 <meta property="og:image" content="https://chronicle.klay-wang.com/icons/icon-512.png">
 <meta name="twitter:card" content="summary">
@@ -31,7 +31,7 @@
  {"@type":"Person","@id":"https://klay-wang.com/#person","name":"Klay Wang","url":"https://klay-wang.com/","sameAs":["https://klay-wang.com/","https://x.com/_Klay24_","https://github.com/klaywang24","https://www.linkedin.com/in/klay-w-a593bb101/","https://www.kaggle.com/klaywong","https://huggingface.co/klay24"]},
  
  {"@type":"WebSite","name":"Market Chronicle 美股编年史","alternateName":"美股编年史","url":"https://chronicle.klay-wang.com/","inLanguage":["zh-CN","en"],
-  "description":"A free, self-updating archive of a century of US market history, plus original, publicly reconciled market indicators: the KAPX Index, the LEAPS cost gauge (Fear's Price Tag), and the LEAPS Window.",
+  "description":"A free, self-updating archive of a century of US market history, plus two original gauges and one public ledger of outcomes: the KAPX Index and the Fear-Price Index (Fear's Price Tag), every reading reconciled daily.",
   "publisher":{"@id":"https://klay-wang.com/#person"}},
  {"@type":"Dataset","name":"KAPX Index daily series (CNN Fear & Greed ÷ VIX)","alternateName":["K 指数","K-Index","KAPX"],
   "description":"The KAPX Index is an original contrarian US equity sentiment indicator: K = CNN Fear & Greed Index ÷ VIX. K < 1 marks extreme-fear signals. Daily values plus a public ledger reconciling every signal since 2011 against forward Nasdaq-100 returns — wins and losses alike. Updated each trading day by an automated pipeline; readings since the site's July 2026 launch are timestamped ex-ante in the public GitHub commit log, while the ledger back to 2011 is backfilled from public data and independently reproducible.",
@@ -844,7 +844,7 @@
       <p class="dek">一个每个交易日收盘后自动更新的美股历史图表档案站：免费、无广告、代码公开。把近百年的市场，做成一部可以读的编年史。</p></div>
     <div class="doc-body">
       <h3>这是什么</h3>
-      <p>美股编年史（Market Chronicle）把标普 500、纳斯达克，以及金融、消费、奢侈品等个股篮子的历史，整理成章节式的可视化：回报的形状、危机的节奏、估值的锚、波动的纹理、时间的复利。除了长历史图表，还有三个自研视角：「今日头版」的市场温度、「K 指数」、「LEAPS 窗口」。</p>
+      <p>美股编年史（Market Chronicle）把标普 500、纳斯达克，以及金融、消费、奢侈品等个股篮子的历史，整理成章节式的可视化：回报的形状、危机的节奏、估值的锚、波动的纹理、时间的复利。除了长历史图表，还有自研的两把刻度加一本结果账：K 指数测市场怕不怕，恐惧的标价指数测恐惧现在值多少钱；台账把每条读数与之后的走势逐笔公开对账，赢的亏的都在。</p>
       <h3>数据与口径</h3>
       <p>价格与回报以复权收盘价（Adj Close）近似含分红总回报；估值 CAPE / PE(TTM) 来自 multpl / Robert Shiller 的长历史序列；恐惧贪婪指数来自 CNN；个股基本面来自 macrotrends 与 Yahoo Finance；板块涨跌分布由本站管线按标普 500 全成分股每日收盘统计。长历史图表多采用对数坐标，以如实呈现百年尺度上的涨跌：1929 年跌得比 2000、2008 深得多，图上就应当更陡，这是数据本身的诚实。本站对数字只做忠实转录：按官方源当日发布的值原样入账，绝不修改；源头日后修订时，旧记录保持原样：它记录的是「官方当时说了什么」：修订另行注明，绝不悄悄覆盖。</p>
       <h3>怎么建的</h3>
@@ -960,7 +960,7 @@
 <!-- ================= 方法论 ================= -->
 <section class="panel" id="panel-methodology">
   <div class="doc-page">
-    <div class="hero"><div class="kicker">METHODOLOGY · 方法论</div><h1>方法论：两个刻度，一本台账</h1>
+    <div class="hero"><div class="kicker">METHODOLOGY · 方法论</div><h1>方法论：两把刻度，一本结果账</h1>
       <p class="dek">定义、公式、统计口径与全部历史结果：包括失效的那几次。本页所有数字由每日数据管线自动更新的公开 JSON 支撑；上线（2026 年 7 月）起的读数带 GitHub 提交时间戳、为事前记录，之前回溯至 2011 年的历史台账则为公开数据回填、可独立复现。</p></div>
     <div class="doc-body">
       <h3>K 指数（KAPX Index）</h3>

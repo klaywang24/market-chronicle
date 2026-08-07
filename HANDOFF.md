@@ -3132,3 +3132,21 @@ VERIFY.md 公式与独立实现一致）⇒ **该 no-op 时会 no-op**；负向 
 ② DOI 标题定成能覆盖两个旗舰的伞名并更新 `.zenodo.json` ③ 旧英文名收编为 `alternateName`（不是删）
 ④ `/fear-price` 外部 slug → 内部 `leaps` 面板映射（flat html + `_redirects` 一跳 + 重跑
 `build_route_pages.py` + 26 项自检）⑤ 产品架构措辞＝「两把刻度 + 一本结果账」，不是三个平级指数。
+
+### §49.13 /fear-price 网址 + 「两把刻度，一本结果账」措辞（2026-08-07 上午落地）
+
+**②网址**：`_redirects` 加 `/fear-price → /leaps` 301 两条（带与不带尾斜杠）。
+刻意不做 flat html、不动 app.js：内部 panel 名 leaps 有 46 处引用，改名高成本零收益；
+301 让 SEO 权重全部归并到已有身份页 /leaps。对外发链接一律用 chronicle.klay-wang.com/fear-price。
+⚠️ 本地无法验 Pages 重定向，push 后要在线上打一次 /fear-price 确认 301（/options 同型规则已验过型）。
+
+**③措辞**：产品架构从「三个平级视角」改为定案的「两把刻度，一本结果账」。五处：
+meta description / og:description / JSON-LD WebSite description（保留 (Fear's Price Tag)
+括注等①收编）/ 关于段（原「三个自研视角：今日头版、K 指数、LEAPS 窗口」）/ methodology h1
+与路由页标题（原「两个刻度，一本台账」）。**i18n 零联动**（实测：这些长句都不在字典里，
+i18n 只翻界面骨架）。新中文文案无破折号、无直角引号。
+
+sw CACHE mc-v20→v21（外壳变了，回访者靠它拿新版）。build_route_pages.py 已重跑（16 页）。
+自检六项全过，含负向样本（挖掉新词检查器确实报红）。
+
+**①旧英文名收编（79 处）刻意未动**——留给下一个会话，与本次改动不冲突。

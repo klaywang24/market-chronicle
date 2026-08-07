@@ -78,7 +78,7 @@ ROUTES = {
         "Macro charts: rates, liquidity, and market context, updated daily.",
     ),
     "methodology": (
-        "方法论 · 两个刻度，一本台账",
+        "方法论 · 两把刻度，一本结果账",
         "K 指数与恐惧的标价指数的完整方法论：口径定义、数据来源、对账规则，"
         "以及为什么每条读数都要留下可验证的时间戳。Methodology of the KAPX Index and Fear's Price Tag.",
     ),
