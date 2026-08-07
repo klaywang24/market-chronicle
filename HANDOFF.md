@@ -3237,3 +3237,24 @@ i18n 14 个重复 key 独立会话在修（task chip 已领走）。
 配套：index.html 的 i18n.js?v= bump 到 20260807c，sw.js CACHE bump 到 mc-v24，
 build_route_pages.py 已重跑 16 页。验证：EN 态查表逐 key 核对全部按裁定生效、
 console 零错误、体检脚本归零（841 key / 0 重复）。
+
+### §49.17 排版三连 + 本线收官（2026-08-08 01:10 ET · 4114e1c/dd34885/21a7f71 均已上线实测）
+
+Klay 定的排版口径：**注释与定义类文字宽屏一行展示、与相邻元素同宽同字号**。
+「明明放得下却折行」的两个惯犯＝`text-wrap: balance`（把一行均分两截）与 `max-width` 宽度闸。
+① options `.op-note` 去 balance（`.op-fresh` 的 balance 刻意保留＝多行孤字防护）
+② `.ledger-intro` 去 balance + 去 max-width:760px，字号 13.5→15.5px 与 .dek 一致；
+   官方定义段拆两截（定义留顶部，公开与见证声明沉面板底部，i18n 一条拆两条 + noscript 同步）
+③ 每周对账墙去 max-width:900px 与上方同宽；删「全部往期」行（模板/CSS/i18n 三处清）；
+   列表 6→**滚动最新 3 条**（digest_archive.json 契约头插，旧的自然滚出，面积恒定）
+
+戳终值：style=20260808b · app/i18n=20260808a · docs-i18n=20260807a · sw=mc-v28。
+零缓存浏览器 DOM 断言 + 六个线上 URL 实测全过；Klay 本机旧页＝其浏览器 SW 缓存（无痕已证干净）。
+
+⚠️ **头版对账墙是双层渲染**（pulse-base 打底 + pulse-reveal 同坐标覆盖，内容一致）——
+querySelectorAll 会看到两份 .digest-archive，是架构不是 bug，别当重复渲染修。
+
+⏳ 本线遗留验收点（自动，无需人工）：TRACKED 7→9 在 2026-08-07（周五）晚 daily 首次生效，
+链末行应出现 leaps.json + gauge_math.json；8 月底 monthly-release 新闸链（含 7/7 自测）首战。
+命名线正在本仓落它的五项（canonical 块/series_id/llms.txt/撞车措辞/禁词闸），勿动
+index.html、js/i18n.js、llms.txt 的它未提交改动。
