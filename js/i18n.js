@@ -131,7 +131,7 @@
     "越高 = 买保护的人越多 = 越恐慌": ["higher = more protection buying = more fear", "", "", ""],
     "倒挂（近端恐慌）": ["Backwardation (near-term panic)", "", "", ""],
     "升水（结构正常）": ["Contango (normal structure)", "", "", ""],
-    // 2026-08-07 去重：9天/30天 只保留温度计 hero 区那份；3月/6月 撞月份名（Mar/Jun），
+    // 2026-08-06 去重：9天/30天 只保留温度计 hero 区那份；3月/6月 撞月份名（Mar/Jun），
     // 期限档无空格版全站已无渲染点（期限阶梯用的是带空格的 3 月 / 6 月），删。
     "比值 2011 年来百分位": ["ratio percentile since 2011", "", "", ""],
     "大于 1 = 倒挂 = 历史级恐慌": ["above 1 = inverted = historic panic", "", "", ""],
@@ -971,7 +971,7 @@
     "市场温度": ["Market temp", "Temp. du marché", "Markttemperatur", "Temp. del mercado"],
     "开启": ["Open", "Ouverte", "Offen", "Abierta"],
     "关闭": ["Closed", "Fermée", "Geschlossen", "Cerrada"],
-    // 2026-08-07 去重：GICS 板块名（医疗保健/能源/工业/原材料/公用事业/房地产/通信服务/
+    // 2026-08-06 去重：GICS 板块名（医疗保健/能源/工业/原材料/公用事业/房地产/通信服务/
     // 必需消费/可选消费）统一收编到上方行业暴露区那份全名版；科技 键归顶栏 tab 区。
     // 注意方向：JS 重复 key 后者覆盖前者，此处短名版一直压着 2026-07-20 的全名版在生效；
     // 本次裁定行业暴露环形图按写入意图用 GICS 全名，故删这份短名版（EN 态标签会变长）。
