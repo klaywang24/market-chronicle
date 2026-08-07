@@ -68,13 +68,19 @@
 #   不带码或带假码时该值是 null。**所以「页面看起来一样」不等于没生效，要看这个字段。**
 #
 # 302 不用 301：码换了、人退订了都要能改，301 会被浏览器永久缓存。
-# 大小写各留一行：`_redirects` 区分大小写，而人名首字母大写是常态。
+#
+# 🔴 **本文件的规则只对全小写路径生效，大写一律不匹配**（2026-08-07 上线后实测，非推测）：
+#    /r/jolie → 302 ✅   /r/Jolie → 200 ❌（我原本为它单写了一行，那行是死的，已删）
+#    不是我这条的问题，是全局的：/xq → 302 ✅ 而 /XQ、/Xq、/FEAR-PRICE 全部 200 ❌。
+#    推断＝Pages 把规则里的 from 归一成小写，于是带大写的请求永远匹配不上，
+#    **再加一行大写版也没用**（加了也会被归一成同一条）。
+#    ⇒ 对外发的短链**一律全小写**；人名做路径时先转小写。
 # 🚫 不加 `/r/*` 兜底：命名空间与板块真路径共用，splat 一旦写宽会盖住真页面（见文件顶部那段）。
-#    没匹配上的 /r/xxx 会照默认行为回首页，可以接受。
+#    没匹配上的 /r/xxx 会照默认行为回首页，可以接受（实测 /r/nobody → 200 首页）。
 #
 # ⚠️ 点击数看不到：CF Web Analytics 靠页面里的 JS beacon，302 到站外没有 HTML 也就没有 beacon。
 #    真正要看的数在 Buttondown 那边（某人推荐了几个人），那才是这条链路的产出。
 #
-# 加人流程：拿到码 → 在下面加两行（小写 + 首字母大写）→ commit → push。
+# 加人流程：拿到码 → 在下面加一行（**全小写**）→ commit → push → curl 实测跳没跳对。
 /r/jolie  https://buttondown.com/klay24/?referral_code=mykxjl  302
-/r/Jolie  https://buttondown.com/klay24/?referral_code=mykxjl  302
+/r/lvyu   https://buttondown.com/klay24/?referral_code=hmfwsv  302
