@@ -81,6 +81,38 @@
 # ⚠️ 点击数看不到：CF Web Analytics 靠页面里的 JS beacon，302 到站外没有 HTML 也就没有 beacon。
 #    真正要看的数在 Buttondown 那边（某人推荐了几个人），那才是这条链路的产出。
 #
-# 加人流程：拿到码 → 在下面加一行（**全小写**）→ commit → push → curl 实测跳没跳对。
-/r/jolie  https://buttondown.com/klay24/?referral_code=mykxjl  302
-/r/lvyu   https://buttondown.com/klay24/?referral_code=hmfwsv  302
+# ══ 两条路，对外长得一样，落点不同 ══
+#
+# 【A 推荐码】给**已经有六位码**的人（＝他自己是从订阅页自助订阅的）。
+#   落点 ?referral_code=<码>，Buttondown 原生记「谁推荐了谁」。
+#   更好，因为被推荐来的人自己也会拿到码，可以继续往下传，成链。
+#
+# 【B 标签】给**没有码**的人（＝当初是手工加进列表的，补不回来：
+#   他们已经是订阅者，再去订阅页只会看到「你已经订阅了」，不会重走生成流程）。
+#   落点 ?tag=src-<名字>，谁从这条链接订阅就被打上这个标签。
+#   ⚠️ 标签由链接自己带，Buttondown 遇到不存在的标签会自动创建
+#      ⇒ **这条路不需要那个人在 Buttondown 里有任何东西**，只要一个名字。
+#   看数：Subscribers 页按 src-<名字> 筛选。
+#   🔬 已实测（2026-08-07）：无痕窗口开 ?tag=src-test 订阅 klaywang24+t3，
+#      该记录 Tags 栏出现 src-test。**这条是真的通，不是照文档推的。**
+#      （早前只查过「托管页 HTML 里没有 tag 字段」就差点判它不成立 ——
+#        没看到不等于没有，同「假推荐码测出 null」那次。）
+#   🔴 前缀固定 src-：付费/免费发送对象是靠 tag 分的（premium），
+#      归因标签必须一眼可分，否则群发选错人群。
+#
+# 加人流程：
+#   有码 → 抄码，走 A；没码 → 只要一个全小写名字，走 B。
+#   加完 commit → push → curl 实测每一条跳没跳对（**别省这步**，见上面大小写那条）。
+
+# A 推荐码
+/r/jolie          https://buttondown.com/klay24/?referral_code=mykxjl  302
+/r/lvyu           https://buttondown.com/klay24/?referral_code=hmfwsv  302
+
+# B 标签（2026-08-07 建，均为手工加进列表、无推荐码的人）
+/r/felix          https://buttondown.com/klay24?tag=src-felix          302
+/r/xianzhe        https://buttondown.com/klay24?tag=src-xianzhe        302
+/r/jianghaosanti  https://buttondown.com/klay24?tag=src-jianghaosanti  302
+/r/ninahe         https://buttondown.com/klay24?tag=src-ninahe         302
+/r/luyao          https://buttondown.com/klay24?tag=src-luyao          302
+/r/ganhuang       https://buttondown.com/klay24?tag=src-ganhuang       302
+/r/muchenwu       https://buttondown.com/klay24?tag=src-muchenwu       302
