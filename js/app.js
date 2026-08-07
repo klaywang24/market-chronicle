@@ -1064,7 +1064,7 @@
         { name: "CNN 恐贪", type: "line", xAxisIndex: 0, yAxisIndex: 0, showSymbol: false,
           data: zip(kd.dates, kd.cnn), lineStyle: { color: p.gold, width: 1.4 }, itemStyle: { color: p.gold } },
         { name: "VIX", type: "line", xAxisIndex: 0, yAxisIndex: 0, showSymbol: false,
-          data: zip(kd.dates, kd.vix), lineStyle: { color: p.accent, width: 1.4 }, itemStyle: { color: p.accent },
+          data: zip(kd.dates, kd.vix), lineStyle: { color: p.purple, width: 1.4 }, itemStyle: { color: p.purple },
           markArea: { silent: true, data: areas } },
         { name: "纳指 100", type: "line", xAxisIndex: 0, yAxisIndex: 1, showSymbol: false,
           data: zip(kd.dates, kd.ndx), lineStyle: { color: p.blue, width: 1.6 }, itemStyle: { color: p.blue } },
