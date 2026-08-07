@@ -54,3 +54,27 @@
 # 301 不用 302：这是命名定案后的永久别名，不是会调整的渠道映射。
 /fear-price/  /leaps  301
 /fear-price   /leaps  301
+
+# ── 推荐人短路径 /r/<人>（2026-08-07 建）──
+# 干什么：把 Buttondown 的推荐链接套上自己的域名。
+#   落点＝ https://buttondown.com/klay24/?referral_code=<那个人的六位码>
+#   谁从那个页面订阅，Buttondown 就记一笔在那个人名下（Subscriber → Notes / Analytics 可查）。
+#
+# 码从哪来：后台 Subscribers → 点开那个人 → Properties → Referral code（六位小写字母）。
+#   ⚠️ 那个人**必须已经是订阅者**，没订阅就没有码。
+#
+# 已实测这条链路是通的（2026-08-07）：带真码请求订阅页，页面里
+#   <script id="referring_subscriber_id">"827f1926-…"</script>
+#   不带码或带假码时该值是 null。**所以「页面看起来一样」不等于没生效，要看这个字段。**
+#
+# 302 不用 301：码换了、人退订了都要能改，301 会被浏览器永久缓存。
+# 大小写各留一行：`_redirects` 区分大小写，而人名首字母大写是常态。
+# 🚫 不加 `/r/*` 兜底：命名空间与板块真路径共用，splat 一旦写宽会盖住真页面（见文件顶部那段）。
+#    没匹配上的 /r/xxx 会照默认行为回首页，可以接受。
+#
+# ⚠️ 点击数看不到：CF Web Analytics 靠页面里的 JS beacon，302 到站外没有 HTML 也就没有 beacon。
+#    真正要看的数在 Buttondown 那边（某人推荐了几个人），那才是这条链路的产出。
+#
+# 加人流程：拿到码 → 在下面加两行（小写 + 首字母大写）→ commit → push。
+/r/jolie  https://buttondown.com/klay24/?referral_code=mykxjl  302
+/r/Jolie  https://buttondown.com/klay24/?referral_code=mykxjl  302
