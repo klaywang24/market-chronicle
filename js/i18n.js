@@ -153,7 +153,7 @@
     "越高 = 深度崩盘保护越贵": ["higher = deep-crash protection costs more", "", "", ""],
     "市场广度": ["Market breadth", "", "", ""],
     "标普成分股在 200 日均线上的占比": ["share of S&P constituents above their 200-day average", "", "", ""],
-    "累积史百分位": ["percentile of accumulated history", "", "", ""],
+    "累积史百分位": ["expanding-history percentile", "", "", ""],
     "自": ["since", "", "", ""],
     "越低 = 超卖越深，历史底部常见个位数": ["lower = deeper oversold; historic bottoms often single digits", "", "", ""],
     "每交易日收盘后自动更新": ["auto-updated after each trading day's close", "", "", ""],
@@ -214,6 +214,7 @@
     "2011 年来极端恐惧": ["Extreme fear since 2011", "", "", ""], "最近一次": ["Most recent", "", "", ""],
     "连续交易日聚为一段": ["consecutive days grouped into one segment", "", "", ""],
     "常态（≥ 25）": ["Normal (≥ 25)", "", "", ""],
+    "极端恐惧区（< 25）": ["Extreme-fear zone (< 25)", "", "", ""],
     "读数越过你设定阈值时邮件通知": ["Email notice when a reading crosses your threshold", "", "", ""],
     // ---- 页脚新栏目 ----
     "关于我们": ["About us", "", "", ""],
@@ -221,9 +222,11 @@
     "定价与套餐": ["Pricing & plans", "", "", ""],
     "数据 & API": ["Data & API", "", "", ""],
     // ---- 温度计 hero 新版式碎片 ----
-    "VIX1Y 在过去": ["VIX1Y over the past", "", "", ""],
+    // 下三键拼成一句（HTML 里 3 年 裹在 <b> 里）：译文按拼接后的英文语序设计，
+    // 第三段带前导空格补 </b> 后没有空格的缝 —— 拼出 VIX1Y's percentile within the past 3 years (high = expensive)
+    "VIX1Y 在过去": ["VIX1Y's percentile within the past", "", "", ""],
     "3 年": ["3 years", "", "", ""],
-    "的百分位（高=贵）": ["percentile (high = expensive)", "", "", ""],
+    "的百分位（高=贵）": [" (high = expensive)", "", "", ""],
     "0 · 便宜": ["0 · cheap", "", "", ""],
     "贵 · 100": ["expensive · 100", "", "", ""],
     // ---- 个股与板块（30 天口径，2026-07-18 新增）----
@@ -397,7 +400,7 @@
     "增长与就业 · GROWTH": ["Growth & Jobs", "Croissance & emploi", "Wachstum & Arbeitsmarkt", "Crecimiento y empleo"],
     "仓位与杠杆 · POSITIONING": ["Positioning & Leverage", "", "", ""],
     "专业管理人实际把多少钱押在股票上？（嘴会说谎，仓位不会）": ["How much are professional managers actually betting on stocks? (Mouths lie; positions don't)", "", "", ""],
-    "NAAIM 经理人敞口指数（2006 年至今 · 周频）": ["NAAIM Manager Exposure Index (2006–present, weekly)", "", "", ""],
+    "NAAIM 经理人敞口指数（2006 年至今 · 周频）": ["NAAIM Exposure Index (2006–present, weekly)", "", "", ""],
     "NAAIM 会员主动管理人的平均股票敞口：0 = 空仓，100 = 满仓，大于 100 = 加杠杆；历史底部常见 20 以下 · 尾标为最新读数 · 底部滑块可拖拽缩放。CFTC 期货持仓与融资余额将陆续入列": ["Average equity exposure of NAAIM member active managers: 0 = all cash, 100 = fully invested, above 100 = levered; historic bottoms often print below 20 · end label = latest reading · drag the bottom slider to zoom. CFTC futures positioning and margin debt will join this chapter", "", "", ""],
     "NAAIM 经理人敞口": ["NAAIM manager exposure", "", "", ""],
     "满仓 100": ["Fully invested: 100", "", "", ""],
@@ -652,7 +655,7 @@
     "每年的涨跌，是利润挣来的，还是估值给的？": ["Each year's move — earned by profits, or granted by multiples?", "Chaque année — gagnée par les profits ou offerte par les multiples ?", "Jedes Jahr — von Gewinnen verdient oder vom Multiple geschenkt?", "Cada año: ¿ganado por beneficios o regalado por múltiplos?"],
     "分红有没有年年长大？": ["Do the dividends grow every year?", "Le dividende grandit-il chaque année ?", "Wächst die Dividende Jahr für Jahr?", "¿Crece el dividendo cada año?"],
     "放回同一个篮子里看，贵还是便宜、强还是弱？": ["Back in the basket — cheap or dear, strong or weak?", "Dans le panier — cher ou bon marché, fort ou faible ?", "Zurück im Korb — teuer oder billig, stark oder schwach?", "En la cesta: ¿caro o barato, fuerte o débil?"],
-    "巴菲特们打开报表前先看的一屏。": ["The one screen the Buffetts check before the filings.", "L'écran que les Buffett regardent avant les comptes.", "Der Bildschirm, den die Buffetts zuerst prüfen.", "La pantalla que los Buffett miran antes de las cuentas."],
+    "巴菲特们打开报表前先看的一屏。": ["The one screen value investors check before the filings.", "L'écran que les Buffett regardent avant les comptes.", "Der Bildschirm, den die Buffetts zuerst prüfen.", "La pantalla que los Buffett miran antes de las cuentas."],
 
     // ---- 其他 UI ----
     "和谁比一比？：": ["Compare with — ", "Comparer avec — ", "Vergleichen mit — ", "Comparar con — "],
@@ -993,6 +996,15 @@
     [/^今日 CNN 恐贪（(.+)）$/, ["CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)", "CNN Fear & Greed today ($1)"]],
     [/^即：比过去三年 (\d+)% 的交易日都贵$/, ["i.e. pricier than $1% of all trading days in the past three years", "", "", ""]],
     [/^历时 (\d+) 天（([\d.]+) 年）$/, ["$1 days ($2 years)", "$1 jours ($2 ans)", "$1 Tage ($2 Jahre)", "$1 días ($2 años)"]],
+    // 2026-08-07 EN 态全站扫描补漏：落点图与保费散点图的 marker tooltip 函数体
+    // （app.js 四处 formatter，DOM 扫描测不到 hover 层，代码审计抓出）
+    [/^LEAPS 窗口 · 最低恐贪 ([\d.]+)$/, ["LEAPS window · min F&G $1", "", "", ""]],
+    [/^K < 1 信号 · 最低 K ([\d.]+)$/, ["K < 1 signal · min K $1", "", "", ""]],
+    [/^12 个月后 (.+)（纳指 100）$/, ["12 months on: $1 (Nasdaq-100)", "", "", ""]],
+    [/^60 个交易日后 (.+)（纳指 100）$/, ["60 trading days on: $1 (Nasdaq-100)", "", "", ""]],
+    [/^60 个交易日后：纳指 (.+) · 标普 (.+)$/, ["60 trading days on: Nasdaq $1 · S&P $2", "", "", ""]],
+    [/^12 个月后：纳指 (.+) · 标普 (.+)$/, ["12 months on: Nasdaq $1 · S&P $2", "", "", ""]],
+    [/^开窗日 VIX ([\d.]+) · 最低恐贪 ([\d.]+)$/, ["VIX at open $1 · min F&G $2", "", "", ""]],
     // 2026-07-19 四层扫描抓到的存量泄漏：收益分布图与持有期图的 tooltip 函数体
     [/^(\d+) 年$/, ["$1 yrs", "$1 ans", "$1 J.", "$1 años"]],
     [/^持有 ([\d.]+) 年$/, ["Held $1 years", "Détenu $1 ans", "$1 Jahre gehalten", "Mantenido $1 años"]],
