@@ -19,6 +19,8 @@ on:
 permissions:
   contents: read
   issues: write            # 只要开 issue 的权限，不给写仓库
+  actions: read            # 🆕 2026-08-06：check_daily_dispatched 要读 daily.yml 的 run 历史
+                           #    （判「压根没触发」只能从 Actions API 看，产物新鲜度看不出来）
 jobs:
   check:
     runs-on: ubuntu-latest

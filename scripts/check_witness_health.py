@@ -29,11 +29,12 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -286,12 +287,66 @@ def check_options_page() -> dict:
             "detail": f"期权页数据 {d}{prov}（{age} 天前）", "age": age}
 
 
+def check_daily_dispatched() -> dict:
+    """daily 的**定时触发**有没有按工作日发生（2026-08-06 加）。
+
+    🔑 为什么 `check_daily_alive` 挡不住这一类：它看的是**产物新鲜度**、SLA 4 天。
+       2026-08-06 实况 —— daily 的 schedule 事件停在 08-05（那次还失败了），
+       08-06 一发都没触发，而 check_daily_alive 读到「1 天前」照样报 ok
+       （离报红还差 3 天）。**缺一天在它眼里是正常的，这是刻意的**：
+       它当初为 7·12→14「daily 整个死掉 4 天」而建，且日历天数法在周一必然
+       回看到周五（3 天），阈值收到 1 就会每周一误报。
+    🔑 为什么本项不需要任何假日日历：cron 是 `0 22 * * 1-5`，**GitHub 不认市场假日**
+       —— 工作日它一定触发，假日那天照跑、只是取不到新市场数据。
+       ∴ 判据可以是纯粹的「上一个工作日有没有 run 记录」，不必判断那天开不开市。
+       （这正是绕开「日历天 vs 交易日」那个两难的地方：换一个不需要日历的判据。）
+    🔑 为什么只认 `event=schedule`：手动 `workflow_dispatch` 是人在救火，
+       把它算进来会让「没人管也在跑」和「每天靠人补」看起来一样。
+       2026-08-05/06 两次手动补跑正是如此 —— 算进来本项就会绿。
+    """
+    try:
+        req = urllib.request.Request(
+            "https://api.github.com/repos/klaywang24/market-chronicle/actions/"
+            "workflows/daily.yml/runs?event=schedule&per_page=10",
+            headers={"Accept": "application/vnd.github+json",
+                     "User-Agent": "witness-watchdog"})
+        tok = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+        if tok:
+            req.add_header("Authorization", f"Bearer {tok}")
+        with urllib.request.urlopen(req, timeout=25) as r:
+            runs = json.loads(r.read()).get("workflow_runs", [])
+    except Exception as e:
+        return {"status": "unknown", "detail": f"查 Actions API 失败：{str(e)[:70]}"}
+    if not runs:
+        return {"status": "unknown", "detail": "查不到 daily.yml 的 schedule 运行记录"}
+
+    last = max(datetime.fromisoformat(x["created_at"].replace("Z", "+00:00")).date()
+               for x in runs)
+    # 期望值＝最近一个「22:00 UTC 那一发早该发生」的工作日。
+    # 留 1.5h 宽限（GitHub 排程实测常延迟 ~1h，历史上见过 23:00–23:10 才起）。
+    now = datetime.now(timezone.utc)
+    d = now.date()
+    if not (now.hour >= 23 and now.minute >= 30) and not now.hour > 23:
+        d -= timedelta(days=1)
+    while d.isoweekday() > 5:            # 回退到最近的工作日
+        d -= timedelta(days=1)
+    lag = (d - last).days
+    if last >= d:
+        return {"status": "ok", "detail": f"daily 定时触发最近一次 {last}（期望 ≥{d}）"}
+    return {"status": "bad",
+            "detail": f"⛔ daily **定时触发**最近一次 {last}，而期望至少到 {d}"
+                      f"（差 {lag} 天）—— 不是跑失败，是**压根没触发**，"
+                      f"这种情况不发任何通知，沉默和正常长得一样。"
+                      f"补跑：gh workflow run daily-update"}
+
+
 CHECKS = {
     "链最后一行": check_chain_row,
     "锚定日志": check_anchor_log,
     "链头快照(直接问IA)": check_snapshot_live,
     "与存档逐字对账": check_archive_match,
     "daily是否还活着": check_daily_alive,
+    "daily定时有没有触发": check_daily_dispatched,
     "期权页是否在更新": check_options_page,
 }
 
