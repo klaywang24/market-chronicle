@@ -3086,6 +3086,26 @@
     };
   });
 
+  // 类目轴的票代前加公司 logo（2026-08-07 加）。
+  // 复用站内自托管 logos/<小写票代>.png —— 与个股页大标题、表格 tbl-logo 同源，
+  // 由 scripts/fetch_logos.py 每周同步，不引入新依赖、不打外部请求。
+  // ⚠️ 与 HTML 侧 __logoErr 的三级兜底不同：ECharts 的 rich 图片没有 onerror，
+  //    文件缺失时该格留空、票代文字照常显示 —— 是降级不是报错，可接受。
+  //    （本页 13 只票的 logo 已于 2026-08-07 逐个核实存在，含 SPY/QQQ 两只 ETF。）
+  // 🚨 只给「类目就是票代」的轴用。同文件 ch-vol-family 的类目是 r.label 不是票代，
+  //    照抄会给非票代标签配图 —— 2026-08-07 改这处时正是靠断言数量对不上才发现。
+  const logoAxisLabel = (p, rows) => ({
+    color: p.muted, fontSize: 11,
+    formatter: (tk) => `{i${tk}|}{t|${tk}}`,
+    rich: Object.assign(
+      { t: { color: p.muted, fontSize: 11, padding: [0, 0, 0, 6], verticalAlign: "middle" } },
+      Object.fromEntries(rows.map((r) => [`i${r.tk}`, {
+        backgroundColor: { image: `logos/${r.tk.toLowerCase()}.png` },
+        width: 14, height: 14, verticalAlign: "middle",
+      }])),
+    ),
+  });
+
   // 做空成交结构（2026-07-18）：只报位置，不报方向。
   // 🚨 做空占比高 ≠ 看空（做市商对冲/ETF 套利/可转债对冲均计入），故这张图画的是
   // 「当日占比在自己三年历史中的百分位」，而不是占比本身：占比只作 tooltip 里的原值。
@@ -3104,10 +3124,10 @@
         // ⚠️ 函数体内的中文 JSON.stringify(getOption()) 扫不到——2026-07-18 那次
         //    全域审计正是因此漏掉这两处（英文态悬停显示「76.4 分位」）。走 translate。
         : (+v).toFixed(1) + " " + (window.MC_I18N ? MC_I18N.translate("分位") : "分位")) }),
-      grid: { left: 78, right: 44, top: 22, bottom: 34 },
+      grid: { left: 98, right: 44, top: 22, bottom: 34 },
       xAxis: Object.assign({ type: "value", min: 0, max: 100, name: "三年百分位" }, baseAxis(p)),
       yAxis: Object.assign({ type: "category", data: rows.map((r) => r.tk) },
-        baseAxis(p), { axisLabel: { color: p.muted, fontSize: 11 } }),
+        baseAxis(p), { axisLabel: logoAxisLabel(p, rows) }),
       series: [{
         type: "bar", data: rows.map((r) => r.pctile), barMaxWidth: 18,
         // 同 VRP 定案：由浅到深猩红，纯视觉层级；此处不设红绿语义：
@@ -3166,11 +3186,11 @@
     }
     return {
       tooltip: tip(p, { valueFormatter: (v) => (v == null ? "--" : (+v).toFixed(1)) }),
-      grid: { left: 62, right: 92, top: 24, bottom: 32 },
+      grid: { left: 82, right: 92, top: 24, bottom: 32 },
       xAxis: Object.assign({ type: "value", min: 0, max: 100,
         name: isEN ? "percentile" : "百分位" }, baseAxis(p)),
       yAxis: Object.assign({ type: "category", data: rows.map((r) => r.tk) },
-        baseAxis(p), { axisLabel: { color: p.muted, fontSize: 11 } }),
+        baseAxis(p), { axisLabel: logoAxisLabel(p, rows) }),
       series: [{
         type: "bar", data: rows.map((r) => r.v), barMaxWidth: 18,
         // 单色由浅到深，不设红绿语义：「拥挤」本身没有好坏，绿色会被读成「安全」
@@ -3317,11 +3337,11 @@
           return `${r.tk}<br>ρ = ${r.chg.toFixed(3)}<br>p = ${r.p.toFixed(4)}<br>n = ${r.n}`;
         },
       }),
-      grid: { left: 62, right: 108, top: 22, bottom: 32 },
+      grid: { left: 82, right: 108, top: 22, bottom: 32 },
       xAxis: Object.assign({ type: "value", scale: true,
         name: isEN ? "Spearman ρ" : "Spearman ρ" }, baseAxis(p)),
       yAxis: Object.assign({ type: "category", data: rows.map((r) => r.tk) },
-        baseAxis(p), { axisLabel: { color: p.muted, fontSize: 11 } }),
+        baseAxis(p), { axisLabel: logoAxisLabel(p, rows) }),
       series: [{
         type: "bar", data: rows.map((r) => r.chg), barMaxWidth: 16,
         // 标红＝p<0.05；ETF 用蓝，呼应散点图里那两只精确为零的点
