@@ -19,6 +19,7 @@
 | 提交署名一律 `Klay <klaywang24@gmail.com>`，**绝不加 Co-Authored-By**；判据 `git log -1 --format='%an <%ae>'` | 项目地图抬头 |
 | **只 `git add` 自己动过的文件（禁 `-A`）**；CI 每天自 commit 数据，推前先 `git pull --rebase` | 硬规矩 §5 |
 | **push 与 `gh workflow run` 由 Klay 在终端自跑**（分类器拦 AI push） | 硬规矩 §6 |
+| **公开仓正文绝不写个人标识符**（旧身份邮箱/用户名、第三方账号与邮箱）。核查结论一律脱敏表述：「查过了，没有 X」这句话本身就把 X 写进了公开仓。被查词只留本地私有文档 | §61 |
 
 ## 二、中文与 i18n
 
