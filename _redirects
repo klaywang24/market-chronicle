@@ -88,6 +88,19 @@
 # 302 不用 301：码换了、人退订了都要能改，301 会被浏览器永久缓存。
 #
 # 🔴 **本文件的规则只对全小写路径生效，大写一律不匹配**（2026-08-07 上线后实测，非推测）：
+
+# ─────────────────────────────────────────────────────────────────────
+# 🔴 2026-08-10 全部改写：Buttondown 账号被封（支付争议，与内容无关），
+#    原落点 buttondown.com/klay24 已全站 404，这 9 条链接一度全是坏的。
+#    新落点＝ Substack 订阅页。
+#
+# ⚠️ 归因能力降级，必须知道：
+#    · 原来 ?referral_code=<码> 由 Buttondown 原生记「谁推荐了谁」——**Substack 没有等价物**
+#    · 原来 ?tag=src-<名字> 给订阅者打标签 ——**Substack 也没有**
+#    · ⇒ 现在只剩 Cloudflare 侧的「谁点了这条短链」，**点击之后转化到谁，断了**
+#    · 历史教训：吕雨那 32 人里，29 人是靠 src-1 标签才认出来的。
+#      同样的事往后认不出来了，除非订阅表单自己加「你从哪来」的选项。
+# ─────────────────────────────────────────────────────────────────────
 #    /r/jolie → 302 ✅   /r/Jolie → 200 ❌（我原本为它单写了一行，那行是死的，已删）
 #    不是我这条的问题，是全局的：/xq → 302 ✅ 而 /XQ、/Xq、/FEAR-PRICE 全部 200 ❌。
 #    推断＝Pages 把规则里的 from 归一成小写，于是带大写的请求永远匹配不上，
@@ -126,14 +139,14 @@
 #   加完 commit → push → curl 实测每一条跳没跳对（**别省这步**，见上面大小写那条）。
 
 # A 推荐码
-/r/jolie          https://buttondown.com/klay24/?referral_code=mykxjl  302
-/r/lvyu           https://buttondown.com/klay24/?referral_code=hmfwsv  302
+/r/jolie          https://fearprice.substack.com/subscribe   302
+/r/lvyu           https://fearprice.substack.com/subscribe   302
 
 # B 标签（2026-08-07 建，均为手工加进列表、无推荐码的人）
-/r/felix          https://buttondown.com/klay24?tag=src-felix          302
-/r/xianzhe        https://buttondown.com/klay24?tag=src-xianzhe        302
-/r/jianghaosanti  https://buttondown.com/klay24?tag=src-jianghaosanti  302
-/r/ninahe         https://buttondown.com/klay24?tag=src-ninahe         302
-/r/luyao          https://buttondown.com/klay24?tag=src-luyao          302
-/r/ganhuang       https://buttondown.com/klay24?tag=src-ganhuang       302
-/r/muchenwu       https://buttondown.com/klay24?tag=src-muchenwu       302
+/r/felix          https://fearprice.substack.com/subscribe   302
+/r/xianzhe        https://fearprice.substack.com/subscribe   302
+/r/jianghaosanti  https://fearprice.substack.com/subscribe   302
+/r/ninahe         https://fearprice.substack.com/subscribe   302
+/r/luyao          https://fearprice.substack.com/subscribe   302
+/r/ganhuang       https://fearprice.substack.com/subscribe   302
+/r/muchenwu       https://fearprice.substack.com/subscribe   302
