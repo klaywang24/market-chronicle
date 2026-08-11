@@ -19,6 +19,14 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BIZ = os.path.abspath(os.path.join(REPO, "..", "..", "生意与起号"))
 SRC = os.path.join(BIZ, "04-Buttondown抢救备份", "邮件正文")
 CARDS = os.path.join(BIZ, "01-起号引流", "每日 digest")
+
+# ── 双源取材（2026-08-11 修死管线）：
+#   冻结源 SRC＝Buttondown 抢救快照，覆盖 ≤2026-08-09，**永不再长**；
+#   活源＝每日 digest/<日夹>[/子夹]/文案_final.md，≥ LIVE_CUTOVER 起由这里进。
+#   没有这条活源，档案永远停在 08-09（前会话验尸结论，勿删活源再犯）。
+LIVE_CUTOVER = "2026-08-10"
+# 活源对外正文的结束边界：这些内部节起，往后全是流程与判据，绝不外泄
+INTERNAL_HEADS = ("## 图槽", "## 回访清单", "## 🛑", "## 🔴")
 OUT = os.path.join(REPO, "digest")
 IMGOUT = os.path.join(OUT, "img")
 SITE = "https://chronicle.klay-wang.com"
@@ -157,7 +165,7 @@ def build_body(md, date_str, slug, log):
         raise RuntimeError(f"{date_str} 第 {n[0]+1} 张图无实测映射，"
                            f"不许靠顺序猜（跑 scratchpad/verify_images.py 补表）")
 
-    md = re.sub(r"!\[([^\]]*)\]\((https://assets\.buttondown\.email/images/[^)]+)\)", md_img, md)
+    md = re.sub(r"!\[([^\]]*)\]\((https://assets\.buttondown\.email/images/[^)]+|local://card)\)", md_img, md)
     md = re.sub(r'<img src="https://assets\.buttondown\.email/images/[^"]+"[^>]*>', html_img, md)
     md = re.sub(r"<!--\s*buttondown-editor-mode[^>]*-->", "", md)
     # 死平台残留：snippet 占位标签 + 自指存档链接（后者含用户名，§61 禁止进公开仓）
@@ -350,16 +358,106 @@ def parse(path):
     body = re.sub(r"^\s*存档链接.*$", "", body, flags=re.M)
     return date, title, body.strip()
 
+
+def live_files(cutover):
+    """活源清单：<日夹>/文案_final.md 与 <日夹>/<子夹>/文案_final.md（周回顾在子夹）。
+    只收日夹日期 ≥ cutover 的——冻结快照覆盖 ≤2026-08-09，重叠会撞 slug 守卫。"""
+    out = []
+    for p in sorted(glob.glob(os.path.join(CARDS, "20*", "文案_final.md")) +
+                    glob.glob(os.path.join(CARDS, "20*", "*", "文案_final.md"))):
+        m = re.search(r"/(\d{4}-\d{2}-\d{2})/", p.replace(os.sep, "/"))
+        if m and m.group(1) >= cutover:
+            out.append(p)
+    return out
+
+
+def parse_live(path):
+    """活源解析：从工作稿抽**对外正文**，内部段绝不外泄。
+    ⚠️ 三条判据与 `每日 digest/tools/to_substack.py` 保持一致（那边改了这边必须跟）：
+       ①起点 = 「## ⚡」 ②剔除 = `>` 行 / `### ` 行 / LinkedIn 节 ③图位 = 〖图N：卡名〗
+    与邮件出口的两处已知差异（故意的，不是漏）：
+       · 不注入换平台开场白/结尾 footer——档案页模板自带 dg-wall/dg-foot；
+       · 英文节不自动配 _EN 卡（那条配对判据只活在出口里，不复制第二份）。
+    日期口径 = 日夹名（数据日）。冻结段用的是邮件发送日，两段口径差一并记录在案：
+    周回顾产在周五日夹（发送在其后 1-3 天），§七「日期=数据的美东交易日」下周五更合理。"""
+    raw = open(path, encoding="utf-8").read()
+    m = re.search(r"/(\d{4}-\d{2}-\d{2})/", path.replace(os.sep, "/"))
+    date = m.group(1)
+    tm = re.search(r"##\s*邮件标题.*?\*\*推荐\*\*\s*```\s*\n(.+?)\n\s*```", raw, re.S)
+    if not tm:
+        raise RuntimeError(f"{path}: 找不到「邮件标题→推荐」块，不许猜标题")
+    title = tm.group(1).strip()
+    if "## ⚡" not in raw:
+        raise RuntimeError(f"{path}: 没有「## ⚡」起点，格式变了先对齐 to_substack 再说")
+    start = raw.index("## ⚡")
+    ends = [i for i in (raw.find("\n" + h, start) for h in INTERNAL_HEADS) if i > 0]
+    body = raw[start:min(ends)] if ends else raw[start:]
+    out, skip = [], False
+    for ln in body.split("\n"):
+        st = ln.strip()
+        if st.startswith("## "):
+            skip = st[3:].strip().startswith("LinkedIn")
+            if skip:
+                continue
+        if skip or st.startswith(">") or st.startswith("### "):
+            continue
+        out.append(ln)
+    body = "\n".join(out)
+    body = re.sub(r"〖图\d+：([^〗]+)〗", r"![\1_纯中文.png](local://card)", body)
+    return date, title, body.strip()
+
+
+LEDGER = os.path.abspath(os.path.join(REPO, "..", "..", "期权数据管线", "data", "发布台账.csv"))
+
+def ledger_special(folder_date):
+    """特刊（周报/月报）的**发布证明**与**实发标题**，都取自发布台账。
+    为什么必须走台账（2026-08-11 正向样本抓出来的，别退回草稿标题）：
+      ① 草稿推荐块标题 ≠ 实发标题（8.3-8.7 周回顾：草稿「你惦记的存储…」，
+         实发「你的票…· 8.3-8.7 本周回顾」——按草稿判「回顾」会静默漏掉整个特刊）；
+      ② 档案＝发出去的东西。台账行是「发出去了」的唯一证明——没有行就不上站，
+         防止「周五写好、周一才发，周末先上了站」的时间墙泄漏。
+    匹配窗＝日夹日期起 7 天内的 回顾/收官 行；标题优先邮件平台（substack/buttondown）。"""
+    import csv as _csv
+    end = (datetime.date.fromisoformat(folder_date) + datetime.timedelta(days=7)).isoformat()
+    try:
+        rows = list(_csv.DictReader(open(LEDGER, encoding="utf-8")))
+    except FileNotFoundError:
+        return None
+    hits = [r for r in rows
+            if folder_date <= (r.get("date") or "") <= end
+            and re.search(r"回顾|收官", (r.get("content_type") or "") + (r.get("title") or ""))
+            and (r.get("title") or "").strip()]
+    if not hits:
+        return None
+    pref = next((r for r in hits if r.get("platform") in ("substack", "buttondown")), hits[0])
+    return pref["title"].strip(), pref["date"]
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", help="只出这一天，用于样张")
+    ap.add_argument("--live-cutover", default=LIVE_CUTOVER,
+                    help="活源起始日。默认=冻结快照终点次日；改小仅用于测试样张，生产别动")
     a = ap.parse_args()
     today = datetime.date.today().isoformat()
     os.makedirs(OUT, exist_ok=True)
-    files = sorted(glob.glob(os.path.join(SRC, "*.md")))
+    entries = ([(f, parse) for f in sorted(glob.glob(os.path.join(SRC, "*.md")))] +
+               [(f, parse_live) for f in live_files(a.live_cutover)])
     done, seen_slugs = [], {}
-    for f in files:
-        date, title, body = parse(f)
+    for f, parser in entries:
+        date, title, body = parser(f)
+        special = False
+        if parser is parse_live:
+            # 活源的特刊按**目录结构**识别（周报/月报住日夹的子夹，日更住日夹根）。
+            # 特刊须有发布台账行才放行，且标题以台账（实发）为准——理由见 ledger_special。
+            sub = os.path.basename(os.path.dirname(f)).strip()
+            if not re.match(r"\d{4}-\d{2}-\d{2}$", sub):
+                led = ledger_special(date)
+                if not led:
+                    print(f"  ⏳ {date} 特刊未见发布台账回顾/收官行，待发布后自动进站：{title[:22]}")
+                    continue
+                title, pub = led
+                special = True
+                print(f"  [台账] {date} 特刊按实发标题进站（发布于 {pub}）：{title[:30]}")
         if a.only and date != a.only:
             continue
         if date >= today:                      # 时间墙：当日永不上站
@@ -367,14 +465,14 @@ def main():
             continue
         # §46 口径（2026-08-11 Klay 复核后维持）：**站上档案只收周报/月报**。
         # 日更正文不上本站——它们公开在 Substack 归档里（2026-08-11 经 RSS 导入）。
-        # 判据只有这一处实现，别在别处另写一份。
-        if not re.search(r"回顾|收官", title):
+        # 判据只有这一处实现，别在别处另写一份（活源特刊由台账放行，等价于同一判据）。
+        if not special and not re.search(r"回顾|收官", title):
             print(f"  ⏭  {date} 日更，按 §46 不进站（公开在 Substack）：{title[:22]}")
             continue
         log = []
         # 🚨 一天可能发两封（2026-07-26：日更 + 本周回顾）。同名会静默覆盖，
         #    而两封都照样打 ✅ ——日志会骗人，所以这里必须显式撞车守卫。
-        slug = date + ("-weekly" if re.search(r"回顾|收官", title) else "")
+        slug = date + ("-weekly" if special or re.search(r"回顾|收官", title) else "")
         path = os.path.join(OUT, f"{slug}.html")
         if slug in seen_slugs:
             raise RuntimeError(f"输出撞车：{slug} 已被 {seen_slugs[slug]} 占用，"
