@@ -206,3 +206,9 @@ K 指数（`kindex.json`、`kindex_signals.json`）、恐惧的标价指数
   改口径 = 另起新链。
 - **本机制证明的是「没被改过」，不是「数字是对的」。** 上游源自身的修订、我们取数当时的错误，
   都由 ①自核 与公开勘误负责，不由哈希链负责。
+
+## digest_archive.json
+往期判读归档索引（兑现定价页「往期归档公开可查·逐日归档」）。
+由 `scripts/build_digest_archive.py` 从本地稿件生成 —— **原先靠 Buttondown 存档页取标题与链接
+（§45），该平台 2026-08-10 已终止、存档全 404，故改为本地生成。**
+字段：`date` / `slug` / `title` / `url` / `kind`（daily｜weekly）。

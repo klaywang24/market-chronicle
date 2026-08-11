@@ -27,8 +27,17 @@ ALLOW_ANCHOR = "VIX"  # 窗口内必须出现它
 
 def targets():
     """对外可见的文本面：页面、脚本里的字符串、机器可读入口、仓库门面。"""
+    # 2026-08-11：归档页与 feed 原本在扫描范围外＝闸对新内容失明（实测：它报「违规 0」
+    # 的同时，digest/ 里有 2 处裸用）。归档是「当时发出去的原话」，按勘误准则旧文不回改
+    # ⇒ 这里把它们纳入扫描但只作 INFO 播报，不 fail 构建；非归档路径照旧硬失败。
     for p in sorted(ROOT.glob("*.html")):
         yield p
+    # 归档面：真的 yield 出去才叫扫（2026-08-11 首版只往集合里塞路径没 yield，
+    # 闸照旧报「24 个文件·违规 0」——自造 bug 只在真跑时现形）
+    for p in sorted(ROOT.glob("digest/*.html")) + [ROOT / "feed.xml"]:
+        if p.exists():
+            ARCHIVE_PATHS.add(str(p))
+            yield p
     for p in sorted((ROOT / "js").glob("*.js")):
         yield p
     for name in ("llms.txt", "README.md", "README.zh.md"):
@@ -37,15 +46,19 @@ def targets():
             yield p
 
 
+ARCHIVE_PATHS = set()
+
 def main():
     files = 0
     hits = 0
     ok = 0
     bad = []
+    archived = []
 
     for path in targets():
         files += 1
         text = path.read_text(encoding="utf-8", errors="replace")
+        is_archive = str(path) in ARCHIVE_PATHS
         for m in re.finditer(TERM, text):
             hits += 1
             window = text[max(0, m.start() - ALLOW_WITHIN):m.start()]
@@ -55,7 +68,14 @@ def main():
             line = text.count("\n", 0, m.start()) + 1
             ctx = text[max(0, m.start() - 24):m.start() + len(TERM) + 12]
             ctx = ctx.replace("\n", " ")
-            bad.append((path.relative_to(ROOT), line, ctx))
+            # 归档＝当时发出去的原话，按勘误准则旧文不回改 ⇒ 只播报不失败。
+            # 但**必须播报**：不播报就等于闸又瞎了一次。
+            (archived if is_archive else bad).append((path.relative_to(ROOT), line, ctx))
+
+    if archived:
+        print(f"INFO: 往期归档里有 {len(archived)} 处裸用「{TERM}」（原文如此，不回改）：")
+        for rel, line, ctx in archived:
+            print(f"  {rel}:{line}  …{ctx}…")
 
     if bad:
         print(f"RED: 扫 {files} 个文件，「{TERM}」共 {hits} 处，"
@@ -66,8 +86,8 @@ def main():
               f"确实在说 VIX 就把 VIX 紧挨着写在前面。")
         return 1
 
-    print(f"OK: 扫 {files} 个文件，「{TERM}」共 {hits} 处，"
-          f"全部为归属性用法（前 {ALLOW_WITHIN} 字内有 {ALLOW_ANCHOR}），违规 0。")
+    print(f"OK: 扫 {files} 个文件，「{TERM}」共 {hits} 处 = "
+          f"归属性 {ok} + 归档原文 {len(archived)}，**新增违规 0**。")
     return 0
 
 

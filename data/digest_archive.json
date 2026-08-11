@@ -1,16 +1,160 @@
 {
-  "_note": "头版「每周对账 · 公开归档」墙。🔴 只收周对账与月复盘，每日 digest 永不进本表 —— 公开度按品类切（周报免费拉新／日更付费独占），这是 2026-07-26 定的分法，改它等于改定价承诺。契约：周报发出后在 issues 头部插一行（date=发送日 / title=邮件标题原样照录 / url=Buttondown 存档页真实链接），随当日提交 push；标题与链接必须取自存档页实况，绝不手编。数组为空时头版整块不渲染，不会留空壳。",
-  "archive_index": "https://buttondown.com/klay24/archive/",
-  "issues": [
+  "generated_at": "2026-08-11T15:16:14Z",
+  "count": 22,
+  "items": [
+    {
+      "date": "2026-08-09",
+      "slug": "2026-08-09-weekly",
+      "title": "你的票，看似一周没动，其实走过了千山万水· 8.3-8.7 本周回顾",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-09-weekly",
+      "kind": "weekly"
+    },
+    {
+      "date": "2026-08-08",
+      "slug": "2026-08-08",
+      "title": "台积电，从牛夫人变成了小甜甜？· 08-07",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-08",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-08-07",
+      "slug": "2026-08-07",
+      "title": "13.69 亿美元，全押在周五上午的一个数字上· 08-06",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-07",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-08-06",
+      "slug": "2026-08-06",
+      "title": "闪迪财报交卷，尾盘居然这么多看涨？· 08-05",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-06",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-08-05",
+      "slug": "2026-08-05",
+      "title": "闪迪明天开奖，回本线今天就画好了· 08-04",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-05",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-08-04",
+      "slug": "2026-08-04",
+      "title": "亚马逊站上三万亿，贝索斯准备要卖40.7亿 ？·08-03",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-04",
+      "kind": "daily"
+    },
     {
       "date": "2026-08-02",
-      "title": "美股七月赚钱了吗？· 7月收官 & 回顾",
-      "url": "https://buttondown.com/klay24/archive/u7f8e-u80a1-u4e03-u6708-u8d5a-u94b1-u4e86-u5417/"
+      "slug": "2026-08-02-weekly",
+      "title": "美股七月赚钱了吗？这里面或许有你想要的答案：7月收官 & 回顾",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-02-weekly",
+      "kind": "weekly"
+    },
+    {
+      "date": "2026-08-01",
+      "slug": "2026-08-01",
+      "title": "7 月最后一个交易日， 看跌的钱留下了，看涨的钱走了· 07-31",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-01",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-07-31",
+      "slug": "2026-07-31",
+      "title": "微软一天市值增加4500亿美元，美股有史以来最大 · 07-30",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-31",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-07-30",
+      "slug": "2026-07-30",
+      "title": "美联储要加息？微软说：接着花，还要多花· 07-29",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-30",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-07-29",
+      "slug": "2026-07-29",
+      "title": "闪迪一天跌掉14%，可乐却64年新高，市场在等美联储· 07-28",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-29",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-07-28",
+      "slug": "2026-07-28",
+      "title": "市场今天追的是英伟达的信用故事， 不是存储的供给故事· 07-27",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-28",
+      "kind": "daily"
     },
     {
       "date": "2026-07-26",
+      "slug": "2026-07-26",
+      "title": "存储跌了三成， 上车的票反而更贵了· 07-25",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-26",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-07-26",
+      "slug": "2026-07-26-weekly",
       "title": "美股跌到位了吗？· 7.20-7.24 本周回顾",
-      "url": "https://buttondown.com/klay24/archive/u7f8e-u80a1-u8dcc-u5230-u4f4d-u4e86-u5417-720-724/"
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-26-weekly",
+      "kind": "weekly"
+    },
+    {
+      "date": "2026-07-24",
+      "slug": "2026-07-24",
+      "title": "昨天市场挨了三记重拳，却在收盘前自己爬了起来 · 07-24",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-24",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-07-23",
+      "slug": "2026-07-23",
+      "title": "Google CFO 还没念出数字，存储股的期权已经把剧本演完了· 07-23",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-23",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-07-22",
+      "slug": "2026-07-22",
+      "title": "财报开牌前，聪明钱在买翅膀· 07-22",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-22",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-07-21",
+      "slug": "2026-07-21",
+      "title": "有人花一万二，买了张四分钱的崩盘险· 07-21",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-21",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-07-20",
+      "slug": "2026-07-20",
+      "title": "三个互不相识的市场，同一天把怕调贵了 · 07-20",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-20",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-07-17",
+      "slug": "2026-07-17",
+      "title": "大跌的日子，多数人反而不打开账户",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-17",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-07-16",
+      "slug": "2026-07-16",
+      "title": "恐惧的标价 · 07-15 收盘",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-16",
+      "kind": "daily"
+    },
+    {
+      "date": "2026-07-15",
+      "slug": "2026-07-15",
+      "title": "市场对眼前一点也不怕，却对一年后要价 74 分位",
+      "url": "https://chronicle.klay-wang.com/digest/2026-07-15",
+      "kind": "daily"
     }
   ]
 }
