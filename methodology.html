@@ -1038,7 +1038,11 @@
                ⚠️ 发送纪律：免费名单只收极端读数信；digest 发送对象绝不能再选 Everyone，
                否则付费权益名不副实（7·20 定论原文），要用 Buttondown tag 区分。
                不带 target="_blank"：券商 App 内置浏览器会吞新标签（f081ea0 原注释）。 -->
-          <form class="ledger-sub" action="https://buttondown.com/api/emails/embed-subscribe/klay24" method="post">
+          <!-- 2026-08-11：Buttondown 账号被终止，旧端点实测 POST 返回 400 ＝ 访客填了邮箱点下去数据掉进虚空。
+     改指 Substack。用 GET 到 /subscribe 并把邮箱带过去（该页会预填），实测 200；
+     不用 Substack 的 API 端点：跨站 POST 会被 CORS 挡，且没有免 JS 的成功页。
+     不带 target="_blank"：券商 App 内置浏览器会吞新标签（f081ea0 原注释，续用）。 -->
+          <form class="ledger-sub" action="https://fearprice.substack.com/subscribe" method="get">
             <div class="sub-row">
               <input class="sub-input" type="email" name="email" required placeholder="you@email.com" aria-label="Email">
               <button class="sub-btn" type="submit">免费订阅</button>
