@@ -1042,13 +1042,19 @@
      改指 Substack。用 GET 到 /subscribe 并把邮箱带过去（该页会预填），实测 200；
      不用 Substack 的 API 端点：跨站 POST 会被 CORS 挡，且没有免 JS 的成功页。
      不带 target="_blank"：券商 App 内置浏览器会吞新标签（f081ea0 原注释，续用）。 -->
-          <form class="ledger-sub" action="https://fearprice.substack.com/subscribe" method="get">
+<!-- 2026-08-11 二改（Klay 定）：去掉邮箱输入框，改成直接跳转。
+     原来是 GET 预填到 Substack：访客在本站打完邮箱，到 Substack 还要再确认一次＝两步，白流失一批人。
+     Substack 订阅页自己就要邮箱，本站再要一遍没有意义。一步到位，且这一跳仍记在本站 Cloudflare 里。
+     文案一字未动：「免费订阅」与注脚都是 i18n 的 D 键，改字＝英文态整段泄漏（硬规矩 §2）。
+     用 a 而非 button：不再提交表单，语义上是导航。`.sub-btn` 已有 width:100%，
+     只补 display/text-align/text-decoration 三条（走内联样式，不动 style.css ⇒ 不必 bump ?v=）。
+     不带 target="_blank"：券商 App 内置浏览器会吞新标签（f081ea0 原注释，续用）。 -->
+          <div class="ledger-sub">
             <div class="sub-row">
-              <input class="sub-input" type="email" name="email" required placeholder="you@email.com" aria-label="Email">
-              <button class="sub-btn" type="submit">免费订阅</button>
+              <a class="sub-btn" href="https://fearprice.substack.com/subscribe" style="display:inline-block;text-align:center;text-decoration:none">免费订阅</a>
             </div>
             <div class="sub-note">免费 · 由读数触发，不按日历 · 随时退订，不发广告</div>
-          </form>
+          </div>
         </div>
         <div class="ptier featured">
 <!-- 2026-07-26 用户裁：删除创始价徽章 -->
