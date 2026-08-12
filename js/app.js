@@ -989,6 +989,15 @@
     // 实测 1600px 下左边距 254 / 右边距 225，内容被推偏、左侧 216px 是死白。
     document.documentElement.classList.toggle("no-toc", chapters.length === 0);
     document.documentElement.classList.toggle("has-toc", chapters.length > 0);
+    /* TOC 让位切换是**已知的**容器宽度变更点：从无目录页（「今日」头版）切进有目录页时，
+       图表在 .then(buildToc) 之前就建完了，宽度是让位前的旧值。平时靠 ResizeObserver 的
+       rAF 追平；但 rAF 在 headless 虚拟时间下会被饿死（2026-08-11 CI 溢出闸两连红、
+       且只红 pulse 之后第一个有目录的面板＝本机制的指纹）。这里已确知尺寸变了，
+       同步校一遍，不等下一帧。与 visibilitychange 兜底同款判据。 */
+    built.forEach((c, id) => {
+      const cel = document.getElementById(id);
+      if (cel && cel.clientWidth > 0 && !c.isDisposed() && Math.abs(c.getWidth() - cel.clientWidth) > 1) c.resize();
+    });
     highlightToc();
     positionToc();
   }
