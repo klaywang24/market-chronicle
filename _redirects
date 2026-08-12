@@ -73,89 +73,63 @@
 /fear-price/  /leaps  301
 /fear-price   /leaps  301
 
-# ── 推荐人短路径 /r/<人>（2026-08-07 建）──
-# 干什么：把 Buttondown 的推荐链接套上自己的域名。
-#   落点＝ https://buttondown.com/klay24/?referral_code=<那个人的六位码>
-#   谁从那个页面订阅，Buttondown 就记一笔在那个人名下（Subscriber → Notes / Analytics 可查）。
-#
-# 码从哪来：后台 Subscribers → 点开那个人 → Properties → Referral code（六位小写字母）。
-#   ⚠️ 那个人**必须已经是订阅者**，没订阅就没有码。
-#
-# 已实测这条链路是通的（2026-08-07）：带真码请求订阅页，页面里
-#   <script id="referring_subscriber_id">"827f1926-…"</script>
-#   不带码或带假码时该值是 null。**所以「页面看起来一样」不等于没生效，要看这个字段。**
-#
-# 302 不用 301：码换了、人退订了都要能改，301 会被浏览器永久缓存。
-#
-# 🔴 **本文件的规则只对全小写路径生效，大写一律不匹配**（2026-08-07 上线后实测，非推测）：
-
-# ─────────────────────────────────────────────────────────────────────
-# 🔴 2026-08-10 全部改写：Buttondown 账号被封（支付争议，与内容无关），
-#    原落点 buttondown.com/klay24 已全站 404，这 9 条链接一度全是坏的。
-#    新落点＝ Substack 订阅页。
-#
-# ⚠️ 归因能力降级，必须知道：
-#    · 原来 ?referral_code=<码> 由 Buttondown 原生记「谁推荐了谁」——**Substack 没有等价物**
-#    · 原来 ?tag=src-<名字> 给订阅者打标签 ——**Substack 也没有**
-#    · ⇒ 现在只剩 Cloudflare 侧的「谁点了这条短链」，**点击之后转化到谁，断了**
-#    · 历史教训：吕雨那 32 人里，29 人是靠 src-1 标签才认出来的。
-#      同样的事往后认不出来了，除非订阅表单自己加「你从哪来」的选项。
-# ─────────────────────────────────────────────────────────────────────
-#    # 2026-08-11：/subscribe 此前**不存在**（无文件、无规则），靠 SPA 兜底静默落到首页。
-#   Substack 邮件统计里已经出现过「/subscribe 点击 1 次」＝真有读者点了订阅、被丢去首页。
-#   现在把它作为**本域名上的公共订阅入口**：点击记在自己站的 Cloudflare 里，落地页交给 Substack。
-#   给朋友的专属邀请仍走 /r/<名字>（能分人看数）；对外公开场合发 /subscribe。
+# ── 公共订阅入口 /subscribe ──
+# 2026-08-11：此前它**根本不存在**（无文件、无规则），靠 SPA 兜底静默落到首页；
+#   Substack 邮件统计里已出现过「/subscribe 点击 1 次」＝真有读者点了订阅被丢去首页。
+#   现在它是本域名上的公共订阅入口：点击记在自己站的 Cloudflare 里，落地页交给 Substack。
+#   对外公开场合（简介、社媒、群）发 /subscribe；要分人看数才发 /r/<码>。
 /subscribe        https://fearprice.substack.com/subscribe   302
 
-/r/jolie → 302 ✅   /r/Jolie → 200 ❌（我原本为它单写了一行，那行是死的，已删）
-#    不是我这条的问题，是全局的：/xq → 302 ✅ 而 /XQ、/Xq、/FEAR-PRICE 全部 200 ❌。
-#    推断＝Pages 把规则里的 from 归一成小写，于是带大写的请求永远匹配不上，
-#    **再加一行大写版也没用**（加了也会被归一成同一条）。
-#    ⇒ 对外发的短链**一律全小写**；人名做路径时先转小写。
-# 🚫 不加 `/r/*` 兜底：命名空间与板块真路径共用，splat 一旦写宽会盖住真页面（见文件顶部那段）。
-#    没匹配上的 /r/xxx 会照默认行为回首页，可以接受（实测 /r/nobody → 200 首页）。
+# ── 推荐人短路径 /r/<码> ──
+# 干什么：给某个人一条专属短链，他分享出去后能看出流量是谁带来的。
 #
-# ✅ 点击数**看得到**（2026-08-07 下午更正本行原说法）：
-#    原写「看不到」只对 Web Analytics（RUM）成立 —— 它靠页面里的 JS beacon，302 没 HTML 就没 beacon。
-#    但**域名层（zone）分析是服务端计数，302 照数**；加了 Zone→Analytics→Read 之后 /r/ 各条点击可查。
-#    🔑 教训：说「测不到」要讲清是哪把尺子测不到，不同层的尺子能力不同。
-#    ⇒ 两层都要看：**点击数在 Cloudflare，转化数在 Buttondown**（某人推荐了几个人）。
+# 🔴 **路径里一律用不透明四位码，绝不用人名**（2026-08-12 Klay 定）。
+#   两个理由，都不是洁癖：
+#   ①本文件在**公开仓**里 ⇒ 写人名＝把朋友的姓名公开在 GitHub 上，撞站规「公开仓正文绝不写个人标识符」；
+#   ②收到链接的人会把它转发出去 ⇒ 名字跟着链接走，很多人并不想露真名。
+#   码↔人的对照表只留在本地私有文档（`生意与起号/01-起号引流/_推荐码对照表.md`，该目录已 gitignore）。
+#   码用 [a-z2-9] 去掉 l/o/0/1 等易混字符；**全小写**（本文件规则只对全小写路径生效，见下）。
 #
-# ══ 两条路，对外长得一样，落点不同 ══
+# ⚠️ 归因只剩一层，必须知道（2026-08-10 平台迁移后的实况）：
+#   · Buttondown 时代有两样东西，Substack **都没有等价物**：
+#     原生的「谁推荐了谁」（?referral_code=）、给订阅者打标签（?tag=src-）。
+#   · ⇒ 现在只剩 Cloudflare 域名层的「哪条短链被点了几次」，
+#     **点击之后转化到谁，这一段断了**。想补回来只能让订阅表单自己问「你从哪来」。
+#   · 历史教训：早期某个推荐人带来的 32 人里，29 人是靠标签才认出来的。同样的事往后认不出来。
 #
-# 【A 推荐码】给**已经有六位码**的人（＝他自己是从订阅页自助订阅的）。
-#   落点 ?referral_code=<码>，Buttondown 原生记「谁推荐了谁」。
-#   更好，因为被推荐来的人自己也会拿到码，可以继续往下传，成链。
+# 🔴 **本文件的规则只对全小写路径生效**（2026-08-07 上线后实测，非推测）：
+#   /xq → 302 ✅ 而 /XQ、/Xq、/FEAR-PRICE 全部 200 ❌。
+#   推断＝Pages 把规则里的 from 归一成小写，带大写的请求永远匹配不上，
+#   **再加一行大写版也没用**（会被归一成同一条）。⇒ 对外发的短链一律全小写。
 #
-# 【B 标签】给**没有码**的人（＝当初是手工加进列表的，补不回来：
-#   他们已经是订阅者，再去订阅页只会看到「你已经订阅了」，不会重走生成流程）。
-#   落点 ?tag=src-<名字>，谁从这条链接订阅就被打上这个标签。
-#   ⚠️ 标签由链接自己带，Buttondown 遇到不存在的标签会自动创建
-#      ⇒ **这条路不需要那个人在 Buttondown 里有任何东西**，只要一个名字。
-#   看数：Subscribers 页按 src-<名字> 筛选。
-#   🔬 已实测（2026-08-07）：无痕窗口开 ?tag=src-test 订阅 klaywang24+t3，
-#      该记录 Tags 栏出现 src-test。**这条是真的通，不是照文档推的。**
-#      （早前只查过「托管页 HTML 里没有 tag 字段」就差点判它不成立 ——
-#        没看到不等于没有，同「假推荐码测出 null」那次。）
-#   🔴 前缀固定 src-：付费/免费发送对象是靠 tag 分的（premium），
-#      归因标签必须一眼可分，否则群发选错人群。
+# 🚫 不加 `/r/*` 兜底：命名空间与板块真路径共用，splat 写宽会盖住真页面（见文件顶部）。
+#   没匹配上的 /r/xxx 照默认行为回首页（实测 /r/nobody → 200 首页），可以接受：
+#   首页上就有免费订阅按钮，漏斗不断，只是这一次的归因认不出来。
+#
+# ✅ 点击数看得到：域名层（zone）分析是**服务端计数，302 照数**。
+#   Web Analytics(RUM) 看不到，因为它靠页面 JS beacon，302 没有 HTML 就没有 beacon。
+#   🔑 说「测不到」必须讲清是哪把尺子测不到——不同层的尺子能力不同。
+#
+# 302 不用 301：落点会变（换平台、换活动页），301 会被浏览器永久缓存。
 #
 # 加人流程：
-#   有码 → 抄码，走 A；没码 → 只要一个全小写名字，走 B。
-#   加完 commit → push → curl 实测每一条跳没跳对（**别省这步**，见上面大小写那条）。
-
-# A 推荐码
-/r/jolie          https://fearprice.substack.com/subscribe   302
-/r/lvyu           https://fearprice.substack.com/subscribe   302
-
-# B 标签（2026-08-07 建，均为手工加进列表、无推荐码的人）
-/r/felix          https://fearprice.substack.com/subscribe   302
-/r/xianzhe        https://fearprice.substack.com/subscribe   302
-/r/jianghaosanti  https://fearprice.substack.com/subscribe   302
-/r/ninahe         https://fearprice.substack.com/subscribe   302
-/r/luyao          https://fearprice.substack.com/subscribe   302
-/r/ganhuang       https://fearprice.substack.com/subscribe   302
-/r/muchenwu       https://fearprice.substack.com/subscribe   302
+#   1. 生成一个没用过的四位码（别用姓名首字母、别用生日这类可猜的）
+#   2. 本文件加一行 `/r/<码>  <落点>  302`
+#   3. 私有对照表里记「码 → 谁」
+#   4. commit → push → **curl 实测这一条跳没跳对**（别省，见上面大小写那条）
+#
+# 2026-08-12：以下 9 条由原来的人名路径换成码。旧的人名路径**已删除**（Klay 定），
+#   已发出去的旧链接会落回首页——漏斗仍在，只是那一次的归因认不出来。
+#   若要继续追某个人，把新链接重发给他。
+/r/3e6h          https://fearprice.substack.com/subscribe   302
+/r/7sdy          https://fearprice.substack.com/subscribe   302
+/r/inim          https://fearprice.substack.com/subscribe   302
+/r/jqet          https://fearprice.substack.com/subscribe   302
+/r/jcmf          https://fearprice.substack.com/subscribe   302
+/r/ec5v          https://fearprice.substack.com/subscribe   302
+/r/xi53          https://fearprice.substack.com/subscribe   302
+/r/66gi          https://fearprice.substack.com/subscribe   302
+/r/n98q          https://fearprice.substack.com/subscribe   302
 
 # 2026-08-11：日更正文按 §46 不进本站档案（公开在 Substack 归档）。
 # 这 19 个路径曾短暂在线约 40 分钟，指回档案页而不是落进 SPA 兜底显示成首页。
