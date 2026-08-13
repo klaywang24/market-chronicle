@@ -187,6 +187,13 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 <div class="op-chart" id="ch-cmhist"></div>
 <p class="op-fresh" id="fr7"></p>
 
+<!-- Ⅷ ──────────────────────────────── -->
+<div class="chapter-head" id="op-ch8"><span class="chapter-no">第八章</span><h2 id="op-ch8-h2">跳空之后 · 缺口的三种下场</h2></div>
+<p class="op-note" id="op-ch8-note"></p>
+<div class="op-chart tall" id="ch-gaps"></div>
+<p class="op-note" id="op-ch8-fin"></p>
+<p class="op-fresh" id="fr8"></p>
+
 <!-- 口径说明 ──────────────────────── -->
 <div class="op-caliber" id="op-cal">
   <b>口径说明（读数前必看）</b><br>
@@ -195,6 +202,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
   · 归因只做算术：量至少两倍于持仓记<b>更像新增</b>，量超过持仓记<b>倾向新增</b>，量小于存量记<b>无法归因</b>。不猜方向，不讲故事。<br>
   · 现价口径：官方收盘价为唯一真源；当日尚未收盘时用盘前快照并明确标注。<br>
   · 大单榜只列我们复核后的 A 级，不是全量数据，原始数据不在本页提供。<br>
+  · 跳空章口径：跳空＝开盘对昨收，盘中＝收盘对开盘；真缺口＝当日最低高于前日最高（或反之），比开盘价跳空严格。金融五只为参照系，不参与排行。<br>
   · <b>仅为数据与信息，不构成投资建议，不含任何买卖推荐。</b>
 </div>
 
@@ -240,7 +248,8 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
       "期权异动 & 分析": "Options Flow & Analysis",
       "正在读取当日数据…": "Loading today's data…",
       "第一章": "Chapter Ⅰ", "第二章": "Chapter Ⅱ", "第三章": "Chapter Ⅲ", "第四章": "Chapter Ⅳ",
-      "第五章": "Chapter Ⅴ", "第六章": "Chapter Ⅵ", "第七章": "Chapter Ⅶ",
+      "第五章": "Chapter Ⅴ", "第六章": "Chapter Ⅵ", "第七章": "Chapter Ⅶ", "第八章": "Chapter Ⅷ",
+      "跳空之后 · 缺口的三种下场": "After the gap: three fates",
       "今天，谁贴着自己的墙": "Who is hugging their wall today",
       "一根轴 ·": "One axis ·",
       "昨天的钱，今天还在不在": "Is yesterday's money still there",
@@ -275,6 +284,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
       "· Attribution is arithmetic only: volume at least twice the open interest reads <b>likely new</b>; volume above OI reads <b>leans new</b>; volume below OI reads <b>inconclusive</b>. No direction-guessing, no storytelling.<br>" +
       "· Spot: the official close is the only source of truth; before the close we show an intraday snapshot, clearly labeled.<br>" +
       "· The big board lists only rechecked A-grade rows. It is not the full dataset, and raw data is not provided on this page.<br>" +
+      "· Gap chapter: gap = open vs prior close; intraday = close vs open; a true gap = today's low above yesterday's high (or the reverse), stricter than the opening print. The five financials are reference only.<br>"+
       "· <b>Data and information only; not investment advice; no buy or sell recommendations.</b>";
   }
   const dark = document.documentElement.classList.contains("dark-mode");
@@ -356,6 +366,10 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
       fr5: grow(fl),
       fr6: daily,
       fr7: grow(cm),
+      fr8: (D.gaps && D.gaps.date)
+        ? tr("每个交易日收盘后加一天，已记 <b>" + D.gaps.days + "</b> 个交易日（本栏 " + dot(D.gaps.date) + " 起步）。跳空宇宙比期权宇宙宽：多了一批高波票与三只点名票，金融五只只当参照系、不参与排行。",
+             "One more day per session; <b>" + D.gaps.days + "</b> session(s) recorded (this section starts " + dot(D.gaps.date) + "). The gap universe is wider than the options universe: extra high-beta names plus three watchlist names; the five financials serve as reference only and are excluded from the ranking.")
+        : "",
     };
     Object.entries(txt).forEach(([id, v]) => { const el = $(id); if (el) el.innerHTML = v; });
   })();
@@ -641,9 +655,45 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
       { name: tr("一年","1-year"), type: "bar", data: TL.map(r => r.iv365), itemStyle: { color: dark ? "#8a867e" : "#5a5a5a" }, barWidth: 10 },
     ],
   });
+  /* ── Ⅷ 跳空之后 ── */
+  if (D.gaps && D.gaps.date && D.gaps.rows && D.gaps.rows.length) {
+    const G = D.gaps.rows;
+    $("op-ch8-note").innerHTML = tr(
+      "当天涨跌拆成两段：<b>跳空</b>＝开盘对昨收（隔夜共识的重定价），<b>盘中</b>＝收盘对开盘（开盘后真金白银打出来的）。同样的收盘涨幅，可以是三种完全不同的下场：<b>跳空后被吞</b>（高开被卖）、<b>跳空后延续</b>（真有新钱进来）、<b>零跳空硬涨</b>（全靠盘中买上去）。标记 ▲/▼ 的是<b>真缺口</b>（当日最低高于前日最高，或反之）：比开盘价跳空严得多的口径。",
+      "Each day's move splits in two: the <b>gap</b> (open vs prior close — overnight repricing) and the <b>intraday</b> leg (close vs open — money actually traded after the bell). The same daily gain can meet three different fates: <b>gap swallowed</b> (opened high, sold all day), <b>gap extended</b> (new money kept coming), or <b>no gap at all</b> (the whole move built intraday). ▲/▼ marks a <b>true gap</b> — today's low above yesterday's high (or the reverse) — a far stricter test than the opening print.");
+    const tg = r => r.true_gap === "向上" ? " ▲" : (r.true_gap === "向下" ? " ▼" : "");
+    mkChart("ch-gaps").setOption({
+      grid: { left: 60, right: 24, top: 36, bottom: 64 },
+      legend: { data: [tr("跳空", "Gap"), tr("盘中", "Intraday")], textStyle: { color: MUTED }, top: 4 },
+      tooltip: { trigger: "axis", axisPointer: { type: "shadow" },
+                 valueFormatter: v => (v > 0 ? "+" : "") + (v == null ? "—" : v.toFixed(2)) + "%" },
+      xAxis: { type: "category", data: G.map(r => r.ticker + tg(r)), ...axisBase,
+               axisLabel: { color: MUTED, fontSize: 11, rotate: 45 } },
+      yAxis: { type: "value", name: "%", nameTextStyle: { color: MUTED }, ...axisBase },
+      series: [
+        { name: tr("跳空", "Gap"), type: "bar", stack: "d", data: G.map(r => r.gap),
+          itemStyle: { color: GOLD }, barWidth: 12 },
+        { name: tr("盘中", "Intraday"), type: "bar", stack: "d", data: G.map(r => r.intraday),
+          itemStyle: { color: dark ? "#8a867e" : "#5a5a5a" }, barWidth: 12 },
+      ],
+    });
+    if (D.gaps.finref && D.gaps.finref.length) {
+      const fx = D.gaps.finref.map(r =>
+        r.ticker + " " + (r.chg > 0 ? "+" : "") + (r.chg == null ? "—" : r.chg.toFixed(2)) + "%").join(" · ");
+      $("op-ch8-fin").innerHTML = tr(
+        "<b>金融参照组</b>（半年里单日 ±10% 天数为零的五只，不参与排行）：" + fx +
+        "。它们的用途只有一个：当这五只<b>同一天</b>一起跳空，那不是个股新闻，是系统性事件。",
+        "<b>Financial reference group</b> (five names with zero ±10% days in six months; excluded from the ranking): " + fx +
+        ". They serve one purpose: when all five gap on the <b>same day</b>, that is not stock news — it is systemic.");
+    }
+  } else {
+    $("op-ch8-note").textContent = tr("本栏起步中，首个交易日数据落库后显示。",
+                                      "This section is warming up; it appears once the first session lands.");
+  }
+
   /* 左侧目录（≥1280px 桌面，滚动高亮） */
   const CH = [["op-ch1",tr("Ⅰ 谁贴着自己的墙","I Hugging the wall")],["op-ch2",tr("Ⅱ 一根轴","II One axis")],["op-ch3",tr("Ⅲ 昨天的钱在不在","III Yesterday's money")],
-              ["op-ch4",tr("Ⅳ 大单榜","IV Big board")],["op-ch5",tr("Ⅴ 墙在动","V Walls in motion")],["op-ch6",tr("Ⅵ 两条命","VI Two lives")],["op-ch7",tr("Ⅶ 一年期的怕","VII One-year fear")]];
+              ["op-ch4",tr("Ⅳ 大单榜","IV Big board")],["op-ch5",tr("Ⅴ 墙在动","V Walls in motion")],["op-ch6",tr("Ⅵ 两条命","VI Two lives")],["op-ch7",tr("Ⅶ 一年期的怕","VII One-year fear")],["op-ch8",tr("Ⅷ 跳空之后","VIII After the gap")]];
   const toc = document.createElement("nav");
   toc.className = "op-toc";
   toc.innerHTML = "<div class='op-toc-h'>" + tr("本页章节","On this page") + "</div>" +
