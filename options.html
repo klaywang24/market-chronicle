@@ -191,6 +191,8 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 <div class="chapter-head" id="op-ch8"><span class="chapter-no">第八章</span><h2 id="op-ch8-h2">跳空之后 · 缺口的三种下场</h2></div>
 <p class="op-note" id="op-ch8-note"></p>
 <div class="op-chart tall" id="ch-gaps"></div>
+<div class="op-chips" id="gap-chips" style="display:none"></div>
+<div class="op-chart" id="ch-gaps-daily" style="display:none"></div>
 <p class="op-note" id="op-ch8-fin"></p>
 <p class="op-fresh" id="fr8"></p>
 
@@ -662,21 +664,68 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
       "当天涨跌拆成两段：<b>跳空</b>＝开盘对昨收（隔夜共识的重定价），<b>盘中</b>＝收盘对开盘（开盘后真金白银打出来的）。同样的收盘涨幅，可以是三种完全不同的下场：<b>跳空后被吞</b>（高开被卖）、<b>跳空后延续</b>（真有新钱进来）、<b>零跳空硬涨</b>（全靠盘中买上去）。标记 ▲/▼ 的是<b>真缺口</b>（当日最低高于前日最高，或反之）：比开盘价跳空严得多的口径。",
       "Each day's move splits in two: the <b>gap</b> (open vs prior close — overnight repricing) and the <b>intraday</b> leg (close vs open — money actually traded after the bell). The same daily gain can meet three different fates: <b>gap swallowed</b> (opened high, sold all day), <b>gap extended</b> (new money kept coming), or <b>no gap at all</b> (the whole move built intraday). ▲/▼ marks a <b>true gap</b> — today's low above yesterday's high (or the reverse) — a far stricter test than the opening print.");
     const tg = r => r.true_gap === "向上" ? " ▲" : (r.true_gap === "向下" ? " ▼" : "");
+    /* 横向排行（Klay 08-13 定：排行榜横着读 + 标签带 logo，与第四章按票汇总同族）。
+       echarts 类目轴自下而上画 ⇒ 倒序数组让涨幅第一名排最上。行高 26px 动态撑高容器。 */
+    const gel = $("ch-gaps");
+    gel.style.height = (G.length * 26 + 86) + "px";
+    const rev = [...G].reverse();
+    const rich = {};
+    G.forEach(r => { rich["L" + r.ticker] = {
+      backgroundColor: { image: "logos/" + r.ticker.toLowerCase() + ".png" },
+      width: 14, height: 14 }; });
+    const gbyt = {}; G.forEach(r => gbyt[r.ticker] = r);
     mkChart("ch-gaps").setOption({
-      grid: { left: 60, right: 24, top: 36, bottom: 64 },
+      grid: { left: 112, right: 40, top: 36, bottom: 28 },
       legend: { data: [tr("跳空", "Gap"), tr("盘中", "Intraday")], textStyle: { color: MUTED }, top: 4 },
       tooltip: { trigger: "axis", axisPointer: { type: "shadow" },
                  valueFormatter: v => (v > 0 ? "+" : "") + (v == null ? "—" : v.toFixed(2)) + "%" },
-      xAxis: { type: "category", data: G.map(r => r.ticker + tg(r)), ...axisBase,
-               axisLabel: { color: MUTED, fontSize: 11, rotate: 45 } },
-      yAxis: { type: "value", name: "%", nameTextStyle: { color: MUTED }, ...axisBase },
+      yAxis: { type: "category", data: rev.map(r => r.ticker), ...axisBase, splitLine: { show: false },
+               axisLabel: { color: INK, fontSize: 11,
+                            formatter: tk => "{L" + tk + "|} " + tk + tg(gbyt[tk]), rich } },
+      xAxis: { type: "value", name: "%", nameTextStyle: { color: MUTED }, ...axisBase },
       series: [
-        { name: tr("跳空", "Gap"), type: "bar", stack: "d", data: G.map(r => r.gap),
-          itemStyle: { color: GOLD }, barWidth: 12 },
-        { name: tr("盘中", "Intraday"), type: "bar", stack: "d", data: G.map(r => r.intraday),
-          itemStyle: { color: dark ? "#8a867e" : "#5a5a5a" }, barWidth: 12 },
+        { name: tr("跳空", "Gap"), type: "bar", stack: "d", data: rev.map(r => r.gap),
+          itemStyle: { color: GOLD }, barWidth: 13 },
+        { name: tr("盘中", "Intraday"), type: "bar", stack: "d", data: rev.map(r => r.intraday),
+          itemStyle: { color: dark ? "#8a867e" : "#5a5a5a" }, barWidth: 13 },
       ],
     });
+    /* 逐日子视图：攒够 ≥2 个交易日自动亮（首日一根柱不如不画）。独立 chips，
+       不挂 .op-tkchips —— 那套是第Ⅱ/Ⅴ/Ⅶ章共用的 17 只选择器，本章宇宙是 35 只。 */
+    if (D.gaps.days >= 2 && D.gaps.history) {
+      const H = D.gaps.history;
+      let gcur = G[0] ? G[0].ticker : null;
+      $("gap-chips").style.display = "";
+      $("ch-gaps-daily").style.display = "";
+      const gchip = tk => `<button class="op-chip${tk === gcur ? " on" : ""}" data-g="${tk}">${logo(tk, "")}${tk}</button>`;
+      $("gap-chips").innerHTML = G.map(r => gchip(r.ticker)).join("");
+      const dailyC = mkChart("ch-gaps-daily");
+      const drawGapDaily = tk => {
+        const h = H[tk] || [];
+        dailyC.setOption({
+          grid: { left: 60, right: 24, top: 36, bottom: 34 },
+          legend: { data: [tr("跳空", "Gap"), tr("盘中", "Intraday")], textStyle: { color: MUTED }, top: 4 },
+          tooltip: { trigger: "axis", axisPointer: { type: "shadow" },
+                     valueFormatter: v => (v > 0 ? "+" : "") + (v == null ? "—" : v.toFixed(2)) + "%" },
+          xAxis: { type: "category", data: h.map(r => dot(r.date) + (r.true_gap !== "无" ? (r.true_gap === "向上" ? " ▲" : " ▼") : "")), ...axisBase },
+          yAxis: { type: "value", name: "%", nameTextStyle: { color: MUTED }, ...axisBase },
+          series: [
+            { name: tr("跳空", "Gap"), type: "bar", stack: "d", data: h.map(r => r.gap),
+              itemStyle: { color: GOLD }, barWidth: 14 },
+            { name: tr("盘中", "Intraday"), type: "bar", stack: "d", data: h.map(r => r.intraday),
+              itemStyle: { color: dark ? "#8a867e" : "#5a5a5a" }, barWidth: 14 },
+          ],
+        }, true);
+      };
+      drawGapDaily(gcur);
+      $("gap-chips").addEventListener("click", e => {
+        const b = e.target.closest("[data-g]");
+        if (!b) return;
+        gcur = b.dataset.g;
+        $("gap-chips").querySelectorAll(".op-chip").forEach(x => x.classList.toggle("on", x.dataset.g === gcur));
+        drawGapDaily(gcur);
+      });
+    }
     if (D.gaps.finref && D.gaps.finref.length) {
       const fx = D.gaps.finref.map(r =>
         r.ticker + " " + (r.chg > 0 ? "+" : "") + (r.chg == null ? "—" : r.chg.toFixed(2)) + "%").join(" · ");

@@ -395,7 +395,8 @@ html.no-toc .toc { display: none; }
   font-weight: 600;
   margin-bottom: 6px;
 }
-.hero .dek { color: var(--ink-muted); max-width: 1020px; margin-top: 10px; font-size: 15.5px; }
+.hero .dek { color: var(--ink-muted); max-width: 1020px; margin-top: 10px; font-size: 15.5px;; text-wrap: pretty; }
+/* text-wrap:pretty：末行不孤字（2026-08-13 Klay 圈过 dek 段“开车。”两字独行）；不支持的浏览器安全忽略 */
 
 .chapter { margin: 48px 0; }
 .chapter-head { display: flex; align-items: baseline; gap: 14px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-bottom: 6px; }
@@ -1178,8 +1179,7 @@ html.dark-mode .ci-x .c-ic, html.dark-mode .ci-github .c-ic { fill: #e8e6e1; }
   /* 2026-08-08 Klay 定：与 .dek 同字号 15.5px、宽屏一行展示。
      去掉 max-width 760px 硬闸（强制折行的主因）；窄屏仍自然折行 */
   margin: 10px 0 16px;
-  font-size: 15.5px; line-height: 1.75; color: var(--ink-soft);
-}
+  font-size: 15.5px; line-height: 1.75; color: var(--ink-soft);; text-wrap: pretty; }
 .ledger-cards {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px;
 }
