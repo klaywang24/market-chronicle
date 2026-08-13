@@ -30,7 +30,13 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 .op-chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .op-chip img { width: 15px; height: 15px; border-radius: 4px; vertical-align: -3px; margin-right: 5px; background: #fff; }
 .op-chiprow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; }
-.op-tkchips { row-gap: 10px; }
+/* 2026-08-13 票签统一 .seg 胶囊后的三处补丁：
+   ① 胶囊内 logo 尺寸（原 .op-chip img 规则不再命中，不定死会按原图 64px 渲染）
+   ② 胶囊在分组行内不要自带下边距（行距统一交给 .op-tkchips 的 row-gap 管，否则双倍间隔）
+   ③ 三行之间的间隔加大到 14px（Klay 点名「注意三行之间的间隔」） */
+.op-tkchips .seg img, #gap-tabs img { width: 15px; height: 15px; border-radius: 4px; vertical-align: -3px; margin-right: 5px; background: #fff; }
+.op-tkchips .seg { margin: 0; }
+.op-tkchips { row-gap: 14px; }
 .op-cgl { font-size: 11px; color: var(--ink-muted); letter-spacing: .04em; min-width: 84px; }
 @media (max-width: 640px) { .op-cgl { min-width: 100%; margin-bottom: -2px; } }
 .op-logo { width: 18px; height: 18px; border-radius: 4px; vertical-align: -4px; margin-right: 7px; background: #fff; }
@@ -416,10 +422,12 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
   const grouped = new Set(GROUPS.flatMap(g => g[1]));
   const rest = [...have].filter(t => !grouped.has(t)).sort();
   if (rest.length) GROUPS[GROUPS.length - 1][1].push(...rest);
-  const chip = tk => `<button class="op-chip${tk === cur ? " on" : ""}" data-t="${tk}">${logo(tk, "")}${tk}</button>`;
+  /* 2026-08-13 Klay 定：Ⅱ/Ⅴ/Ⅶ 三章票签统一为首页「口径实验室」.seg 胶囊语言（红底选中）。
+     三行分组结构保留：每行 = 组名 + 一枚 .seg 胶囊；行间隔由 .op-tkchips 的 row-gap 管。 */
+  const chip = tk => `<button type="button" data-t="${tk}" aria-selected="${tk === cur}">${logo(tk, "")}${tk}</button>`;
   const chipHtml = GROUPS
     .map(([n, ts]) => { const row = ts.filter(t => have.has(t)).map(chip).join("");
-                       return row ? `<div class="op-chiprow"><span class="op-cgl">${n}</span>${row}</div>` : ""; })
+                       return row ? `<div class="op-chiprow"><span class="op-cgl">${n}</span><div class="seg">${row}</div></div>` : ""; })
     .join("");
   document.querySelectorAll(".op-tkchips").forEach(el => el.innerHTML = chipHtml);
   const axisC = mkChart("ch-axis"), flipC = mkChart("ch-flip"), cmC = mkChart("ch-cmhist");
@@ -536,9 +544,10 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
   }
 
   document.querySelectorAll(".op-tkchips").forEach(el => el.addEventListener("click", e => {
-    const b = e.target.closest(".op-chip"); if (!b) return;
+    const b = e.target.closest("button[data-t]"); if (!b) return;
     cur = b.dataset.t;
-    document.querySelectorAll(".op-tkchips .op-chip").forEach(x => x.classList.toggle("on", x.dataset.t === cur));
+    document.querySelectorAll(".op-tkchips button[data-t]").forEach(x =>
+      x.setAttribute("aria-selected", String(x.dataset.t === cur)));
     document.querySelectorAll(".op-cur").forEach(x => x.textContent = cur);
     drawAxis(cur); drawFlip(cur); drawCm(cur);
   }));
