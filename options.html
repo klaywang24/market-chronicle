@@ -190,7 +190,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 <!-- Ⅷ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch8"><span class="chapter-no">第八章</span><h2 id="op-ch8-h2">跳空之后 · 缺口的三种下场</h2></div>
 <p class="op-note" id="op-ch8-note"></p>
-<div class="op-chips" id="gap-tabs"></div>
+<div class="seg" id="gap-tabs"></div>
 <div class="op-chart tall" id="ch-gaps"></div>
 <p class="op-note" id="op-ch8-fin"></p>
 <p class="op-fresh" id="fr8"></p>
@@ -683,50 +683,53 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
     let gtab = 0;
     const gel = $("ch-gaps");
     const gapsC = mkChart("ch-gaps");
+    /* 尺寸对齐做空页那套（Klay 08-13「有点小」）：行高 38、条宽 18、字号 12。 */
     const drawGaps = () => {
       const rows = GTABS[gtab][1]().slice().sort((a, b) => (b.chg || 0) - (a.chg || 0));
-      gel.style.height = Math.max(180, rows.length * 30 + 92) + "px";
+      gel.style.height = Math.max(220, rows.length * 38 + 96) + "px";
       const rev = [...rows].reverse();
       const rich = {};
       rows.forEach(r => { rich["L" + r.ticker] = {
         backgroundColor: { image: "logos/" + r.ticker.toLowerCase() + ".png" },
-        width: 14, height: 14 }; });
+        width: 16, height: 16 }; });
       const byt = {}; rows.forEach(r => byt[r.ticker] = r);
       gapsC.setOption({
-        grid: { left: 112, right: 74, top: 36, bottom: 28 },
-        legend: { data: [tr("跳空", "Gap"), tr("盘中", "Intraday")], textStyle: { color: MUTED }, top: 4 },
+        grid: { left: 124, right: 84, top: 40, bottom: 30 },
+        legend: { data: [tr("跳空", "Gap"), tr("盘中", "Intraday")], textStyle: { color: MUTED, fontSize: 12.5 }, top: 4 },
         tooltip: { trigger: "axis", axisPointer: { type: "shadow" },
                    valueFormatter: v => (v > 0 ? "+" : "") + (v == null ? "—" : v.toFixed(2)) + "%" },
         yAxis: { type: "category", data: rev.map(r => r.ticker), ...axisBase, splitLine: { show: false },
-                 axisLabel: { color: INK, fontSize: 11,
+                 axisLabel: { color: INK, fontSize: 12.5,
                               formatter: tk => "{L" + tk + "|} " + tk + tg(byt[tk]), rich } },
         xAxis: { type: "value", name: "%", nameTextStyle: { color: MUTED }, ...axisBase },
         series: [
           { name: tr("跳空", "Gap"), type: "bar", stack: "d", data: rev.map(r => r.gap),
-            itemStyle: { color: RED }, barWidth: 14 },
+            itemStyle: { color: RED }, barWidth: 18 },
           { name: tr("盘中", "Intraday"), type: "bar", stack: "d", data: rev.map(r => r.intraday),
-            itemStyle: { color: dark ? "#8a867e" : "#5a5a5a" }, barWidth: 14 },
+            itemStyle: { color: dark ? "#8a867e" : "#5a5a5a" }, barWidth: 18 },
           /* 数字放条外（Klay 08-13 定）：隐形覆盖条，长度=该行图形的最右沿
              （0、跳空端、合计端三者取大），标签因此永远悬在整组条的右侧空白处，
              不会再埋进负值段里。不进图例、不进悬浮框。 */
-          { name: "", type: "bar", barGap: "-100%", barWidth: 14, silent: true,
+          { name: "", type: "bar", barGap: "-100%", barWidth: 18, silent: true,
             tooltip: { show: false },
             itemStyle: { color: "rgba(0,0,0,0)" },
             data: rev.map(r => Math.max(0, r.gap || 0, (r.gap || 0) + (r.intraday || 0))),
-            label: { show: true, position: "right", color: INK, fontSize: 11,
+            label: { show: true, position: "right", color: INK, fontSize: 12,
                      fontFamily: "ui-monospace,monospace",
                      formatter: p => { const c = rev[p.dataIndex].chg;
                                        return (c > 0 ? "+" : "") + (c == null ? "—" : c.toFixed(2)) + "%"; } } },
         ],
       }, true);
     };
+    /* 胶囊开关＝首页「口径实验室」同款 .seg（aria-selected 驱动，红底选中态） */
     $("gap-tabs").innerHTML = GTABS.map(([n], i) =>
-      `<button class="op-chip${i === gtab ? " on" : ""}" data-gt="${i}">${n}</button>`).join("");
+      `<button type="button" data-gt="${i}" aria-selected="${i === gtab}">${n}</button>`).join("");
     $("gap-tabs").addEventListener("click", e => {
       const b = e.target.closest("[data-gt]");
       if (!b) return;
       gtab = +b.dataset.gt;
-      $("gap-tabs").querySelectorAll(".op-chip").forEach(x => x.classList.toggle("on", +x.dataset.gt === gtab));
+      $("gap-tabs").querySelectorAll("button").forEach(x =>
+        x.setAttribute("aria-selected", String(+x.dataset.gt === gtab)));
       drawGaps();
     });
     drawGaps();
