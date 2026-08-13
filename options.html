@@ -703,10 +703,18 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
         xAxis: { type: "value", name: "%", nameTextStyle: { color: MUTED }, ...axisBase },
         series: [
           { name: tr("跳空", "Gap"), type: "bar", stack: "d", data: rev.map(r => r.gap),
-            itemStyle: { color: GOLD }, barWidth: 14 },
+            itemStyle: { color: RED }, barWidth: 14 },
           { name: tr("盘中", "Intraday"), type: "bar", stack: "d", data: rev.map(r => r.intraday),
-            itemStyle: { color: dark ? "#8a867e" : "#5a5a5a" }, barWidth: 14,
-            label: { show: true, position: "right", color: MUTED, fontSize: 11, fontFamily: "ui-monospace,monospace",
+            itemStyle: { color: dark ? "#8a867e" : "#5a5a5a" }, barWidth: 14 },
+          /* 数字放条外（Klay 08-13 定）：隐形覆盖条，长度=该行图形的最右沿
+             （0、跳空端、合计端三者取大），标签因此永远悬在整组条的右侧空白处，
+             不会再埋进负值段里。不进图例、不进悬浮框。 */
+          { name: "", type: "bar", barGap: "-100%", barWidth: 14, silent: true,
+            tooltip: { show: false },
+            itemStyle: { color: "rgba(0,0,0,0)" },
+            data: rev.map(r => Math.max(0, r.gap || 0, (r.gap || 0) + (r.intraday || 0))),
+            label: { show: true, position: "right", color: INK, fontSize: 11,
+                     fontFamily: "ui-monospace,monospace",
                      formatter: p => { const c = rev[p.dataIndex].chg;
                                        return (c > 0 ? "+" : "") + (c == null ? "—" : c.toFixed(2)) + "%"; } } },
         ],
