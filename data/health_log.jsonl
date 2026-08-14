@@ -6,3 +6,4 @@
 {"date":"2026-08-11","generated_at":"2026-08-12T01:21:43Z","overall":"ok","checks":{"链最后一行":"ok","锚定日志":"ok","链头快照(直接问IA)":"ok","与存档逐字对账":"ok","daily是否还活着":"ok","daily定时有没有触发":"ok","期权页是否在更新":"ok"}}
 {"date":"2026-08-12","generated_at":"2026-08-12T23:03:11Z","overall":"ok","checks":{"链最后一行":"ok","锚定日志":"ok","链头快照(直接问IA)":"ok","与存档逐字对账":"ok","daily是否还活着":"ok","daily定时有没有触发":"ok","期权页是否在更新":"ok"}}
 {"date":"2026-08-13","generated_at":"2026-08-13T22:57:55Z","overall":"unknown","checks":{"链最后一行":"ok","锚定日志":"ok","链头快照(直接问IA)":"ok","与存档逐字对账":"unknown","daily是否还活着":"ok","daily定时有没有触发":"ok","期权页是否在更新":"ok"}}
+{"date":"2026-08-14","generated_at":"2026-08-14T22:45:34Z","overall":"unknown","checks":{"链最后一行":"ok","锚定日志":"ok","链头快照(直接问IA)":"unknown","与存档逐字对账":"unknown","daily是否还活着":"ok","daily定时有没有触发":"ok","期权页是否在更新":"ok"}}
