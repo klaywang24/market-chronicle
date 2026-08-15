@@ -270,18 +270,50 @@ def check_options_page() -> dict:
 
     判据用 `meta.data_date`（数据对应的交易日）而不是 `generated_at`：
     重跑一次旧数据会刷新 generated_at 却不代表页面变新了 —— **那正是最该被抓住的假绿**。
+
+    ━━ 🔴 2026-08-14 补第二道：新鲜 ≠ 完整（Klay 令·第一性原理修）━━
+    上面那道只问「多久没更新」。08-14 实证它抓不到另一种假绿：
+    17:30 那班生成页面时官方收盘价还没落库 ⇒ 17 只票的 `spot_kind` 全是 `premarket`、
+    `chg_pct` 全 null，**而 `data_date` 照样是当天** ⇒ 上面那道看一眼日期就报绿。
+    随后 19:00 那班生成了正确版本却推不上去（自动 rebase 被一个纯噪音文件挡住），
+    **站上整夜挂着半成品，而体检全绿。** 次日是周六、生成器不上班 ⇒ 本会挂满整个周末。
+
+    🔑 第一性：`data_date` 回答的是「这页说的是**哪天**」，不是「这页**做完了吗**」。
+       两者平时相关、出事时脱钩，而故障恰恰只发生在出事时。
+       ⇒ 完整度必须由**事实字段**回答：`structure[].spot_kind`（close / intraday / premarket）。
+    🚫 刻意**不读** `meta.provisional`：那是生成器给自己贴的标签，08-14 它就贴错过
+       （页面确实是临时的，它却写 False）。**体检不该依赖被检查方的自我声明。**
+       ——生成器侧已同步修成由事实推导，但这里仍只看原始事实，两处独立成立。
     """
     p = DATA / "options_page.json"
     if not p.exists():
         return {"status": "bad", "detail": "options_page.json 不存在 —— 期权页无数据可读"}
     try:
-        meta = json.loads(p.read_text(encoding="utf-8")).get("meta") or {}
+        j = json.loads(p.read_text(encoding="utf-8"))
+        meta = j.get("meta") or {}
     except Exception as e:
         return {"status": "bad", "detail": f"options_page.json 解析失败：{str(e)[:60]}"}
     d = meta.get("data_date")
     age = days_since(str(d), et=True) if d else None    # data_date 是美东交易日
     if age is None:
         return {"status": "unknown", "detail": "meta.data_date 缺失或无法解析"}
+
+    # ── 第二道：完整度（读事实，不读标签）──
+    stale = [t.get("ticker") for t in (j.get("structure") or [])
+             if t.get("spot_kind") != "close"]
+    if stale:
+        now_et = datetime.now(ZoneInfo("America/New_York"))
+        # 当日盘中/刚收盘 spot_kind 非 close 是**合法状态**，不报。
+        # 判据取 18:30 ET：官方收盘价的结算窗口实测落在 17:3x–17:4x（08-13 17:41 / 08-14 17:31），
+        # 留将近一小时余量 ⇒ 过了这个点还没收盘价，就不是"还没结算"，是"这一版没做完"。
+        overdue = (age >= 1) or (age == 0 and (now_et.hour, now_et.minute) >= (18, 30))
+        if overdue:
+            return {"status": "bad", "age": age, "detail":
+                    f"期权页 {d} 数据不完整：{len(stale)} 只票仍非官方收盘价"
+                    f"（{', '.join(stale[:6])}{'…' if len(stale) > 6 else ''}）"
+                    f" —— 多半是收盘价落库前那一班生成的版本卡在站上，"
+                    f"看本机 eod-scan 日志有没有 push/rebase 未成功"}
+
     prov = "（盘中临时读数）" if meta.get("provisional") else ""
     return {"status": "ok" if age <= SLA["options_page"] else "bad",
             "detail": f"期权页数据 {d}{prov}（{age} 天前）", "age": age}
