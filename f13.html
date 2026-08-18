@@ -16,15 +16,17 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 .f13-wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 6px; }
 .f13-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; }
 .f13-brand { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 19px; font-weight: 700; color: var(--ink); text-decoration: none; }
-.f13-nav2 { display: flex; flex-wrap: wrap; gap: 26px; align-items: center; padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
-.f13-nav2 a, .f13-nav2 .on { font-size: 14.5px; color: var(--ink-soft); text-decoration: none; padding: 2px 0; }
-.f13-nav2 a:hover { color: var(--ink); }
-.f13-nav2 .on { color: var(--ink); font-weight: 700; border-bottom: 2px solid var(--accent); }
-.f13-navctl { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+/* 2026-08-18 Klay 点名「切不同 tab 视觉比例不一样」：根因＝站上两套导航实现
+   （index/路由页 .tab 胶囊按钮 7px13px+边框+圆角8px；options/f13 裸文字 padding 2px 0）。
+   ⇒ 导航外观归主站 .tab 一处定义，本页只管排布与右侧控件（一处样式一个实现）。 */
+.f13-nav2 { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+.f13-nav2 .tabs { flex: 1; }
+.f13-nav2 a.tab { text-decoration: none; }
+.f13-navctl { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 /* 🐛 2026-08-18 修：`.f13-nav2 a`(0,1,1) 特异性压过 `.f13-subbtn`(0,1,0)，
    padding 被覆盖成 2px 0 ⇒ 按钮塌成 29×29 + 20px 圆角 = 红圆球（Klay 两次圈图）。
    nowrap/flex-shrink 都没错，错在选择器打不过。⇒ 用 a.f13-subbtn(0,2,1) 取回。 */
-.f13-nav2 a.f13-subbtn { font-size: 13px; font-weight: 600; color: #fff !important; background: var(--accent); border-radius: 20px; padding: 6px 16px; white-space: nowrap; flex-shrink: 0; }
+.f13-navctl a.f13-subbtn { font-size: 13px; font-weight: 600; color: #fff !important; background: var(--accent); border-radius: 20px; padding: 6px 16px; white-space: nowrap; flex-shrink: 0; }
 .f13-langbtn { font-size: 12.5px; color: var(--ink-soft); background: transparent; border: 1px solid var(--border); border-radius: 20px; padding: 5px 13px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 .f13-langbtn:hover { color: var(--ink); border-color: var(--ink-muted); }
 .f13-logo { width: 17px; height: 17px; border-radius: 4px; vertical-align: -3px; margin-right: 6px; background: #fff; }
@@ -38,7 +40,7 @@ h1.f13 { font-family: 'Noto Serif SC',serif; font-size: 27px; margin: 18px 0 6px
 /* 2026-08-18 改版（Klay）：左侧机构目录 + 右侧详情，右侧承载更多数据 */
 /* 2026-08-18 Klay：目录贴视口最左（此前在 .f13-wrap 的 1080px 居中框内，左边空 173px）。
    ⇒ layout 整块移出居中容器、自成全宽栅格；页头与导言仍居中，读起来不至于拉成一长条。 */
-.f13-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; align-items: start; padding: 0 22px 80px; }
+.f13-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; align-items: start; padding: 0 16px 80px; }
 .f13-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 4px; }
 .f13-cap { border-radius: 10px; padding: 9px 12px; cursor: pointer; border: 1.5px solid var(--border); background: var(--bg-card); margin-bottom: 7px; }
 .f13-cap:hover { border-color: var(--ink-muted); }
@@ -81,12 +83,14 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
     <a class="f13-brand" href="/">美股编年史</a>
   </div>
   <nav class="f13-nav2">
-    <a href="/">今日</a>
-    <a href="/kindex">K 指数 · 台账</a>
-    <a href="/leaps">恐惧的标价 · 台账</a>
-    <a href="/options">期权异动</a>
-    <span class="on">13F 开奖</span>
-    <a href="/spy">百年档案</a>
+    <div class="tabs">
+      <a class="tab" href="/">今日</a>
+      <a class="tab" href="/kindex">K 指数 · 台账</a>
+      <a class="tab" href="/leaps">恐惧的标价 · 台账</a>
+      <a class="tab" href="/options">期权异动</a>
+      <a class="tab active" href="/f13">13F 开奖</a>
+      <a class="tab" href="/spy">百年档案</a>
+    </div>
     <div class="f13-navctl">
       <a class="f13-subbtn" href="/pricing">订阅</a>
       <button class="f13-langbtn" id="f13-lang" title="切换语言 / Switch language"></button>

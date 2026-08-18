@@ -17,10 +17,13 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 .op-wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 80px; }
 .op-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; }
 .op-brand { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 19px; font-weight: 700; color: var(--ink); text-decoration: none; }
-.op-top a.op-sub { font-size: 13px; font-weight: 600; color: #fff; background: var(--accent); border-radius: 20px; padding: 6px 16px; text-decoration: none; }
+.op-navctl a.op-sub, .op-top a.op-sub { font-size: 13px; font-weight: 600; color: #fff; background: var(--accent); border-radius: 20px; padding: 6px 16px; text-decoration: none; white-space: nowrap; flex-shrink: 0; }
 .op-langbtn { font-size: 12.5px; color: var(--ink-soft); background: transparent; border: 1px solid var(--border); border-radius: 20px; padding: 5px 13px; cursor: pointer; }
 .op-langbtn:hover { color: var(--ink); border-color: var(--ink-muted); }
-.op-nav { display: flex; flex-wrap: wrap; gap: 26px; align-items: center; padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+/* 2026-08-18：导航外观归主站 .tab 一处定义（此前本页裸文字，与路由页胶囊按钮两套观感） */
+.op-nav .tabs { flex: 1; }
+.op-nav a.tab { text-decoration: none; }
+.op-nav { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
 .op-navctl { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .op-nav a, .op-nav .on { font-size: 14.5px; color: var(--ink-soft); text-decoration: none; padding: 2px 0; }
 .op-nav a:hover { color: var(--ink); }
@@ -121,12 +124,14 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
   <a class="op-brand" href="/">美股编年史</a>
 </div>
 <nav class="op-nav">
-  <a href="/">今日</a>
-  <a href="/kindex">K 指数 · 台账</a>
-  <a href="/leaps">恐惧的标价 · 台账</a>
-  <span class="on">期权异动</span>
-  <a href="/f13">13F 开奖</a>
-  <a href="/spy">百年档案</a>
+  <div class="tabs">
+    <a class="tab" href="/">今日</a>
+    <a class="tab" href="/kindex">K 指数 · 台账</a>
+    <a class="tab" href="/leaps">恐惧的标价 · 台账</a>
+    <a class="tab active" href="/options">期权异动</a>
+    <a class="tab" href="/f13">13F 开奖</a>
+    <a class="tab" href="/spy">百年档案</a>
+  </div>
   <div class="op-navctl">
     <a class="op-sub" href="/pricing">订阅</a>
     <button class="op-langbtn" id="op-lang" title="切换语言 / Switch language"></button>
