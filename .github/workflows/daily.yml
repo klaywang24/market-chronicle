@@ -68,7 +68,7 @@ jobs:
       # 建闸当天已用负向样本实测报红（植入一处→exit 1→还原→复绿），不是只写不验。
       - name: verify banned terms
         run: python tools/check_banned_terms.py
-      # 路由页判重闸（2026-08-17 接线，见 HANDOFF §57）。
+      # 路由页判重闸（2026-08-17 接线，见 HANDOFF §63）。
       # 07-30 路由页只换 head、正文 17 份相同 → 08-08 GSC 判重复拒收；本闸保证
       # 每个路由页只含自己的 panel、canonical 自指、sitemap 与实际页面清单精确对账。
       # 建闸当天先对修复前产物实测：166 条红 exit 1，修复后转绿 —— 负向已验，不是只写不验。

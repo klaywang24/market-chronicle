@@ -116,7 +116,7 @@
            实测这七个面板共 42 章 / 78 卡（占全站内容 78%），但回访理由≈0；
            而每天变的三项（今日 / K 指数 / 恐惧的标价）此前被它们稀释成同级。
            顺带结构性解决 EN 顶栏溢出（此前靠隐藏订阅胶囊打补丁，见 style.css 同日注释）。
-           下拉项仍是 .tab[data-panel]（§57 起全部是 <a href>：爬虫走 href 内链，JS 委托拦截走 SPA；瘦身路由页上目标 panel 不在 DOM 时放行给浏览器整页导航）；
+           下拉项仍是 .tab[data-panel]（§63 起全部是 <a href>：爬虫走 href 内链，JS 委托拦截走 SPA；瘦身路由页上目标 panel 不在 DOM 时放行给浏览器整页导航）；
            触发器用 .tab-trigger（无 data-panel）以免被委托当成面板点击。 -->
       <div class="tab-group" id="archive-group">
         <button class="tab-trigger" id="archive-trigger" aria-haspopup="true" aria-expanded="false" aria-controls="archive-menu">百年档案</button>

@@ -6,7 +6,7 @@
 Google 眼里全是首页的复本，除首页外任何路由都进不了索引
 （2026-07-27 Search Console 邮件实锤，/pricing 上线以来搜索零可见）。
 
-方案（§57，2026-08-17 重做）：每个路由页 = index.html 换头部身份
+方案（§63，2026-08-17 重做）：每个路由页 = index.html 换头部身份
 （title / description / canonical / og）+ **正文只保留自己的那个 panel**。
 07-30 首版只换头、正文 17 份逐字节相同，Google 判重看正文不看 head ——
 08-08 GSC 邮件「重复网页，Google 选择的规范网页与用户指定的不同」实锤，
@@ -177,7 +177,7 @@ def patch(html: str, route: str, title: str, desc: str) -> str:
 
 
 def strip_foreign_panels(html: str, route: str) -> str:
-    """只保留 id="panel-<route>" 的 section，删除其余全部 panel（§57 判重修复的核心）。
+    """只保留 id="panel-<route>" 的 section，删除其余全部 panel（§63 判重修复的核心）。
 
     边界用 <section>/</section> 配平计数找，不用正则贪婪匹配 —— panel 内部
     允许嵌套 section。保留页统计出的 panel 必须恰好 1 个，否则直接炸。"""

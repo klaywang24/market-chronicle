@@ -5,7 +5,7 @@
 # 而 Pages 对未命中路径一律回 200 + 整份 index.html —— 资源拿到的是 HTML，
 # 解析失败却没有 404，页面样式全丢且控制台干干净净。index.html 头部另有一段
 # 内联脚本兜同一件事（外部 js 那时已经废了，只有内联脚本还能跑）。
-# §57：/pulse 是首页别名（app.js 里 canonical 归 /），此前靠 SPA 兜底 200 回整份
+# §63：/pulse 是首页别名（app.js 里 canonical 归 /），此前靠 SPA 兜底 200 回整份
 # 首页 = 在 Google 眼里又一个首页复本。301 让别名在 HTTP 层就归位。
 /pulse/        /             301
 /pulse         /             301
