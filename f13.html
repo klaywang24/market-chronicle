@@ -169,7 +169,7 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
     document.querySelectorAll(".f13-cap.on").forEach(x => x.classList.remove("on"));
     el.classList.add("on");
     const d = (D.institutions || {})[c.cn] || {};
-    let h = '<h2>' + NM(c) + '</h2><div class="pmeta">' + DT(c) + (_EN ? " · period " : " · 报告期 ") + (c.period || "·") +
+    let h = '<h2>' + NM(c) + '</h2><div class="pmeta">' + DT(c) + (_EN ? " · period " : " · 报告期 ") + (c.period || "·")
       + (_EN ? " · filed " : " · 披露 ") + (c.filing_date || "·") + (_EN ? " · book " : " · 组合 ") + B(c.value_usd) +
       (d.accession ? " · acc " + d.accession : "") + "</div>";
     if (!c.solid) {
