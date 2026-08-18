@@ -126,14 +126,22 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
   <a class="op-brand" href="/">美股编年史</a>
 </div>
 <nav class="op-nav topbar-navband">
-  <div class="tabs">
+      <!-- 🔴 2026-08-18 修：本块原为 `<div class="tabs">`，而全站中和规则写的是
+           `html .topbar-navband nav.tabs { margin-left: 0 }`（css/style.css:112，选择器带 nav）。
+           ⇒ div 版吃不到中和，于是被老布局遗留的
+           `html:not([lang^="zh"]) .tabs { margin-left: calc(max(254px, …)) }`（style.css:911）
+           右推约 254px —— **英文态左边空出一大块、且少掉的宽度把导航挤成两行**。
+           中文态没有那条 EN 规则，所以只有英文页坏，中文页一直是好的。
+           ⇒ 改回站上通用写法 `<nav class="tabs">`（index/kindex/leaps/spy 全是它，只有本页与
+           options 两个平铺页当初自造成 div）。**§80：改站上样式前先用站上现成的语言。** -->
+  <nav class="tabs">
     <a class="tab" href="/">今日</a>
     <a class="tab" href="/kindex">K 指数 · 台账</a>
     <a class="tab" href="/leaps">恐惧的标价 · 台账</a>
     <a class="tab active" href="/options">期权异动</a>
     <a class="tab" href="/f13">13F 开奖</a>
     <a class="tab" href="/spy">百年档案</a>
-  </div>
+  </nav>
   <div class="op-navctl">
     <a class="op-sub" href="/pricing">订阅</a>
     <button class="op-langbtn" id="op-lang" title="切换语言 / Switch language"></button>
@@ -258,7 +266,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
       "美股编年史": "Market Chronicle", "订阅": "Subscribe",
       "今日": "Today", "K 指数 · 台账": "KAPX · Ledger",
       "恐惧的标价 · 台账": "Fear-Price Index · Ledger",
-      "期权异动": "Options", "13F 开奖": "13F Scorecard", "百年档案": "The Archive",
+      "期权异动": "Options", "13F 开奖": "13F", "百年档案": "The Archive",
       "OPTIONS · 期权异动 & 分析": "OPTIONS · FLOW & ANALYSIS",
       "期权异动 & 分析": "Options Flow & Analysis",
       "正在读取当日数据…": "Loading today's data…",

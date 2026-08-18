@@ -126,14 +126,22 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
     <a class="f13-brand" href="/">美股编年史</a>
   </div>
   <nav class="f13-nav2 topbar-navband">
-    <div class="tabs">
+      <!-- 🔴 2026-08-18 修：本块原为 `<div class="tabs">`，而全站中和规则写的是
+           `html .topbar-navband nav.tabs { margin-left: 0 }`（css/style.css:112，选择器带 nav）。
+           ⇒ div 版吃不到中和，于是被老布局遗留的
+           `html:not([lang^="zh"]) .tabs { margin-left: calc(max(254px, …)) }`（style.css:911）
+           右推约 254px —— **英文态左边空出一大块、且少掉的宽度把导航挤成两行**。
+           中文态没有那条 EN 规则，所以只有英文页坏，中文页一直是好的。
+           ⇒ 改回站上通用写法 `<nav class="tabs">`（index/kindex/leaps/spy 全是它，只有本页与
+           options 两个平铺页当初自造成 div）。**§80：改站上样式前先用站上现成的语言。** -->
+    <nav class="tabs">
       <a class="tab" href="/">今日</a>
       <a class="tab" href="/kindex">K 指数 · 台账</a>
       <a class="tab" href="/leaps">恐惧的标价 · 台账</a>
       <a class="tab" href="/options">期权异动</a>
       <a class="tab active" href="/f13">13F 开奖</a>
       <a class="tab" href="/spy">百年档案</a>
-    </div>
+    </nav>
     <div class="f13-navctl">
       <a class="f13-subbtn" href="/pricing">订阅</a>
       <button class="f13-langbtn" id="f13-lang" title="切换语言 / Switch language"></button>
@@ -271,11 +279,11 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
       "美股编年史": "Market Chronicle", "订阅": "Subscribe",
       "今日": "Today", "K 指数 · 台账": "KAPX · Ledger",
       "恐惧的标价 · 台账": "Fear-Price Index · Ledger",
-      "期权异动": "Options", "13F 开奖": "13F Scorecard", "百年档案": "The Archive",
+      "期权异动": "Options", "13F 开奖": "13F", "百年档案": "The Archive",
       "实心 · 集中决策（可逐笔）": "Solid · Concentrated decision (position by position)",
       "描边 · 平台多策略 / 系统化 / 主权配置（只报规模）": "Outline · Multi-strategy / systematic / sovereign (size only)",
       "未直读（无独立 13F-HR 主体，如实标）": "Not read directly (no standalone 13F-HR filer)",
-      "13F 开奖": "13F Scorecard",
+      "13F 开奖": "13F",
       "机构每季向 SEC 申报美股多头持仓（13F），季末快照、45 天后披露。滞后不是缺陷，是原材料：":
         "Institutions report US long equity holdings to the SEC each quarter (13F): a quarter-end snapshot, disclosed 45 days later. The lag is not a defect, it is the raw material: ",
       "季末到披露日之间那段走势，在披露当天就已经是已知的、可复算的":
