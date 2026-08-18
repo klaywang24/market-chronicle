@@ -37,28 +37,39 @@ html:not([lang^="zh"]) .f13-nav2 a.tab { padding: 6px 10px; }
 .f13-langbtn { font-size: 12.5px; color: var(--ink-soft); background: transparent; border: 1px solid var(--border); border-radius: 20px; padding: 5px 13px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 .f13-langbtn:hover { color: var(--ink); border-color: var(--ink-muted); }
 .f13-logo { width: 17px; height: 17px; border-radius: 4px; vertical-align: -3px; margin-right: 6px; background: #fff; }
-.f13-mono { display: inline-flex; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 10.5px; font-weight: 700; align-items: center; justify-content: center; vertical-align: -3px; margin-right: 6px; }
-.f13-cap.solid .f13-mono { background: var(--bg); color: var(--ink); }
-h1.f13 { font-family: 'Noto Serif SC',serif; font-size: 27px; margin: 18px 0 6px; color: var(--ink); }
+.f13-cap.solid h1.f13 { font-family: 'Noto Serif SC',serif; font-size: 27px; margin: 18px 0 6px; color: var(--ink); }
 .f13-sub { font-size: 13.5px; color: var(--ink-soft); line-height: 1.8; max-width: 760px; }
 .f13-fresh { font-size: 12px; color: var(--ink-muted); margin: 10px 0 26px; }
 .f13-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin: 0 0 14px; }
 .f13-legend .sw { display: inline-block; width: 13px; height: 13px; border-radius: 4px; vertical-align: -2px; margin-right: 5px; }
-/* 2026-08-18 改版（Klay）：左侧机构目录 + 右侧详情，右侧承载更多数据 */
-/* 2026-08-18 Klay：目录贴视口最左（此前在 .f13-wrap 的 1080px 居中框内，左边空 173px）。
-   ⇒ layout 整块移出居中容器、自成全宽栅格；页头与导言仍居中，读起来不至于拉成一长条。 */
+/* 目录去盒化（2026-08-18 Klay：「和其他 tab 页格格不入」）。
+   站上 07-26 已为目录定过调（css/style.css 的 .toc 一节）：原本每章一个圆角边框块 +
+   选中态填充底色，判为「与旧 tab 同一个毛病＝组件库默认值观感」，改成
+   **纯文字列表 + 左侧 2px 色条标记当前项，与顶栏导航同一套语言**。
+   我先前那版黑底圆角卡片 + logo 头像，正是那个已被淘汰的形状 ⇒ 照既有语言重做，
+   并去掉机构 logo/字母头像（Klay：只写名字就行）。
+   实心/描边这条判据不靠色块表达，改为**文字浓淡 + 分组小标题**：
+   集中决策＝正常墨色，只报规模＝弱化色，语义不丢而视觉不吵。 */
 .f13-layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 24px; align-items: start; padding: 0 16px 80px; }
-.f13-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 4px; }
-.f13-cap { border-radius: 10px; padding: 9px 12px; cursor: pointer; border: 1.5px solid var(--border); background: var(--bg-card); margin-bottom: 7px; }
-.f13-cap:hover { border-color: var(--ink-muted); }
-.f13-cap.solid { background: var(--ink); border-color: var(--ink); }
-.f13-cap.solid .nm { color: var(--bg); }
-.f13-cap.solid .meta { color: var(--bg); opacity: .72; }
-.f13-cap .nm { font-size: 13.5px; font-weight: 700; color: var(--ink); }
-.f13-cap .meta { font-size: 11px; color: var(--ink-muted); margin-top: 3px; font-family: 'JetBrains Mono',monospace; }
-.f13-cap.dis { opacity: .45; cursor: default; }
-.f13-cap.on { outline: 2.5px solid var(--accent); }
-.f13-groupttl { font-size: 11.5px; color: var(--ink-muted); letter-spacing: .06em; margin: 14px 0 7px; }
+.f13-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 6px; }
+.f13-cap {
+  display: block; cursor: pointer;
+  border: none; border-left: 2px solid transparent; border-radius: 0; background: transparent;
+  padding: 6px 10px; margin-bottom: 1px;
+  font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.f13-cap:hover { background: var(--bg-card-hover); }
+.f13-cap .nm { font-size: 12.5px; color: var(--ink-muted); font-weight: 500; }
+.f13-cap .meta { font-size: 10.5px; color: var(--ink-muted); opacity: .62; margin-top: 1px; }
+.f13-cap.solid .nm { color: var(--ink); }            /* 集中决策＝正常墨色 */
+.f13-cap:not(.solid) .nm { color: var(--ink-muted); } /* 只报规模＝弱化 */
+.f13-cap.on { border-left-color: var(--accent); background: var(--bg-card-hover); }
+.f13-cap.on .nm { color: var(--ink); font-weight: 700; }
+.f13-cap.dis { opacity: .4; cursor: default; }
+.f13-cap.dis:hover { background: transparent; }
+.f13-groupttl { font-size: 10.5px; color: var(--ink-muted); letter-spacing: .08em; margin: 16px 0 6px; padding-left: 10px; opacity: .75; }
+.f13-groupttl:first-child { margin-top: 0; }
 @media (max-width: 860px) { .f13-layout { grid-template-columns: 1fr; } .f13-side { position: static; max-height: none; } }
 .f13-panel { border: 1px solid var(--border); border-radius: 14px; background: var(--bg-card); padding: 20px 22px 24px; margin: 0 0 40px; }
 .f13-panel h2 { font-family: 'Noto Serif SC',serif; font-size: 20px; margin: 0 0 4px; color: var(--ink); }
@@ -153,9 +164,7 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
     for (const c of list) {
       const el = document.createElement("div");
       el.className = "f13-cap" + (c.solid ? " solid" : "") + (c.value_usd ? "" : " dis");
-      const av = c.tk ? '<img class="f13-logo" src="logos/' + c.tk + '.png" alt="" loading="lazy" onerror="this.remove()">'
-                      : '<span class="f13-mono">' + NM(c).replace(/[（(].*/, "").trim().slice(0, 1) + '</span>';
-      el.innerHTML = '<div class="nm">' + av + NM(c) + '</div><div class="meta">' +
+      el.innerHTML = '<div class="nm">' + NM(c) + '</div><div class="meta">' +
         (c.solid ? (c.n_holdings != null ? c.n_holdings + (_EN ? " positions · " : " 笔 · ") : "")
                  : (c.entries ? c.entries.toLocaleString() + (_EN ? " rows · " : " 条 · ") : "")) +
         B(c.value_usd) + (c.history_n ? " · " + c.history_n + (_EN ? "q" : " 期") : "") + "</div>";
