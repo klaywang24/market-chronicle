@@ -13,7 +13,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 <link rel="stylesheet" href="css/style.css?v=20260818b">
 <style>
 /* 页面私有样式一律 f13- 前缀，只借主站 :root 变量与字体，不碰主站类 */
-.f13-wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 80px; }
+.f13-wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 6px; }
 .f13-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; }
 .f13-brand { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 19px; font-weight: 700; color: var(--ink); text-decoration: none; }
 .f13-nav2 { display: flex; flex-wrap: wrap; gap: 26px; align-items: center; padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
@@ -21,7 +21,10 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 .f13-nav2 a:hover { color: var(--ink); }
 .f13-nav2 .on { color: var(--ink); font-weight: 700; border-bottom: 2px solid var(--accent); }
 .f13-navctl { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-.f13-subbtn { font-size: 13px; font-weight: 600; color: #fff !important; background: var(--accent); border-radius: 20px; padding: 6px 16px; white-space: nowrap; flex-shrink: 0; }
+/* 🐛 2026-08-18 修：`.f13-nav2 a`(0,1,1) 特异性压过 `.f13-subbtn`(0,1,0)，
+   padding 被覆盖成 2px 0 ⇒ 按钮塌成 29×29 + 20px 圆角 = 红圆球（Klay 两次圈图）。
+   nowrap/flex-shrink 都没错，错在选择器打不过。⇒ 用 a.f13-subbtn(0,2,1) 取回。 */
+.f13-nav2 a.f13-subbtn { font-size: 13px; font-weight: 600; color: #fff !important; background: var(--accent); border-radius: 20px; padding: 6px 16px; white-space: nowrap; flex-shrink: 0; }
 .f13-logo { width: 17px; height: 17px; border-radius: 4px; vertical-align: -3px; margin-right: 6px; background: #fff; }
 .f13-mono { display: inline-flex; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 10.5px; font-weight: 700; align-items: center; justify-content: center; vertical-align: -3px; margin-right: 6px; }
 .f13-cap.solid .f13-mono { background: var(--bg); color: var(--ink); }
@@ -31,7 +34,9 @@ h1.f13 { font-family: 'Noto Serif SC',serif; font-size: 27px; margin: 18px 0 6px
 .f13-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin: 0 0 14px; }
 .f13-legend .sw { display: inline-block; width: 13px; height: 13px; border-radius: 4px; vertical-align: -2px; margin-right: 5px; }
 /* 2026-08-18 改版（Klay）：左侧机构目录 + 右侧详情，右侧承载更多数据 */
-.f13-layout { display: grid; grid-template-columns: 285px minmax(0, 1fr); gap: 26px; align-items: start; }
+/* 2026-08-18 Klay：目录贴视口最左（此前在 .f13-wrap 的 1080px 居中框内，左边空 173px）。
+   ⇒ layout 整块移出居中容器、自成全宽栅格；页头与导言仍居中，读起来不至于拉成一长条。 */
+.f13-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; align-items: start; padding: 0 22px 80px; }
 .f13-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 4px; }
 .f13-cap { border-radius: 10px; padding: 9px 12px; cursor: pointer; border: 1.5px solid var(--border); background: var(--bg-card); margin-bottom: 7px; }
 .f13-cap:hover { border-color: var(--ink-muted); }
@@ -92,11 +97,13 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
     <span><span class="sw" style="background:var(--ink)"></span><b>实心</b>＝集中决策：每一笔都是一个决策体的判断，可逐笔看</span>
     <span><span class="sw" style="border:1.5px solid var(--border);background:var(--bg-card)"></span><b>描边</b>＝平台多策略 / 系统化 / 主权配置：只报规模。从几千行里挑一只说「它看好」，等于从一栋楼里挑一个房客说这栋楼喜欢他</span>
   </div>
-  <div class="f13-layout">
-    <aside class="f13-side" id="wall"></aside>
-    <main class="f13-main"><div id="panel"></div></main>
-  </div>
-  <div class="f13-note" id="foot"></div>
+</div>
+<div class="f13-layout">
+  <aside class="f13-side" id="wall"></aside>
+  <main class="f13-main">
+    <div id="panel"></div>
+    <div class="f13-note" id="foot"></div>
+  </main>
 </div>
 <script>
 (async function () {
