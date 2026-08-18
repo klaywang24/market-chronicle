@@ -3510,7 +3510,7 @@ Klay 给 token 加了 `Zone → Analytics → Read`（**编辑现有 token，非
 
 **已知边界（故意留的，不是漏）**：活源特刊的英文节**不注入 _EN 卡**（那条配对判据只活在 to_substack.py 里，不复制第二份——档案页与邮件在这一点上有已知差异）；活源日期口径＝日夹名（数据日，周五），冻结段＝邮件发送日，两段口径差已在代码注释记录。四件未决照旧（定价页措辞/导航入口/两处恐慌指数旧文/Substack 重复周回顾，见 08-10 发布状态档）。
 
-## §63 路由页判重根治：正文瘦身 + tab 内链化 + sitemap 对账闸（2026-08-17 EDT·本节最新，与前文冲突以本节为准）
+## §63 路由页判重根治：正文瘦身 + tab 内链化 + sitemap 对账闸（2026-08-17 19:0x–20:4x EDT·本节最新，与前文冲突以本节为准）
 
 **起因**：GSC 08-08 两封邮件——「重复网页，Google 选择的规范网页与用户指定的不同」+「站点地图中的网页无法被编入索引」。Klay 08-17 追问「之前也改过一次，为什么又出错」，答案写在下面，比修复本身更重要。
 
@@ -3533,3 +3533,5 @@ Klay 给 token 加了 `Zone → Analytics → Read`（**编辑现有 token，非
 **验证**：本地起 clean-URL 模拟服务器（Pages 的 /spy→spy.html 映射），浏览器实测：首页 SPA 拦截（pushState、无刷新、panel/tab/canonical 三同步）✅；/spy 瘦身页仅含自身 panel、17 canvas、5 表全填、EN 切换正常 ✅；瘦身页点 kindex tab → 整页导航到 /kindex ✅；控制台 TypeError 归零 ✅。线上 curl：新版本已部署。
 
 **验收判据（终局量，不再是中间量）**：GSC 覆盖率报告里 16 路由 + /digest/ + 3 周报的「已编入索引」数。⚠️ 需要 Klay 在 GSC 后台对 sitemap 重新提交一次并抽几页「请求编入索引」；两三周后的复查也归 Klay 的 GSC 邮件——**下次再收到「重复网页」邮件，先跑 `python3 tools/check_route_pages.py`，绿着才允许怀疑 Google 慢**。
+
+**收口（08-17 20:5x EDT）**：Klay 已在 GSC 重提 sitemap（当场读出 22 页）并对 /kindex /leaps /pricing /digest/ 请求编入索引。对照基线（近3月）：曝光 2,567 / 点击 8 / 平均排名 5.8。复查窗口 ≈ 09-01。⚠️ 已知将红一次：digest 管线 08-17 20:21 生成的 2026-08-14-weekly 尚未提交，提交后 check_route_pages 会报 sitemap 缺页——重跑 build_route_pages.py 即平，这是闸在正常工作。
