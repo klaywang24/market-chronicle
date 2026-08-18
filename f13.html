@@ -112,8 +112,8 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
   <p class="f13-sub">机构每季向 SEC 申报美股多头持仓（13F），季末快照、45 天后披露。滞后不是缺陷，是原材料：<b>季末到披露日之间那段走势，在披露当天就已经是已知的、可复算的</b>。本页只对账：不算机构盈亏（13F 无成本价、无空头腿），不归因，不给「跟不跟」。</p>
   <div class="f13-fresh" id="fresh">加载中…</div>
   <div class="f13-legend">
-    <span><span class="sw" style="background:var(--ink)"></span><b>实心</b>＝集中决策：每一笔都是一个决策体的判断，可逐笔看</span>
-    <span><span class="sw" style="border:1.5px solid var(--border);background:var(--bg-card)"></span><b>描边</b>＝平台多策略 / 系统化 / 主权配置：只报规模。从几千行里挑一只说「它看好」，等于从一栋楼里挑一个房客说这栋楼喜欢他</span>
+    <span><span class="sw" style="background:var(--ink)"></span><b class="f13-i18n" data-en="Solid">实心</b>＝集中决策：每一笔都是一个决策体的判断，可逐笔看</span>
+    <span><span class="sw" style="border:1.5px solid var(--border);background:var(--bg-card)"></span><b class="f13-i18n" data-en="Outline">描边</b>＝平台多策略 / 系统化 / 主权配置：只报规模。从几千行里挑一只说「它看好」，等于从一栋楼里挑一个房客说这栋楼喜欢他</span>
   </div>
     <div id="panel"></div>
     <div class="f13-note" id="foot"></div>
@@ -127,16 +127,24 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
     const r = await fetch("data/f13_page.json", { cache: "no-store" });
     D = await r.json();
   } catch (e) { $("#fresh").textContent = "数据加载失败，请刷新重试。"; return; }
+  const _EN = localStorage.getItem("mc-lang") === "en";
+  const NM = (c) => _EN ? (c.en || c.cn) : c.cn;
+  const DT = (c) => _EN ? (c.decision_type_en || c.decision_type) : c.decision_type;
   const B = (v) => v == null ? "·" : (v >= 1e12 ? "$" + (v / 1e12).toFixed(2) + "T" : v >= 1e9 ? "$" + (v / 1e9).toFixed(1) + "B" : "$" + Math.round(v / 1e6).toLocaleString() + "M");
   const N = (v) => v == null ? "·" : Number(v).toLocaleString();
-  const _EN = localStorage.getItem("mc-lang") === "en";
   $("#fresh").textContent = _EN
     ? "Latest period " + D.latest_quarter + " (filing dates on each card) · assembled " + D.generated_at.slice(0, 10) + " · source: SEC EDGAR 13F-HR, read directly"
     : "最新报告期 " + D.latest_quarter + "（各家披露日见胶囊）· 页面装配 " + D.generated_at.slice(0, 10) + " · 源：SEC EDGAR 13F-HR 直读";
   const wall = $("#wall");
-  const groups = [["实心 · 集中决策（可逐笔）", D.capsules.filter(c => c.solid)],
-                  ["描边 · 平台多策略 / 系统化 / 主权配置（只报规模）", D.capsules.filter(c => !c.solid && c.value_usd)],
-                  ["未直读（无独立 13F-HR 主体，如实标）", D.capsules.filter(c => !c.solid && !c.value_usd)]];
+  const G = _EN
+    ? ["Solid · concentrated decision (position by position)",
+       "Outline · multi-strategy / systematic / sovereign (size only)",
+       "Not read directly (no standalone 13F-HR filer)"]
+    : ["实心 · 集中决策（可逐笔）", "描边 · 平台多策略 / 系统化 / 主权配置（只报规模）",
+       "未直读（无独立 13F-HR 主体，如实标）"];
+  const groups = [[G[0], D.capsules.filter(c => c.solid)],
+                  [G[1], D.capsules.filter(c => !c.solid && c.value_usd)],
+                  [G[2], D.capsules.filter(c => !c.solid && !c.value_usd)]];
   for (const [ttl, list] of groups) {
     if (!list.length) continue;
     const h = document.createElement("div"); h.className = "f13-groupttl"; h.textContent = ttl; wall.appendChild(h);
@@ -146,32 +154,33 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
       const el = document.createElement("div");
       el.className = "f13-cap" + (c.solid ? " solid" : "") + (c.value_usd ? "" : " dis");
       const av = c.tk ? '<img class="f13-logo" src="logos/' + c.tk + '.png" alt="" loading="lazy" onerror="this.remove()">'
-                      : '<span class="f13-mono">' + c.cn.replace(/[（(].*/, "").slice(0, 1) + '</span>';
-      el.innerHTML = '<div class="nm">' + av + c.cn + '</div><div class="meta">' +
-        (c.solid ? (c.n_holdings != null ? c.n_holdings + " 笔 · " : "") : (c.entries ? c.entries.toLocaleString() + " 条 · " : "")) +
-        B(c.value_usd) + (c.history_n ? " · " + c.history_n + " 期" : "") + "</div>";
+                      : '<span class="f13-mono">' + NM(c).replace(/[（(].*/, "").trim().slice(0, 1) + '</span>';
+      el.innerHTML = '<div class="nm">' + av + NM(c) + '</div><div class="meta">' +
+        (c.solid ? (c.n_holdings != null ? c.n_holdings + (_EN ? " positions · " : " 笔 · ") : "")
+                 : (c.entries ? c.entries.toLocaleString() + (_EN ? " rows · " : " 条 · ") : "")) +
+        B(c.value_usd) + (c.history_n ? " · " + c.history_n + (_EN ? "q" : " 期") : "") + "</div>";
       if (c.value_usd) el.onclick = () => show(c, el);
       g.appendChild(el);
     }
   }
   const first = D.capsules.filter(c => c.solid).sort((a, b) => (b.value_usd || 0) - (a.value_usd || 0))[0];
-  if (first) { const el = [...document.querySelectorAll(".f13-cap")].find(x => x.textContent.includes(first.cn)); if (el) show(first, el); }
+  if (first) { const el = [...document.querySelectorAll(".f13-cap")].find(x => x.textContent.includes(NM(first))); if (el) show(first, el); }
   function show(c, el) {
     document.querySelectorAll(".f13-cap.on").forEach(x => x.classList.remove("on"));
     el.classList.add("on");
     const d = (D.institutions || {})[c.cn] || {};
-    let h = '<h2>' + c.cn + '</h2><div class="pmeta">' + c.decision_type + " · 报告期 " + (c.period || "·") +
-      " · 披露 " + (c.filing_date || "·") + " · 组合 " + B(c.value_usd) +
+    let h = '<h2>' + NM(c) + '</h2><div class="pmeta">' + DT(c) + (_EN ? " · period " : " · 报告期 ") + (c.period || "·") +
+      + (_EN ? " · filed " : " · 披露 ") + (c.filing_date || "·") + (_EN ? " · book " : " · 组合 ") + B(c.value_usd) +
       (d.accession ? " · acc " + d.accession : "") + "</div>";
     if (!c.solid) {
       h += _EN
         ? '<p class="f13-sub">This is a ' + c.decision_type + ' filer: the table is the sum of hundreds of separate strategy books, so no single position reads as a house judgement. Size only here (' +
           (c.entries ? c.entries.toLocaleString() : "\u00b7") + ' rows · ' + B(c.value_usd) + ').</p>'
-        : '<p class="f13-sub">这家是' + c.decision_type + '：持仓表是几百个策略各自仓位的加总，单只持仓读不出机构判断，所以本页对它只报规模（' +
+        : '<p class="f13-sub">这家是' + DT(c) + '：持仓表是几百个策略各自仓位的加总，单只持仓读不出机构判断，所以本页对它只报规模（' +
           (c.entries ? c.entries.toLocaleString() : "·") + ' 条持仓 · ' + B(c.value_usd) + '）。</p>';
     }
     if (d.ledger && d.ledger.length) {
-      h += '<h3>开奖表 · 季末价 → 披露日价（可复算）</h3><div class="f13-scroll"><table class="f13"><tr><th>票</th><th>动作</th><th>名义</th><th>占组合</th><th>季末收</th><th>披露日收</th><th>区间涨跌</th><th>来源</th></tr>';
+      h += '<h3>' + (_EN ? "Scorecard: quarter-end to filing-date price (recomputable)" : "开奖表 · 季末价 → 披露日价（可复算）") + '</h3><div class="f13-scroll"><table class="f13"><tr><th>票</th><th>动作</th><th>名义</th><th>占组合</th><th>季末收</th><th>披露日收</th><th>区间涨跌</th><th>来源</th></tr>';
       for (const r of d.ledger) {
         const ch = parseFloat(r.chg_pct);
         h += '<tr><td><img class="f13-logo" src="logos/' + r.ticker.toLowerCase() + '.png" alt="" loading="lazy" onerror="this.remove()">' + r.ticker + "</td><td>" + r.action + "</td><td>" + B(+r.notional_usd) + "</td><td>" +
@@ -183,21 +192,22 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
     }
     if (d.holdings && d.holdings.length) {
       const mx = d.holdings[0].pct || 1;
-      h += '<h3>最新持仓 · 前 ' + d.holdings.length + '（按市值）</h3><div class="f13-scroll"><table class="f13"><tr><th>发行人</th><th>市值</th><th>股数</th><th>占组合</th></tr>';
+      h += '<h3>' + (_EN ? "Top " + d.holdings.length + " holdings (by value)" : "最新持仓 · 前 " + d.holdings.length + "（按市值）") + '</h3><div class="f13-scroll"><table class="f13"><tr><th>发行人</th><th>市值</th><th>股数</th><th>占组合</th></tr>';
       for (const r of d.holdings) {
         h += '<tr><td class="iss">' + (r.tk ? '<img class="f13-logo" src="logos/' + r.tk + '.png" alt="" loading="lazy" onerror="this.remove()">' : "") + r.issuer + "</td><td>" + B(r.value_usd) + "</td><td>" + N(r.shares) +
           '</td><td><span class="f13-pbar" style="width:' + Math.max(2, r.pct / mx * 70) + 'px"></span>' + r.pct + "%</td></tr>";
       }
-      if (d.holdings_rest && d.holdings_rest.n) h += '<tr><td class="iss">其余 ' + d.holdings_rest.n + ' 只合计</td><td>' + B(d.holdings_rest.value_usd) + "</td><td>·</td><td>·</td></tr>";
+      if (d.holdings_rest && d.holdings_rest.n) h += '<tr><td class="iss">' + (_EN ? "Other " + d.holdings_rest.n + " names combined" : "其余 " + d.holdings_rest.n + " 只合计") + '</td><td>' + B(d.holdings_rest.value_usd) + "</td><td>·</td><td>·</td></tr>";
       h += "</table></div>";
     }
     if (d.timeline && d.timeline.periods.length > 1) {
       const ps = d.timeline.periods, vs = d.timeline.value_total, mx = Math.max(...vs);
-      h += '<h3>时间轴 · 组合总值（' + ps.length + ' 期：' + ps[0] + ' → ' + ps[ps.length - 1] + '）</h3><div class="f13-tl">' +
+      h += '<h3>' + (_EN ? "Timeline: book value (" + ps.length + " quarters, " + ps[0] + " to " + ps[ps.length - 1] + ")"
+                          : "时间轴 · 组合总值（" + ps.length + " 期：" + ps[0] + " → " + ps[ps.length - 1] + "）") + '</h3><div class="f13-tl">' +
         vs.map((v, i) => '<div class="b" style="height:' + Math.max(2, v / mx * 100) + '%" title="' + ps[i] + " " + B(v) + '"></div>').join("") +
         '</div><div class="f13-tlx"><span>' + ps[0] + "</span><span>" + ps[ps.length - 1] + "</span></div>";
       if (d.timeline.shares_top) {
-        h += '<h3>持仓股数逐期（当前前几大 · 连续加仓在这里是能看见的形状）</h3>';
+        h += '<h3>' + (_EN ? "Share count by quarter (current top names; steady accumulation is a shape here, not an adjective)" : "持仓股数逐期（当前前几大 · 连续加仓在这里是能看见的形状）") + '</h3>';
         let cnt = 0;
         for (const [iss, ss] of Object.entries(d.timeline.shares_top)) {
           if (++cnt > 5) break;
@@ -261,6 +271,7 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
         else if (c.nodeType === 1 && !["SCRIPT", "STYLE"].includes(c.tagName)) walk(c);
       }
     };
+    document.querySelectorAll("[data-en]").forEach((e) => { e.textContent = e.dataset.en; });
     const RX = [
       [/^最新持仓 · 前 (\d+)（按市值）$/, (m) => `Top ${m[1]} holdings (by value)`],
       [/^时间轴 · 组合总值（(\d+) 期：(\S+) → (\S+)）$/, (m) => `Timeline: book value (${m[1]} quarters, ${m[2]} to ${m[3]})`],
