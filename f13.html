@@ -16,7 +16,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 .f13-wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 6px; }
 .f13-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; }
 .f13-brand { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 19px; font-weight: 700; color: var(--ink); text-decoration: none; }
-/* 2026-08-18 Klay 点名「切不同 tab 视觉比例不一样」：根因＝站上两套导航实现
+/* 2026-08-18 Klay 点名切不同 tab 视觉比例不一样：根因＝站上两套导航实现
    （index/路由页 .tab 胶囊按钮 7px13px+边框+圆角8px；options/f13 裸文字 padding 2px 0）。
    ⇒ 导航外观归主站 .tab 一处定义，本页只管排布与右侧控件（一处样式一个实现）。 */
 .f13-nav2 { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
@@ -42,9 +42,9 @@ html:not([lang^="zh"]) .f13-nav2 a.tab { padding: 6px 10px; }
 .f13-fresh { font-size: 12px; color: var(--ink-muted); margin: 10px 0 26px; }
 .f13-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin: 0 0 14px; }
 .f13-legend .sw { display: inline-block; width: 13px; height: 13px; border-radius: 4px; vertical-align: -2px; margin-right: 5px; }
-/* 目录去盒化（2026-08-18 Klay：「和其他 tab 页格格不入」）。
+/* 目录去盒化（2026-08-18 Klay：和其他 tab 页格格不入）。
    站上 07-26 已为目录定过调（css/style.css 的 .toc 一节）：原本每章一个圆角边框块 +
-   选中态填充底色，判为「与旧 tab 同一个毛病＝组件库默认值观感」，改成
+   选中态填充底色，判为与旧 tab 同一个毛病＝组件库默认值观感，改成
    **纯文字列表 + 左侧 2px 色条标记当前项，与顶栏导航同一套语言**。
    我先前那版黑底圆角卡片 + logo 头像，正是那个已被淘汰的形状 ⇒ 照既有语言重做，
    并去掉机构 logo/字母头像（Klay：只写名字就行）。
@@ -120,11 +120,11 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
   <aside class="f13-side" id="wall"></aside>
   <main class="f13-main">
   <h1 class="f13">13F 开奖</h1>
-  <p class="f13-sub">机构每季向 SEC 申报美股多头持仓（13F），季末快照、45 天后披露。滞后不是缺陷，是原材料：<b>季末到披露日之间那段走势，在披露当天就已经是已知的、可复算的</b>。本页只对账：不算机构盈亏（13F 无成本价、无空头腿），不归因，不给「跟不跟」。</p>
+  <p class="f13-sub">机构每季向 SEC 申报美股多头持仓（13F），季末快照、45 天后披露。滞后不是缺陷，是原材料：<b>季末到披露日之间那段走势，在披露当天就已经是已知的、可复算的</b>。本页只对账：不算机构盈亏（13F 无成本价、无空头腿），不归因，不给跟不跟。</p>
   <div class="f13-fresh" id="fresh">加载中…</div>
   <div class="f13-legend">
     <span><span class="sw" style="background:var(--ink)"></span><b class="f13-i18n" data-en="Solid">实心</b>＝集中决策：每一笔都是一个决策体的判断，可逐笔看</span>
-    <span><span class="sw" style="border:1.5px solid var(--border);background:var(--bg-card)"></span><b class="f13-i18n" data-en="Outline">描边</b>＝平台多策略 / 系统化 / 主权配置：只报规模。从几千行里挑一只说「它看好」，等于从一栋楼里挑一个房客说这栋楼喜欢他</span>
+    <span><span class="sw" style="border:1.5px solid var(--border);background:var(--bg-card)"></span><b class="f13-i18n" data-en="Outline">描边</b>＝平台多策略 / 系统化 / 主权配置：只报规模。从几千行里挑一只说它看好，等于从一栋楼里挑一个房客说这栋楼喜欢他</span>
   </div>
     <div id="panel"></div>
     <div class="f13-note" id="foot"></div>
@@ -255,11 +255,11 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
         "Institutions report US long equity holdings to the SEC each quarter (13F): a quarter-end snapshot, disclosed 45 days later. The lag is not a defect, it is the raw material: ",
       "季末到披露日之间那段走势，在披露当天就已经是已知的、可复算的":
         "the price path between quarter-end and filing date is already known and fully recomputable on the day it is disclosed",
-      "。本页只对账：不算机构盈亏（13F 无成本价、无空头腿），不归因，不给「跟不跟」。":
+      "。本页只对账：不算机构盈亏（13F 无成本价、无空头腿），不归因，不给跟不跟。":
         ". This page only reconciles: no institution P&L (13F carries no cost basis and no short leg), no attribution, no follow-or-not calls.",
       "＝集中决策：每一笔都是一个决策体的判断，可逐笔看":
         " = concentrated decision: every position is one decision-maker's judgement, readable position by position",
-      "＝平台多策略 / 系统化 / 主权配置：只报规模。从几千行里挑一只说「它看好」，等于从一栋楼里挑一个房客说这栋楼喜欢他":
+      "＝平台多策略 / 系统化 / 主权配置：只报规模。从几千行里挑一只说它看好，等于从一栋楼里挑一个房客说这栋楼喜欢他":
         " = multi-strategy / systematic / sovereign: size only. Picking one name out of thousands of rows to say \u201cthey like it\u201d is like picking one tenant out of a building to say the building likes him",
       "开奖表 · 季末价 → 披露日价（可复算）": "Scorecard: quarter-end price to filing-date price (recomputable)",
       "票": "Ticker", "动作": "Action", "名义": "Notional", "占组合": "% of book",
