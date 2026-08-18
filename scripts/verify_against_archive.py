@@ -126,16 +126,49 @@ def snapshot_timestamps(limit: int) -> list[str]:
     return out[:limit]
 
 
-def fetch_archived(ts: str) -> list[dict] | None:
-    """取该时间戳的存档内容。id_ 后缀 = 拿原始字节，不带 Wayback 注入的工具条。"""
+# 🔴 2026-08-18：一次请求 ≠ 一个判决。
+#    本项 08-12→08-17 连续 6 个交易日报「未能取得存档」，被 check_witness_health 升级为 bad。
+#    复查：不是链子有问题，也不是端点变动 —— IA 对自动请求间歇性限流（429），
+#    而 fetch_archived **只打一次 HTTP，失败即返回 None**。
+#    ⇒ 「这一次没拿到」被当成了「这一天没测到」，再由连败计数升级成故障。
+#    事后用 --all 补测 9 份存档（08-04→08-17）全部逐字一致 —— 那 6 天链子一直是干净的，
+#    红的是尺子不是被测物。
+# 🔑 第一性：本项要回答的是「存档副本与本地是否一致」。单次 HTTP 只是这个问题的**代理**，
+#    代理失败时该做的是再试，而不是把代理的失败当成问题的答案。（与 §83 同族。）
+# ⚠️ 重试要分清「拿不到」的两种：
+#    · 429 / 超时 / 连接错  → 传输问题，退避后重试
+#    · 404                  → 该时间戳真没有这份存档，重试多少次都一样，立刻放弃
+#    合成一类的话，要么白等（对 404 死磕），要么误判（对 429 说「不存在」）。
+# 🚫 退避是必须的，不是礼貌：无退避的密集重试正是招来 429 的原因，会把偶发限流变成持续限流。
+RETRY_DELAYS = (5, 15, 45)          # 秒；共 4 次尝试，最坏约 65 秒，仍远短于单轮预算
+
+
+def fetch_archived(ts: str, get=None) -> list[dict] | None:
+    """取该时间戳的存档内容。id_ 后缀 = 拿原始字节，不带 Wayback 注入的工具条。
+
+    get 参数只为可测：默认走真网络，selftest 注入假的。"""
+    get = get or _get
     url = f"https://web.archive.org/web/{ts}id_/{TARGET_URL}"
-    code, body = _get(url, timeout=60)
-    if code != 200 or not body.strip():
-        return None
-    try:
-        return [json.loads(l) for l in body.splitlines() if l.strip()]
-    except json.JSONDecodeError:
-        return None
+    last = None
+    for attempt in range(len(RETRY_DELAYS) + 1):
+        code, body = get(url, 60)
+        last = code
+        if code == 200 and body.strip():
+            try:
+                return [json.loads(l) for l in body.splitlines() if l.strip()]
+            except json.JSONDecodeError:
+                print(f"       （{ts} 取到了但解析失败 —— 这不是限流，是内容坏了，不重试）")
+                return None
+        if code == 404:
+            print(f"       （{ts} 该存档不存在(404) —— 重试无用，放弃）")
+            return None
+        if attempt < len(RETRY_DELAYS):
+            d = RETRY_DELAYS[attempt]
+            print(f"       （{ts} 第 {attempt + 1} 次取回失败 code={code}，{d}s 后重试）")
+            time.sleep(d)
+    print(f"       （{ts} 重试 {len(RETRY_DELAYS) + 1} 次仍取不到，最后 code={last}"
+          f"{' ＝ IA 限流' if last == 429 else ''}）")
+    return None
 
 
 def compare(archived: list[dict], local: list[dict]) -> tuple[str, list[str]]:
