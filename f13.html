@@ -25,6 +25,8 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
    padding 被覆盖成 2px 0 ⇒ 按钮塌成 29×29 + 20px 圆角 = 红圆球（Klay 两次圈图）。
    nowrap/flex-shrink 都没错，错在选择器打不过。⇒ 用 a.f13-subbtn(0,2,1) 取回。 */
 .f13-nav2 a.f13-subbtn { font-size: 13px; font-weight: 600; color: #fff !important; background: var(--accent); border-radius: 20px; padding: 6px 16px; white-space: nowrap; flex-shrink: 0; }
+.f13-langbtn { font-size: 12.5px; color: var(--ink-soft); background: transparent; border: 1px solid var(--border); border-radius: 20px; padding: 5px 13px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.f13-langbtn:hover { color: var(--ink); border-color: var(--ink-muted); }
 .f13-logo { width: 17px; height: 17px; border-radius: 4px; vertical-align: -3px; margin-right: 6px; background: #fff; }
 .f13-mono { display: inline-flex; width: 17px; height: 17px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 10.5px; font-weight: 700; align-items: center; justify-content: center; vertical-align: -3px; margin-right: 6px; }
 .f13-cap.solid .f13-mono { background: var(--bg); color: var(--ink); }
@@ -87,6 +89,7 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
     <a href="/spy">百年档案</a>
     <div class="f13-navctl">
       <a class="f13-subbtn" href="/pricing">订阅</a>
+      <button class="f13-langbtn" id="f13-lang" title="切换语言 / Switch language"></button>
       <button class="theme-toggle" id="f13-theme" title="日夜切换">☀</button>
     </div>
   </nav>
@@ -193,6 +196,35 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
 
   }
   $("#foot").innerHTML = "数据：SEC EDGAR 13F-HR 原始申报直读，逐期校验（各期持仓合计与封面总值对账）。13F 只含美股多头，无成本价、无期权与空头腿，因此本页不计算任何机构的盈亏，也不构成任何投资建议。名义额口径：增减持＝股数变动×季末收盘，新进＝期末市值，清仓＝上期期末市值。";
+  // 语言切换：与主站/期权页同一 localStorage 键 mc-lang，同用刷新制（文案由 JS 现拼，不走 D 键）
+  const L = localStorage.getItem("mc-lang") === "en" ? "en" : "zh";
+  const lb = document.getElementById("f13-lang");
+  if (lb) {
+    lb.textContent = L === "zh" ? "EN" : "简";
+    lb.onclick = () => { localStorage.setItem("mc-lang", L === "zh" ? "en" : "zh"); location.reload(); };
+  }
+  if (L === "en") {
+    document.documentElement.lang = "en";
+    document.title = "13F Scorecard · Market Chronicle";
+    const TR = {
+      "美股编年史": "Market Chronicle", "订阅": "Subscribe",
+      "今日": "Today", "K 指数 · 台账": "KAPX · Ledger",
+      "恐惧的标价 · 台账": "Fear-Price Index · Ledger",
+      "期权异动": "Options", "13F 开奖": "13F Scorecard", "百年档案": "The Archive",
+      "实心 · 集中决策（可逐笔）": "Solid · Concentrated decision (position by position)",
+      "描边 · 平台多策略 / 系统化 / 主权配置（只报规模）": "Outline · Multi-strategy / systematic / sovereign (size only)",
+      "未直读（无独立 13F-HR 主体，如实标）": "Not read directly (no standalone 13F-HR filer)",
+    };
+    const walk = (n) => {
+      for (const c of [...n.childNodes]) {
+        if (c.nodeType === 3) { const t = c.nodeValue.trim(); if (TR[t]) c.nodeValue = c.nodeValue.replace(t, TR[t]); }
+        else if (c.nodeType === 1 && !["SCRIPT", "STYLE"].includes(c.tagName)) walk(c);
+      }
+    };
+    walk(document.body);
+    new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach((n) => n.nodeType === 1 && walk(n))))
+      .observe(document.body, { childList: true, subtree: true });
+  }
   const tt = document.getElementById("f13-theme");
   if (tt) tt.onclick = () => {
     const dark = document.documentElement.classList.toggle("dark-mode");
