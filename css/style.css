@@ -294,7 +294,10 @@ html:not([lang^="zh"]) .brand em { display: none; }
 /* 2026-07-19：改芯片式后这里不能再压到 padding 6px 7px：那会让边框贴着字，
    芯片的形没了。改为只收字号与间距；两行布局本来就腾出了 200+px，够放。 */
 html:not([lang^="zh"]) .topbar-inner { gap: 14px; }
-html:not([lang^="zh"]) .tab { font-size: 12.5px; padding: 6px 11px; }
+/* 2026-08-18 修：EN 缩字号规则漏了 .tab-trigger（百年档案触发器没有 .tab 类），
+   EN 态它保持 15.5px ⇒ 与同排 12.5px 的 tab 基线错位。此洞一直在，13F tab 加入后
+   把行宽顶紧才显形（Klay 圈图点名）。 */
+html:not([lang^="zh"]) .tab, html:not([lang^="zh"]) .tab-trigger { font-size: 12.5px; padding: 6px 11px; }
 html:not([lang^="zh"]) .tabs { gap: 7px; }
 /* 2026-07-26（§47）：删掉这条里的 margin-left: 0 —— 它是 07-19 单行顶栏（.topbar-inner）时代的
    省空间补丁，当时控件在第二行、英文更宽会挤爆。07-25 顶栏改双行后控件移回报头行，靠
