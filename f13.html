@@ -39,6 +39,12 @@ html:not([lang^="zh"]) .f13-nav2 a.tab { padding: 6px 10px; }
 .f13-logo { width: 17px; height: 17px; border-radius: 4px; vertical-align: -3px; margin-right: 6px; background: #fff; }
 .f13-cap.solid h1.f13 { font-family: 'Noto Serif SC',serif; font-size: 27px; margin: 18px 0 6px; color: var(--ink); }
 .f13-sub { font-size: 13.5px; color: var(--ink-soft); line-height: 1.8; max-width: 760px; }
+/* 2026-08-18 Klay：导语里加黑的字标红，与其他页面一致。
+   用站上唯一的红变量 --accent（亮 #C81E1E / 暗 #F0533F，随主题走），
+   不写死十六进制 —— 本页私有前缀只该管排布，颜色要走全站语言。
+   站上此前没有正文加黑变红的现成规则（--accent 只用在 kicker/按钮/边框），
+   故此处新写；若别的页也要，应抽成公共类而不是各页各写。 */
+.f13-sub b { color: var(--accent); }
 .f13-fresh { font-size: 12px; color: var(--ink-muted); margin: 10px 0 26px; }
 .f13-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin: 0 0 14px; }
 .f13-legend .sw { display: inline-block; width: 13px; height: 13px; border-radius: 4px; vertical-align: -2px; margin-right: 5px; }
