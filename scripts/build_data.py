@@ -437,6 +437,33 @@ SECTOR_ETFS = [
 ]
 
 
+def pick_index_quotes(idx_px, idx_spec, prev_q):
+    """把下载结果翻译成 quotes 字典；缺的符号逐个降级而不是整轮崩。
+    （抽出来是为了可单测——原逻辑埋在 build_pulse 里，而那函数会先下载 500 只成分股。）
+
+    回 (quotes, missing)。任何符号缺席都**必须出声**：不出声的降级等于没发生。
+    降级顺序：本轮真值 → pulse.json 旧值(标 stale=True) → 该指数本轮缺席。
+    🔑 判据是 `len(s) >= 2` 不是 `len(s) >= 1`：chg 要拿末两根算，只有一根同样会崩。
+    """
+    quotes, missing = {}, []
+    for sym, key in idx_spec:
+        s = idx_px[sym].dropna() if (idx_px is not None and sym in idx_px.columns) else None
+        if s is None or len(s) < 2:
+            missing.append(sym)
+            if key in prev_q:
+                quotes[key] = dict(prev_q[key], stale=True)
+                print(f"  🔴 {sym} 取不到（重试后仍空）⇒ 沿用 pulse.json 旧值并标 stale=True")
+            else:
+                print(f"  🔴 {sym} 取不到且无旧值可用 ⇒ 本轮该指数缺席")
+            continue
+        quotes[key] = {"close": round(float(s.iloc[-1]), 2),
+                       "chg": round(float(s.iloc[-1] / s.iloc[-2] - 1) * 100, 2)}
+    if missing:
+        print(f"  ⚠️ 指数行情缺 {len(missing)}/{len(idx_spec)} 个：{'、'.join(missing)}"
+              f" —— 已按「沿用旧值+标 stale」降级，本轮其余产物照常生成")
+    return quotes, missing
+
+
 def build_pulse():
     """今日头版：市场温度（估值百分位+情绪百分位）/2、涨跌家数分布、板块当日涨跌。
     情绪 = 上涨家数占比 (涨 + 平/2)/总数 在近一年中的百分位；
@@ -505,14 +532,42 @@ def build_pulse():
     sectors.sort(key=lambda x: -x["chg"])
 
     # 指数当日行情 + 现有信号
-    idx_px = yf.download("^GSPC ^NDX ^DJI ^RUT ^VIX", period="5d", interval="1d",
-                         progress=False, auto_adjust=True)["Close"]
-    quotes = {}
-    for sym, key in (("^GSPC", "spx"), ("^NDX", "ndx"), ("^DJI", "dji"),
-                     ("^RUT", "rut"), ("^VIX", "vix")):
-        s = idx_px[sym].dropna()
-        quotes[key] = {"close": round(float(s.iloc[-1]), 2),
-                       "chg": round(float(s.iloc[-1] / s.iloc[-2] - 1) * 100, 2)}
+    # 🔴 2026-08-18 修：本段原来是「一次请求当成一个判决」——
+    #    `yf.download` 五个指数一把取，任何一个当时返回空 ⇒ `s.iloc[-1]` 抛
+    #    IndexError: single positional indexer is out-of-bounds ⇒ **整个 build_data.py 死在这里**，
+    #    后面的热力图/pulse/写盘全不执行，当轮一行都没提交，站上 kindex/pulse 停在前一天。
+    #    实况：08-18 22:26 UTC 那轮如此挂掉；同一批符号在 18:4x 复测**五个全部正常** ⇒ 瞬时故障。
+    # 🔑 病不在数据在结构，两点：
+    #    ① **没有重试**：一次空返回就定终局（与 verify_against_archive 同族，见该文件 2026-08-18 注）。
+    #    ② **没有逐符号容错**：一个符号空掉，另外四个也跟着陪葬——而本文件别处（广度计算、
+    #       ndx constituents）都写着「失败留旧文件」继续跑。**同一个文件里，唯独这一处一坏全崩。**
+    #    ③ 附带：原报错**不说是哪个符号**，只抛一句越界，定位要靠猜。
+    # ⇒ 改成：整体最多试 3 次（退避 5/15 秒）；仍缺的符号**逐个跳过并明写是哪个**，
+    #   本轮该指数沿用 pulse.json 里的旧值（宁可旧，不可崩）。
+    IDX = (("^GSPC", "spx"), ("^NDX", "ndx"), ("^DJI", "dji"), ("^RUT", "rut"), ("^VIX", "vix"))
+    idx_px = None
+    for attempt, wait in enumerate((5, 15, 0)):
+        try:
+            idx_px = yf.download(" ".join(s_ for s_, _ in IDX), period="5d", interval="1d",
+                                 progress=False, auto_adjust=True)["Close"]
+        except Exception as e:
+            print(f"  指数行情第 {attempt + 1} 次下载抛错：{type(e).__name__}: {str(e)[:80]}")
+            idx_px = None
+        ok = idx_px is not None and all(
+            s_ in idx_px.columns and len(idx_px[s_].dropna()) >= 2 for s_, _ in IDX)
+        if ok or not wait:
+            break
+        missing = [] if idx_px is None else [
+            s_ for s_, _ in IDX if s_ not in idx_px.columns or len(idx_px[s_].dropna()) < 2]
+        print(f"  指数行情第 {attempt + 1} 次不完整（缺 {missing or '全部'}），{wait}s 后重试")
+        time.sleep(wait)
+
+    prev_q = {}
+    try:
+        prev_q = json.loads((DATA / "pulse.json").read_text()).get("quotes") or {}
+    except Exception:
+        pass
+    quotes, idx_missing = pick_index_quotes(idx_px, IDX, prev_q)
     fng = k = None
     try:
         kd = json.loads((DATA / "kindex.json").read_text())["current"]
