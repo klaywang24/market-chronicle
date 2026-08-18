@@ -23,6 +23,8 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 /* 2026-08-18：导航外观归主站 .tab 一处定义（此前本页裸文字，与路由页胶囊按钮两套观感） */
 .op-nav .tabs { flex: 1; }
 .op-nav a.tab { text-decoration: none; }
+/* 🔑 2026-08-18：外观由 `.topbar-navband .tab`（纯文字+底部 2px 砖红线）统一，
+   本页 nav 补该祖先类即与路由页同源；此前只吃到基础 .tab（带框胶囊）⇒ 两套观感。 */
 .op-nav { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
 .op-navctl { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .op-nav a, .op-nav .on { font-size: 14.5px; color: var(--ink-soft); text-decoration: none; padding: 2px 0; }
@@ -123,7 +125,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 <div class="op-top">
   <a class="op-brand" href="/">美股编年史</a>
 </div>
-<nav class="op-nav">
+<nav class="op-nav topbar-navband">
   <div class="tabs">
     <a class="tab" href="/">今日</a>
     <a class="tab" href="/kindex">K 指数 · 台账</a>

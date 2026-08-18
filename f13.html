@@ -22,6 +22,8 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 .f13-nav2 { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 4px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
 .f13-nav2 .tabs { flex: 1; }
 .f13-nav2 a.tab { text-decoration: none; }
+/* 🔑 2026-08-18：外观由 `.topbar-navband .tab`（纯文字+底部 2px 砖红线）统一，
+   本页 nav 补该祖先类即与路由页同源；此前只吃到基础 .tab（带框胶囊）⇒ 两套观感。 */
 /* EN 态标签更长（Fear-Price Index · Ledger 等），1440px 下会挤成两行 ⇒ 沿用主站
    `html:not([lang^="zh"]) .tab` 的缩字号思路，本页再收紧 gap 与横向内边距。 */
 html:not([lang^="zh"]) .f13-nav2 { gap: 8px; }
@@ -45,7 +47,7 @@ h1.f13 { font-family: 'Noto Serif SC',serif; font-size: 27px; margin: 18px 0 6px
 /* 2026-08-18 改版（Klay）：左侧机构目录 + 右侧详情，右侧承载更多数据 */
 /* 2026-08-18 Klay：目录贴视口最左（此前在 .f13-wrap 的 1080px 居中框内，左边空 173px）。
    ⇒ layout 整块移出居中容器、自成全宽栅格；页头与导言仍居中，读起来不至于拉成一长条。 */
-.f13-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; align-items: start; padding: 0 16px 80px; }
+.f13-layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 24px; align-items: start; padding: 0 16px 80px; }
 .f13-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 4px; }
 .f13-cap { border-radius: 10px; padding: 9px 12px; cursor: pointer; border: 1.5px solid var(--border); background: var(--bg-card); margin-bottom: 7px; }
 .f13-cap:hover { border-color: var(--ink-muted); }
@@ -87,7 +89,7 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
   <div class="f13-top">
     <a class="f13-brand" href="/">美股编年史</a>
   </div>
-  <nav class="f13-nav2">
+  <nav class="f13-nav2 topbar-navband">
     <div class="tabs">
       <a class="tab" href="/">今日</a>
       <a class="tab" href="/kindex">K 指数 · 台账</a>
@@ -102,6 +104,10 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
       <button class="theme-toggle" id="f13-theme" title="日夜切换">☀</button>
     </div>
   </nav>
+</div>
+<div class="f13-layout">
+  <aside class="f13-side" id="wall"></aside>
+  <main class="f13-main">
   <h1 class="f13">13F 开奖</h1>
   <p class="f13-sub">机构每季向 SEC 申报美股多头持仓（13F），季末快照、45 天后披露。滞后不是缺陷，是原材料：<b>季末到披露日之间那段走势，在披露当天就已经是已知的、可复算的</b>。本页只对账：不算机构盈亏（13F 无成本价、无空头腿），不归因，不给「跟不跟」。</p>
   <div class="f13-fresh" id="fresh">加载中…</div>
@@ -109,10 +115,6 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
     <span><span class="sw" style="background:var(--ink)"></span><b>实心</b>＝集中决策：每一笔都是一个决策体的判断，可逐笔看</span>
     <span><span class="sw" style="border:1.5px solid var(--border);background:var(--bg-card)"></span><b>描边</b>＝平台多策略 / 系统化 / 主权配置：只报规模。从几千行里挑一只说「它看好」，等于从一栋楼里挑一个房客说这栋楼喜欢他</span>
   </div>
-</div>
-<div class="f13-layout">
-  <aside class="f13-side" id="wall"></aside>
-  <main class="f13-main">
     <div id="panel"></div>
     <div class="f13-note" id="foot"></div>
   </main>
@@ -127,7 +129,10 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
   } catch (e) { $("#fresh").textContent = "数据加载失败，请刷新重试。"; return; }
   const B = (v) => v == null ? "·" : (v >= 1e12 ? "$" + (v / 1e12).toFixed(2) + "T" : v >= 1e9 ? "$" + (v / 1e9).toFixed(1) + "B" : "$" + Math.round(v / 1e6).toLocaleString() + "M");
   const N = (v) => v == null ? "·" : Number(v).toLocaleString();
-  $("#fresh").textContent = "最新报告期 " + D.latest_quarter + "（各家披露日见胶囊）· 页面装配 " + D.generated_at.slice(0, 10) + " · 源：SEC EDGAR 13F-HR 直读";
+  const _EN = localStorage.getItem("mc-lang") === "en";
+  $("#fresh").textContent = _EN
+    ? "Latest period " + D.latest_quarter + " (filing dates on each card) · assembled " + D.generated_at.slice(0, 10) + " · source: SEC EDGAR 13F-HR, read directly"
+    : "最新报告期 " + D.latest_quarter + "（各家披露日见胶囊）· 页面装配 " + D.generated_at.slice(0, 10) + " · 源：SEC EDGAR 13F-HR 直读";
   const wall = $("#wall");
   const groups = [["实心 · 集中决策（可逐笔）", D.capsules.filter(c => c.solid)],
                   ["描边 · 平台多策略 / 系统化 / 主权配置（只报规模）", D.capsules.filter(c => !c.solid && c.value_usd)],
@@ -159,8 +164,11 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
       " · 披露 " + (c.filing_date || "·") + " · 组合 " + B(c.value_usd) +
       (d.accession ? " · acc " + d.accession : "") + "</div>";
     if (!c.solid) {
-      h += '<p class="f13-sub">这家是' + c.decision_type + '：持仓表是几百个策略各自仓位的加总，单只持仓读不出机构判断，所以本页对它只报规模（' +
-        (c.entries ? c.entries.toLocaleString() : "·") + ' 条持仓 · ' + B(c.value_usd) + '）。</p>';
+      h += _EN
+        ? '<p class="f13-sub">This is a ' + c.decision_type + ' filer: the table is the sum of hundreds of separate strategy books, so no single position reads as a house judgement. Size only here (' +
+          (c.entries ? c.entries.toLocaleString() : "\u00b7") + ' rows · ' + B(c.value_usd) + ').</p>'
+        : '<p class="f13-sub">这家是' + c.decision_type + '：持仓表是几百个策略各自仓位的加总，单只持仓读不出机构判断，所以本页对它只报规模（' +
+          (c.entries ? c.entries.toLocaleString() : "·") + ' 条持仓 · ' + B(c.value_usd) + '）。</p>';
     }
     if (d.ledger && d.ledger.length) {
       h += '<h3>开奖表 · 季末价 → 披露日价（可复算）</h3><div class="f13-scroll"><table class="f13"><tr><th>票</th><th>动作</th><th>名义</th><th>占组合</th><th>季末收</th><th>披露日收</th><th>区间涨跌</th><th>来源</th></tr>';
@@ -240,6 +248,12 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
       "发行人": "Issuer", "市值": "Value", "股数": "Shares",
       "直证": "Direct", "二手": "Secondary",
       "清仓": "Exited", "减持": "Trimmed", "增持": "Added", "新进": "New", "持平": "Unchanged",
+      "加载中…": "Loading\u2026",
+      "数据加载失败，请刷新重试。": "Failed to load data. Please refresh.",
+      "时间轴回补中：全史逐期数据正在从 EDGAR 补齐，补到即显示。":
+        "Timeline backfill in progress: full history is being pulled from EDGAR and appears as it lands.",
+      "数据：SEC EDGAR 13F-HR 原始申报直读，逐期校验（各期持仓合计与封面总值对账）。13F 只含美股多头，无成本价、无期权与空头腿，因此本页不计算任何机构的盈亏，也不构成任何投资建议。名义额口径：增减持＝股数变动×季末收盘，新进＝期末市值，清仓＝上期期末市值。":
+        "Data: read directly from SEC EDGAR 13F-HR filings, verified per quarter (sum of holdings reconciled against the cover-page total). 13F covers US long equity only, with no cost basis, options or short leg, so this page computes no institution P&L and is not investment advice. Notional convention: added/trimmed = share change \u00d7 quarter-end close; new = period-end value; exited = prior period-end value.",
     };
     const walk = (n) => {
       for (const c of [...n.childNodes]) {
