@@ -172,16 +172,38 @@ function card(name,st,detail,why){
       w:"最严重的一项：2026-07-12 那次 daily 整个死掉 4 天没人发现"});
   }catch(e){out.push({n:"daily 是否还活着",s:"unknown",d:"GitHub API 拉取失败",w:"没查到 ≠ 没问题"})}
 
-  // ⑤ 期权页是否在更新（2026-08-05 晚新增，与体检第六项同判据）
+  // ⑤ 期权页是否在更新（2026-08-05 晚新增；2026-08-18 补上第二道）
   //    这一项查的是**本机那条链路**：launchd → 生成器 → push 站仓。
   //    整段在 CI 之外，GitHub 一侧看不见；任何一环断掉都只表现为「页面停止更新」。
-  //    🔑 判据用 meta.data_date 不用 generated_at —— 重跑旧数据会刷新后者却不代表页面变新，
-  //       那正是最该被抓住的假绿。
+  //
+  //    🔴 2026-08-18 修：本段注释从建成起就写着「与体检第六项同判据」，而它其实只抄了
+  //       第一道。08-18 凌晨实况 —— 线上 08-17 那版 17 只票全是盘中读数，
+  //       check_witness_health 判 bad，本卡片却是绿勾、旁边还并排印着「· 盘中临时读数」：
+  //       证据与绿灯同框。总体横幅因此显示「一切正常」。
+  //       🔑 一处判据只能有一个实现。两套尺子并存时，人看到的永远是松的那把 ——
+  //          而松的那把恰恰装在人唯一会打开的那个页面上。
+  //
+  //    🔑 第一道（在不在更新）用 meta.data_date 不用 generated_at —— 重跑旧数据会刷新
+  //       后者却不代表页面变新，那正是最该被抓住的假绿。
+  //    🔑 第二道（做完没有）读 structure[].spot_kind 这个**事实字段**，
+  //       🚫 刻意**不读** meta.provisional：那是生成器给自己贴的标签，08-14 贴错过
+  //       （页面确实是临时的，它却写 False）。**体检不该依赖被检查方的自我声明。**
+  //       此处与 check_witness_health.check_options_page 各自独立成立，不是互抄。
+  //    🔑 18:30 ET 这个点：官方收盘价结算实测落在 17:3x–17:4x（08-13 17:41 / 08-14 17:31），
+  //       留将近一小时余量 ⇒ 过了还没收盘价，就不是「还没结算」，是「这一版没做完」。
+  //       当天盘中 spot_kind 非 close 是**合法状态**，不报。
   try{const r=await fetch("https://chronicle.klay-wang.com/data/options_page.json",{cache:"no-store"});
-    const m=(await r.json()).meta||{};const a=days(m.data_date);
-    out.push({n:"期权页是否在更新",s:a<=SLA.opt?"ok":"bad",
-      d:`数据日 ${m.data_date}（${a} 天前）${m.provisional?" · 盘中临时读数":""} · ${m.n_tickers} 只标的`,
-      w:"本机 launchd 那条链路的唯一体温计：它停了说明定时任务/生成器/推送里有一环断了"});
+    const j=await r.json(), m=j.meta||{}, a=days(m.data_date);
+    const stale=(j.structure||[]).filter(t=>t.spot_kind!=="close").map(t=>t.ticker);
+    const et=new Date(new Date().toLocaleString("en-US",{timeZone:"America/New_York"}));
+    const overdue=stale.length>0 && (a>=1 || (a===0 && et.getHours()*60+et.getMinutes()>=18*60+30));
+    out.push(overdue
+      ? {n:"期权页是否在更新",s:"bad",
+         d:`期权页 ${m.data_date} 数据不完整：${stale.length} 只票仍非官方收盘价（${stale.slice(0,6).join(", ")}${stale.length>6?"…":""}）`,
+         w:"多半是收盘价落库前那一班生成的版本卡在站上 —— 看本机 eod-scan 日志有没有 push/rebase 未成功"}
+      : {n:"期权页是否在更新",s:a<=SLA.opt?"ok":"bad",
+         d:`数据日 ${m.data_date}（${a} 天前）${stale.length?" · 盘中临时读数":""} · ${m.n_tickers} 只标的`,
+         w:"本机 launchd 那条链路的唯一体温计：它停了说明定时任务/生成器/推送里有一环断了"});
   }catch(e){out.push({n:"期权页是否在更新",s:"unknown",d:"拉取失败",w:"没查到 ≠ 没问题"})}
 
   // ⑥ 与存档逐字对账 —— 浏览器做不了（跨域 + 要下整份存档字节），给命令，不假装查过。
