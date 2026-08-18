@@ -58,22 +58,31 @@ html:not([lang^="zh"]) .f13-nav2 a.tab { padding: 6px 10px; }
    集中决策＝正常墨色，只报规模＝弱化色，语义不丢而视觉不吵。 */
 .f13-layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 24px; align-items: start; padding: 0 16px 80px; }
 .f13-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 6px; }
+/* 2026-08-18 Klay：左侧目录换胶囊 UI。
+   照抄站上两套现成语言，不发明第三套：
+   · 常态取 .tab（1px 边框 + var(--bg-card) + 8px 圆角 + .15s cubic-bezier(.4,0,.2,1)）
+   · 选中态取 .stat.signal-on（accent 边框 + accent-soft 底），替掉原来的左侧 2px 红条
+   ⚠️ 不直接复用 .tab 类：那是单行内联控件，本项是两行块（名称 + 笔数/规模/期数），
+      复用会继承它的 nowrap 与内联流。这里只搬取值，不搬结构。
+   ⚠️ 集中决策 / 只报规模的区分仍由 .nm 的墨色深浅承担（见下），
+      没有改用边框去编码 —— 页脚图例里的实心/描边说的是那两个圆点，别和胶囊边框混为一谈。 */
 .f13-cap {
-  display: block; cursor: pointer;
-  border: none; border-left: 2px solid transparent; border-radius: 0; background: transparent;
-  padding: 6px 10px; margin-bottom: 1px;
+  display: block; cursor: pointer; width: 100%; text-align: left;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card);
+  padding: 8px 12px; margin-bottom: 6px;
   font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', monospace;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: border-color .15s cubic-bezier(.4,0,.2,1), background .15s cubic-bezier(.4,0,.2,1);
 }
-.f13-cap:hover { background: var(--bg-card-hover); }
+.f13-cap:hover { background: var(--bg-card-hover); border-color: var(--ink-muted); }
 .f13-cap .nm { font-size: 12.5px; color: var(--ink-muted); font-weight: 500; }
 .f13-cap .meta { font-size: 10.5px; color: var(--ink-muted); opacity: .62; margin-top: 1px; }
 .f13-cap.solid .nm { color: var(--ink); }            /* 集中决策＝正常墨色 */
 .f13-cap:not(.solid) .nm { color: var(--ink-muted); } /* 只报规模＝弱化 */
-.f13-cap.on { border-left-color: var(--accent); background: var(--bg-card-hover); }
+.f13-cap.on { border-color: var(--accent); background: var(--accent-soft); }
 .f13-cap.on .nm { color: var(--ink); font-weight: 700; }
 .f13-cap.dis { opacity: .4; cursor: default; }
-.f13-cap.dis:hover { background: transparent; }
+.f13-cap.dis:hover { background: var(--bg-card); border-color: var(--border); }
 .f13-groupttl { font-size: 10.5px; color: var(--ink-muted); letter-spacing: .08em; margin: 16px 0 6px; padding-left: 10px; opacity: .75; }
 .f13-groupttl:first-child { margin-top: 0; }
 @media (max-width: 860px) { .f13-layout { grid-template-columns: 1fr; } .f13-side { position: static; max-height: none; } }
