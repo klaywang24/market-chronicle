@@ -246,6 +246,9 @@ html.dark-mode .tab-menu { box-shadow: 0 10px 28px rgba(0,0,0,.5); }
 .tab-menu .tab { border-color: transparent; background: transparent; text-align: left; width: 100%; }
 /* 链接式 tab（期权页等平铺独立页入口）：对齐 button.tab 的观感 */
 a.tab-ext { text-decoration: none; display: inline-flex; align-items: center; color: inherit; border-bottom: none; }
+/* §57 全部 tab 从 <button> 换 <a href>（SEO 内链可爬）：补齐 anchor 与 button 的盒模型差异 */
+a.tab { text-decoration: none; display: inline-block; }
+.tab-menu a.tab { display: block; }
 a.tab-ext:hover { color: var(--ink); border-bottom: none; }
 .tab-menu .tab:hover { transform: none; background: var(--bg-card-hover); }
 

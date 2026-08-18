@@ -74,7 +74,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260813a">
+<link rel="stylesheet" href="css/style.css?v=20260817a">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -101,12 +101,12 @@
   <div class="topbar-navband">
    <div class="topbar-row">
     <nav class="tabs" id="tabs">
-      <button class="tab active" data-panel="pulse">今日</button>
+      <a class="tab active" href="/" data-panel="pulse">今日</a>
       <!-- 双标签（2026-07-25）：窄屏四项一行放不下（390px 实测差约 40px），此处按断点换短版。
            两版各自是独立文本节点，i18n 的 D 键分别匹配，且「K 指数」「恐惧的标价」两个键早已存在 —— 零新增翻译。
            不能改成 CSS 隐藏「· 台账」那半截：D 键按整个文本节点精确匹配，拆开就匹配不上了。 -->
-      <button class="tab" data-panel="kindex"><span class="t-full">K 指数 · 台账</span><span class="t-short">K 指数</span></button>
-      <button class="tab" data-panel="leaps"><span class="t-full">恐惧的标价 · 台账</span><span class="t-short">恐惧的标价</span></button>
+      <a class="tab" href="/kindex" data-panel="kindex"><span class="t-full">K 指数 · 台账</span><span class="t-short">K 指数</span></a>
+      <a class="tab" href="/leaps" data-panel="leaps"><span class="t-full">恐惧的标价 · 台账</span><span class="t-short">恐惧的标价</span></a>
       <!-- 2026-08-05 期权页转正（Klay 拍板免观察期）：/options 是平铺独立页不是 SPA 面板，
            所以用 <a> 不用 <button>——router 正则与 D 面板机制都不用动。
            EN 名刻意用短的 Options：EN 顶栏在 900-1379px 本就贴边（07-17 胶囊挤爆定案），别再加长词。 -->
@@ -116,18 +116,18 @@
            实测这七个面板共 42 章 / 78 卡（占全站内容 78%），但回访理由≈0；
            而每天变的三项（今日 / K 指数 / 恐惧的标价）此前被它们稀释成同级。
            顺带结构性解决 EN 顶栏溢出（此前靠隐藏订阅胶囊打补丁，见 style.css 同日注释）。
-           下拉项仍是 .tab[data-panel]，#tabs 的事件委托与 activatePanel 的 active 切换照常生效；
+           下拉项仍是 .tab[data-panel]（§57 起全部是 <a href>：爬虫走 href 内链，JS 委托拦截走 SPA；瘦身路由页上目标 panel 不在 DOM 时放行给浏览器整页导航）；
            触发器用 .tab-trigger（无 data-panel）以免被委托当成面板点击。 -->
       <div class="tab-group" id="archive-group">
         <button class="tab-trigger" id="archive-trigger" aria-haspopup="true" aria-expanded="false" aria-controls="archive-menu">百年档案</button>
         <div class="tab-menu" id="archive-menu" role="menu" hidden>
-          <button class="tab" role="menuitem" data-panel="macro">宏观</button>
-          <button class="tab" role="menuitem" data-panel="spy">标普 500</button>
-          <button class="tab" role="menuitem" data-panel="qqq">纳斯达克</button>
-          <button class="tab" role="menuitem" data-panel="tech">科技</button>
-          <button class="tab" role="menuitem" data-panel="fin">金融</button>
-          <button class="tab" role="menuitem" data-panel="consumer">消费</button>
-          <button class="tab" role="menuitem" data-panel="luxury">奢侈品</button>
+          <a class="tab" role="menuitem" href="/macro" data-panel="macro">宏观</a>
+          <a class="tab" role="menuitem" href="/spy" data-panel="spy">标普 500</a>
+          <a class="tab" role="menuitem" href="/qqq" data-panel="qqq">纳斯达克</a>
+          <a class="tab" role="menuitem" href="/tech" data-panel="tech">科技</a>
+          <a class="tab" role="menuitem" href="/fin" data-panel="fin">金融</a>
+          <a class="tab" role="menuitem" href="/consumer" data-panel="consumer">消费</a>
+          <a class="tab" role="menuitem" href="/luxury" data-panel="luxury">奢侈品</a>
         </div>
       </div>
     </nav>
@@ -145,7 +145,7 @@
 <main class="container">
 
 <!-- ================= K 指数 ================= -->
-<section class="panel" id="panel-kindex">
+<section class="panel active" id="panel-kindex">
   <div class="hero">
     <div class="kicker">K-INDEX · CNN ÷ VIX</div>
     <h1>金风玉露一相逢</h1>
@@ -223,884 +223,36 @@
 </section>
 
 <!-- ================= 今日 · 头版 ================= -->
-<section class="panel active" id="panel-pulse">
-  <div class="pulse-hero" id="pulse-hero">
-    <div class="pulse-layer pulse-base" id="pulse-base"></div>
-    <div class="pulse-layer pulse-reveal force-dark" id="pulse-reveal" aria-hidden="true"></div>
-  </div>
-</section>
 
 <!-- ================= 标普 500 ================= -->
-<section class="panel" id="panel-spy">
-  <div class="hero">
-    <div class="kicker">S&amp;P 500 · SINCE 1927</div>
-    <h1>标普 500：一个世纪的形状</h1>
-    <p class="dek">价格、回报、分布、周期、回撤、估值、盈利与结构：把近百年的标普 500 放进一部章节式编年史。</p>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>头版 · 世纪尺度</h2></div>
-    <p class="chapter-q">拉长到一个世纪，回报长什么样？</p>
-    <div class="card"><h3>百年走势（月线 · 对数坐标）</h3><div class="chart" id="ch-spy-century"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>年度结账</h2></div>
-    <p class="chapter-q">98 份年度成绩单，各落在哪个区间？</p>
-    <div class="card"><h3>年度回报</h3><div class="sub">每年收盘对收盘的价格回报</div><div class="chart short" id="ch-spy-annual"></div></div>
-    <div class="card"><h3>收益分布</h3><div class="sub">年度回报分桶 · 悬停查看每桶年份</div><div class="chart short" id="ch-spy-dist"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>入场与离场</h2></div>
-    <p class="chapter-q">随便挑一天入场，拿满 N 年赚钱的概率有多大？</p>
-    <div class="grid-2">
-      <div class="card"><h3>持有期胜率</h3><div class="sub">月频滚动窗口 · 正收益概率</div><div class="chart short" id="ch-spy-holding"></div></div>
-      <div class="card"><h3>持有期年化分位</h3><div class="table-wrap"><table id="spy-holding-table"></table></div></div>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第四章</span><h2>滚动年化</h2></div>
-    <p class="chapter-q">5 年、10 年、20 年为期，复利何时让人失望过？</p>
-    <div class="card"><h3>滚动 5 / 10 / 20 年年化回报</h3><div class="chart short" id="ch-spy-rollmatrix"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第五章</span><h2>周期换挡</h2></div>
-    <p class="chapter-q">牛市走多久，熊市跌多深？</p>
-    <div class="card"><h3>牛长熊短（跌 20% 确认熊 · 涨 25% 确认牛）</h3><div class="sub">上方牛市（对数压缩）· 下方熊市（百分比）· 标注均为真实涨跌幅</div><div class="chart chart-tall" id="ch-spy-bullbear"></div></div>
-    <div class="card"><h3>逐段明细</h3><div class="sub">首段自数据起点截断</div><div class="table-wrap table-scroll"><table id="spy-bullbear-table"></table></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第六章</span><h2>左尾放大镜</h2></div>
-    <p class="chapter-q">最坏的单日有多坏？</p>
-    <div class="grid-2">
-      <div class="card"><h3>日收益分布（对数计数）</h3><div class="chart short" id="ch-spy-dailyhist"></div></div>
-      <div class="card"><h3>最差 / 最好单日</h3><div class="table-wrap"><table id="spy-extremes-table"></table></div></div>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第七章</span><h2>回撤谱系</h2></div>
-    <p class="chapter-q">跌下去要多深，爬回来要多久？</p>
-    <div class="card"><h3>历史回撤曲线</h3><div class="sub">距前高的百分比距离（周频）</div><div class="chart short" id="ch-spy-dd"></div></div>
-    <div class="grid-2">
-      <div class="card"><h3>深度回撤一览（≥10%）</h3><div class="table-wrap"><table id="spy-dd-table"></table></div></div>
-      <div class="card"><h3>年内最大回撤 vs 全年收益</h3><div class="sub">几乎每一年都有回撤，多数年份仍收正</div><div class="chart short" id="ch-spy-intra"></div></div>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第八章</span><h2>估值的两条曲线</h2></div>
-    <p class="chapter-q">现在贵不贵？和 1929、2000 比呢？</p>
-    <div class="grid-2">
-      <div class="card"><h3>席勒 CAPE（1871 年至今）</h3><div class="chart short" id="ch-spy-cape"></div></div>
-      <div class="card"><h3>PE（TTM，1871 年至今）</h3><div class="chart short" id="ch-spy-pettm"></div></div>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no"></span><h2>估值的弹性</h2></div>
-    <p class="chapter-q">当前估值站在 150 年历史的什么位置？</p>
-    <div class="k-status" id="spy-val-cards"></div>
-    <div class="card"><h3>PE（TTM）与三条历史中位数</h3><div class="sub">全历史（1871→）· 近 50 年 · 2010 年以来，三条虚线即三个"回归锚"</div><div class="chart short" id="ch-spy-val"></div></div>
-    <p class="footnote" id="spy-val-note"></p>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第九章</span><h2>利润基本面</h2></div>
-    <p class="chapter-q">指数背后，每股盈利涨了多少？</p>
-    <div class="card"><h3>标普 500 EPS（TTM · 对数坐标）</h3><div class="chart short" id="ch-spy-eps"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第十章</span><h2>恐惧的标价</h2></div>
-    <p class="chapter-q">市场什么时候在发抖？</p>
-    <div class="card"><h3>VIX · 保险费的账本</h3><div class="sub">VIX 衡量市场对未来 30 天的波动预期：冲破 30，意味着投资者已经在为下一轮风险付保费。叠加 20 日 / 60 日年化已实现波动率（周频）。</div><div class="chart short" id="ch-spy-vol"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第十一章</span><h2>月度季节性</h2></div>
-    <p class="chapter-q">哪个月份最顺，哪个月最凶？</p>
-    <div class="card"><h3>各月平均涨跌与上涨概率</h3><div class="chart short" id="ch-spy-season"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第十二章</span><h2>行业结构</h2></div>
-    <p class="chapter-q">五百家公司分布在哪些行业？</p>
-    <div class="card"><h3>GICS 行业分布（按家数）</h3><div class="chart short" id="ch-spy-sectors"></div></div>
-    <div class="card"><h3>行业暴露（按权重）</h3><div class="sub">家数看分布，权重看集中度：单一行业占比 ≥25% 标红</div><div class="chart" id="ch-spy-sectorw"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第十三章</span><h2>五百家一览</h2></div>
-    <p class="chapter-q">名单本身就是一部行业史。</p>
-    <div class="card"><h3>当前成分股（Wikipedia · 随每日更新刷新）</h3><div class="table-wrap table-scroll"><table id="spy-constituents"></table></div></div>
-  </div>
-</section>
 
 <!-- ================= 纳斯达克 ================= -->
-<section class="panel" id="panel-qqq">
-  <div class="hero">
-    <div class="kicker">NASDAQ · COMPOSITE 1971 / NDX 1985</div>
-    <h1>纳斯达克：成长与代价</h1>
-    <p class="dek">纳指综指（1971→）与纳指 100（1985→）：更陡的复利，更深的回撤。</p>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>综指历程</h2></div>
-    <p class="chapter-q">半个世纪的成长股复利曲线。</p>
-    <div class="card"><h3>纳指综指 × 纳指 100（月线 · 对数坐标）</h3><div class="chart" id="ch-qqq-century"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>年度结账</h2></div>
-    <p class="chapter-q">四十年成绩单，波动比标普大多少？</p>
-    <div class="card"><h3>纳指 100 年度回报</h3><div class="chart short" id="ch-qqq-annual"></div></div>
-    <div class="card"><h3>收益分布</h3><div class="sub">年度回报分桶 · 悬停查看每桶年份</div><div class="chart short" id="ch-qqq-dist"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>入场与离场</h2></div>
-    <p class="chapter-q">纳指 100 拿满 N 年，赚钱概率多大？</p>
-    <div class="grid-2">
-      <div class="card"><h3>持有期胜率</h3><div class="chart short" id="ch-qqq-holding"></div></div>
-      <div class="card"><h3>持有期年化分位</h3><div class="table-wrap"><table id="qqq-holding-table"></table></div></div>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第四章</span><h2>滚动年化</h2></div>
-    <p class="chapter-q">dotcom 之后，10 年年化曾经归零。</p>
-    <div class="card"><h3>滚动 5 / 10 / 20 年年化回报</h3><div class="chart short" id="ch-qqq-rollmatrix"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第五章</span><h2>周期换挡</h2></div>
-    <p class="chapter-q">纳指的牛市更陡，熊市也更狠。</p>
-    <div class="card"><h3>牛长熊短（跌 20% 确认熊 · 涨 25% 确认牛）</h3><div class="sub">上方牛市（对数压缩）· 下方熊市（百分比）· 标注均为真实涨跌幅</div><div class="chart chart-tall" id="ch-qqq-bullbear"></div></div>
-    <div class="card"><h3>逐段明细</h3><div class="sub">首段自数据起点截断</div><div class="table-wrap table-scroll"><table id="qqq-bullbear-table"></table></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第六章</span><h2>左尾放大镜</h2></div>
-    <p class="chapter-q">成长股的极端日长什么样？</p>
-    <div class="grid-2">
-      <div class="card"><h3>日收益分布（对数计数）</h3><div class="chart short" id="ch-qqq-dailyhist"></div></div>
-      <div class="card"><h3>最差 / 最好单日</h3><div class="table-wrap"><table id="qqq-extremes-table"></table></div></div>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第七章</span><h2>回撤解剖</h2></div>
-    <p class="chapter-q">dotcom 崩了 −83%，这次呢？</p>
-    <div class="card"><h3>纳指 100 历史回撤曲线</h3><div class="chart short" id="ch-qqq-dd"></div></div>
-    <div class="grid-2">
-      <div class="card"><h3>深度回撤一览（≥10%）</h3><div class="table-wrap"><table id="qqq-dd-table"></table></div></div>
-      <div class="card"><h3>年内最大回撤 vs 全年收益</h3><div class="chart short" id="ch-qqq-intra"></div></div>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no"></span><h2>估值的弹性</h2></div>
-    <p class="chapter-q">纳指 100 现在贵吗？</p>
-    <div class="k-status" id="qqq-val-cards"></div>
-    <p class="footnote">指数级的纳指 PE 长历史与远期 PE 无免费公开数据源（原站为 Bloomberg 手动维护），此处仅展示 QQQ ETF 口径的当前值；个股级的 20 年 PE 历史请进入金融/消费/奢侈品板块的个股页查看。</p>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第八章</span><h2>纳指恐慌</h2></div>
-    <p class="chapter-q">成长股的心跳有多快？</p>
-    <div class="card"><h3>VXN · 纳指的保险费</h3><div class="sub">VXN 衡量市场对纳指未来 30 天的波动预期。叠加 20 日 / 60 日年化已实现波动率（周频）。</div><div class="chart short" id="ch-qqq-vol"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第九章</span><h2>月度季节性</h2></div>
-    <p class="chapter-q">纳指的月份脾气。</p>
-    <div class="card"><h3>各月平均涨跌与上涨概率</h3><div class="chart short" id="ch-qqq-season"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第十章</span><h2>行业结构</h2></div>
-    <p class="chapter-q">纳指 100 有多"科技"？</p>
-    <div class="card"><h3>ICB 行业分布（按家数）</h3><div class="chart short" id="ch-qqq-sectors"></div></div>
-    <div class="card"><h3>行业暴露（按权重）</h3><div class="sub">纳指 100 有多集中：单一行业占比 ≥25% 标红</div><div class="chart" id="ch-qqq-sectorw"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第十一章</span><h2>纳指百家</h2></div>
-    <p class="chapter-q">一百家公司的名单。</p>
-    <div class="card"><h3>当前成分股（Wikipedia · 随每日更新刷新）</h3><div class="table-wrap table-scroll"><table id="qqq-constituents"></table></div></div>
-  </div>
-</section>
 
 <!-- ================= 科技 ================= -->
-<section class="panel" id="panel-tech">
-  <nav class="subnav" id="subnav-tech"></nav>
-  <div class="basket-overview" id="tech-overview">
-  <div class="hero">
-    <div class="kicker">TECHNOLOGY &amp; MEGACAP</div>
-    <h1>科技：增长的引擎</h1>
-    <p class="dek">七姐妹，加半导体的博通、台积电、AMD 与存储的美光、闪迪：十二只科技巨头。先看板块的锚 QQQ，再点个股名徐徐展开各自的历史。</p>
-  </div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>板块的锚：QQQ</h2></div>
-    <p class="chapter-q">纳斯达克 100 至今，科技巨头共同走过了什么？</p>
-    <div class="card"><h3>QQQ 走势（月线 · 对数坐标）</h3><div class="chart short" id="ch-tech-etf"></div></div>
-    <div class="grid-2">
-      <div class="card"><h3>QQQ 年度回报</h3><div class="chart short" id="ch-tech-etf-annual"></div></div>
-      <div class="card"><h3>QQQ 回撤曲线</h3><div class="chart short" id="ch-tech-etf-dd"></div></div>
-    </div>
-  </div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>成长的对照</h2></div>
-    <p class="chapter-q">同样的 100 元，各自长成了多少？</p>
-    <div class="card"><h3>七巨头等权指数（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">NVDA / MSFT / GOOGL / AMZN / META / AAPL / TSLA 等权、每日再平衡，自 Meta 2012 上市同一起跑线；墨色粗线为指数，图例括号内为各自总倍数。</div><div class="chart" id="ch-mag7"></div></div>
-    <div class="card"><h3>归一化成长曲线（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">九只成员自最晚上市者同一起跑线（Meta 2012 上市）；墨色粗线为等权组合。</div><div class="chart" id="ch-tech-growth"></div></div>
-    <div class="card"><h3>个股对照</h3><div class="sub">年化收益按各自币种计；YTD 为年初至今涨跌 · 点击任意一行进入个股页</div><div class="table-wrap"><table id="tech-table"></table></div></div>
-  </div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>组合的脾气</h2></div>
-    <p class="chapter-q">等权拿着这九只，年景和回撤什么样？</p>
-    <div class="grid-2">
-      <div class="card"><h3>等权组合年度回报</h3><div class="chart short" id="ch-tech-annual"></div></div>
-      <div class="card"><h3>等权组合回撤曲线</h3><div class="chart short" id="ch-tech-dd"></div></div>
-    </div>
-  </div>
-  </div>
-  <div class="basket-stock" id="tech-stock" style="display:none"></div>
-</section>
 
 <!-- ================= 金融 ================= -->
-<section class="panel" id="panel-fin">
-  <nav class="subnav" id="subnav-fin"></nav>
-  <div class="basket-overview" id="fin-overview">
-  <div class="hero">
-    <div class="kicker">FINTECH &amp; FINANCIALS</div>
-    <h1>金融：钱的生意</h1>
-    <p class="dek">银行、卡组织、投行、资管、券商、保险与加密/稳定币，十四只龙头。先看板块的锚 XLF，再点个股名徐徐展开各自的历史。</p>
-  </div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>板块的锚：XLF</h2></div>
-    <p class="chapter-q">1998 年至今，金融板块 ETF 走过了什么？</p>
-    <div class="card"><h3>XLF 走势（月线 · 对数坐标）</h3><div class="chart short" id="ch-fin-etf"></div></div>
-    <div class="grid-2">
-      <div class="card"><h3>XLF 年度回报</h3><div class="chart short" id="ch-fin-etf-annual"></div></div>
-      <div class="card"><h3>XLF 回撤曲线</h3><div class="chart short" id="ch-fin-etf-dd"></div></div>
-    </div>
-  </div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>成长的对照</h2></div>
-    <p class="chapter-q">同样的 100 元，各自长成了多少？</p>
-    <div class="card"><h3>归一化成长曲线（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">十一只核心成员自 2008-03（Visa 上市）同一起跑线；墨色粗线为等权组合。COIN/HOOD/CRCL 上市较晚，不入组合、只出个股页。</div><div class="chart" id="ch-fin-growth"></div></div>
-    <div class="card"><h3>个股对照</h3><div class="sub">年化收益按各自币种计；YTD 为年初至今涨跌 · 点击任意一行进入个股页</div><div class="table-wrap"><table id="fin-table"></table></div></div>
-  </div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>组合的脾气</h2></div>
-    <p class="chapter-q">等权拿着这十一只，年景和回撤什么样？</p>
-    <div class="grid-2">
-      <div class="card"><h3>等权组合年度回报</h3><div class="chart short" id="ch-fin-annual"></div></div>
-      <div class="card"><h3>等权组合回撤曲线</h3><div class="chart short" id="ch-fin-dd"></div></div>
-    </div>
-  </div>
-  </div>
-  <div class="basket-stock" id="fin-stock" style="display:none"></div>
-</section>
 
 <!-- ================= 消费 ================= -->
-<section class="panel" id="panel-consumer">
-  <nav class="subnav" id="subnav-consumer"></nav>
-  <div class="basket-overview" id="consumer-overview">
-  <div class="hero">
-    <div class="kicker">CONSUMER STAPLES &amp; DISCRETIONARY</div>
-    <h1>消费：慢变量的复利</h1>
-    <p class="dek">可乐、超市、仓储会员店、建材、折扣零售与快餐：六只穿越周期的消费龙头，锚定 XLP 与 XLY 双 ETF。</p>
-  </div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>板块的锚：XLP × XLY</h2></div>
-    <p class="chapter-q">防守与周期，两条消费曲线怎么走？</p>
-    <div class="card"><h3>XLP（必需消费）× XLY（可选消费）走势（月线 · 对数坐标）</h3><div class="chart short" id="ch-consumer-etf"></div></div>
-    <div class="grid-2">
-      <div class="card"><h3>XLP 年度回报</h3><div class="chart short" id="ch-consumer-etf-annual"></div></div>
-      <div class="card"><h3>XLY 年度回报</h3><div class="chart short" id="ch-consumer-etf2-annual"></div></div>
-    </div>
-  </div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>成长的对照</h2></div>
-    <p class="chapter-q">四十年维度，谁是真正的复利机器？</p>
-    <div class="card"><h3>归一化成长曲线（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">墨色粗线为六股等权组合</div><div class="chart" id="ch-consumer-growth"></div></div>
-    <div class="card"><h3>个股对照</h3><div class="sub">点击任意一行进入个股页</div><div class="table-wrap"><table id="consumer-table"></table></div></div>
-  </div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>组合的脾气</h2></div>
-    <p class="chapter-q">防守型组合的年景与回撤。</p>
-    <div class="grid-2">
-      <div class="card"><h3>等权组合年度回报</h3><div class="chart short" id="ch-consumer-annual"></div></div>
-      <div class="card"><h3>等权组合回撤曲线</h3><div class="chart short" id="ch-consumer-dd"></div></div>
-    </div>
-  </div>
-  </div>
-  <div class="basket-stock" id="consumer-stock" style="display:none"></div>
-</section>
 
 <!-- ================= 奢侈品 ================= -->
-<section class="panel" id="panel-luxury">
-  <nav class="subnav" id="subnav-luxury"></nav>
-  <div class="basket-overview" id="luxury-overview">
-  <div class="hero">
-    <div class="kicker">LUXURY · SINCE 2015</div>
-    <h1>奢侈品：定价权的溢价</h1>
-    <p class="dek">LVMH、爱马仕、法拉利：三只对定价权的信仰（起点 2015-10，法拉利上市；欧股按欧元计价）。</p>
-  </div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>成长的对照</h2></div>
-    <p class="chapter-q">同为奢侈品，分化有多大？</p>
-    <div class="card"><h3>归一化成长曲线（起点 = 100 · 对数坐标 · 周线）</h3><div class="sub">墨色粗线为三股等权组合；MC/RMS 为欧元、RACE 为美元，混币种仅供比较</div><div class="chart" id="ch-luxury-growth"></div></div>
-    <div class="card"><h3>个股对照</h3><div class="table-wrap"><table id="luxury-table"></table></div></div>
-  </div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>组合的脾气</h2></div>
-    <p class="chapter-q">奢侈品也有熊市。</p>
-    <div class="grid-2">
-      <div class="card"><h3>等权组合年度回报</h3><div class="chart short" id="ch-luxury-annual"></div></div>
-      <div class="card"><h3>等权组合回撤曲线</h3><div class="chart short" id="ch-luxury-dd"></div></div>
-    </div>
-  </div>
-  </div>
-  <div class="basket-stock" id="luxury-stock" style="display:none"></div>
-</section>
 
 <!-- ================= 宏观 ================= -->
-<section class="panel" id="panel-macro">
-  <div class="hero">
-    <div class="kicker">MACRO · CAPITAL / CREDIT / PRICES / GROWTH</div>
-    <h1>宏观：市场的水位</h1>
-    <p class="dek">资金面、信用、物价与增长：指数涨跌的四个上游变量，全部来自圣路易斯联储 FRED，随每日更新刷新。</p>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>资金面 · CAPITAL</h2></div>
-    <p class="chapter-q">钱贵不贵、多不多？隔夜利率是资金的体温计，逆回购与 Fed 资产负债表是流动性的蓄水池。</p>
-    <div class="card"><h3>隔夜利率：SOFR × EFFR × 联邦基金目标上限</h3><div class="chart short" id="ch-macro-rates"></div></div>
-    <div class="grid-2">
-      <div class="card"><h3>隔夜逆回购用量（ON RRP · 十亿美元）</h3><div class="sub">过剩流动性的蓄水池，抽干即水位警报</div><div class="chart short" id="ch-macro-rrp"></div></div>
-      <div class="card"><h3>Fed 资产负债表（WALCL · 万亿美元）</h3><div class="sub">QE 放水 / QT 收水的总闸门</div><div class="chart short" id="ch-macro-walcl"></div></div>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>信用 · CREDIT</h2></div>
-    <p class="chapter-q">Fed 政策方向写在收益率曲线上，违约恐惧写在信用利差里。</p>
-    <div class="card"><h3>国债收益率：2Y × 10Y × 20Y × 30Y</h3><div class="chart short" id="ch-macro-yields"></div></div>
-    <div class="grid-2">
-      <div class="card"><h3>期限利差：10Y − 2Y</h3><div class="sub">倒挂（&lt; 0）历来是衰退的前奏</div><div class="chart short" id="ch-macro-curve"></div></div>
-      <div class="card"><h3>信用利差：高收益 × 投资级 OAS</h3><div class="sub">CDS 级的违约恐惧温度计（美银美林指数）</div><div class="chart short" id="ch-macro-credit"></div></div>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>物价 · PRICES</h2></div>
-    <p class="chapter-q">CPI、核心 PCE 与 PPI：Fed 盯的就是这三条线回不回 2%。</p>
-    <div class="card"><h3>通胀同比：CPI × 核心 PCE × PPI</h3><div class="chart short" id="ch-macro-inflation"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第四章</span><h2>增长与就业 · GROWTH</h2></div>
-    <p class="chapter-q">GDP、非农、失业率与企业利润：基本面的四块基石。</p>
-    <div class="grid-2">
-      <div class="card"><h3>实际 GDP 环比年化</h3><div class="chart short" id="ch-macro-gdp"></div></div>
-      <div class="card"><h3>非农新增就业（千人/月）× 失业率</h3><div class="chart short" id="ch-macro-jobs"></div></div>
-    </div>
-    <div class="card"><h3>企业利润同比（季频）</h3><div class="sub">全美企业税后利润（FRED CP）：指数 EPS 的宏观母体</div><div class="chart short" id="ch-macro-profits"></div></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第五章</span><h2>仓位与杠杆 · POSITIONING</h2></div>
-    <p class="chapter-q">专业管理人实际把多少钱押在股票上？（嘴会说谎，仓位不会）</p>
-    <div class="card">
-      <h3>NAAIM 经理人敞口指数（2006 年至今 · 周频）</h3>
-      <div class="sub">NAAIM 会员主动管理人的平均股票敞口：0 = 空仓，100 = 满仓，大于 100 = 加杠杆；历史底部常见 20 以下 · 尾标为最新读数 · 底部滑块可拖拽缩放。CFTC 期货持仓与融资余额将陆续入列</div>
-      <div class="chart short" id="ch-naaim"></div>
-    </div>
-    <div class="card">
-      <h3>全社会股票配置（AIAE · 1945 年至今 · 季频）</h3>
-      <div class="sub">所有投资者手里，股票占「股票+债务」的比例：越高，全社会越把钱压在股票上。数据来自美联储资金流量表（Z.1）。这是 NAAIM 的慢镜头：一个是专业管理人这周的仓位，一个是整个社会几十年的配置。只报位置、不测方向。</div>
-      <div class="chart short" id="ch-aiae"></div>
-    </div>
-  </div>
-</section>
 
 <!-- ================= 恐惧的标价指数（LEAPS 贵贱温度计） ================= -->
-<section class="panel" id="panel-leaps">
-  <div class="hero">
-    <div class="kicker">LEAPS · 贵贱温度计</div>
-    <h1>恐惧的标价指数</h1>
-    <p class="dek">今天买长期期权（LEAPS，12–18 个月）在历史上算贵还是便宜？头条 = 1 年期市场波动率（VIX1Y）在过去 3 年的百分位：把三年里的每个交易日按贵贱排成一队，看今天排第几位，越高越贵。它只描述成本，不预测方向、不构成买卖建议：像油价牌告诉你今天油贵不贵，但不替你决定要不要开车。</p>
-  </div>
-
-  <p class="ledger-intro">官方定义：恐惧的标价指数（英文名 Fear-Price Index）是 Market Chronicle 每个交易日发布的长天期期权成本刻度：取 1 年期市场波动率（VIX1Y）在过去 3 年的百分位，读数 0 到 100，高即贵。它只描述成本，不测收益、不预测方向、不构成买卖建议。<br>序列标识 mc.fear_price.vix1y_pct3y.v1，公式与序列身份一经公开即不静默更改，任何口径迭代都会另立新版本。<br>它与 KAPX 指数是两条独立序列，公式不同、互不派生。曾用英文名 Fear's Price Tag、LEAPS Cost Gauge、The Price of Fear 均指同一序列。</p>
-<noscript><p class="ledger-intro" lang="en">Canonical definition: The Fear-Price Index (Chinese: 恐惧的标价指数) is a descriptive gauge of long-dated option cost published by Market Chronicle each trading day: the percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years, read 0 to 100, higher meaning historically more expensive. Descriptive only: never return-tested, not a trading signal, not investment advice. Series identifier: mc.fear_price.vix1y_pct3y.v1; the formula and series identity are never changed silently, and any revision would launch a new version. It is a separate series from the KAPX Index: the two use different formulas and neither is derived from the other. Formerly published in English as Fear's Price Tag, the LEAPS Cost Gauge and The Price of Fear, all legacy aliases of this same series. Machine-readable data: <a href="/data/leaps_gauge.json">/data/leaps_gauge.json</a> &middot; full brief: <a href="/llms.txt">/llms.txt</a></p></noscript>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第一章</span><h2>今天贵不贵</h2></div>
-    <p class="chapter-q">此刻买 LEAPS，价格在历史上处于什么位置？</p>
-    <div id="lg-hero"></div>
-    <div class="card">
-      <h3>恐惧的远期价目表 · VIX 期货逐月结算价</h3>
-      <div class="sub">真金白银交易出来的恐惧曲线，与上方指数轨互证：实线 = 最新结算，向右上倾斜 = 越远越贵；虚线 = 一周前对照；首点 = VIX 现值。期货接近 24 小时交易，官方账本每天只记这一笔结算价。</div>
-      <div class="chart" id="ch-leaps-vx"></div>
-    </div>
-    <!-- 2026-07-25：三个送达入口之一（头版 / K 指数 / 本页），位置统一贴着「当日读数」。
-         本行由页末上移（原在「保费与之后的走势」章末）：同一页两句同文=重复，且读数处才是它该在的地方。
-         口径不变：只说送达、不提价格、不做按钮；紧邻的是 #lg-hero 当日读数（描述性），
-         与本页各处历史对照/净值图保持距离，7·16 相邻性定案照旧。 -->
-    <div class="poem">这一页的读数，每个交易日盘前送进邮箱 → <a href="pricing">盘前数据简报</a></div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>贵贱的历史</h2></div>
-    <p class="chapter-q">拉长看，这个成本刻度是怎么走的？</p>
-    <div class="card">
-      <h3>恐惧的标价指数 · VIX1Y 三年滚动百分位（2007 年至今）</h3>
-      <div class="sub">纵轴越高越贵（0–100），50 为中性；绿色为可复现回测段，猩红为发布后逐日记录的前向台账（自 2026-07-13）；底部滑块可拖拽缩放</div>
-      <div class="chart tall" id="ch-leaps-gauge"></div>
-    </div>
-    <div class="card">
-      <h3>短端 vs 长端 · 同一个市场给两种时间开的价（2011 年至今）</h3>
-      <div class="sub">红线 = 1 年期（VIX1Y，LEAPS 对应的那截）；绿线 = 9 天期（VIX9D）。两线的间距 = 期限斜率；短端的波动远大于长端。</div>
-      <div class="chart tall" id="ch-leaps-ends"></div>
-    </div>
-    <div class="poem">这是温度计，不是策略。它只回答"贵还是便宜"，不回答"该不该买"。每个读数带 Git 时间戳，事前记录、公开可查。</div>
-  </div>
-
-  <!-- ===== 恐惧的分解（2026-07-17 自头版搬入；与上方 4 context 去重后剩四卡，JS 填充 #leaps-decomp） ===== -->
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>恐惧的分解</h2></div>
-    <p class="chapter-q">怕，是能拆开读的：有多少人在买保护、纳指比大盘多付多少保费、多少只股票还站在自己的长期均线上、恐贪指数的七个零件各指向哪。</p>
-    <div id="leaps-decomp"></div>
-    <div class="card">
-      <h3>谁在押注恐惧 · 杠杆基金在 VIX 期货的净头寸</h3>
-      <div class="sub">CFTC 官方持仓（2006 年至今）：每周二数据、周五发布，滞后三天；零线以下 = 净做空恐惧（历史常态），以上 = 净做多；虚线 = 资管机构对照 · 底部滑块可拖拽缩放</div>
-      <div class="chart tall" id="ch-leaps-cot"></div>
-    </div>
-  </div>
-
-  <!-- ===== 个股与板块（2026-07-18 新增；30 天口径，与上方 1 年口径不是一把尺，故用分隔带隔开） ===== -->
-  <div class="lg-divider"><span>个股与板块</span><em>以下为 30 天口径，与上方 1 年口径不是同一把尺</em></div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">个股 · 30 天</span><h2>个股的怕，与大盘的怕</h2></div>
-    <p class="chapter-q">大盘看着平静的时候，单只股票被标价成什么样？</p>
-    <div id="vf-hero"></div>
-    <div class="card">
-      <h3>各标的的贵贱百分位 · 30 天隐含波动率在过去 3 年的位置</h3>
-      <div class="sub">越高越贵（0–100），50 为中性；标普500成分股一行为成分股波动率的加权几何平均。<b>横向可比的是百分位、不是波动率本身</b>：个股波动天然高于指数，但百分位是各自跟自己的历史比，所以能放在一起看。历史不足 250 个交易日的标的不计算百分位，留空。</div>
-      <div class="chart" id="ch-vol-family"></div>
-    </div>
-    <div class="card">
-      <h3>做空成交结构 · 当日占比在自己三年历史中的位置</h3>
-      <div class="sub"><b>做空占比高 ≠ 有人看空。</b>做市商对冲、ETF 申赎套利、可转债对冲都会计入做空量：这里量的是卖方向成交的结构占比，不是情绪、不是持仓、更不是方向判断。所以本卡只报一件事：今天这个占比，放进这只票自己过去三年里排第几。历史不足 250 个交易日的不给百分位，留空。</div>
-      <div class="chart" id="ch-short-flow"></div>
-    </div>
-    <div class="poem">这一段量的是 30 天，上面那些量的是 1 年。同一个市场的两截时间，不能相减，也不能混着说。保费说的是价格，成交结构说的是今天的成交。至于「此刻还留着多少仓位」，那是另一本账，在下一章。</div>
-  </div>
-
-  <!-- ===== 做空的两本账（2026-07-19 新增）：流量与存量，五节 ===== -->
-  <div class="lg-divider"><span>做空的两本账</span><em>做空有两本账：持仓（多少股票正被做空）和成交（每天有多少做空在换手）。这一节反复证明一件事：换个数法，画面可能相反，所以只把它们并排摊开，不替你下结论。</em></div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">口径实验室</span><h2>换把尺，结论就翻了</h2></div>
-    <p class="chapter-q">下面这条线是 11 只大盘科技股的做空持仓，在各自历史里的平均位置。数据一个字没变，只换了衡量方式：一种数绝对股数，一种除以日均成交量。请按这个开关。</p>
-    <div class="seg" id="seg-breadth">
-      <button type="button" data-k="si" aria-selected="true">按持仓股数</button>
-      <button type="button" data-k="dtc" aria-selected="false">按补仓天数（÷ 成交量）</button>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <h3>做空持仓的广度 · 跨票平均分位</h3>
-        <div class="sub">每期取各标的在自身近 48 期（约两年）中的百分位，再跨票平均。50 为中性。样本不足 24 期的标的不参与当期平均。</div>
-        <div class="chart" id="ch-short-breadth"></div>
-      </div>
-      <!-- ⚠️ 标签与数字分开放在各自元素里：文本节点里混着 <b> 会把整句切碎，i18n 的 D 键匹配不上 -->
-      <div class="card readout">
-        <div class="cal-cap"><span>最近 6 期平均</span></div>
-        <div class="cal-big" id="cal-now">—</div>
-        <div class="cal-cap" style="margin-top:22px"><span>2024 全年</span></div>
-        <div class="cal-vs" id="cal-base">—</div>
-        <div class="cal-verdict" id="cal-verdict">—</div>
-      </div>
-    </div>
-    <div class="poem">同一批数字，除不除以成交量，指向相反的结论。所以这里不给判断，只把两把尺并排放着：你自己看它们分别说了什么。</div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">当前横截面</span><h2>此刻，谁的空头最拥挤</h2></div>
-    <p class="chapter-q">用补仓天数（持仓 ÷ 日均成交量）在自身近两年中的位置。它回答的是「相对于这只票自己的流动性，空头有多挤」：而不是「谁被做空的股数多」（大票天然多）。持仓高 ≠ 有人看空：做市商对冲、ETF 申赎套利、可转债与并购套利都会留下空头持仓。</p>
-    <div class="seg" id="seg-cross">
-      <button type="button" data-k="dtc" aria-selected="true">补仓天数分位</button>
-      <button type="button" data-k="si" aria-selected="false">持仓股数分位</button>
-      <button type="button" data-k="flow" aria-selected="false">当日做空占比分位（流量）</button>
-    </div>
-    <div class="card">
-      <h3>各标的的拥挤度百分位</h3>
-      <div class="sub">本表滞后约两周：每月两次结算，结算日之后约 8 个交易日才发布，所以它不是今天的读数，只能当缓慢变动的背景。历史不足 24 期的不给百分位，留空。</div>
-      <div class="chart tall" id="ch-short-interest"></div>
-      <p class="footnote" id="cross-note"></p>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">单票下钻</span><h2>一只票的两条命</h2></div>
-    <p class="chapter-q">上面是横截面，这里是纵切面。选一只票，看它的持仓（柱）与补仓天数（线）在最近 48 个结算期里怎么走。两者常常不同向：这正是「股数」与「拥挤度」不是一回事的直接证据。</p>
-    <div class="tk-picker" id="tk-picker"></div>
-    <div class="card">
-      <h3>持仓与拥挤度 · 最近 48 个结算期</h3>
-      <div class="sub">柱为做空持仓（股数，左轴），线为补仓天数（右轴）。两轴各自缩放，只看形状不看高低对比。</div>
-      <div class="chart tall" id="ch-short-single"></div>
-      <p class="footnote" id="single-note"></p>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">一个被数据否掉的提案</span><h2>「流量与存量背离」，是零</h2></div>
-    <p class="chapter-q">原本的设想是：某天做空成交占比冲高、但持仓没增，就说明那是对冲或套利而非建仓。听起来很顺：实测不成立。537 个结算窗口，横轴是流量，纵轴是持仓变化。按开关换配对方式。</p>
-    <div class="seg" id="seg-scatter">
-      <button type="button" data-k="lvl" aria-selected="true">流量水平 vs 持仓变化（原提案）</button>
-      <button type="button" data-k="chg" aria-selected="false">流量变化 vs 持仓变化（同类对同类）</button>
-    </div>
-    <div class="grid-2 wide-left">
-      <div class="card">
-        <h3>每个结算窗口一个点</h3>
-        <div class="sub">红点为个股，蓝点为 ETF（SPY / QQQ）。</div>
-        <div class="chart" id="ch-short-scatter"></div>
-      </div>
-      <div class="card readout">
-        <div class="cal-cap"><span>SPEARMAN 相关系数 · 全样本合并</span></div>
-        <div class="cal-big" id="sc-rho">—</div>
-        <div class="cal-cap" id="sc-n"></div>
-        <div class="cal-verdict" id="sc-verdict">—</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">显著性</span><h2>四只显著，但校正后一只不剩</h2></div>
-    <p class="chapter-q">把「流量变化 vs 持仓变化」逐票拆开，每只做 4,000 次置换检验。11 只里有 4 只 p&lt;0.05（纯随机的期望是 0.55 只）：说明确实有东西。但做多重比较校正（Bonferroni，阈值 p&lt;0.0045）之后，一只都不存活。</p>
-    <div class="card">
-      <h3>逐票相关系数与置换检验</h3>
-      <div class="sub">条形是 Spearman ρ，标红的是 p&lt;0.05。注意两只 ETF 精确为零：这与「ETF 的做空量由申赎套利主导、跟看空无关」的理论预期一致。一个符合理论的零值，比一堆勉强显著的正值更能说明这组数没被过度拟合。</div>
-      <div class="chart tall" id="ch-short-sig"></div>
-    </div>
-    <div class="poem">四只显著、校正后归零，这句话本身就是结论：有东西，但不够硬。所以这一章只陈列检验结果，不据此下任何判断。</div>
-  </div>
-
-  <!-- ===== 历史参照：恐惧极值之后（描述性记录，非建议） ===== -->
-  <div class="lg-divider"><span>历史参照 · 恐惧极值之后</span><em>以下为描述性历史记录，不是买卖建议</em></div>
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">历史参照</span><h2>恐惧极值之后</h2></div>
-    <p class="chapter-q">历史上每次极端恐惧（CNN 恐贪 &lt; 25）之后，市场怎么走了？以下是一份诚实的历史记录：陈列"之后发生了什么"，含赢的和输的，供你参照，不构成买卖建议。</p>
-    <div class="k-status" id="leaps-status"></div>
-    <div class="card">
-      <h3>CNN 恐贪 × 纳指 100（2011 年至今）</h3>
-      <div class="sub">黄色为 CNN 恐贪指数（左轴 0–100），蓝色为纳指 100（右轴 · 对数）；恐贪 &lt; 25 的极端恐惧期红色高亮，25 处虚线为极端恐惧线</div>
-      <div class="chart tall" id="ch-leaps"></div>
-    </div>
-    <div class="poem">恐惧极值标记的是情绪，不是估值底：2021 下半年几次极端恐惧，12 个月后仍在下方。这里陈列的是"之后发生了什么"，含赢与输，供你参照，不替你决定。</div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">历史参照 · 逐次对账</span><h2>每次极值之后的走势</h2></div>
-    <p class="chapter-q">2011 年以来每次极端恐惧，6 / 12 / 18 个月后指数在哪里？</p>
-    <div class="card">
-      <h3>恐贪 &lt; 25 · 逐次历史对账</h3>
-      <div class="sub">连续低于 25 的交易日聚为一段（间隔 &gt;10 个交易日记新段）；数字为该段首日起 6/12/18 个月（126/252/378 交易日）标普 500 与纳指 100 的涨跌幅：历史事实记录，非建议</div>
-      <div class="table-wrap table-scroll"><table id="leaps-table"></table></div>
-      <p class="footnote" id="leaps-verdict"></p>
-    </div>
-    <div class="card">
-      <h3>每一次极值都标在这条线上</h3>
-      <div class="sub">纳指 100（对数坐标）· 圆点 = 极端恐惧段起点（2011 年起）· 菱形 = K &lt; 1（2011 年起）· 点标记看当次之后 · 底部滑块可拖拽缩放</div>
-      <div class="chart" id="ch-leaps-map"></div>
-    </div>
-    <div class="card">
-      <h3>如果机械地每次都跟、持有 12 个月，历史上长什么样？</h3>
-      <div class="sub">净值 = 1 元照此规则操作后变成几元。这是一份<strong>诚实披露的历史记录，不是策略推荐</strong>：它约 6 成时间空仓，长期<strong>跑不赢一直持有纳指</strong>（两条虚线）。空仓期记零、不计成本与滑点，完整口径见方法论：列在这里是为了"连输的也摊开"，不是让你照做</div>
-      <div class="chart" id="ch-leaps-eq"></div>
-    </div>
-  </div>
-
-  <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">历史参照 · 保费</span><h2>保费与之后的走势</h2></div>
-    <p class="chapter-q">当日恐慌保费越贵，之后的走势就越大吗？（描述性观察，非规律承诺）</p>
-    <div class="card">
-      <h3>极值当日的 VIX × 12 个月后的纳指</h3>
-      <div class="sub">每个点是一次极端恐惧段：横轴 = 当日 VIX（恐慌的保费水位），纵轴 = 12 个月后纳指涨跌幅；绿 = 涨、红 = 跌 · 点任意点看当次 · 历史描述，非建议</div>
-      <div class="chart short" id="ch-leaps-vix"></div>
-    </div>
-    <div class="card">
-      <h3>滚动三年年化：机械跟随 vs 一直持有（历史对照）</h3>
-      <div class="sub">任一时点回看三年的年化收益率；实线为机械跟随、虚线为满仓两个锚：纯历史对照，说明"低暴露≠更优"，非策略推荐 · 底部滑块可拖拽缩放</div>
-      <div class="chart" id="ch-leaps-roll"></div>
-    </div>
-    <!-- 2026-07-25：本行已上移至第一章「今天贵不贵」读数之下（三个入口定案）。
-         此处不再重复同一句：一页两遍等于把「只说送达」的克制说没了。 -->
-  </div>
-</section>
 
 <!-- ================= 关于 ================= -->
-<section class="panel" id="panel-about">
-  <div class="doc-page">
-    <div class="hero"><div class="kicker">ABOUT · 关于</div><h1>关于美股编年史</h1>
-      <p class="dek">一个每个交易日收盘后自动更新的美股历史图表档案站：免费、无广告、代码公开。把近百年的市场，做成一部可以读的编年史。</p></div>
-    <div class="doc-body">
-      <h3>这是什么</h3>
-      <p>美股编年史（Market Chronicle）把标普 500、纳斯达克，以及金融、消费、奢侈品等个股篮子的历史，整理成章节式的可视化：回报的形状、危机的节奏、估值的锚、波动的纹理、时间的复利。除了长历史图表，还有自研的两把刻度加一本结果账：K 指数测市场怕不怕，恐惧的标价指数测恐惧现在值多少钱；台账把每条读数与之后的走势逐笔公开对账，赢的亏的都在。</p>
-      <h3>数据与口径</h3>
-      <p>价格与回报以复权收盘价（Adj Close）近似含分红总回报；估值 CAPE / PE(TTM) 来自 multpl / Robert Shiller 的长历史序列；恐惧贪婪指数来自 CNN；个股基本面来自 macrotrends 与 Yahoo Finance；板块涨跌分布由本站管线按标普 500 全成分股每日收盘统计。长历史图表多采用对数坐标，以如实呈现百年尺度上的涨跌：1929 年跌得比 2000、2008 深得多，图上就应当更陡，这是数据本身的诚实。本站对数字只做忠实转录：按官方源当日发布的值原样入账，绝不修改；源头日后修订时，旧记录保持原样：它记录的是「官方当时说了什么」：修订另行注明，绝不悄悄覆盖。</p>
-      <h3>怎么建的</h3>
-      <p>本站由一人搭建，纯静态托管：没有服务器，也没有数据库，站上的数据就是公开仓库里那几百个 JSON 文件，谁都能翻。数据管线用 Python（yfinance / pandas）+ GitHub Actions，每个交易日收盘后自动拉数、算指标、提交、重新部署。代码以 PolyForm Noncommercial 1.0.0 许可公开：非商业使用免费，商业使用需另行授权。</p>
-      <h3>一句话免责</h3>
-      <p>本站所有内容仅供信息与教育用途，<strong>不构成任何投资建议</strong>。市场有风险，决策请独立判断。</p>
-    </div>
-  </div>
-</section>
 
 <!-- ================= 联系 ================= -->
-<section class="panel" id="panel-contact">
-  <div class="doc-page">
-    <div class="hero"><div class="kicker">CONTACT · 联系</div><h1>联系我</h1>
-      <p class="dek">数据问题、功能建议、合作，欢迎随时来找。</p></div>
-    <div class="doc-body">
-      <div class="contact-icons">
-        <a class="ci ci-web" href="https://klay-wang.com/" target="_blank" rel="noopener" title="klay-wang.com" aria-label="Personal website"><svg class="c-ic c-ic-web" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm7.93 9h-3.02c-.13-2.4-.72-4.6-1.64-6.24A8.01 8.01 0 0119.93 11zM12 4.04c1.1 1.36 1.95 3.82 2.11 6.96H9.89c.16-3.14 1.01-5.6 2.11-6.96zM8.73 4.76C7.81 6.4 7.22 8.6 7.09 11H4.07a8.01 8.01 0 014.66-6.24zM4.07 13h3.02c.13 2.4.72 4.6 1.64 6.24A8.01 8.01 0 014.07 13zM12 19.96c-1.1-1.36-1.95-3.82-2.11-6.96h4.22c-.16 3.14-1.01 5.6-2.11 6.96zm3.27-.72c.92-1.64 1.51-3.84 1.64-6.24h3.02a8.01 8.01 0 01-4.66 6.24z"/></svg></a>
-        <a class="ci ci-mail" href="mailto:klaywang24+marketchronicle@gmail.com" title="klaywang24+marketchronicle@gmail.com" aria-label="Email"><svg class="c-ic c-ic-mailbox" viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="4" width="21" height="16" rx="2.5" fill="#0f6cbd"/><path d="M2.5 5.5 12 13l9.5-7.5" stroke="#fff" stroke-width="1.8" fill="none"/></svg></a>
-        <a class="ci ci-x" href="https://x.com/_Klay24_" target="_blank" rel="noopener" title="@_Klay24_" aria-label="X"><svg class="c-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
-        <a class="ci ci-github" href="https://github.com/klaywang24" target="_blank" rel="noopener" title="klaywang24" aria-label="GitHub"><svg class="c-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
-        <a class="ci ci-discord" href="https://discord.gg/MnMEZg7Kx2" target="_blank" rel="noopener" title="Discord" aria-label="Discord"><svg class="c-ic c-ic-discord" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg></a>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ================= 隐私政策 ================= -->
-<section class="panel" id="panel-privacy">
-  <div class="doc-page">
-    <div class="hero"><div class="kicker">PRIVACY</div><h1>隐私政策</h1>
-      <p class="dek">最后更新：2026-07-05</p></div>
-    <div class="doc-body">
-      <p class="doc-fineprint">本页为合规信息说明，非法律意见。</p>
-      <h3>概述与运营者</h3>
-      <p>本站是托管在 Cloudflare Pages 上的纯静态网站，没有账户系统、没有服务器后端。本站由个人独立运营（即数据控制者 / data controller）。任何隐私相关请求，请邮件 <a href="mailto:klaywang24+marketchronicle@gmail.com">klaywang24+marketchronicle@gmail.com</a>。</p>
-      <h3>我们处理哪些数据、依据是什么</h3>
-      <p>本站不主动收集你主动提交的个人信息。可能涉及的数据仅有：</p>
-      <ul>
-        <li><strong>服务器访问日志</strong>：托管方 Cloudflare 在向你提供网页时，可能记录你的 IP、浏览器 UA 等技术信息（处理依据：为提供网站服务的正当利益 / legitimate interest）。这些日志由 Cloudflare 掌握与控制，我们无法访问其明细。</li>
-        <li><strong>浏览器本地存储</strong>：仅用于记住你的「日/夜主题」与「界面语言」两项偏好，属功能必需，存在你本地设备、不上传、不含可识别到你的个人身份信息。</li>
-      </ul>
-      <h3>Cookie</h3>
-      <p>我们<strong>自己不设置任何追踪 cookie，也不运行自建统计分析</strong>。下述第三方组件可能设置其自身 cookie；你可随时在浏览器中屏蔽或清除。</p>
-      <h3>第三方与跨境传输</h3>
-      <p>加载页面时会向以下第三方发起请求，可能将你的 IP 等技术信息传输至你所在地以外（含美国等）的服务器，它们各自的隐私政策适用，我们不控制其处理行为：</p>
-      <ul>
-        <li>Google Fonts（fonts.googleapis.com）：网页字体；</li>
-<!-- 2026-07-26 §45：TradingView 热力图 iframe 已撤（改自有数据板块涨跌图），条目同批移除。 -->
-        <li>parqet（assets.parqet.com）：公司 logo 图标；</li>
-        <li>Cloudflare Web Analytics（cloudflareinsights.com）：无 Cookie 的聚合访问统计（访问量、来源、国家/地区），不设 Cookie、不做跨站追踪，我们看不到任何单个访客的身份或 IP；</li>
-        <li>Cloudflare Pages（pages.dev）：网站托管方。</li>
-      </ul>
-      <h3>我们不做的事</h3>
-      <p>我们<strong>不出售、不出租、不交易你的个人信息</strong>（包括美国加州 CCPA 定义下的「出售 / 分享」），也不进行定向广告。</p>
-      <h3>你的权利</h3>
-      <p>在适用法律（如欧盟 GDPR、英国 UK-GDPR、加州 CCPA/CPRA）下，你可能享有访问、更正、删除、限制或反对处理、数据可携等权利。由于本站几乎不掌握可识别到你个人的数据，多数请求可直接通过清除浏览器数据完成；如需我们协助，请邮件联系，我们将在合理期限内回应。你也有权向你所在地的数据保护机构投诉。</p>
-      <h3>儿童</h3>
-      <p>本站不面向 13 岁以下儿童，也不会有意收集其信息。</p>
-      <h3>变更与联系</h3>
-      <p>政策如有更新，会在本页顶部注明最后更新日期。隐私相关问题，请邮件 <a href="mailto:klaywang24+marketchronicle@gmail.com">klaywang24+marketchronicle@gmail.com</a>。</p>
-    </div>
-  </div>
-</section>
 
 <!-- ================= 服务条款 ================= -->
-<section class="panel" id="panel-terms">
-  <div class="doc-page">
-    <div class="hero"><div class="kicker">TERMS</div><h1>服务条款</h1>
-      <p class="dek">最后更新：2026-07-06</p></div>
-    <div class="doc-body">
-      <h3>运营者</h3>
-      <p>本网站及其付费产品由个人经营者 <strong>XIN WANG</strong>（品牌名：Market Chronicle）运营。联系方式见「联系」页。</p>
-      <h3>接受条款</h3>
-      <p>访问或使用本站，即表示你已阅读并同意以下条款。</p>
-      <h3>用途与非投资建议</h3>
-      <p>本站内容仅供信息与教育用途，<strong>不构成任何投资、财务、法律或税务建议</strong>。所有数据可能存在延迟、错误或不完整，请勿仅凭本站信息做出交易或投资决策。</p>
-      <h3>无担保</h3>
-      <p>本站按「现状」与「现有」提供，不对其准确性、完整性、可用性或对特定用途的适用性作任何明示或默示担保。</p>
-      <h3>责任限制</h3>
-      <p>在适用法律允许的最大范围内，对于因使用或无法使用本站而产生的任何直接或间接损失，我们不承担责任。</p>
-      <h3>知识产权与第三方</h3>
-      <p>本站代码以 PolyForm Noncommercial 1.0.0 许可公开（见 GitHub 仓库）：非商业使用免费，商业使用需另行授权；图表与文案供个人非商业参考。站内引用的第三方服务受其各自条款约束。</p>
-      <h3>付费产品与结算</h3>
-      <p>本站的付费订阅产品由支付服务商 <strong>Paddle 作为 Merchant of Record（记录商户）</strong> 处理结账、发票与税费：即你的付款合同对方为 Paddle，其条款与隐私政策一并适用。购买者须年满 18 周岁或所在地法定成年年龄。退款遵循本站《退款政策》。</p>
-      <h3>适用法律与可分割性</h3>
-      <p>本条款受运营者所在司法管辖区的法律约束（具体管辖地将随正式运营明确）。若其中任一条款被认定无效，其余条款仍然有效。本条款构成你与我们之间就使用本站的完整约定。</p>
-      <h3>变更</h3>
-      <p>我们可能随时更新本条款，更新后继续使用即视为接受。</p>
-    </div>
-  </div>
-</section>
 
 <!-- ================= 退款政策 ================= -->
-<section class="panel" id="panel-refunds">
-  <div class="doc-page">
-    <div class="hero"><div class="kicker">REFUNDS</div><h1>退款政策</h1>
-      <p class="dek">最后更新：2026-07-14</p></div>
-    <div class="doc-body">
-      <h3>适用范围</h3>
-      <p>本政策适用于本站的付费订阅：<strong>Standard · 每日盘前数据简报</strong>（$29 / 月，或 $290 / 年）。网站本身的全部图表、台账与方法论<strong>永久免费开放</strong>，不涉及退款。</p>
-      <h3>退款条件</h3>
-      <ul>
-        <li><strong>14 天无理由退款</strong>：订阅后 14 天内不满意，可全额退款，无需说明理由；</li>
-        <li>退款通过支付服务商 Paddle 处理，原路退回；</li>
-        <li>申请方式：邮件 <a href="mailto:klaywang24+marketchronicle@gmail.com">klaywang24+marketchronicle@gmail.com</a>，附订单信息即可。</li>
-      </ul>
-      <p>本政策自 2026-07-14 起生效。你所在地消费者保护法赋予的更高权利（如更长的无条件撤销期）优先适用。</p>
-    </div>
-  </div>
-</section>
 
 <!-- ================= 方法论 ================= -->
-<section class="panel" id="panel-methodology">
-  <div class="doc-page">
-    <div class="hero"><div class="kicker">METHODOLOGY · 方法论</div><h1>方法论：两把刻度，一本结果账</h1>
-      <p class="dek">定义、公式、统计口径与全部历史结果：包括失效的那几次。本页所有数字由每日数据管线自动更新的公开 JSON 支撑；上线（2026 年 7 月）起的读数带 GitHub 提交时间戳、为事前记录，之前回溯至 2011 年的历史台账则为公开数据回填、可独立复现。</p></div>
-    <div class="doc-body">
-      <h3>K 指数（KAPX Index）</h3>
-      <p>定义：<strong>K = CNN 恐惧贪婪指数 ÷ VIX</strong>。当恐惧（CNN 走低）与波动（VIX 走高）同时出现，K 跌破 1，记为一次信号。聚类口径：连续 K &lt; 1 的交易日聚为一次信号，间隔超过 10 个交易日记为新信号。收益视界：信号首日纳指 100 收盘价之后 20 / 40 / 60 个交易日的涨跌幅。</p>
-      <p><strong>官方定义（canonical）</strong>：KAPX 指数（K 取自「恐」字拼音首字母）是 Market Chronicle 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。读数、方法论与完整信号台账永久免费公开：上线（2026-07）起为逐日事前记录，2011 至上线前为公开数据回填、可独立复现；见证链公开可查：哈希链台账、GitHub 公开发布、第三方网页存档、Zenodo DOI 检查点。英文引用统一使用 <strong>the KAPX Index</strong>（此前英文材料中的 K-Index 为同一指标；中文名「K 指数」不变）。</p>
-      <p>截至 2026 年 7 月：2011 年以来共 39 次信号，60 个交易日视界下 26 次上涨、13 次下跌：V 形回调中胜率高，2011、2015、2018 年底、2022 等持续压力期多次为负；所有信号持有至今全部为正。逐次对账表见「<a href="kindex">K 指数</a>」页，原始数据见 <a href="https://chronicle.klay-wang.com/data/kindex_signals.json" target="_blank" rel="noopener">kindex_signals.json</a>。</p>
-      <h3>恐惧的标价指数（LEAPS 贵贱温度计）</h3>
-      <p>定义：头条 = <strong>1 年期市场波动率（VIX1Y）在过去 3 年的百分位</strong>，0 = 历史最便宜、100 = 历史最贵。它回答一个问题：今天买长期期权（LEAPS，12–18 个月）在历史上算贵还是便宜。旁配 5 年 / 全史两个坐标，以及四项 context（只展示、不平均进头条）：VRP 波动税（VIX1Y − 1 年已实现波动率）、期限阶梯（VIX9D→VIX1Y）、Call 偏斜 SKEW（全史百分位）、10 年期实际利率（全史百分位）。为何用 VIX1Y：LEAPS 是长期期权，须用期限最贴近它的波动率：VIX1Y 是 Cboe 免费家族里最长、最接近的一档。</p>
-      <p><strong>它是描述性温度计，不是交易信号、不是预测。</strong>只描述"贵不贵"，不说"该不该买"：像油价牌告诉你今天油贵不贵，但不替你决定要不要开车。因此本指数<strong>永不以择时/入场工具名义营销、永不测收益</strong>。公式一经注册即冻结（VIX1Y 头条 / 高=贵 / 三窗口 / 四 context），迭代即另立新兄弟。数据回填至 2007 年、可独立复现；2026 年 7 月发布起的读数带 GitHub 提交时间戳、为事前记录。原始数据见 <a href="https://chronicle.klay-wang.com/data/leaps_gauge.json" target="_blank" rel="noopener">leaps_gauge.json</a>。</p>
-      <h3>LEAPS 窗口（历史参照）</h3>
-      <p>定义：CNN 恐惧贪婪指数收于 <strong>25 以下（极端恐惧）</strong>，即记为一段；连续低于 25 的交易日聚为同一段。视界：该段首日之后 6 / 12 / 18 个月的标普 500 与纳指 100 涨跌幅。这是一份"恐惧极值之后发生了什么"的<strong>描述性历史记录，非买卖建议</strong>。</p>
-      <p>截至 2026 年 7 月：2011 年以来共 45 次窗口，12 个月视界下纳指 100 为 34 涨 7 跌（其余尚未满 12 个月）：2021 年下半年的几次窗口 12 个月后为负，<strong>情绪极值不等于估值底</strong>。逐次对账见「<a href="leaps">LEAPS 窗口</a>」页，原始数据见 <a href="https://chronicle.klay-wang.com/data/leaps.json" target="_blank" rel="noopener">leaps.json</a>。</p>
-      <h3>「如果每次都跟」的口径与如实披露</h3>
-      <p>先说人话：<strong>净值就是「1 元变几元」</strong>：曲线走到 ×9.5，意思是期初投入的 1 元变成了 9.5 元。计算规则：窗口（或信号）首日按纳指 100 收盘价入场，LEAPS 窗口持有 12 个月、K 信号持有 60 个交易日后离场；持有期内出现的新信号跳过、不加仓、不重置；空仓期收益记零；不计交易成本、滑点与税费。</p>
-      <p>如实披露（截至 2026 年 7 月）：按此口径，LEAPS 策略（买纳指）2011 年以来净值约 <strong>9.5 倍</strong>：高于同期一直持有标普 500 的约 <strong>5.8 倍</strong>，低于一直持有纳指 100 的约 <strong>13.0 倍</strong>；K 策略 2011 年以来约 <strong>4.0 倍</strong>，明显低于同期一直持有纳指的约 <strong>13.0 倍</strong>。<strong>本站不宣称这些信号能跑赢同标的的买入持有。</strong>台账的价值在于告诉你「现在处于历史的哪个位置」，以及每一次极端情绪之后市场实际发生了什么：赢的和输的都在账上。</p>
-      <p>为什么 K 策略的净值远低于一直持有？因为它约有六成时间空仓：只在 K &lt; 1 后持有 60 个交易日，其余时间收益记零。在一个长期上行的市场里，空仓越久，总收益就越难追上一直满仓：这是仓位暴露的结构性差异，不是信号失效。同一个原因也解释了它更浅的回撤（2011 年以来最大回撤约 <strong>−26.7%</strong>，浅于纳指 100 的 −35.6% 与标普 500 的 −33.9%）：一半时间不在场，下跌自然也躲过一半：这是低暴露的机械结果，并非择时技巧。<strong>净值垫底与回撤最浅，是同一枚硬币的两面。</strong>宜把 K 当作定位「现在有多恐慌」的刻度、恐慌时部署现金的纪律锚，而非用来跑赢大盘的策略。</p>
-      <p>基准说明：对账一律双锚：纳指 100（策略实际交易标的）与标普 500（主流市场锚）并列展示。情绪输入端为标普 / 全市场口径（VIX 期限结构仅标普体系有官方指数，恐贪指数本身以标普为中心），属数据现实而非选择。</p>
-      <h3>可验证性</h3>
-      <p>本站为纯静态架构：每个交易日收盘后，GitHub Actions 数据管线自动拉取数据、计算指标并提交至公开仓库。<strong>自本站上线（2026 年 7 月）起</strong>，每一天的读数都带有 Git 提交时间戳：<a href="https://github.com/klaywang24/market-chronicle/commits/main" target="_blank" rel="noopener">提交历史</a>公开可查，属事前记录。<strong>管线偶尔会因技术故障漏跑</strong>：发生时读数于修复后补录，<strong>Git 历史里能清楚看到哪天是当日提交、哪天是补录，我们不抹平这个差别</strong>；已发生的故障逐次记录在下方「已知特性与局限」。<strong>上线之前、回溯至 2011 年的历史台账</strong>，则是按公开公式、用公开历史数据（CNN 恐贪存档 + VIX）回填而成：任何人都能用同样的公开数据独立复现，但属历史回填、并非事前提交。两段口径分开标注，不混为一谈。</p>
-      <h3>已知特性与局限</h3>
-      <p><strong>2026-07-12 → 07-14 管线故障（已修复）</strong>：<code>scripts/build_data.py</code> 中一个仍被下游使用的变量，在 2026-07-12 的一次改动里被误删，导致 daily-update 连续失败；<strong>07-13、07-14 两个交易日未能当日提交</strong>，读数于 07-15 补录（commit <code>569e047</code>）。数据本身由公开数据源重算得到、可独立复现，受影响的只是这两天的<strong>提交时间戳</strong>：按本站口径，它们属「补录」而非「事前」。故障已修复（commit <code>82f5822</code>），并补上了失败告警：此前的通知脚本在管线失败时仍会读取旧数据、发出一条看起来正常的播报，把故障静默掉了。</p>
-      <p>VIX 本身是 CNN 恐惧贪婪指数七个分量之一（其「市场波动」分量以 VIX 相对 50 日均线衡量）。而 K = CNN 恐贪 ÷ VIX，因此 VIX 通过两条同向通道影响 K：分母直接除以 VIX，分子里还占约七分之一的波动分量：波动率被部分双重计重。这意味着 KAPX 对波动率的敏感度，高于一个「完全独立的恐惧 ÷ 波动率」比值，「两个独立信号相除」的说法并不严格（约七分之六的恐贪独立于 VIX）。这不是缺陷：可把 KAPX 理解为一个「偏重波动率应激的恐惧指标」，对本指标「在恐慌与波动同时极端时定位历史坐标」的用途而言，这份灵敏度正是想要的。我们如实披露这一重叠，而非悄悄剔除：公式一经公开即不静默更改，任何口径迭代都会另立新版本。</p>
-      <h3>数据源</h3>
-      <p>CNN Fear &amp; Greed（whit3rabbit 每日存档 + CNN 官方接口当日值）；价格与 VIX 来自 Yahoo Finance（复权收盘价近似含分红总回报）；VIX 期限结构（VIX9D / VIX3M / VIX6M）来自 Cboe 官方历史数据；Put/Call 比为 CNN 口径的全市场 5 日均值；估值长历史来自 multpl / Robert Shiller。机器可读入口见 <a href="https://chronicle.klay-wang.com/llms.txt" target="_blank" rel="noopener">llms.txt</a>。KAPX 指数历史读数亦以公开数据集形式发布于 <a href="https://www.kaggle.com/datasets/klaywong/kapx-index-daily-fear-pricing-gauge" target="_blank" rel="noopener">Kaggle</a> 与 <a href="https://huggingface.co/datasets/klay24/kapx-index" target="_blank" rel="noopener">Hugging Face</a>（CC BY 4.0，季度更新）。</p>
-      <p>数据修订说明：CNN 恐贪存档对最近数日的读数可能有 ±1–2 点的事后修订（当日实时快照会被官方历史值替换），台账随每日管线自动吸收修订；收益视界一律在无缺日的价格日历上按交易日计。</p>
-      <h3>引用</h3>
-      <p>引用 K 指数或 LEAPS 窗口数据时，请注明来源：<strong>KAPX Index — Market Chronicle（chronicle.klay-wang.com）</strong>（此前英文引用名 K-Index 指同一指标）。需要可引用的版本时，用月度快照的 DOI <a href="https://doi.org/10.5281/zenodo.21783004" target="_blank" rel="noopener">10.5281/zenodo.21783004</a>，它永远指向最新一版。我们以 PolyForm Noncommercial 1.0.0 提供的是这本账的编排与衍生计算，非商业使用免费；其中的原始数值是各源发布的事实，我们不对它们主张所有权，其条款以各源为准。</p>
-      <p class="doc-fineprint">本页所有统计仅供信息与教育用途，不构成投资建议；历史表现不预示未来。</p>
-    </div>
-  </div>
-</section>
 
 <!-- ================= 定价 ================= -->
-<section class="panel" id="panel-pricing">
-  <div class="doc-page">
-    <div class="hero"><div class="kicker">PRICING · 定价</div><h1>定价</h1>
-      <p class="dek">本站不荐股、不预测、不晒收益：想要这三样，请出门右转。每个开盘前只回答三个问题：今天贵不贵，市场怕不怕，这个位置在历史上排第几。三分钟人话，错了不删。</p></div>
-    <div class="doc-body">
-      <div class="pbill">
-        <div class="pbill-inner">
-          <button class="pbill-btn active" data-bill="m">按月</button>
-          <button class="pbill-btn" data-bill="y">按年</button>
-        </div>
-        <div class="pbill-note">按年 = 10 个月价 · 省 2 个月</div>
-      </div>
-      <div class="pricing-tiers" id="pricing-tiers">
-        <div class="ptier t-free">
-          <div class="ptier-name">免费 · Free</div>
-          <div class="ptier-price">$0<i class="u">永久</i></div>
-          <div class="ptier-tag">网站永远免费开放</div>
-          <ul class="ptier-list">
-            <li>全部指数台账 + 当日读数（恐惧的标价指数 / K 指数 / 市场温度）</li>
-            <li>百年历史图表 + 方法论 + 板块涨跌分布</li>
-            <li>GitHub 提交历史逐日可验证</li>
-            <li>极端读数出现的那天，一封免费邮件（由读数触发，不按日历）</li>
-            <li>无广告 · 无墙 · 无需注册</li>
-          </ul>
-          <!-- 2026-07-17 用户裁：免费订阅表单从站上整体移除（曾在主页台账区→定价页 Free 档各待过一天）。
-               付费卡旁边放输入框=三卡动作不同构，且免费名单现阶段没用处。免费报名唯一入口=Buttondown
-               托管页 buttondown.com/klay24（digest/外链用）。要恢复直接翻 f081ea0。 -->
-          <!-- 2026-07-26 用户裁：恢复（推翻上一条与 07-25 页脚删除）。理由：漏斗缺「不付钱但想再看看」
-               的容器，访客要么当场 $29 要么蒸发（Cloudflare：156 访客/周全落首页零沉淀）。口径不变=
-               极端读数免费信（/check-inbox/ /confirmed/ 两页一直在线，只是入口被拆了）。
-               ⚠️ 发送纪律：免费名单只收极端读数信；digest 发送对象绝不能再选 Everyone，
-               否则付费权益名不副实（7·20 定论原文），要用 Buttondown tag 区分。
-               不带 target="_blank"：券商 App 内置浏览器会吞新标签（f081ea0 原注释）。 -->
-          <!-- 2026-08-11：Buttondown 账号被终止，旧端点实测 POST 返回 400 ＝ 访客填了邮箱点下去数据掉进虚空。
-     改指 Substack。用 GET 到 /subscribe 并把邮箱带过去（该页会预填），实测 200；
-     不用 Substack 的 API 端点：跨站 POST 会被 CORS 挡，且没有免 JS 的成功页。
-     不带 target="_blank"：券商 App 内置浏览器会吞新标签（f081ea0 原注释，续用）。 -->
-<!-- 2026-08-11 二改（Klay 定）：去掉邮箱输入框，改成直接跳转。
-     原来是 GET 预填到 Substack：访客在本站打完邮箱，到 Substack 还要再确认一次＝两步，白流失一批人。
-     Substack 订阅页自己就要邮箱，本站再要一遍没有意义。一步到位，且这一跳仍记在本站 Cloudflare 里。
-     文案一字未动：「免费订阅」与注脚都是 i18n 的 D 键，改字＝英文态整段泄漏（硬规矩 §2）。
-     用 a 而非 button：不再提交表单，语义上是导航。`.sub-btn` 已有 width:100%，
-     只补 display/text-align/text-decoration 三条（走内联样式，不动 style.css ⇒ 不必 bump ?v=）。
-     不带 target="_blank"：券商 App 内置浏览器会吞新标签（f081ea0 原注释，续用）。 -->
-          <div class="ledger-sub">
-            <div class="sub-row">
-              <a class="sub-btn" href="https://fearprice.substack.com/subscribe" style="display:inline-block;text-align:center;text-decoration:none">免费订阅</a>
-            </div>
-            <div class="sub-note">免费 · 由读数触发，不按日历 · 随时退订，不发广告</div>
-          </div>
-        </div>
-        <div class="ptier featured">
-<!-- 2026-07-26 用户裁：删除创始价徽章 -->
-          <div class="ptier-name">Standard</div>
-          <div class="ptier-price"><span class="p-m">$29<i class="u">/ 月</i></span><span class="p-y">$290<i class="u">/ 年</i></span></div>
-          <div class="ptier-tag"><span class="p-m"></span><span class="p-y">≈ $24 / 月 · 年付 = 10 个月价</span></div>
-          <ul class="ptier-list">
-<!-- 2026-07-26 用户裁（今日判读卡同批）：原「每日判读正文：站上永不公开」。头版开始露每期开头
-     两句现象句（data/judgment_teaser.json），先改措辞再开卡，顺序不可反：承诺先行，机制跟上。 -->
-<!-- 2026-07-26 §45 时间墙定案（用户裁）：当日订户专享，往期归档公开 —— 头版存档墙同批上线。 -->
-            <li><b>当日判读全文</b>：盘前只进订户邮箱；往期归档公开可查</li>
-            <li><b>判读档案</b>：逐日归档，越攒越厚</li>
-<!-- 2026-07-25 用户裁：删除「每周一期传说处决：付费先看，30 天后公开」。该栏目暂时不产出，
-     售卖页不留不在交付的承诺。恢复时连同「30 天后公开」的公开落点一起做，否则承诺无处兑现。 -->
-            <li>期权结构数据表：覆盖美股期权成交量前列的十余只标的，清单随流动性调整</li>
-          </ul>
-          <div class="ptier-soon">订阅后 24 小时内开通（这一步由我手动完成），之后每个交易日开盘前送达。14 天内不满意可全额退款。</div>
-          <!-- 标签整串放进 p-m/p-y，不留裸文本节点：i18n 的 applyTo 按整节点精确匹配 D 字典，
-               而 D 里已有 "订阅"→"Subscribe"（i18n.js:49）。留 "订阅 " 单独成节点会被译成 Subscribe，
-               在「以 EN 加载→切回 ZH」这条路径上产生「Subscribe $29 / 月」混搭。整串不是 D 的 key，故安全。 -->
-          <a class="ptier-cta" href="#" id="pay-btn"><span class="p-m">订阅 $29 / 月</span><span class="p-y">订阅 $290 / 年</span></a>
-<!-- 2026-07-26 用户裁：删除「创始价 $9.9 · 邮件预约」次级 CTA。
-     理由（此前已议）：它对所有人可见，等于「两扇门」里那扇预约门不存在了 ——
-     任何陌生人都能发这封信拿 3 折，$29 就成了不看说明的人的价格，与设计初衷相反。 -->
-        </div>
-        <div class="ptier t-pro">
-          <div class="ptier-name">Pro</div>
-          <div class="ptier-price"><span class="p-m">$99<i class="u">/ 月</i></span><span class="p-y">$990<i class="u">/ 年</i></span></div>
-          <div class="ptier-tag"><span class="p-m">面向专业用户 · 数据自主</span><span class="p-y">≈ $82.5 / 月 · 年付 = 10 个月价</span></div>
-          <ul class="ptier-list">
-            <li>Standard 全部内容</li>
-            <li>CSV / 数据导出 + 全史数据下载</li>
-            <li>读数越过你设定阈值时邮件通知</li>
-            <li>API（远期）</li>
-          </ul>
-          <div class="ptier-soon">Standard 上线 3–6 个月后开放</div>
-        </div>
-      </div>
-      <p class="pay-methods"><strong>支付方式</strong>：支持 <img class="pay-ico" src="icons/pay/visa.svg" alt="" loading="lazy">Visa / <img class="pay-ico" src="icons/pay/mastercard.svg" alt="" loading="lazy">Mastercard / <img class="pay-ico" src="icons/pay/paypal.svg" alt="" loading="lazy">PayPal / <img class="pay-ico" src="icons/pay/applepay.svg" alt="" loading="lazy">Apple Pay / <img class="pay-ico" src="icons/pay/unionpay.svg" alt="" loading="lazy">银联信用卡。<br>不支持支付宝 / 微信 / 银联借记卡。</p>
-      <p><strong>数字，随处可见，永远免费。</strong>档案真正的用处在之后每次大跌的那天：你手里已经有一个 15 年没换过口径的读数。</p>
-      <p class="pricing-inst"><strong>机构 / 数据授权</strong>（序列授权、指数授权、再分发）— <a href="contact">联系我们</a>，不标价。</p>
-      <p>年付 = 10 个月价（$290 / $990）· 14 天无条件退款、无试用（免费层即试用）· 通过订阅邮件中的管理链接随时取消。订单与支付由 Merchant of Record 处理，账单上会显示其名称。<strong>仅为数据与信息，不构成投资建议，不含任何买卖推荐。</strong></p>
-      <p class="doc-fineprint">Pro 与 API 为后续规划，非最终承诺，上线时间待定。</p>
-    </div>
-  </div>
-</section>
 
 </main>
 
@@ -1131,6 +283,7 @@
              并从裸文件树改指向 data/README.md ： 先给上下文(来源/许可/口径)，再给 375 个 JSON。
              那份 README 同时是 GEO 资产：结构化、可被反复链接的说明页正是 LLM 摄取时最爱的东西。 -->
         <a href="https://github.com/klaywang24/market-chronicle/blob/main/data/README.md" target="_blank" rel="noopener">数据 &amp; API</a>
+        <a href="digest/">周报档案</a>
       </div>
       <div class="footer-col">
         <!-- 2026-07-16：法律三件套归一栏（服务条款原在 About、隐私/退款在这=一套东西拆两处）；
@@ -1146,8 +299,8 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260813a"></script>
-<script src="js/app.js?v=20260811a"></script>
+<script src="js/i18n.js?v=20260817a"></script>
+<script src="js/app.js?v=20260817a"></script>
 <script src="js/docs-i18n.js?v=20260807a"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>

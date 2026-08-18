@@ -74,7 +74,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260813a">
+<link rel="stylesheet" href="css/style.css?v=20260817a">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {
@@ -101,12 +101,12 @@
   <div class="topbar-navband">
    <div class="topbar-row">
     <nav class="tabs" id="tabs">
-      <button class="tab active" data-panel="pulse">今日</button>
+      <a class="tab active" href="/" data-panel="pulse">今日</a>
       <!-- 双标签（2026-07-25）：窄屏四项一行放不下（390px 实测差约 40px），此处按断点换短版。
            两版各自是独立文本节点，i18n 的 D 键分别匹配，且「K 指数」「恐惧的标价」两个键早已存在 —— 零新增翻译。
            不能改成 CSS 隐藏「· 台账」那半截：D 键按整个文本节点精确匹配，拆开就匹配不上了。 -->
-      <button class="tab" data-panel="kindex"><span class="t-full">K 指数 · 台账</span><span class="t-short">K 指数</span></button>
-      <button class="tab" data-panel="leaps"><span class="t-full">恐惧的标价 · 台账</span><span class="t-short">恐惧的标价</span></button>
+      <a class="tab" href="/kindex" data-panel="kindex"><span class="t-full">K 指数 · 台账</span><span class="t-short">K 指数</span></a>
+      <a class="tab" href="/leaps" data-panel="leaps"><span class="t-full">恐惧的标价 · 台账</span><span class="t-short">恐惧的标价</span></a>
       <!-- 2026-08-05 期权页转正（Klay 拍板免观察期）：/options 是平铺独立页不是 SPA 面板，
            所以用 <a> 不用 <button>——router 正则与 D 面板机制都不用动。
            EN 名刻意用短的 Options：EN 顶栏在 900-1379px 本就贴边（07-17 胶囊挤爆定案），别再加长词。 -->
@@ -116,18 +116,18 @@
            实测这七个面板共 42 章 / 78 卡（占全站内容 78%），但回访理由≈0；
            而每天变的三项（今日 / K 指数 / 恐惧的标价）此前被它们稀释成同级。
            顺带结构性解决 EN 顶栏溢出（此前靠隐藏订阅胶囊打补丁，见 style.css 同日注释）。
-           下拉项仍是 .tab[data-panel]，#tabs 的事件委托与 activatePanel 的 active 切换照常生效；
+           下拉项仍是 .tab[data-panel]（§57 起全部是 <a href>：爬虫走 href 内链，JS 委托拦截走 SPA；瘦身路由页上目标 panel 不在 DOM 时放行给浏览器整页导航）；
            触发器用 .tab-trigger（无 data-panel）以免被委托当成面板点击。 -->
       <div class="tab-group" id="archive-group">
         <button class="tab-trigger" id="archive-trigger" aria-haspopup="true" aria-expanded="false" aria-controls="archive-menu">百年档案</button>
         <div class="tab-menu" id="archive-menu" role="menu" hidden>
-          <button class="tab" role="menuitem" data-panel="macro">宏观</button>
-          <button class="tab" role="menuitem" data-panel="spy">标普 500</button>
-          <button class="tab" role="menuitem" data-panel="qqq">纳斯达克</button>
-          <button class="tab" role="menuitem" data-panel="tech">科技</button>
-          <button class="tab" role="menuitem" data-panel="fin">金融</button>
-          <button class="tab" role="menuitem" data-panel="consumer">消费</button>
-          <button class="tab" role="menuitem" data-panel="luxury">奢侈品</button>
+          <a class="tab" role="menuitem" href="/macro" data-panel="macro">宏观</a>
+          <a class="tab" role="menuitem" href="/spy" data-panel="spy">标普 500</a>
+          <a class="tab" role="menuitem" href="/qqq" data-panel="qqq">纳斯达克</a>
+          <a class="tab" role="menuitem" href="/tech" data-panel="tech">科技</a>
+          <a class="tab" role="menuitem" href="/fin" data-panel="fin">金融</a>
+          <a class="tab" role="menuitem" href="/consumer" data-panel="consumer">消费</a>
+          <a class="tab" role="menuitem" href="/luxury" data-panel="luxury">奢侈品</a>
         </div>
       </div>
     </nav>
@@ -1131,6 +1131,7 @@
              并从裸文件树改指向 data/README.md ： 先给上下文(来源/许可/口径)，再给 375 个 JSON。
              那份 README 同时是 GEO 资产：结构化、可被反复链接的说明页正是 LLM 摄取时最爱的东西。 -->
         <a href="https://github.com/klaywang24/market-chronicle/blob/main/data/README.md" target="_blank" rel="noopener">数据 &amp; API</a>
+        <a href="digest/">周报档案</a>
       </div>
       <div class="footer-col">
         <!-- 2026-07-16：法律三件套归一栏（服务条款原在 About、隐私/退款在这=一套东西拆两处）；
@@ -1146,8 +1147,8 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260813a"></script>
-<script src="js/app.js?v=20260811a"></script>
+<script src="js/i18n.js?v=20260817a"></script>
+<script src="js/app.js?v=20260817a"></script>
 <script src="js/docs-i18n.js?v=20260807a"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>

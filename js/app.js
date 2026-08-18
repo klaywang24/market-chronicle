@@ -233,8 +233,11 @@
 
   const panelDone = new Set();
   async function activatePanel(name) {
+    const target = document.getElementById("panel-" + name);
+    // §57 瘦身路由页只带自己的 panel：目标不在 DOM（popstate 等旁路进来）→ 整页导航
+    if (!target) { location.href = urlFor(name, ""); return; }
     document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
-    document.getElementById("panel-" + name).classList.add("active");
+    target.classList.add("active");
     document.querySelectorAll(".tab").forEach((t) =>
       t.classList.toggle("active", t.dataset.panel === name));
     // 档案下拉：组内任一面板激活时，触发器一并高亮（否则进了档案页顶栏看不出身在何处）
@@ -258,10 +261,8 @@
     if (currentStock) showStock(currentStock.basket, currentStock.safe);
   }
 
-  document.getElementById("tabs").addEventListener("click", (e) => {
-    const tab = e.target.closest(".tab");
-    if (tab) navigate(tab.dataset.panel);          // tab 是 button 不是 a，走不到链接委托，这里直接调
-  });
+  // §57：tab 从 <button> 换成 <a href> 后，顶栏点击统一走下方的全站链接委托
+  // （一个机制管所有站内链接，不再单设通道）。此处不再绑定。
 
   // ---------------- 百年档案下拉（2026-07-25 导航精简 10 → 4） ----------------
   // 七个静态档案面板收进下拉；选中态与开合状态分开管理：
@@ -899,6 +900,9 @@
     if (u.origin !== location.origin || !u.pathname.startsWith(ROOT)) return;
     const rest = u.pathname.slice(ROOT.length);
     if (rest !== "" && !registry[rest]) return;
+    // §57：瘦身路由页 registry 仍是全量，但 DOM 只有本页 panel——
+    // 目标面板不在 DOM 就放行给浏览器整页导航到对应路由页
+    if (!document.getElementById("panel-" + (rest || "pulse"))) return;
     e.preventDefault();
     navigate(rest || "pulse", new URLSearchParams(u.search).get("s") || "");
   });
@@ -1094,6 +1098,7 @@
     const on = cur.k < 1;
     const last = sig.signals[sig.signals.length - 1];
     const el = document.getElementById("k-status");
+    if (!el) return;  // §57 瘦身路由页：kindex 面板不在本页
     el.innerHTML = `
       <div class="stat ${on ? "signal-on" : ""}">
         <div class="label">今日 K 指数（${cur.date.replace(/-/g, "\u2011")}）</div>
@@ -1219,7 +1224,9 @@
   async function renderDDTable(dsName, tableId) {
     const d = await load(dsName);
     const top = d.episodes.slice(0, 10);
-    document.getElementById(tableId).innerHTML =
+    const _host1 = document.getElementById(tableId);
+    if (!_host1) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+    _host1.innerHTML =
       "<tr><th>峰值</th><th>谷底</th><th>深度</th><th>下跌(天)</th><th>修复(天)</th></tr>" +
       top.map((e) =>
         `<tr><td>${e.peak}</td><td>${e.trough}</td><td class="neg">${e.depth}%</td>` +
@@ -1414,6 +1421,7 @@
     const c = (v, suffix) => v == null ? "<td>--</td>" :
       `<td class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(1)}${suffix}</td>`;
     const tbl = document.getElementById(tableId);
+    if (!tbl) return;  // §57 瘦身路由页：该板块面板不在本页
     tbl.innerHTML =
       '<tr><th>代码</th><th class="left has-logo">名称</th><th>市值 ($B)</th><th>YTD</th><th>1年</th><th>3年年化</th><th>5年年化</th><th>10年年化</th><th>共同起点年化</th><th>最大回撤</th></tr>' +
       d.rows.map((r) =>
@@ -1483,7 +1491,9 @@
   async function renderHoldingTable(dsName, tableId) {
     const d = await load(dsName);
     const f = (v) => `<td class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(1)}%</td>`;
-    document.getElementById(tableId).innerHTML =
+    const _host2 = document.getElementById(tableId);
+    if (!_host2) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+    _host2.innerHTML =
       "<tr><th>持有期</th><th>胜率</th><th>年化中位</th><th>最差年化</th><th>最好年化</th><th>样本</th></tr>" +
       d.rows.map((r) =>
         `<tr><td>${r.years} 年</td><td>${r.win}%</td>` + f(r.median) + f(r.worst) + f(r.best) +
@@ -1517,7 +1527,9 @@
 
   async function renderBullBearTable(dsName, tableId) {
     const d = await load(dsName);
-    document.getElementById(tableId).innerHTML =
+    const _host3 = document.getElementById(tableId);
+    if (!_host3) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+    _host3.innerHTML =
       "<tr><th>阶段</th><th>起点</th><th>终点</th><th>涨跌</th><th>历时(天)</th></tr>" +
       d.cycles.slice().reverse().map((c) =>
         `<tr><td>${c.kind === "bull" ? "🐂 牛" : "🐻 熊"}</td><td>${c.start}</td><td>${c.end || "进行中"}</td>` +
@@ -1699,7 +1711,9 @@
 
   async function renderExtremesTable(dsName, tableId) {
     const d = await load(dsName);
-    document.getElementById(tableId).innerHTML =
+    const _host4 = document.getElementById(tableId);
+    if (!_host4) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+    _host4.innerHTML =
       "<tr><th>#</th><th>最差单日</th><th>跌幅</th><th>最好单日</th><th>涨幅</th></tr>" +
       d.worst.map((w, i) => {
         const b = d.best[i];
@@ -1792,7 +1806,9 @@
   async function renderConstituents(dsName, tableId) {
     const d = await load(dsName);
     const hasAdded = d.rows[0] && d.rows[0].added !== undefined;
-    document.getElementById(tableId).innerHTML =
+    const _host5 = document.getElementById(tableId);
+    if (!_host5) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+    _host5.innerHTML =
       `<tr><th>#</th><th>代码</th><th class="left center-col">公司</th><th class="left center-col">${hasAdded ? "GICS 行业" : "行业"}</th>${hasAdded ? "<th>纳入日期</th>" : ""}</tr>` +
       d.rows.map((r, i) =>
         `<tr><td>${i + 1}</td><td>${r.ticker}</td><td class="center-col"><span class="co-wrap">${tblLogo(r.ticker)}${r.name}</span></td>` +
@@ -1852,7 +1868,9 @@
       const curCape = cape.cape[cape.cape.length - 1];
       const capePct = percentile(cape.cape, curCape);
       const fwd = iv.SPY && iv.SPY.forward_pe;
-      document.getElementById("spy-val-cards").innerHTML = [
+      const _host6 = document.getElementById("spy-val-cards");
+      if (!_host6) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+      _host6.innerHTML = [
         ["当前 PE (TTM)", st.cur.toFixed(1), `全历史第 ${st.pct} 百分位`, st.pct > 90],
         ["席勒 CAPE", curCape.toFixed(1), `1871 年来第 ${capePct} 百分位`, capePct > 90],
         ["远期 PE (SPY 口径)", fwd ? fwd.toFixed(1) : "--", fwd ? "" : "免费源暂缺，参考 TTM", false],
@@ -1863,7 +1881,9 @@
         `口径说明：PE(TTM) 与 CAPE 来自 multpl/席勒月度数据（${st.since} 年起），百分位为当前值在全部历史读数中的位置；` +
         `三条中位数是三个不同时代的"估值重力"：离哪条锚越远，弹性拉得越满。数据截至 ${st.asof}。`;
       const qv = iv.QQQ || {};
-      document.getElementById("qqq-val-cards").innerHTML = [
+      const _host7 = document.getElementById("qqq-val-cards");
+      if (!_host7) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+      _host7.innerHTML = [
         ["QQQ PE (TTM · ETF 口径)", qv.trailing_pe ? qv.trailing_pe.toFixed(1) : "--", "持仓加权"],
         ["QQQ 远期 PE", qv.forward_pe ? qv.forward_pe.toFixed(1) : "--", qv.forward_pe ? "" : "免费源暂缺"],
         ["SPY PE 对照", iv.SPY && iv.SPY.trailing_pe ? iv.SPY.trailing_pe.toFixed(1) : "--", "同为 ETF 口径"],
@@ -2315,7 +2335,9 @@
   async function renderPulse() {
     let d, leaps = null, kd = null, ks = null;
     try { d = await load("pulse"); } catch (e) {
-      document.getElementById("pulse-base").innerHTML =
+      const _host8 = document.getElementById("pulse-base");
+      if (!_host8) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+      _host8.innerHTML =
         '<p style="color:var(--ink-muted)">数据更新中，稍后自动出现 · data updating</p>';
       return;
     }
@@ -2444,7 +2466,9 @@
     // 情绪仪表盘六卡已于 2026-07-17 迁往「恐惧的标价」页（renderFearDecomp）：
     // 与该页既有 4 context 去重后剩四卡（SKEW/期限结构两张删），头版不再渲染。
 
-    document.getElementById("pulse-base").innerHTML = `
+    const _host9 = document.getElementById("pulse-base");
+    if (!_host9) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+    _host9.innerHTML = `
       <div class="pulse-kicker">TODAY'S FRONT PAGE · ${d.date}</div>
       <div class="pulse-chartband"></div>
       <div class="pulse-head">
@@ -2674,7 +2698,9 @@
     const d = await load("leaps");
     const cur = d.current;
     const last = d.episodes[d.episodes.length - 1];
-    document.getElementById("leaps-status").innerHTML = `
+    const _host10 = document.getElementById("leaps-status");
+    if (!_host10) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+    _host10.innerHTML = `
       <div class="stat ${cur.window_open ? "signal-on" : ""}">
         <div class="label">今日 CNN 恐贪（${cur.date.replace(/-/g, "\u2011")}）</div>
         <div class="value">${cur.fng.toFixed(0)}</div>
@@ -2686,7 +2712,9 @@
 
     const cell = (v) => v == null ? "<td>--</td>" :
       `<td class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + v.toFixed(1)}%</td>`;
-    document.getElementById("leaps-table").innerHTML =
+    const _host11 = document.getElementById("leaps-table");
+    if (!_host11) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+    _host11.innerHTML =
       "<tr><th>#</th><th>窗口首日</th><th>持续(日)</th><th>最低恐贪</th>" +
       "<th>SPX+6m</th><th>SPX+12m</th><th>SPX+18m</th><th>NDX+6m</th><th>NDX+12m</th><th>NDX+18m</th><th>NDX至今</th></tr>" +
       d.episodes.slice().reverse().map((e, i) =>
@@ -2820,7 +2848,9 @@
     let d;
     try { d = await load("leaps_gauge"); }
     catch (e) {
-      document.getElementById("lg-hero").innerHTML =
+      const _host12 = document.getElementById("lg-hero");
+      if (!_host12) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+      _host12.innerHTML =
         '<div class="card"><p style="color:var(--ink-muted);font-size:13px">数据更新中，稍后自动出现 · data updating</p></div>';
       return;
     }
@@ -2841,7 +2871,9 @@
     const banner = m.degraded
       ? `<p class="lg-degraded">数据源中断：本页读数停在 ${c.date}（${m.stale_days} 天前），等待上游恢复。历史台账完整未受影响。</p>`
       : "";
-    document.getElementById("lg-hero").innerHTML = `
+    const _host13 = document.getElementById("lg-hero");
+    if (!_host13) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+    _host13.innerHTML = `
       <div class="card">${banner}
         <div class="lg-top">
           <div class="lg-num">
@@ -3597,7 +3629,9 @@
   renderBasketTable("luxury", "luxury-table");
   load("meta").then((m) => {
     // "数据更新于" 单独包 span 以便 i18n 词典翻译；日期语言中性
-    document.getElementById("meta-line").innerHTML =
+    const _host14 = document.getElementById("meta-line");
+    if (!_host14) return;  // §57 瘦身路由页：该面板不在本页，跳过填充
+    _host14.innerHTML =
       '<span>数据更新于</span> ' + m.updated.slice(0, 10);
     const [y, mo, dd] = m.updated.slice(0, 10).split("-");
     metaDate = `${dd}-${mo}-${y}`; // 日-月-年

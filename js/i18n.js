@@ -223,6 +223,7 @@
     "联系我们": ["Contact us", "", "", ""],
     "定价与套餐": ["Pricing & plans", "", "", ""],
     "数据 & API": ["Data & API", "", "", ""],
+    "周报档案": ["Weekly digest", "", "", ""],
     // ---- 温度计 hero 新版式碎片 ----
     // 下三键拼成一句（HTML 里 3 年 裹在 <b> 里）：译文按拼接后的英文语序设计，
     // 第三段带前导空格补 </b> 后没有空格的缝 —— 拼出 VIX1Y's percentile within the past 3 years (high = expensive)

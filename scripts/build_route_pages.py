@@ -6,8 +6,14 @@
 Google 眼里全是首页的复本，除首页外任何路由都进不了索引
 （2026-07-27 Search Console 邮件实锤，/pricing 上线以来搜索零可见）。
 
-方案：每个路由生成一份 index.html 的完整拷贝，只替换头部身份
-（title / description / canonical / og）。Cloudflare Pages 对平铺文件
+方案（§57，2026-08-17 重做）：每个路由页 = index.html 换头部身份
+（title / description / canonical / og）+ **正文只保留自己的那个 panel**。
+07-30 首版只换头、正文 17 份逐字节相同，Google 判重看正文不看 head ——
+08-08 GSC 邮件「重复网页，Google 选择的规范网页与用户指定的不同」实锤，
+canonical 声明在正文雷同时不被采信。tab 已换成 <a href>（app.js 委托拦截），
+瘦身页上点到不存在的 panel 时浏览器整页导航到对应路由页。
+sitemap.xml 也由本脚本生成（expected_sitemap_urls 是清单唯一实现，
+tools/check_route_pages.py 闸用同一函数对账）。Cloudflare Pages 对平铺文件
 foo.html 服务在 /foo（无尾斜杠），与 _redirects 现有规则同向；
 🚨 绝不能用 foo/index.html 目录形式 —— Pages 会把 /foo 308 到 /foo/，
 与 _redirects 里 /foo/ → /foo 的 301 对撞成无限循环（/welcome 线上实测
@@ -21,8 +27,9 @@ Pages 目录页就是强制加斜杠的）。相对资源路径在 /foo 下解�
 ⚠️ /pulse 故意不生成：它是首页别名（app.js 里 canonical 归到 /），
    生成了反而制造首页复本。
 """
-import sys
 import pathlib
+import re
+import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BASE = "https://chronicle.klay-wang.com"
@@ -111,6 +118,29 @@ ROUTES = {
 }
 
 
+def expected_sitemap_urls(root=ROOT):
+    """应收录页面清单的唯一实现 —— 生成器写 sitemap 用它，闸对账也用它。
+    组成：首页 + ROUTES 全部路由 + /options（独立平铺页）+ /digest/ 归档页 + 各周报。
+    noindex 转化页（pay/welcome/check-inbox/confirmed）与 /pulse（首页别名，
+    _redirects 已 301 归 /）永不入内。"""
+    urls = [f"{BASE}/"]
+    urls += [f"{BASE}/{r}" for r in ROUTES]
+    urls.append(f"{BASE}/options")
+    urls.append(f"{BASE}/digest/")
+    for f in sorted((root / "digest").glob("*-weekly.html")):
+        urls.append(f"{BASE}/digest/{f.stem}")
+    return urls
+
+
+def write_sitemap(root=ROOT):
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    lines += [f"  <url><loc>{u}</loc></url>" for u in expected_sitemap_urls(root)]
+    lines.append("</urlset>")
+    (root / "sitemap.xml").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"生成 sitemap.xml（{len(expected_sitemap_urls(root))} 条）")
+
+
 def patch(html: str, route: str, title: str, desc: str) -> str:
     """替换头部六处身份标记；任何一处找不到或不唯一都直接炸，绝不静默产出错页。"""
     full_title = f"{title} · 美股编年史 Market Chronicle"
@@ -143,7 +173,42 @@ def patch(html: str, route: str, title: str, desc: str) -> str:
         n = html.count(old)
         assert n == 1, f"{route}: 锚串命中 {n} 次（应为 1）：{old[:60]}"
         html = html.replace(old, new, 1)
-    return html
+    return strip_foreign_panels(html, route)
+
+
+def strip_foreign_panels(html: str, route: str) -> str:
+    """只保留 id="panel-<route>" 的 section，删除其余全部 panel（§57 判重修复的核心）。
+
+    边界用 <section>/</section> 配平计数找，不用正则贪婪匹配 —— panel 内部
+    允许嵌套 section。保留页统计出的 panel 必须恰好 1 个，否则直接炸。"""
+    lines = html.split("\n")
+    starts = [(i, re.search(r'id="panel-([a-z]+)"', l).group(1))
+              for i, l in enumerate(lines) if re.search(r'<section[^>]*id="panel-[a-z]+"', l)]
+    assert len(starts) == 17, f"{route}: index.html 应有 17 个 panel，实际 {len(starts)}"
+    drop = set()
+    kept = 0
+    for i, name in starts:
+        depth = 0
+        j = i
+        while True:
+            depth += lines[j].count("<section")
+            depth -= lines[j].count("</section>")
+            if depth <= 0:
+                break
+            j += 1
+        if name == route:
+            kept += 1
+            # 静态可见：被保留的 panel 直接带 active（JS 起来之前/失败时正文也在）
+            lines[i] = lines[i].replace('class="panel"', 'class="panel active"')
+        else:
+            drop.update(range(i, j + 1))
+    assert kept == 1, f"{route}: 保留 panel {kept} 个（应为 1）"
+    out = [l for i, l in enumerate(lines) if i not in drop]
+    # 顶栏静态 active 从 pulse 挪到本页 tab（找不到本页顶栏 tab 就只摘 pulse 的，JS 会补）
+    joined = "\n".join(out)
+    joined = joined.replace('class="tab active" data-panel="pulse"', 'class="tab" data-panel="pulse"', 1)
+    joined = joined.replace(f'class="tab" data-panel="{route}"', f'class="tab active" data-panel="{route}"', 1)
+    return joined
 
 
 def main():
@@ -155,7 +220,8 @@ def main():
     for route, (title, desc) in targets.items():
         out = ROOT / f"{route}.html"
         out.write_text(patch(src, route, title, desc), encoding="utf-8")
-        print(f"生成 {out.name}")
+        print(f"生成 {out.name}（仅含 panel-{route}）")
+    write_sitemap()
     print(f"共 {len(targets)} 页")
 
 
