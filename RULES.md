@@ -48,7 +48,10 @@
 |---|---|
 | 🚨 **永远不要往仓库根加 `404.html`**：加了 Pages 会从「SPA 兜底」切走，**深链全挂** | §38.2 · §56 |
 | `_redirects` **只写尾斜杠，故意不写 `/*`** | §38.2 |
-| 🚨 **改 `index.html` 之后必须重跑 `python3 scripts/build_route_pages.py`**，否则 16 个路由页与首页漂移。脚本锚串校验报错是提醒你同步，不是让你绕过 | §49 |
+| 🚨 **改 `index.html` 之后必须重跑 `python3 scripts/build_route_pages.py`**，否则 16 个路由页与首页漂移。脚本锚串校验报错是提醒你同步，不是让你绕过。§63 起路由页只含自己的 panel（正文判重根治），改完跑 `python3 tools/check_route_pages.py` 收尾 | §49→§63 |
+| 🚨 **路由页正文绝不允许两两相同**：canonical 只是声明，Google 判重看正文；正文雷同时它自选规范页、你的 canonical 作废（08-08 GSC 邮件实锤）。判据在 `tools/check_route_pages.py`（已挂 daily.yml），绿着才许提交 | §63 |
+| **新增可收录页面（digest 周报等）不用手改 sitemap**：`sitemap.xml` 由 `build_route_pages.py` 生成，清单唯一实现是 `expected_sitemap_urls()`；跑一遍生成器即对账。手改 sitemap = 制造漂移 | §63 |
+| **SEO 类修复的验收判据必须是终局量**（GSC「已编入索引」页数），不是自己脚本的中间量（200/canonical/301 全绿只证明「替换成功」不证明「Google 采信」）。§49 那句「近期 GSC 告警多半是重爬滞后」已作废——**收到判重邮件先跑判重闸，绿着才允许怀疑 Google 慢** | §63 |
 | 🚨 **`ROUTES` 增删路由必须同步改 `.gitattributes`**，否则新页污染语言统计、旧页留悬空条目 | §56 |
 | **创始价带码链接不能断**：`s` 以外的 query 一律保留 | §38.3 |
 | 🚨 **`_redirects` 的规则只对全小写路径生效**：`/xq` 通而 `/XQ`／`/Xq` 全部落回 200。对外发的短链**一律全小写**，补一行大写版也没用（会被归一成同一条） | §59 |
