@@ -126,6 +126,7 @@ def expected_sitemap_urls(root=ROOT):
     urls = [f"{BASE}/"]
     urls += [f"{BASE}/{r}" for r in ROUTES]
     urls.append(f"{BASE}/options")
+    urls.append(f"{BASE}/f13")          # 13F 开奖独立页（2026-08-18·与期权页数据完全不互通）
     urls.append(f"{BASE}/digest/")
     for f in sorted((root / "digest").glob("*-weekly.html")):
         urls.append(f"{BASE}/digest/{f.stem}")

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>13F 开奖 · 美股编年史 Market Chronicle</title>
+<link rel="canonical" href="https://chronicle.klay-wang.com/f13">
+<meta name="description" content="机构 13F 持仓对账：季末到披露日之间那段走势，披露当天就是已知的、可复算的。只对账，不算机构盈亏，不给跟不跟。">
+<script>
+try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) document.documentElement.classList.add("dark-mode"); } catch (e) {}
+</script>
+<style>html{background:#FFFFFF}html.dark-mode{background:#111111}</style>
+<link rel="stylesheet" href="css/style.css?v=20260817a">
+<style>
+/* 页面私有样式一律 f13- 前缀，只借主站 :root 变量与字体，不碰主站类 */
+.f13-wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 80px; }
+.f13-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; }
+.f13-brand { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 19px; font-weight: 700; color: var(--ink); text-decoration: none; }
+.f13-nav { display: flex; gap: 18px; align-items: center; }
+.f13-nav a { font-size: 13.5px; color: var(--ink-soft); text-decoration: none; }
+.f13-nav a:hover { color: var(--ink); }
+h1.f13 { font-family: 'Noto Serif SC',serif; font-size: 27px; margin: 18px 0 6px; color: var(--ink); }
+.f13-sub { font-size: 13.5px; color: var(--ink-soft); line-height: 1.8; max-width: 760px; }
+.f13-fresh { font-size: 12px; color: var(--ink-muted); margin: 10px 0 26px; }
+.f13-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); margin: 0 0 14px; }
+.f13-legend .sw { display: inline-block; width: 13px; height: 13px; border-radius: 4px; vertical-align: -2px; margin-right: 5px; }
+.f13-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 10px; margin: 6px 0 30px; }
+.f13-cap { border-radius: 12px; padding: 12px 14px; cursor: pointer; border: 1.5px solid var(--border); background: var(--bg-card); transition: transform .08s; }
+.f13-cap:hover { transform: translateY(-2px); }
+.f13-cap.solid { background: var(--ink); border-color: var(--ink); }
+.f13-cap.solid .nm { color: var(--bg); }
+.f13-cap.solid .meta { color: var(--bg); opacity: .72; }
+.f13-cap .nm { font-size: 14.5px; font-weight: 700; color: var(--ink); }
+.f13-cap .meta { font-size: 12px; color: var(--ink-muted); margin-top: 4px; font-family: 'JetBrains Mono',monospace; }
+.f13-cap.dis { opacity: .45; cursor: default; }
+.f13-cap.on { outline: 2.5px solid var(--accent); }
+.f13-groupttl { font-size: 12px; color: var(--ink-muted); letter-spacing: .06em; margin: 18px 0 8px; }
+.f13-panel { border: 1px solid var(--border); border-radius: 14px; background: var(--bg-card); padding: 20px 22px 24px; margin: 0 0 40px; }
+.f13-panel h2 { font-family: 'Noto Serif SC',serif; font-size: 20px; margin: 0 0 4px; color: var(--ink); }
+.f13-panel .pmeta { font-size: 12.5px; color: var(--ink-muted); font-family: 'JetBrains Mono',monospace; margin-bottom: 14px; }
+.f13-panel h3 { font-size: 14px; color: var(--ink); margin: 22px 0 8px; }
+table.f13 { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.f13 th { text-align: right; font-weight: 600; color: var(--ink-muted); font-size: 11.5px; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+table.f13 th:first-child, table.f13 td:first-child { text-align: left; }
+table.f13 td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono',monospace; font-size: 12.5px; color: var(--ink); white-space: nowrap; }
+table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; text-overflow: ellipsis; }
+.f13-scroll { overflow-x: auto; }
+.f13-pos { color: var(--up, #C0392B); } .f13-neg { color: var(--down, #1D9E75); }
+.f13-pbar { display: inline-block; height: 7px; border-radius: 4px; background: var(--accent); vertical-align: 1px; margin-right: 6px; opacity: .8; }
+.f13-tl { display: flex; align-items: flex-end; gap: 2px; height: 92px; margin: 8px 0 2px; }
+.f13-tl .b { flex: 1; background: var(--accent); opacity: .55; border-radius: 2px 2px 0 0; min-width: 2px; }
+.f13-tl .b:hover { opacity: 1; }
+.f13-tlx { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--ink-muted); font-family: 'JetBrains Mono',monospace; }
+.f13-srow { margin: 10px 0 2px; }
+.f13-srow .lbl { font-size: 12px; color: var(--ink-soft); margin-bottom: 3px; }
+.f13-mini { display: flex; align-items: flex-end; gap: 1.5px; height: 30px; }
+.f13-mini .b { flex: 1; background: var(--ink-soft); opacity: .5; border-radius: 1px; min-width: 1.5px; }
+.f13-note { font-size: 12.5px; color: var(--ink-muted); line-height: 1.9; margin-top: 34px; border-top: 1px solid var(--border); padding-top: 16px; max-width: 820px; }
+@media (max-width: 640px) { .f13-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
+</style>
+</head>
+<body>
+<div class="f13-wrap">
+  <div class="f13-top">
+    <a class="f13-brand" href="/">美股编年史</a>
+    <nav class="f13-nav"><a href="/">首页</a><a href="/options">期权页</a></nav>
+  </div>
+  <h1 class="f13">13F 开奖</h1>
+  <p class="f13-sub">机构每季向 SEC 申报美股多头持仓（13F），季末快照、45 天后披露。滞后不是缺陷，是原材料：<b>季末到披露日之间那段走势，在披露当天就已经是已知的、可复算的</b>。本页只对账：不算机构盈亏（13F 无成本价、无空头腿），不归因，不给「跟不跟」。</p>
+  <div class="f13-fresh" id="fresh">加载中…</div>
+  <div class="f13-legend">
+    <span><span class="sw" style="background:var(--ink)"></span><b>实心</b>＝集中决策：每一笔都是一个决策体的判断，可逐笔看</span>
+    <span><span class="sw" style="border:1.5px solid var(--border);background:var(--bg-card)"></span><b>描边</b>＝平台多策略 / 系统化 / 主权配置：只报规模。从几千行里挑一只说「它看好」，等于从一栋楼里挑一个房客说这栋楼喜欢他</span>
+  </div>
+  <div id="wall"></div>
+  <div id="panel"></div>
+  <div class="f13-note" id="foot"></div>
+</div>
+<script>
+(async function () {
+  const $ = (s) => document.querySelector(s);
+  let D;
+  try {
+    const r = await fetch("data/f13_page.json", { cache: "no-store" });
+    D = await r.json();
+  } catch (e) { $("#fresh").textContent = "数据加载失败，请刷新重试。"; return; }
+  const B = (v) => v == null ? "·" : (v >= 1e12 ? "$" + (v / 1e12).toFixed(2) + "T" : v >= 1e9 ? "$" + (v / 1e9).toFixed(1) + "B" : "$" + Math.round(v / 1e6).toLocaleString() + "M");
+  const N = (v) => v == null ? "·" : Number(v).toLocaleString();
+  $("#fresh").textContent = "最新报告期 " + D.latest_quarter + "（各家披露日见胶囊）· 页面装配 " + D.generated_at.slice(0, 10) + " · 源：SEC EDGAR 13F-HR 直读";
+  const wall = $("#wall");
+  const groups = [["实心 · 集中决策（可逐笔）", D.capsules.filter(c => c.solid)],
+                  ["描边 · 平台多策略 / 系统化 / 主权配置（只报规模）", D.capsules.filter(c => !c.solid && c.value_usd)],
+                  ["未直读（无独立 13F-HR 主体，如实标）", D.capsules.filter(c => !c.solid && !c.value_usd)]];
+  for (const [ttl, list] of groups) {
+    if (!list.length) continue;
+    const h = document.createElement("div"); h.className = "f13-groupttl"; h.textContent = ttl; wall.appendChild(h);
+    const g = document.createElement("div"); g.className = "f13-grid"; wall.appendChild(g);
+    list.sort((a, b) => (b.value_usd || 0) - (a.value_usd || 0));
+    for (const c of list) {
+      const el = document.createElement("div");
+      el.className = "f13-cap" + (c.solid ? " solid" : "") + (c.value_usd ? "" : " dis");
+      el.innerHTML = '<div class="nm">' + c.cn + '</div><div class="meta">' +
+        (c.solid ? (c.n_holdings != null ? c.n_holdings + " 笔 · " : "") : (c.entries ? c.entries.toLocaleString() + " 条 · " : "")) +
+        B(c.value_usd) + (c.history_n ? " · " + c.history_n + " 期" : "") + "</div>";
+      if (c.value_usd) el.onclick = () => show(c, el);
+      g.appendChild(el);
+    }
+  }
+  function show(c, el) {
+    document.querySelectorAll(".f13-cap.on").forEach(x => x.classList.remove("on"));
+    el.classList.add("on");
+    const d = (D.institutions || {})[c.cn] || {};
+    let h = '<h2>' + c.cn + '</h2><div class="pmeta">' + c.decision_type + " · 报告期 " + (c.period || "·") +
+      " · 披露 " + (c.filing_date || "·") + " · 组合 " + B(c.value_usd) +
+      (d.accession ? " · acc " + d.accession : "") + "</div>";
+    if (!c.solid) {
+      h += '<p class="f13-sub">这家是' + c.decision_type + '：持仓表是几百个策略各自仓位的加总，单只持仓读不出机构判断，所以本页对它只报规模（' +
+        (c.entries ? c.entries.toLocaleString() : "·") + ' 条持仓 · ' + B(c.value_usd) + '）。</p>';
+    }
+    if (d.ledger && d.ledger.length) {
+      h += '<h3>开奖表 · 季末价 → 披露日价（可复算）</h3><div class="f13-scroll"><table class="f13"><tr><th>票</th><th>动作</th><th>名义</th><th>占组合</th><th>季末收</th><th>披露日收</th><th>区间涨跌</th><th>来源</th></tr>';
+      for (const r of d.ledger) {
+        const ch = parseFloat(r.chg_pct);
+        h += "<tr><td>" + r.ticker + "</td><td>" + r.action + "</td><td>" + B(+r.notional_usd) + "</td><td>" +
+          (r.pct_of_book ? r.pct_of_book + "%" : "·") + "</td><td>" + (r.px_quarter_end || "·") + "</td><td>" + (r.px_filing || "·") +
+          '</td><td class="' + (ch >= 0 ? "f13-pos" : "f13-neg") + '">' + (isNaN(ch) ? "·" : (ch > 0 ? "+" : "") + ch + "%") +
+          "</td><td>" + r.source_grade + "</td></tr>";
+      }
+      h += "</table></div>";
+    }
+    if (d.holdings && d.holdings.length) {
+      const mx = d.holdings[0].pct || 1;
+      h += '<h3>最新持仓 · 前 ' + d.holdings.length + '（按市值）</h3><div class="f13-scroll"><table class="f13"><tr><th>发行人</th><th>市值</th><th>股数</th><th>占组合</th></tr>';
+      for (const r of d.holdings) {
+        h += '<tr><td class="iss">' + r.issuer + "</td><td>" + B(r.value_usd) + "</td><td>" + N(r.shares) +
+          '</td><td><span class="f13-pbar" style="width:' + Math.max(2, r.pct / mx * 70) + 'px"></span>' + r.pct + "%</td></tr>";
+      }
+      if (d.holdings_rest && d.holdings_rest.n) h += '<tr><td class="iss">其余 ' + d.holdings_rest.n + ' 只合计</td><td>' + B(d.holdings_rest.value_usd) + "</td><td>·</td><td>·</td></tr>";
+      h += "</table></div>";
+    }
+    if (d.timeline && d.timeline.periods.length > 1) {
+      const ps = d.timeline.periods, vs = d.timeline.value_total, mx = Math.max(...vs);
+      h += '<h3>时间轴 · 组合总值（' + ps.length + ' 期：' + ps[0] + ' → ' + ps[ps.length - 1] + '）</h3><div class="f13-tl">' +
+        vs.map((v, i) => '<div class="b" style="height:' + Math.max(2, v / mx * 100) + '%" title="' + ps[i] + " " + B(v) + '"></div>').join("") +
+        '</div><div class="f13-tlx"><span>' + ps[0] + "</span><span>" + ps[ps.length - 1] + "</span></div>";
+      if (d.timeline.shares_top) {
+        h += '<h3>持仓股数逐期（当前前几大 · 连续加仓在这里是能看见的形状）</h3>';
+        let cnt = 0;
+        for (const [iss, ss] of Object.entries(d.timeline.shares_top)) {
+          if (++cnt > 5) break;
+          const m2 = Math.max(...ss, 1);
+          h += '<div class="f13-srow"><div class="lbl">' + iss + '</div><div class="f13-mini">' +
+            ss.map((v, i) => '<div class="b" style="height:' + Math.max(3, v / m2 * 100) + '%" title="' + ps[i] + " " + N(v) + ' 股"></div>').join("") + "</div></div>";
+        }
+      }
+    } else if (c.solid) {
+      h += '<p class="f13-sub">时间轴回补中：全史逐期数据正在从 EDGAR 补齐，补到即显示。</p>';
+    }
+    $("#panel").innerHTML = '<div class="f13-panel">' + h + "</div>";
+    $("#panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+  $("#foot").innerHTML = "数据：SEC EDGAR 13F-HR 原始申报直读，逐期校验（各期持仓合计与封面总值对账）。13F 只含美股多头，无成本价、无期权与空头腿，因此本页不计算任何机构的盈亏，也不构成任何投资建议。名义额口径：增减持＝股数变动×季末收盘，新进＝期末市值，清仓＝上期期末市值。";
+})();
+</script>
+</body>
+</html>
