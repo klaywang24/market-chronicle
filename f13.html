@@ -134,12 +134,22 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
            中文态没有那条 EN 规则，所以只有英文页坏，中文页一直是好的。
            ⇒ 改回站上通用写法 `<nav class="tabs">`（index/kindex/leaps/spy 全是它，只有本页与
            options 两个平铺页当初自造成 div）。**§80：改站上样式前先用站上现成的语言。** -->
-    <nav class="tabs">
+      <!-- 🔴 2026-08-19 Klay 令「不要再犯这样的错误了」：本页与 /options 的链接此前是光秃秃的
+           class="tab"，与其余 17 页的站头差三样，英文态直接挤成两行（Klay 截图圈出）：
+             ① 缺 t-full / t-short 两版标签 ⇒ 窄屏换不了短版，EN 长标签撑爆 ⇒ 换行
+             ② 缺 data-panel / tab-ext ⇒ 吃不到 css/style.css:224 那条 ▾，看着像另一个站
+             ③ 百年档案在别处是 tab-group 下拉（7 页），这里是平链到 /spy —— **本轮不动**，
+                因为下拉的开关在 js/app.js 里，而本页一个外部脚本都不加载。缺 ▾ 是诚实的：
+                没有下拉就不该长出一个点不开的箭头。
+           data-panel 在本页是**纯 CSS 钩子**：全文 data-panel 出现 0 次，没有任何内联 JS 读它，
+           app.js 也没加载 ⇒ 点击照常走 href 整页跳转。
+           短标签的 EN 值照抄 js/i18n.js:169/484，并已补进本页内联字典（原来只有全长版那两个键）。 -->
+      <nav class="tabs">
       <a class="tab" href="/">今日</a>
-      <a class="tab" href="/kindex">K 指数 · 台账</a>
-      <a class="tab" href="/leaps">恐惧的标价 · 台账</a>
-      <a class="tab" href="/options">期权异动</a>
-      <a class="tab active" href="/f13">13F 开奖</a>
+      <a class="tab" href="/kindex" data-panel="kindex"><span class="t-full">K 指数 · 台账</span><span class="t-short">K 指数</span></a>
+      <a class="tab" href="/leaps" data-panel="leaps"><span class="t-full">恐惧的标价 · 台账</span><span class="t-short">恐惧的标价</span></a>
+      <a class="tab tab-ext" href="/options">期权异动</a>
+      <a class="tab tab-ext active" href="/f13">13F 开奖</a>
       <a class="tab" href="/spy">百年档案</a>
     </nav>
     <div class="f13-navctl">
@@ -278,6 +288,7 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
     const TR = {
       "美股编年史": "Market Chronicle", "订阅": "Subscribe",
       "今日": "Today", "K 指数 · 台账": "KAPX · Ledger",
+      "K 指数": "KAPX", "恐惧的标价": "Fear-Price Index",
       "恐惧的标价 · 台账": "Fear-Price Index · Ledger",
       "期权异动": "Options", "13F 开奖": "13F", "百年档案": "The Archive",
       "实心 · 集中决策（可逐笔）": "Solid · Concentrated decision (position by position)",
