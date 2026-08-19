@@ -371,8 +371,8 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
     const prov = D.meta.provisional
       ? tr("（当前为盘中临时读数，收盘后会被覆盖）", " (intraday provisional; overwritten after the close)")
       : "";
-    const daily = tr("每个交易日收盘后更新，数据延迟、绝不实时。当前是 <b>" + dd + "</b> 收盘。",
-                     "Updated after each trading day's close, delayed, never real time. Currently showing the <b>" + dd + "</b> close.") + prov;
+    const daily = tr("每个交易日收盘后更新，当前是 <b>" + dd + "</b> 收盘。",
+                     "Updated after each trading day's close. Currently showing the <b>" + dd + "</b> close.") + prov;
 
     const fl = days(D.flip_history), cm = days(D.cm_history);
     const filed = D.ledger.reduce((m, c) => (c.events && c.events[0] && c.events[0].date > m ? c.events[0].date : m), "");
