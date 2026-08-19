@@ -1,3 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 24" role="img" aria-label="UnionPay">
-  <text x="20" y="17" text-anchor="middle" font-family="-apple-system,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="800" fill="#00508E">银联</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 24" role="img" aria-label="UnionPay 银联">
+  <title>UnionPay</title>
+  <g transform="skewX(-11)">
+    <rect x="7.6"  y="1" width="9.6" height="22" rx="3.2" fill="#E21836"/>
+    <rect x="16.4" y="1" width="9.6" height="22"          fill="#00447C"/>
+    <rect x="25.2" y="1" width="9.6" height="22" rx="3.2" fill="#007B84"/>
+  </g>
+  <text x="20" y="15.2" text-anchor="middle" font-family="Helvetica,Arial,sans-serif"
+        font-size="7.6" font-weight="700" font-style="italic" fill="#fff"
+        letter-spacing="-0.2">UnionPay</text>
 </svg>
