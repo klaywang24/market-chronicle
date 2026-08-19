@@ -1427,7 +1427,13 @@ html:not([lang^="zh"]) .brand { font-size: 17.5px; }
    剩余空间统一沉到底部块之前（.ptier-list 的 flex:1 已经把页脚推到底），
    于是三张卡「标题/价格/说明/清单」逐行对齐，CTA 也在同一水平线上。 */
 .ptier-list { justify-content: flex-start; }
-.pay-methods { font-size: 13px; color: var(--ink-soft); text-wrap: balance; }
+/* 2026-08-19 Klay 令：「支持」与「不支持」两行左边缘对齐。
+   原来是 <strong>标签</strong>：内容<br>内容 —— <br> 后第二行回到行首，
+   与第一行的「支持」错开一个标签宽。改用 flex 把标签与正文分成两块，
+   正文自成一列 ⇒ 换行天然对齐，且不依赖对标签宽度的估算（em 估算会随字体/字号漂）。*/
+.pay-methods { font-size: 13px; color: var(--ink-soft); display: flex; align-items: baseline; }
+.pay-methods .pay-label { flex: none; }
+.pay-methods .pay-body { flex: 1; min-width: 0; text-wrap: balance; }
 .pay-methods .pay-ico { height: 14px; width: auto; vertical-align: -4px; margin-right: 4px;
   background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 2px 4px; box-sizing: content-box; }
 .ptier { border: 1px solid var(--border); border-radius: 12px; padding: 22px 20px; background: var(--bg-card); display: flex; flex-direction: column; position: relative; }
