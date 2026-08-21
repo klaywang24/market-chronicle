@@ -2508,8 +2508,7 @@
       <div>
         <div class="pulse-section-label">今天热在哪 · 各板块涨跌家数（标普 500 全成分股 · 自有数据，每日收盘后更新）</div>
         <div id="ch-breadth-sector" class="sector-breadth"></div>
-      </div>
-      <div class="pulse-foot">滑动光标，掀开夜之一角。数据每交易日收盘后自动更新；温度是尺度不是信号：96 度的估值曾经烫了三年。</div>`;
+      </div>`;
 
     // 顶部世纪带：真实标普 500 月线（1927→，对数坐标：天然一路向上）。
     // 只做「峰值相对」的温和回撤放大：每个历史新高原样保留（上涨气势不变），

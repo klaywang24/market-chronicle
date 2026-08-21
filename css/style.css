@@ -512,7 +512,7 @@ tr:hover td { background: var(--bg-card-hover); }
 /* ---------- 今日 · 头版（聚光灯封面） ---------- */
 .pulse-hero {
   position: relative;
-  min-height: calc(100vh - 140px);
+  /* 2026-08-21 Klay 令：去掉 min-height 撑高，内容多高面板就多高，底部不再留整块空白 */
   border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
@@ -702,7 +702,6 @@ html:not([lang^="zh"]) .breadth-bar div { min-width: 62px; }
   margin-bottom: 8px;
   font-weight: 600;
 }
-.pulse-foot { color: var(--ink-muted); font-size: 12px; margin-top: auto; line-height: 1.8; }
 
 /* ---------- 二级胶囊导航（板块总览 ↔ 个股） ---------- */
 .subnav {
