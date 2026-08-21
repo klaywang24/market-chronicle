@@ -262,10 +262,20 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
       if (d.timeline.shares_top) {
         h += '<h3>' + (_EN ? "Share count by quarter (current top names; steady accumulation is a shape here, not an adjective)" : "持仓股数逐期（当前前几大 · 连续加仓在这里是能看见的形状）") + '</h3>';
         let cnt = 0;
+        // 2026-08-20 Klay 令：这一段的发行人名前补公司 logo。
+        // shares_top 的键只有发行人名、没有 ticker，而同一份 d.holdings 里带 tk
+        //   ⇒ 就地建 issuer→tk 查表，**不改管线、不动 f13_page.json**。
+        // 🚫 查不到 tk 的一律不显示 logo，绝不猜 ticker —— 与 build_f13_page.py 头注
+        //    「未收录的一律回退 EDGAR 原文，不猜不意译」同一条规矩：
+        //    写错 ticker 顶多不显示 logo，但猜错会把别家公司的脸挂上去。
+        const TKMAP = {};
+        for (const r of (d.holdings || [])) { if (r.issuer && r.tk) TKMAP[r.issuer] = r.tk; }
         for (const [iss, ss] of Object.entries(d.timeline.shares_top)) {
           if (++cnt > 5) break;
           const m2 = Math.max(...ss, 1);
-          h += '<div class="f13-srow"><div class="lbl">' + iss + '</div><div class="f13-mini">' +
+          const _tk = TKMAP[iss];
+          const _lg = _tk ? '<img class="f13-logo" src="logos/' + _tk + '.png" alt="" onerror="this.remove()">' : '';
+          h += '<div class="f13-srow"><div class="lbl">' + _lg + iss + '</div><div class="f13-mini">' +
             ss.map((v, i) => '<div class="b" style="height:' + Math.max(3, v / m2 * 100) + '%" title="' + ps[i] + " " + N(v) + ' 股"></div>').join("") + "</div></div>";
         }
       }
