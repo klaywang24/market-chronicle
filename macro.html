@@ -30,7 +30,7 @@
 {"@context":"https://schema.org","@graph":[
  {"@type":"Person","@id":"https://klay-wang.com/#person","name":"Klay Wang","url":"https://klay-wang.com/","sameAs":["https://klay-wang.com/","https://x.com/_Klay24_","https://github.com/klaywang24","https://www.linkedin.com/in/klay-w-a593bb101/","https://www.kaggle.com/klaywong","https://huggingface.co/klay24"]},
  
- {"@type":"WebSite","name":"Market Chronicle 美股编年史","alternateName":"美股编年史","url":"https://chronicle.klay-wang.com/","inLanguage":["zh-CN","en"],
+ {"@type":"WebSite","name":Market Chronicle 美股编年史,"alternateName":美股编年史,"url":"https://chronicle.klay-wang.com/","inLanguage":["zh-CN","en"],
   "description":"A free, self-updating archive of a century of US market history, plus two original gauges and one public ledger of outcomes: the KAPX Index and the Fear-Price Index (formerly Fear's Price Tag), every reading reconciled daily.",
   "publisher":{"@id":"https://klay-wang.com/#person"}},
  {"@type":"Dataset","name":"KAPX Index daily series (CNN Fear & Greed ÷ VIX)","alternateName":["K 指数","K-Index","KAPX"],
@@ -204,10 +204,12 @@
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">第四章</span><h2>增长与就业 · GROWTH</h2></div>
     <p class="chapter-q">GDP、非农、失业率与企业利润：基本面的四块基石。</p>
-    <div class="grid-2">
-      <div class="card"><h3>实际 GDP 环比年化</h3><div class="chart short" id="ch-macro-gdp"></div></div>
-      <div class="card"><h3>非农新增就业（千人/月）× 失业率</h3><div class="chart short" id="ch-macro-jobs"></div></div>
-    </div>
+    <!-- 2026-08-20 Klay 令：这两张拆开、不并排。
+         右图是双轴（非农柱 + 失业率线，左右两套刻度），并排时宽度被压到一半，
+         两条刻度轴挤在一起、柱体细到看不出方向。改为各占整行。
+         写法照同章「企业利润同比」那张：裸 <div class="card">，不新造样式类。 -->
+    <div class="card"><h3>实际 GDP 环比年化</h3><div class="chart short" id="ch-macro-gdp"></div></div>
+    <div class="card"><h3>非农新增就业（千人/月）× 失业率</h3><div class="chart short" id="ch-macro-jobs"></div></div>
     <div class="card"><h3>企业利润同比（季频）</h3><div class="sub">全美企业税后利润（FRED CP）：指数 EPS 的宏观母体</div><div class="chart short" id="ch-macro-profits"></div></div>
   </div>
 
