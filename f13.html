@@ -317,7 +317,26 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
         "Timeline backfill in progress: full history is being pulled from EDGAR and appears as it lands.",
       "数据：SEC EDGAR 13F-HR 原始申报直读，逐期校验（各期持仓合计与封面总值对账）。13F 只含美股多头，无成本价、无期权与空头腿，因此本页不计算任何机构的盈亏，也不构成任何投资建议。名义额口径：增减持＝股数变动×季末收盘，新进＝期末市值，清仓＝上期期末市值。":
         "Data: read directly from SEC EDGAR 13F-HR filings, verified per quarter (sum of holdings reconciled against the cover-page total). 13F covers US long equity only, with no cost basis, options or short leg, so this page computes no institution P&L and is not investment advice. Notional convention: added/trimmed = share change \u00d7 quarter-end close; new = period-end value; exited = prior period-end value.",
-    };
+    
+      // 🔴 2026-08-20 补：页脚 13 条。两个平铺页不加载 js/i18n.js（刻意，见本页注释），
+      //    改用页内 TR 字典 —— 但建页时**没把页脚词条抄进来**，于是英文态下
+      //    列标题 About/Get Started/Legal 是硬编码英文、底下条目全是中文，
+      //    看起来「翻了一半」，实则一条都没接。Klay 2026-08-20 截图指出。
+      //    译文逐字取自 js/i18n.js（全站权威源），不另造措辞。
+      "每个交易日自动更新的美股百年图表档案与读数台账": "A self-updating archive of a century of US market charts, plus a public ledger of daily readings",
+      "关于我们": "About us",
+      "方法论": "Methodology",
+      "联系我们": "Contact us",
+      "定价与套餐": "Pricing & plans",
+      "数据 & API": "Data & API",
+      "周报档案": "Weekly digest",
+      "服务条款": "Terms",
+      "隐私政策": "Privacy",
+      "退款政策": "Refunds",
+      "美股编年史 · 自用版": "Market Chronicle · personal edition",
+      "数据源：": "Data sources: ",
+      "仅供信息与教育用途，不构成投资建议": "For information and education only; not investment advice",
+};
     const walk = (n) => {
       for (const c of [...n.childNodes]) {
         if (c.nodeType === 3) { const t = c.nodeValue.trim(); if (TR[t]) c.nodeValue = c.nodeValue.replace(t, TR[t]); }
