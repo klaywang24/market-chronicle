@@ -56,7 +56,8 @@ html:not([lang^="zh"]) .f13-nav2 a.tab { padding: 6px 10px; }
    并去掉机构 logo/字母头像（Klay：只写名字就行）。
    实心/描边这条判据不靠色块表达，改为**文字浓淡 + 分组小标题**：
    集中决策＝正常墨色，只报规模＝弱化色，语义不丢而视觉不吵。 */
-.f13-layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 24px; align-items: start; padding: 0 16px 80px; }
+.f13-layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 24px; align-items: start; padding: 0 16px 24px; } /* 底垫 80→24（2026-08-21 Klay 令收底部空白） */
+.f13-main > .f13-panel:last-child { margin-bottom: 0; } /* 末面板不再垫 40px 尾边距，面板间节奏不动 */
 .f13-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 6px; }
 /* 2026-08-18 Klay：左侧目录换胶囊 UI。
    照抄站上两套现成语言，不发明第三套：
