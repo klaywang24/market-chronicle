@@ -410,6 +410,7 @@ html.no-toc .toc { display: none; }
 /* 末章不再垫尾边距（2026-08-21 Klay 令，逐 tab 收底部空白）：章与章之间的 48/58px 节奏不动，
    只有面板最后一章贴住容器（ID 选择器压过 1612 行宽屏档的 58px） */
 #panel-leaps > .chapter:last-child { margin-bottom: 0; }
+#panel-macro > .chapter:last-child { margin-bottom: 0; }
 .chapter-head { display: flex; align-items: baseline; gap: 14px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-bottom: 6px; }
 .chapter-no {
   font-family: 'Fraunces', serif;
