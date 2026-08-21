@@ -30,7 +30,7 @@
 {"@context":"https://schema.org","@graph":[
  {"@type":"Person","@id":"https://klay-wang.com/#person","name":"Klay Wang","url":"https://klay-wang.com/","sameAs":["https://klay-wang.com/","https://x.com/_Klay24_","https://github.com/klaywang24","https://www.linkedin.com/in/klay-w-a593bb101/","https://www.kaggle.com/klaywong","https://huggingface.co/klay24"]},
  
- {"@type":"WebSite","name":"Market Chronicle 美股编年史","alternateName":"美股编年史","url":"https://chronicle.klay-wang.com/","inLanguage":["zh-CN","en"],
+ {"@type":"WebSite","name":Market Chronicle 美股编年史,"alternateName":美股编年史,"url":"https://chronicle.klay-wang.com/","inLanguage":["zh-CN","en"],
   "description":"A free, self-updating archive of a century of US market history, plus two original gauges and one public ledger of outcomes: the KAPX Index and the Fear-Price Index (formerly Fear's Price Tag), every reading reconciled daily.",
   "publisher":{"@id":"https://klay-wang.com/#person"}},
  {"@type":"Dataset","name":"KAPX Index daily series (CNN Fear & Greed ÷ VIX)","alternateName":["K 指数","K-Index","KAPX"],
@@ -209,7 +209,7 @@
       <div class="sub">红线 = 1 年期（VIX1Y，LEAPS 对应的那截）；绿线 = 9 天期（VIX9D）。两线的间距 = 期限斜率；短端的波动远大于长端。</div>
       <div class="chart tall" id="ch-leaps-ends"></div>
     </div>
-    <div class="poem">这是温度计，不是策略。它只回答"贵还是便宜"，不回答"该不该买"。每个读数带 Git 时间戳，事前记录、公开可查。</div>
+    <div class="poem">这是温度计，不是策略。它只回答贵还是便宜，不回答该不该买。每个读数带 Git 时间戳，事前记录、公开可查。</div>
   </div>
 
   <!-- ===== 恐惧的分解（2026-07-17 自头版搬入；与上方 4 context 去重后剩四卡，JS 填充 #leaps-decomp） ===== -->
@@ -336,14 +336,14 @@
   <div class="lg-divider"><span>历史参照 · 恐惧极值之后</span><em>以下为描述性历史记录，不是买卖建议</em></div>
   <div class="chapter">
     <div class="chapter-head"><span class="chapter-no">历史参照</span><h2>恐惧极值之后</h2></div>
-    <p class="chapter-q">历史上每次极端恐惧（CNN 恐贪 &lt; 25）之后，市场怎么走了？以下是一份诚实的历史记录：陈列"之后发生了什么"，含赢的和输的，供你参照，不构成买卖建议。</p>
+    <p class="chapter-q">历史上每次极端恐惧（CNN 恐贪 &lt; 25）之后，市场怎么走了？以下是一份诚实的历史记录：陈列之后发生了什么，含赢的和输的，供你参照，不构成买卖建议。</p>
     <div class="k-status" id="leaps-status"></div>
     <div class="card">
       <h3>CNN 恐贪 × 纳指 100（2011 年至今）</h3>
       <div class="sub">黄色为 CNN 恐贪指数（左轴 0–100），蓝色为纳指 100（右轴 · 对数）；恐贪 &lt; 25 的极端恐惧期红色高亮，25 处虚线为极端恐惧线</div>
       <div class="chart tall" id="ch-leaps"></div>
     </div>
-    <div class="poem">恐惧极值标记的是情绪，不是估值底：2021 下半年几次极端恐惧，12 个月后仍在下方。这里陈列的是"之后发生了什么"，含赢与输，供你参照，不替你决定。</div>
+    <div class="poem">恐惧极值标记的是情绪，不是估值底：2021 下半年几次极端恐惧，12 个月后仍在下方。这里陈列的是之后发生了什么，含赢与输，供你参照，不替你决定。</div>
   </div>
 
   <div class="chapter">
@@ -362,7 +362,7 @@
     </div>
     <div class="card">
       <h3>如果机械地每次都跟、持有 12 个月，历史上长什么样？</h3>
-      <div class="sub">净值 = 1 元照此规则操作后变成几元。这是一份<strong>诚实披露的历史记录，不是策略推荐</strong>：它约 6 成时间空仓，长期<strong>跑不赢一直持有纳指</strong>（两条虚线）。空仓期记零、不计成本与滑点，完整口径见方法论：列在这里是为了"连输的也摊开"，不是让你照做</div>
+      <div class="sub">净值 = 1 元照此规则操作后变成几元。这是一份<strong>诚实披露的历史记录，不是策略推荐</strong>：它约 6 成时间空仓，长期<strong>跑不赢一直持有纳指</strong>（两条虚线）。空仓期记零、不计成本与滑点，完整口径见方法论：列在这里是为了连输的也摊开，不是让你照做</div>
       <div class="chart" id="ch-leaps-eq"></div>
     </div>
   </div>
@@ -377,7 +377,7 @@
     </div>
     <div class="card">
       <h3>滚动三年年化：机械跟随 vs 一直持有（历史对照）</h3>
-      <div class="sub">任一时点回看三年的年化收益率；实线为机械跟随、虚线为满仓两个锚：纯历史对照，说明"低暴露≠更优"，非策略推荐 · 底部滑块可拖拽缩放</div>
+      <div class="sub">任一时点回看三年的年化收益率；实线为机械跟随、虚线为满仓两个锚：纯历史对照，说明低暴露≠更优，非策略推荐 · 底部滑块可拖拽缩放</div>
       <div class="chart" id="ch-leaps-roll"></div>
     </div>
     <!-- 2026-07-25：本行已上移至第一章「今天贵不贵」读数之下（三个入口定案）。
