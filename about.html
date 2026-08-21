@@ -114,6 +114,11 @@
       <!-- 2026-08-18 13F 开奖进主导航（Klay 点名要 tab）：同 /options 先例＝平铺独立页用 <a>，
            EN 刻意用最短的 13F（900-1379px EN 顶栏贴边，别加长词）；窄屏走 t-short。 -->
       <a class="tab tab-ext" href="/f13">13F 开奖</a>
+      <!-- 2026-08-20 Klay 令：宏观从「百年档案」下拉提到顶层，位置紧跟 13F。
+           🔑 它是 SPA 面板不是平铺页 ⇒ 保留 data-panel="macro"、**不加 tab-ext**
+           （tab-ext 是给 /options /f13 那种独立页用的，加了会绕开 app.js 的委托拦截）。
+           EN 用 i18n.js 既有的 "宏观"→"Macro"，零新增词条。 -->
+      <a class="tab" href="/macro" data-panel="macro">宏观</a>
       <!-- 2026-07-25 导航精简 10 → 4：七个「几乎不变」的历史档案收进下拉。
            原理：导航宽度应等于「访客要做的决定」的数量，不是「有多少内容」的数量。
            实测这七个面板共 42 章 / 78 卡（占全站内容 78%），但回访理由≈0；
@@ -124,7 +129,6 @@
       <div class="tab-group" id="archive-group">
         <button class="tab-trigger" id="archive-trigger" aria-haspopup="true" aria-expanded="false" aria-controls="archive-menu">百年档案</button>
         <div class="tab-menu" id="archive-menu" role="menu" hidden>
-          <a class="tab" role="menuitem" href="/macro" data-panel="macro">宏观</a>
           <a class="tab" role="menuitem" href="/spy" data-panel="spy">标普 500</a>
           <a class="tab" role="menuitem" href="/qqq" data-panel="qqq">纳斯达克</a>
           <a class="tab" role="menuitem" href="/tech" data-panel="tech">科技</a>
