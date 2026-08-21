@@ -363,7 +363,9 @@ html:not([lang^="zh"]) .lang-switch { font-size: 11.5px; padding: 3px 8px; }
 }
 
 /* ---------- 版面 ---------- */
-.container { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+/* 底垫 80→24（2026-08-21 Klay 令：各 tab 底部留一点空白即可，不要一大块）——
+   面板到 footer 的总空隙 = 本值 + footer 的 margin-top 40px，改这里全站生效 */
+.container { max-width: 1180px; margin: 0 auto; padding: 32px 24px 24px; }
 
 /* ---------- 无目录页真居中（2026-07-26） ----------
    ≥1280px 时 .container 固定让出 214px 给左侧常驻目录（见下方同宽度媒体查询）。
