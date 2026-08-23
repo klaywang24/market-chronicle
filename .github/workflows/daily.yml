@@ -74,6 +74,16 @@ jobs:
       # 建闸当天先对修复前产物实测：166 条红 exit 1，修复后转绿 —— 负向已验，不是只写不验。
       - name: verify route pages unique
         run: python tools/check_route_pages.py
+      # JSON-LD 结构化数据闸（2026-08-23 接线）。
+      # 出身：08-20 c25a51e「去掉可见文本里的直引号」是全文替换，把 JSON-LD 的**结构引号**
+      # 也吃掉了（"name":"X" → "name":X）；index.html 一处坏 ⇒ 16 个路由页由它生成 ⇒
+      # 全站 19 页结构化数据全部非法，**三天无人发现**，直到 Google Search Console 发邮件
+      # 「值类型不正确·严重问题会导致您的网页无法显示在搜索结果中」。
+      # 那三天里 §63 做的判重/canonical/Dataset 标注，Google 一个字都没读进去。
+      # 判据：每个 ld+json 块必须 json.loads 通过；扫到 0 个块也判红（尺子没上膛≠仓里没有）。
+      # 自检：python tools/check_jsonld.py --selftest（一正两负三样本）
+      - name: verify JSON-LD parses
+        run: python tools/check_jsonld.py
       - name: commit data
         run: |
           git config user.name "klaywang24"
