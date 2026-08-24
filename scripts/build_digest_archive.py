@@ -26,7 +26,12 @@ CARDS = os.path.join(BIZ, "01-起号引流", "每日 digest")
 #   没有这条活源，档案永远停在 08-09（前会话验尸结论，勿删活源再犯）。
 LIVE_CUTOVER = "2026-08-10"
 # 活源对外正文的结束边界：这些内部节起，往后全是流程与判据，绝不外泄
-INTERNAL_HEADS = ("## 图槽", "## 回访清单", "## 🛑", "## 🔴")
+INTERNAL_HEADS = ("## 图槽", "## 回访清单", "## 🛑", "## 🔴",
+                  # 2026-08-24 补：站上档案是**纯中文正文**，中文正文之后的分发物一律不进。
+                  # 08-21 那篇把 下周要回访的→English edition→LinkedIn→小红书 全排在
+                  # `## 图槽` 之前，而边界只认图槽 ⇒ 英文版和小红书整段被卷进正文发上了站。
+                  # （08-14 没暴露只是因为它的 English edition 写在正文起点之前。）
+                  "## 下周要回访的", "## English edition", "## 小红书")
 OUT = os.path.join(REPO, "digest")
 IMGOUT = os.path.join(OUT, "img")
 SITE = "https://chronicle.klay-wang.com"
