@@ -8,3 +8,7 @@ dist/
 
 # 见证链看板是本地运维工具，不上站（运维状态公开挂着，红的时候会变成别人的弹药）
 见证链看板.html
+
+# 定时作业运行日志（本地产物，不进仓）
+data/_digest_archive.log
+data/_digest_archive.std*.log
