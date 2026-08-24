@@ -1,11 +1,18 @@
 {
-  "generated_at": "2026-08-18T10:41:32Z",
-  "count": 4,
+  "generated_at": "2026-08-24T06:28:59Z",
+  "count": 5,
   "items": [
+    {
+      "date": "2026-08-21",
+      "slug": "2026-08-21-weekly",
+      "title": "特朗普又开始卖股票了？8.17-8.21 本周回顾",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-21-weekly",
+      "kind": "weekly"
+    },
     {
       "date": "2026-08-14",
       "slug": "2026-08-14-weekly",
-      "title": "还在看 13F ？真正赚钱的人都是这样操作和复盘 - 本周回顾",
+      "title": "还在看 13F ？真正赚钱的人都是这样操作和复盘 - 本周回顾 · 8.10-8.14",
       "url": "https://chronicle.klay-wang.com/digest/2026-08-14-weekly",
       "kind": "weekly"
     },

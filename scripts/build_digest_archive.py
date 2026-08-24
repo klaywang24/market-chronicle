@@ -383,13 +383,35 @@ def parse_live(path):
     raw = open(path, encoding="utf-8").read()
     m = re.search(r"/(\d{4}-\d{2}-\d{2})/", path.replace(os.sep, "/"))
     date = m.group(1)
+    # 标题块两种格式并存（2026-08-24 实测：08-18/19/21 是新式，08-20 又是旧式，
+    # 不是一次性切换⇒两种都必须收，只认一种会在新式那天整条管线抛异常打死，
+    # 后面所有期数（含 08-21 周报）全部进不了站——这正是 08-18 起档案停更的真因）。
+    #   ①旧式：`## 邮件标题` → `**推荐**` → ``` 代码块
+    #   ②新式：`## 邮件标题` → 空行 → 标题正文一行
+    # 「不许猜标题」的红线保留：两种都取不到仍然抛，绝不退回文件名或正文首句。
     tm = re.search(r"##\s*邮件标题.*?\*\*推荐\*\*\s*```\s*\n(.+?)\n\s*```", raw, re.S)
-    if not tm:
-        raise RuntimeError(f"{path}: 找不到「邮件标题→推荐」块，不许猜标题")
-    title = tm.group(1).strip()
-    if "## ⚡" not in raw:
-        raise RuntimeError(f"{path}: 没有「## ⚡」起点，格式变了先对齐 to_substack 再说")
-    start = raw.index("## ⚡")
+    if tm:
+        title = tm.group(1).strip()
+    else:
+        blk = re.search(r"##\s*邮件标题[^\n]*\n(.*?)(?=\n##\s|\Z)", raw, re.S)
+        title = ""
+        if blk:
+            for ln in blk.group(1).split("\n"):
+                t = ln.strip()
+                if t and not t.startswith((">", "#", "```", "**", "-", "备选")):
+                    title = t
+                    break
+        if not title:
+            raise RuntimeError(f"{path}: 「邮件标题」下两种格式都取不到，不许猜标题")
+    # 正文起点：08-21 起稿子把 `## ⚡ 三行干货` 的 emoji 去掉了，只认 "## ⚡" 会整篇取不到正文
+    #（2026-08-24 实测：08-21 周报因此进不了站）。两种写法都收，仍然只认「三行干货」这一节做起点。
+    start = -1
+    for mark in ("## ⚡", "## 三行干货"):
+        if mark in raw:
+            start = raw.index(mark)
+            break
+    if start < 0:
+        raise RuntimeError(f"{path}: 没有「## ⚡ / ## 三行干货」起点，格式变了先对齐 to_substack 再说")
     ends = [i for i in (raw.find("\n" + h, start) for h in INTERNAL_HEADS) if i > 0]
     body = raw[start:min(ends)] if ends else raw[start:]
     out, skip = [], False
@@ -432,6 +454,22 @@ def ledger_special(folder_date):
     pref = next((r for r in hits if r.get("platform") in ("substack", "buttondown")), hits[0])
     return pref["title"].strip(), pref["date"]
 
+# ── 周区间后缀（2026-08-24 Klay 令：标题要带日期区间）
+#   只补**缺**的：实发标题已含区间就原样不动（08-21「…8.17-8.21 本周回顾」就是实发带的）。
+#   只作用于**周报**：月报走「收官」，套周一到周五会把「7月收官」标成 7.27-7.31＝事实错误。
+#   ⚠️ 补出来的区间是**展示层**，台账里的实发标题不动——档案标题因此可能与实发差一个后缀，
+#      这是 Klay 明令要的，不是脚本擅自改写实发（§45/§46 的「取实发」仍由 ledger_special 保证）。
+RANGE_RE = re.compile(r"\d{1,2}\s*[.\-/]\s*\d{1,2}\s*[-–—~]\s*\d{1,2}\s*[.\-/]\s*\d{1,2}|\d{4}\s*[-–—~]\s*\d{4}")
+
+def with_week_range(title, date):
+    """周报标题缺日期区间时，按该期所在周的周一到周五补一个。"""
+    if "收官" in title or RANGE_RE.search(title):
+        return title
+    d = datetime.date.fromisoformat(date)
+    mon = d - datetime.timedelta(days=d.weekday())
+    fri = mon + datetime.timedelta(days=4)
+    return f"{title} \u00b7 {mon.month}.{mon.day}-{fri.month}.{fri.day}"
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", help="只出这一天，用于样张")
@@ -444,7 +482,19 @@ def main():
                [(f, parse_live) for f in live_files(a.live_cutover)])
     done, seen_slugs = [], {}
     for f, parser in entries:
-        date, title, body = parser(f)
+        # 日更的解析失败不许打死整条管线（2026-08-24 实测两次：08-18 标题块换式、
+        # 08-19 缺「## ⚡」⇒ 全量跑在中途抛异常，后面所有期数含 08-21 周报全部进不了站，
+        # 而日更按 §46 本来就不进站＝为一个不上站的文件牺牲掉所有上站的文件）。
+        # 周报/月报（住日夹子夹）解析失败仍然硬抛：那是真要上站的东西，不许静默漏。
+        _sub = os.path.basename(os.path.dirname(f)).strip()
+        _is_special_path = parser is parse_live and not re.match(r"\d{4}-\d{2}-\d{2}$", _sub)
+        try:
+            date, title, body = parser(f)
+        except RuntimeError as e:
+            if _is_special_path:
+                raise
+            print(f"  ⚠️  日更解析失败，按 §46 反正不进站，跳过不阻断：{e}")
+            continue
         special = False
         if parser is parse_live:
             # 活源的特刊按**目录结构**识别（周报/月报住日夹的子夹，日更住日夹根）。
@@ -469,6 +519,7 @@ def main():
         if not special and not re.search(r"回顾|收官", title):
             print(f"  ⏭  {date} 日更，按 §46 不进站（公开在 Substack）：{title[:22]}")
             continue
+        title = with_week_range(title, date)
         log = []
         # 🚨 一天可能发两封（2026-07-26：日更 + 本周回顾）。同名会静默覆盖，
         #    而两封都照样打 ✅ ——日志会骗人，所以这里必须显式撞车守卫。
