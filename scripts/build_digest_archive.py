@@ -568,7 +568,31 @@ def split_cn_en(body):
             cut = m.start()
     if cut < 0:
         return body, ""
-    return body[:cut].rstrip(), body[cut:].strip()
+    return body[:cut].rstrip(), strip_en_scaffold(body[cut:].strip())
+
+
+# 英文段开头常是标题脚手架（`## English edition · title + subtitle` 下面挂 Title:/Subtitle:/
+# 备选/**推荐标题** 代码块）。它是**给编辑看的**，不是正文——H1 已经是标题，正文里再来一遍
+# 就成了「文章开头先把自己的标题念一遍」。整块丢到下一个 ## 为止。
+# 只丢**含 English edition 字样**的那一节；08-14 的英文正文直接从 `## ⚡ Three-Line Summary`
+# 起，不含这类脚手架，判据不会误伤。
+def strip_en_scaffold(en):
+    # ①活源：`## English edition · title + subtitle` 整节（Title:/Subtitle:/备选）丢到下一个 ##
+    m = re.match(r"^##\s*[^\n]*English edition[^\n]*\n", en)
+    if m:
+        rest = en[m.end():]
+        nxt = re.search(r"^##\s", rest, re.M)
+        return rest[nxt.start():].strip() if nxt else rest.strip()
+    # ②冻结源：分界是内联 HTML（<div>🌍 English edition</div> 或 <h2>English edition</h2>），
+    #   不是 markdown 标题 ⇒ 上面那条吃不到。先丢掉这一行本身。
+    lines = en.split("\n")
+    if lines and "English edition" in lines[0]:
+        lines = lines[1:]
+    en = "\n".join(lines).lstrip("\n")
+    # ③冻结源 08-09 紧跟一个 <h3>Subject line</h3> + ``` 代码块＝英文主标题，
+    #   已经渲染成 H1 了，正文里不再重复一遍。
+    m = re.match(r"^[^\n]*Subject line[^\n]*\n\s*```[^\n]*\n.*?\n\s*```\s*\n", en, re.S)
+    return (en[m.end():] if m else en).strip()
 
 # 英文标题：显式写了就用显式的；三种写法都没有就退回中文标题（07-26/08-02 属此类，
 # 它们的英文段直接从 TL;DR 开始，源里根本没有英文主标题——不许自己编一个）。
