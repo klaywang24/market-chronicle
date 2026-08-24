@@ -44,6 +44,10 @@
 .dg-body blockquote{border-left:2px solid var(--accent);padding-left:14px;margin:1.5em 0;opacity:.9}
 .dg-body a{color:var(--accent)}
 .dg-foot{margin-top:56px;padding-top:22px;border-top:1px solid var(--border,rgba(128,128,128,.25));font-size:13px;opacity:.72}
+/* 墙/页脚/返回 里的链接此前没给颜色，吃浏览器默认蓝 rgb(0,0,238)：
+   暗色下压在 #111 上对比度约 2:1 近乎隐形，亮色下也跟铁锈红设计系统冲突。 */
+.dg-wall a,.dg-foot a,.dg-back{color:var(--accent);text-decoration:none}
+.dg-wall a:hover,.dg-foot a:hover,.dg-back:hover{text-decoration:underline}
 </style>
 </head>
 <body>
