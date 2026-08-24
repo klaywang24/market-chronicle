@@ -621,6 +621,47 @@ def en_title_of(en_body, cn_title):
             return m.group(1).strip(), True
     return cn_title, False
 
+# ── 英文页配图（2026-08-24 Klay 令：英文版不能只有文字）
+# 判据不是我发明的，照抄 `每日 digest/tools/to_substack.py:196` 那条既有规则：
+#   「中文段的 〖图N：文件名〗 顺序＝这一期真正的配图顺序，英文段照它走」，
+#   英文段源稿本来就不放图位，配图在出口按**节序**注入，用同一张卡的 _EN / _纯英文 版本。
+# 与那边保持一致的两点：①图排在小节标题**之前** ②英文 alt 不碰中文文件名（读屏/抓取会读到）。
+EN_VARIANTS = ("_EN", "_纯英文", "_英文主", "_双语")
+
+def en_sibling(cn_name, dirs):
+    """把中文页用的那张卡换成同一张卡的英文版；找不到返回 None（不硬凑、不拿中文卡冒充）。"""
+    stem = os.path.splitext(cn_name)[0]
+    for v in VARIANT_PREF:
+        if stem.endswith(v):
+            stem = stem[:-len(v)]
+            break
+    for suf in EN_VARIANTS:
+        hit = find_card(stem + suf + ".png", dirs)
+        if hit:
+            return os.path.basename(hit)
+    return None
+
+def inject_en_figures(en, names):
+    """按节序把图插进英文正文：第 k 张排在第 k 个小节标题之前。
+    锚点三选一（活源/冻结源体例不同）：优先 `## [Category]`（与 to_substack 同口径），
+    没有就退回全部 `## ` 标题，再没有就用内联 <h3>（冻结源就是这种）。多出来的图补在文末。"""
+    if not names:
+        return en
+    lines = en.split("\n")
+    for pat in (r"^##\s+\[", r"^##\s+\S", r"^\s*<h3\b"):
+        rx = re.compile(pat)
+        if sum(1 for l in lines if rx.search(l)) >= len(names):
+            break
+    out, k = [], 0
+    for ln in lines:
+        if k < len(names) and rx.search(ln):
+            out += [f"![{names[k]}](local://card)", ""]
+            k += 1
+        out.append(ln)
+    for nm in names[k:]:                       # 锚点不够用，剩下的补在文末，绝不丢图
+        out += ["", f"![{nm}](local://card)"]
+    return "\n".join(out)
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", help="只出这一天，用于样张")
@@ -689,11 +730,19 @@ def main():
         else:
             print(f"  ⚠️  {date} 没有英文段，只出中文页")
 
-        first = None
+        first, cn_cards = None, []
         for kind, vslug, vbody, vtitle in variants:
             log = []
-            card = "_纯中文.png" if kind == "cn" else "_EN.png"
-            vbody = re.sub(r"〖图\d+：([^〗]+)〗", r"![\1" + card + r"](local://card)", vbody)
+            if kind == "cn":
+                vbody = re.sub(r"〖图\d+：([^〗]+)〗", r"![\1_纯中文.png](local://card)", vbody)
+            else:
+                dirs = search_dirs(date)
+                sibs = [(c, en_sibling(c, dirs)) for c in cn_cards]
+                miss = [c for c, e in sibs if not e]
+                if miss:
+                    print(f"       ⚠️ {date} 英文版缺卡 {len(miss)}/{len(sibs)}：" +
+                          "、".join(m[:24] for m in miss[:3]))
+                vbody = inject_en_figures(vbody, [e for _, e in sibs if e])
             body_html = build_body(vbody, date, vslug, log)
             desc = re.sub(r"<[^>]+>", "", body_html)[:110].replace('"', "'").strip()
             other = (slug + ".en.html") if kind == "cn" else (slug + ".html")
@@ -729,6 +778,7 @@ def main():
                     print(f"       [推] {rel} ← {src}")
             if kind == "cn":
                 first = next((r for k, _, r in log if k in ("精", "推")), None)
+                cn_cards = [src for k, src, _ in log if k in ("精", "推")]
         done.append((slug, date, title, first, en_title if has_en else None))
     print(f"\n  共出 {len(done)} 页 → {OUT}")
     if not a.only:
