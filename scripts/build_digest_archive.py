@@ -568,7 +568,19 @@ def split_cn_en(body):
             cut = m.start()
     if cut < 0:
         return body, ""
-    return body[:cut].rstrip(), strip_en_scaffold(body[cut:].strip())
+    return trim_cn_tail(body[:cut]), strip_en_scaffold(body[cut:].strip())
+
+
+# 中文段尾部常挂着「换语言」的分隔块：`---` / 🌍 **English edition** / `---`。
+# 它排在英文段起点**之前**，所以拆分时留在中文侧——08-14 中文页因此在末尾多出一条
+# 「🌍 English edition」横幅（Klay 08-24 报）。从尾往回剪掉分隔线与该字样，剪到真正的正文为止。
+CN_TAIL_JUNK = re.compile(r"^\s*(-{3,}|\*{3,}|_{3,}|<hr\s*/?>|.*English edition.*)\s*$", re.I)
+
+def trim_cn_tail(cn):
+    lines = cn.rstrip().split("\n")
+    while lines and (not lines[-1].strip() or CN_TAIL_JUNK.match(lines[-1])):
+        lines.pop()
+    return "\n".join(lines).rstrip()
 
 
 # 英文段开头常是标题脚手架（`## English edition · title + subtitle` 下面挂 Title:/Subtitle:/
