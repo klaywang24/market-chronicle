@@ -26,12 +26,10 @@ CARDS = os.path.join(BIZ, "01-起号引流", "每日 digest")
 #   没有这条活源，档案永远停在 08-09（前会话验尸结论，勿删活源再犯）。
 LIVE_CUTOVER = "2026-08-10"
 # 活源对外正文的结束边界：这些内部节起，往后全是流程与判据，绝不外泄
-INTERNAL_HEADS = ("## 图槽", "## 回访清单", "## 🛑", "## 🔴",
-                  # 2026-08-24 补：站上档案是**纯中文正文**，中文正文之后的分发物一律不进。
-                  # 08-21 那篇把 下周要回访的→English edition→LinkedIn→小红书 全排在
-                  # `## 图槽` 之前，而边界只认图槽 ⇒ 英文版和小红书整段被卷进正文发上了站。
-                  # （08-14 没暴露只是因为它的 English edition 写在正文起点之前。）
-                  "## 下周要回访的", "## English edition", "## 小红书")
+INTERNAL_HEADS = ("## 图槽", "## 回访清单", "## 🛑", "## 🔴")
+# 分发物是「跳过节」不是「结束边界」（2026-08-24 修）：08-21 把 下周要回访的 / LinkedIn /
+# 小红书 排在英文段两侧，若当结束边界，英文段会连同它们一起被截掉，双语页就永远出不来。
+SKIP_SECTIONS = ("LinkedIn", "小红书", "下周要回访的")
 OUT = os.path.join(REPO, "digest")
 IMGOUT = os.path.join(OUT, "img")
 SITE = "https://chronicle.klay-wang.com"
@@ -199,7 +197,7 @@ def strip_cjk_dash(md, log):
     return out
 
 HEAD = """<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="{htmllang}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -213,61 +211,96 @@ HEAD = """<!DOCTYPE html>
 <meta property="article:published_time" content="{date}">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="alternate" type="application/rss+xml" title="美股编年史 · 判读档案" href="{site}/feed.xml">
-<style>
-/* 归档页专属：站上 SPA 外壳不适用，这里只借调色板与字体 */
-.dg-wrap{{max-width:760px;margin:0 auto;padding:48px 20px 96px}}
-.dg-back{{font-size:13px;opacity:.7;text-decoration:none;display:inline-block;margin-bottom:28px}}
-.dg-date{{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.04em;opacity:.6}}
-.dg-title{{font-family:'Fraunces',serif;font-size:clamp(26px,4.4vw,38px);line-height:1.28;margin:10px 0 6px}}
-.dg-wall{{font-size:12.5px;opacity:.62;border-left:2px solid var(--accent);padding-left:10px;margin:18px 0 34px}}
-.dg-body{{font-size:16.5px;line-height:1.86}}
-.dg-body p{{margin:0 0 1.15em}}
-.dg-body h2{{font-family:'Fraunces',serif;font-size:22px;margin:2.1em 0 .7em}}
-.dg-body img{{width:100%;height:auto;border-radius:10px;margin:1.5em 0;display:block}}
-.dg-body blockquote{{border-left:2px solid var(--accent);padding-left:14px;margin:1.5em 0;opacity:.9}}
-.dg-body a{{color:var(--accent)}}
-.dg-foot{{margin-top:56px;padding-top:22px;border-top:1px solid var(--border,rgba(128,128,128,.25));font-size:13px;opacity:.72}}
-</style>
+{alt}
+<script>{themejs}</script>
+<style>{ctlcss}</style>
 </head>
 <body>
+{ctl}
 <div class="dg-wrap">
-<a class="dg-back" href="./">← 判读档案</a>
+<a class="dg-back" href="{backhref}">{backtext}</a>
 <div class="dg-date">{date}</div>
 <h1 class="dg-title">{title}</h1>
-<div class="dg-wall">这是往期归档。当日判读全文只在盘前送进订户邮箱：<a href="{site}/subscribe">订阅</a>后每个交易日开盘前送达。</div>
+<div class="dg-wall">{walltext}</div>
 <div class="dg-body">
 <!--BODY-->{body}<!--/BODY-->
 </div>
-<div class="dg-foot">
-美股编年史 Market Chronicle · 本文为历史归档，数字与判断均为当日口径，事后不回改。<br>
-本站不提供投资建议，不预测方向，不做择时。
+<div class="dg-foot">{foottext}</div>
 </div>
-</div>
+<script>{togglejs}</script>
 </body>
 </html>
 """
 
+# ── 右上角控件（2026-08-24 Klay 令：照个人网站 klay-wang.com 的样子）
+#   机制与那边一致：<html data-theme> + localStorage 的 "theme" / "lang" 两个键，
+#   aria-label 也沿用 Switch language / Toggle dark mode。
+#   站上暗色靠 css/style.css 的 `.dark-mode` 类切 token，所以 data-theme 之外还要挂类。
+THEME_JS = ('(function(){var t=localStorage.getItem("theme")||'
+            '(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");'
+            'var r=document.documentElement;r.setAttribute("data-theme",t);'
+            'if(t==="dark")r.classList.add("dark-mode");})();')
+
+TOGGLE_JS = ('(function(){var b=document.getElementById("dgTheme");if(!b)return;'
+             'var r=document.documentElement;function paint(){var d=r.getAttribute("data-theme")==="dark";'
+             'b.textContent=d?"\u2600":"\u263e";}paint();'
+             'b.addEventListener("click",function(){var d=r.getAttribute("data-theme")==="dark";'
+             'var t=d?"light":"dark";r.setAttribute("data-theme",t);r.classList.toggle("dark-mode",!d);'
+             'localStorage.setItem("theme",t);paint();});})();')
+
+CTL_CSS = """
+.dg-ctl{position:fixed;top:16px;right:18px;display:flex;gap:8px;z-index:50}
+.dg-ctl a,.dg-ctl button{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1;
+  padding:7px 10px;border:1px solid var(--border,rgba(128,128,128,.35));border-radius:999px;
+  background:var(--bg,#fff);color:var(--ink,#111);text-decoration:none;cursor:pointer;
+  opacity:.72;transition:opacity .15s,border-color .15s}
+.dg-ctl a:hover,.dg-ctl button:hover{opacity:1;border-color:var(--accent)}
+@media(max-width:560px){.dg-ctl{top:10px;right:10px}.dg-ctl a,.dg-ctl button{padding:6px 9px;font-size:11px}}
+.dg-wrap{max-width:760px;margin:0 auto;padding:48px 20px 96px}
+.dg-back{font-size:13px;opacity:.7;text-decoration:none;display:inline-block;margin-bottom:28px}
+.dg-date{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.04em;opacity:.6}
+.dg-title{font-family:'Fraunces',serif;font-size:clamp(26px,4.4vw,38px);line-height:1.28;margin:10px 0 6px}
+.dg-wall{font-size:12.5px;opacity:.62;border-left:2px solid var(--accent);padding-left:10px;margin:18px 0 34px}
+.dg-body{font-size:16.5px;line-height:1.86}
+.dg-body p{margin:0 0 1.15em}
+.dg-body h2{font-family:'Fraunces',serif;font-size:22px;margin:2.1em 0 .7em}
+.dg-body h3{font-family:'Fraunces',serif;font-size:18px;margin:1.7em 0 .6em;opacity:.92}
+.dg-body img{width:100%;height:auto;border-radius:10px;margin:1.5em 0;display:block}
+.dg-body blockquote{border-left:2px solid var(--accent);padding-left:14px;margin:1.5em 0;opacity:.9}
+.dg-body a{color:var(--accent)}
+.dg-foot{margin-top:56px;padding-top:22px;border-top:1px solid var(--border,rgba(128,128,128,.25));font-size:13px;opacity:.72}
+"""
+
+def controls(other_href, other_label):
+    lang = (f'<a href="{other_href}" aria-label="Switch language">{other_label}</a>'
+            if other_href else "")
+    return ('<div class="dg-ctl">' + lang +
+            '<button id="dgTheme" type="button" aria-label="Toggle dark mode">\u263e</button></div>')
+
+
+
 
 IDX_HEAD = """<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="{htmllang}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>判读档案 · 美股编年史 Market Chronicle</title>
-<link rel="canonical" href="{site}/digest/">
-<meta name="description" content="美股编年史每日判读的往期归档，逐日累积。当日判读只进订户邮箱，往期公开可查。">
+<title>{h1} · 美股编年史 Market Chronicle</title>
+<link rel="canonical" href="{site}/digest/{canon}">
+<meta name="description" content="{desc}">
 <meta property="og:type" content="website">
-<meta property="og:title" content="判读档案 · 美股编年史">
-<meta property="og:url" content="{site}/digest/">
+<meta property="og:title" content="{h1} · 美股编年史">
+<meta property="og:url" content="{site}/digest/{canon}">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="alternate" type="application/rss+xml" title="美股编年史 · 判读档案" href="{site}/feed.xml">
-<style>
-.dg-wrap{{max-width:820px;margin:0 auto;padding:48px 20px 96px}}
+<link rel="alternate" hreflang="{otherlang}" href="{site}/digest/{othercanon}">
+<script>{themejs}</script>
+<style>{ctlcss}
+.dg-wrap{{max-width:820px}}
 .dg-h1{{font-family:'Fraunces',serif;font-size:clamp(28px,5vw,42px);margin:0 0 10px}}
 .dg-lede{{font-size:15px;line-height:1.8;opacity:.75;max-width:62ch;margin:0 0 8px}}
-.dg-wall{{font-size:12.5px;opacity:.62;border-left:2px solid var(--accent);padding-left:10px;margin:20px 0 40px}}
 .dg-yr{{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;opacity:.5;margin:34px 0 12px}}
-.dg-item{{display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-top:1px solid var(--border,rgba(128,128,128,.2));text-decoration:none}}
+.dg-item{{display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-top:1px solid var(--border,rgba(128,128,128,.2));text-decoration:none;color:inherit}}
 .dg-item:hover .dg-it{{color:var(--accent)}}
 .dg-thumb{{width:104px;height:78px;object-fit:cover;border-radius:6px;flex:0 0 auto;background:rgba(128,128,128,.1)}}
 .dg-meta{{font-family:'JetBrains Mono',monospace;font-size:11.5px;opacity:.55;letter-spacing:.03em}}
@@ -277,39 +310,73 @@ IDX_HEAD = """<!DOCTYPE html>
 </style>
 </head>
 <body>
+{ctl}
 <div class="dg-wrap">
-<h1 class="dg-h1">判读档案</h1>
-<p class="dg-lede">每个交易日盘前一封，只做一件事：把当天的市场状态用可验证的数字讲清楚。贵不贵、怕不怕、极端不极端。不预测方向，不做择时。</p>
-<div class="dg-wall">当日判读全文只在盘前送进订户邮箱：<a href="{site}/subscribe">订阅</a>后每个交易日开盘前送达。往期在此公开可查，逐日累积。</div>
+<h1 class="dg-h1">{h1}</h1>
+<p class="dg-lede">{lede}</p>
+<div class="dg-wall">{walltext}</div>
 {items}
 </div>
+<script>{togglejs}</script>
 </body>
 </html>
 """
 
-def write_index(done):
+def write_index(done, kind="cn"):
+    """中英各出一份索引。英文索引只列有英文版的期数。"""
+    cn = kind == "cn"
     items, cur_ym = [], None
-    for slug, date, title, first_img in sorted(done, key=lambda x: x[1], reverse=True):
+    for slug, date, title, first_img, en_title in sorted(done, key=lambda x: x[1], reverse=True):
+        if not cn and not en_title:
+            continue
         ym = date[:7]
         if ym != cur_ym:
             cur_ym = ym
-            items.append(f'<div class="dg-yr">{ym.replace("-", " / ")}</div>')
-        tag = '<span class="dg-tag">回顾</span>' if slug.endswith("-weekly") else ""
-        thumb = f'<img class="dg-thumb" src="{first_img}" alt="" loading="lazy">' if first_img else '<div class="dg-thumb"></div>'
-        items.append(
-            f'<a class="dg-item" href="./{slug}">{thumb}'
-            f'<div><div class="dg-meta">{date}</div>'
-            f'<div class="dg-it">{html.escape(title)}{tag}</div></div></a>')
-    open(os.path.join(OUT, "index.html"), "w", encoding="utf-8").write(
-        IDX_HEAD.format(site=SITE, items="\n".join(items)))
-    return len(done)
+            items.append('<div class="dg-yr">' + ym.replace("-", " / ") + '</div>')
+        lab = "回顾" if cn else "Weekly"
+        tag = '<span class="dg-tag">' + lab + '</span>' if slug.endswith("-weekly") else ""
+        thumb = ('<img class="dg-thumb" src="' + first_img + '" alt="" loading="lazy">'
+                 if first_img else '<div class="dg-thumb"></div>')
+        href = "./" + slug if cn else "./" + slug + ".en.html"
+        shown = title if cn else en_title
+        items.append('<a class="dg-item" href="' + href + '">' + thumb +
+                     '<div><div class="dg-meta">' + date + '</div>'
+                     '<div class="dg-it">' + html.escape(shown) + tag + '</div></div></a>')
+    name = "index.html" if cn else "index.en.html"
+    open(os.path.join(OUT, name), "w", encoding="utf-8").write(
+        IDX_HEAD.format(
+            site=SITE, items="\n".join(items),
+            htmllang="zh-CN" if cn else "en",
+            canon="" if cn else "index.en.html",
+            othercanon="index.en.html" if cn else "",
+            otherlang="en" if cn else "zh-CN",
+            h1="判读档案" if cn else "The Archive",
+            desc=("美股编年史每日判读的往期归档，逐日累积。当日判读只进订户邮箱，往期公开可查。"
+                  if cn else
+                  "Archived issues of Market Chronicle's daily reading. The current issue goes to "
+                  "subscribers only; past issues are public."),
+            lede=("每个交易日盘前一封，只做一件事：把当天的市场状态用可验证的数字讲清楚。"
+                  "贵不贵、怕不怕、极端不极端。不预测方向，不做择时。"
+                  if cn else
+                  "One email before every open, doing one thing: stating the day's market condition "
+                  "in numbers you can check. Expensive or not, afraid or not, extreme or not. "
+                  "No direction calls, no market timing."),
+            walltext=("当日判读全文只在盘前送进订户邮箱："
+                      '<a href="' + SITE + '/subscribe">订阅</a>后每个交易日开盘前送达。往期在此公开可查，逐日累积。'
+                      if cn else
+                      "The full current issue goes to subscribers before the open: "
+                      '<a href="' + SITE + '/subscribe">subscribe</a>. Past issues are public here.'),
+            themejs=THEME_JS, togglejs=TOGGLE_JS, ctlcss=CTL_CSS,
+            ctl=controls("./index.en.html" if cn else "./", "EN" if cn else "中文")))
+    return sum(1 for d in done if cn or d[4])
+
 
 def write_feed(done):
     """Substack 的 Import posts 吃「website with an RSS feed」，所以全文进 feed。
     图用绝对地址（相对路径导过去会断）。"""
     import xml.sax.saxutils as su
     entries = []
-    for slug, date, title, _ in sorted(done, key=lambda x: x[1], reverse=True):
+    for slug, date, title, *_ in sorted(done, key=lambda x: x[1], reverse=True):
         body = open(os.path.join(OUT, f"{slug}.html"), encoding="utf-8").read()
         m = re.search(r"<!--BODY-->(.*?)<!--/BODY-->", body, re.S)
         if not m or len(m.group(1)) < 200:
@@ -343,8 +410,9 @@ def write_ledger(done):
     """§45 那张表原本靠 Buttondown 存档页取标题链接，平台已死 ⇒ 改成本地生成。"""
     import json
     items = [{"date": d, "slug": s, "title": t, "url": f"{SITE}/digest/{s}",
-              "kind": "weekly" if s.endswith("-weekly") else "daily"}
-             for s, d, t, _ in sorted(done, key=lambda x: x[1], reverse=True)]
+              "kind": "weekly" if s.endswith("-weekly") else "daily",
+              "title_en": en, "url_en": (f"{SITE}/digest/{s}.en.html" if en else None)}
+             for s, d, t, _, en in sorted(done, key=lambda x: x[1], reverse=True)]
     out = {"generated_at": datetime.datetime.now(datetime.timezone.utc)
                               .strftime("%Y-%m-%dT%H:%M:%SZ"),
            "count": len(items), "items": items}
@@ -361,7 +429,7 @@ def parse(path):
     body = re.sub(r"^#\s*.+", "", body, count=1)
     body = re.sub(r"^\s*发布:.*$", "", body, flags=re.M)
     body = re.sub(r"^\s*存档链接.*$", "", body, flags=re.M)
-    return date, title, body.strip()
+    return date, title, body.strip(), s
 
 
 def live_files(cutover):
@@ -423,15 +491,15 @@ def parse_live(path):
     for ln in body.split("\n"):
         st = ln.strip()
         if st.startswith("## "):
-            skip = st[3:].strip().startswith("LinkedIn")
+            skip = st[3:].strip().startswith(SKIP_SECTIONS)
             if skip:
                 continue
-        if skip or st.startswith(">") or st.startswith("### "):
+        if skip or st.startswith(">"):
             continue
         out.append(ln)
     body = "\n".join(out)
-    body = re.sub(r"〖图\d+：([^〗]+)〗", r"![\1_纯中文.png](local://card)", body)
-    return date, title, body.strip()
+    # 图标记原样留着，语言变体（_纯中文 / _EN）由 main 按出哪一版决定
+    return date, title, body.strip(), raw
 
 
 LEDGER = os.path.abspath(os.path.join(REPO, "..", "..", "期权数据管线", "data", "发布台账.csv"))
@@ -475,6 +543,44 @@ def with_week_range(title, date):
     fri = mon + datetime.timedelta(days=4)
     return f"{title} \u00b7 {mon.month}.{mon.day}-{fri.month}.{fri.day}"
 
+# ── 中英拆分（2026-08-24 Klay 令：站上一页只有一种语言，切换靠跳转不靠拼接）
+# 英文段起点三种写法都见过，按优先级找**正文起点之后**最早的一个：
+#   ①冻结源（Buttondown）：内联 HTML 里的 "English edition" 字面量（07-26/08-02 是 <div>，08-09 是 <h2>）
+#   ②活源 08-21：`## English edition · title + subtitle`
+#   ③活源 08-14：`## ⚡ Three-Line Summary`——它不含 "English edition" 字样
+# ⇒ 通用判据＝正文起点后第一个「整行不含中日韩字符的 ## 标题」，冻结源退回字面量。
+CJK_RE = re.compile(r"[一-鿿぀-ヿ가-힯]")
+
+def split_cn_en(body):
+    """把正文切成（中文正文, 英文正文）。没有英文段则英文为空串。"""
+    cut = -1
+    for m in re.finditer(r"^##\s+(.+)$", body, re.M):     # ②③：第一个无中日韩字符的二级标题
+        if not CJK_RE.search(m.group(1)):
+            cut = m.start()
+            break
+    if cut < 0:                                            # ①：冻结源没有 ## 结构，退回字面量
+        m = re.search(r"^.*English edition.*$", body, re.M)
+        if m:
+            cut = m.start()
+    if cut < 0:
+        return body, ""
+    return body[:cut].rstrip(), body[cut:].strip()
+
+# 英文标题：显式写了就用显式的；三种写法都没有就退回中文标题（07-26/08-02 属此类，
+# 它们的英文段直接从 TL;DR 开始，源里根本没有英文主标题——不许自己编一个）。
+EN_TITLE_PATS = (
+    r"Subject line</h3>\s*```\s*\n(.+?)\n",                 # 冻结源 08-09
+    r"^\s*Title:\s*(.+?)\s*$",                              # 活源 08-21
+    r"\*\*推荐标题\*\*\s*```\s*\n(.+?)\n",                  # 活源 08-14
+)
+
+def en_title_of(en_body, cn_title):
+    for pat in EN_TITLE_PATS:
+        m = re.search(pat, en_body, re.M | re.S)
+        if m and m.group(1).strip():
+            return m.group(1).strip(), True
+    return cn_title, False
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", help="只出这一天，用于样张")
@@ -494,7 +600,7 @@ def main():
         _sub = os.path.basename(os.path.dirname(f)).strip()
         _is_special_path = parser is parse_live and not re.match(r"\d{4}-\d{2}-\d{2}$", _sub)
         try:
-            date, title, body = parser(f)
+            date, title, body, raw = parser(f)
         except RuntimeError as e:
             if _is_special_path:
                 raise
@@ -525,31 +631,69 @@ def main():
             print(f"  ⏭  {date} 日更，按 §46 不进站（公开在 Substack）：{title[:22]}")
             continue
         title = with_week_range(title, date)
-        log = []
         # 🚨 一天可能发两封（2026-07-26：日更 + 本周回顾）。同名会静默覆盖，
         #    而两封都照样打 ✅ ——日志会骗人，所以这里必须显式撞车守卫。
         slug = date + ("-weekly" if special or re.search(r"回顾|收官", title) else "")
-        path = os.path.join(OUT, f"{slug}.html")
         if slug in seen_slugs:
             raise RuntimeError(f"输出撞车：{slug} 已被 {seen_slugs[slug]} 占用，"
                                f"当前 {os.path.basename(f)}。加后缀区分，绝不覆盖。")
         seen_slugs[slug] = os.path.basename(f)
-        body_html = build_body(body, date, slug, log)
-        desc = re.sub(r"<[^>]+>", "", body_html)[:110].replace('"', "'").strip()
-        open(path, "w", encoding="utf-8").write(
-            HEAD.format(title=html.escape(title), date=date, slug=slug,
-                        desc=html.escape(desc), site=SITE, body=body_html))
-        imgs = [r for r in log if r[0] in ("精", "推")]      # log 里还混着破折号记录，别当图数
-        inf = sum(1 for k, _, _ in imgs if k == "推")
-        print(f"  ✅ {date}  图 {len(imgs)} 张（精确 {len(imgs)-inf} · 推 {inf}）  {title[:26]}")
-        for k, src, rel in log:
-            if k == "推":
-                print(f"       [推] {rel} ← {src}")
-        first = next((r for k, _, r in log if k in ("精", "推")), None)  # 首图做索引缩略图
-        done.append((slug, date, title, first))
+
+        # 中英各出一页：一页只有一种语言，右上角切换是**跳转**，不是同页拼接。
+        cn_body, en_body = split_cn_en(body)
+        en_title, en_explicit = en_title_of(raw, title)     # 标题去 raw 里找：08-14 的英文标题写在正文起点之前
+        has_en = bool(en_body.strip())
+        variants = [("cn", slug, cn_body, title)]
+        if has_en:
+            variants.append(("en", slug + ".en", en_body, en_title))
+        else:
+            print(f"  ⚠️  {date} 没有英文段，只出中文页")
+
+        first = None
+        for kind, vslug, vbody, vtitle in variants:
+            log = []
+            card = "_纯中文.png" if kind == "cn" else "_EN.png"
+            vbody = re.sub(r"〖图\d+：([^〗]+)〗", r"![\1" + card + r"](local://card)", vbody)
+            body_html = build_body(vbody, date, vslug, log)
+            desc = re.sub(r"<[^>]+>", "", body_html)[:110].replace('"', "'").strip()
+            other = (slug + ".en.html") if kind == "cn" else (slug + ".html")
+            open(os.path.join(OUT, f"{vslug}.html"), "w", encoding="utf-8").write(
+                HEAD.format(
+                    htmllang="zh-CN" if kind == "cn" else "en",
+                    title=html.escape(vtitle), date=date, slug=vslug,
+                    desc=html.escape(desc), site=SITE, body=body_html,
+                    alt=(f'<link rel="alternate" hreflang="{"en" if kind=="cn" else "zh-CN"}" '
+                         f'href="{SITE}/digest/{other[:-5]}">' if has_en else ""),
+                    themejs=THEME_JS, togglejs=TOGGLE_JS, ctlcss=CTL_CSS,
+                    ctl=controls(other if has_en else "", "EN" if kind == "cn" else "中文"),
+                    backhref="./" if kind == "cn" else "./index.en.html",
+                    backtext="← 判读档案" if kind == "cn" else "← Archive",
+                    walltext=("这是往期归档。当日判读全文只在盘前送进订户邮箱："
+                              f'<a href="{SITE}/subscribe">订阅</a>后每个交易日开盘前送达。'
+                              if kind == "cn" else
+                              "This is an archived issue. The full daily reading goes to subscribers "
+                              f'before the open: <a href="{SITE}/subscribe">subscribe</a>.'),
+                    foottext=("美股编年史 Market Chronicle · 本文为历史归档，数字与判断均为当日口径，事后不回改。<br>"
+                              "本站不提供投资建议，不预测方向，不做择时。"
+                              if kind == "cn" else
+                              "Market Chronicle · Archived issue. Figures and judgments are as of that day "
+                              "and are never revised after the fact.<br>"
+                              "No investment advice. No direction calls. No market timing.")))
+            imgs = [r for r in log if r[0] in ("精", "推")]
+            inf = sum(1 for k, _, _ in imgs if k == "推")
+            tag = "中" if kind == "cn" else "EN"
+            note = "" if (kind == "cn" or en_explicit) else "  ⚠️英文标题源里没有，退回中文标题"
+            print(f"  ✅ {date} [{tag}]  图 {len(imgs)} 张（精确 {len(imgs)-inf} · 推 {inf}）  {vtitle[:26]}{note}")
+            for k, src, rel in log:
+                if k == "推":
+                    print(f"       [推] {rel} ← {src}")
+            if kind == "cn":
+                first = next((r for k, _, r in log if k in ("精", "推")), None)
+        done.append((slug, date, title, first, en_title if has_en else None))
     print(f"\n  共出 {len(done)} 页 → {OUT}")
     if not a.only:
-        print(f"  索引页 {write_index(done)} 条 · feed {write_feed(done)} 条 · 台账 {write_ledger(done)} 条")
+        ncn, nen = write_index(done, "cn"), write_index(done, "en")
+        print(f"  索引页 中 {ncn} 条 / EN {nen} 条 · feed {write_feed(done)} 条 · 台账 {write_ledger(done)} 条")
     return done
 
 if __name__ == "__main__":
