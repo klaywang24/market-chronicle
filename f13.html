@@ -205,7 +205,7 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
     if (!list.length) continue;
     const h = document.createElement("div"); h.className = "f13-groupttl"; h.textContent = ttl; wall.appendChild(h);
     const g = wall;
-    list.sort((a, b) => (b.value_usd || 0) - (a.value_usd || 0));
+    list.sort((a, b) => ((b.sort_value_usd || b.value_usd || 0) - (a.sort_value_usd || a.value_usd || 0)));
     for (const c of list) {
       const el = document.createElement("div");
       el.className = "f13-cap" + (c.solid ? " solid" : "") + (c.value_usd ? "" : " dis");
