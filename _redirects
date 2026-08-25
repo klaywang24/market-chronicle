@@ -134,24 +134,7 @@
 /r/66gi          https://fearprice.substack.com/subscribe   302
 /r/n98q          https://fearprice.substack.com/subscribe   302
 
-# 2026-08-11：日更正文按 §46 不进本站档案（公开在 Substack 归档）。
+# 2026-08-11：曾按 §46 撤下 19 个日更路径并 301 指回 /digest/。
+# 2026-08-25：§46 站上口径被 Klay 推翻（HANDOFF §64），日更页重新上站 ⇒ 19 条 301 全部移除，
+# 否则新生成的日更页会被自己的旧规则劫走。
 # 这 19 个路径曾短暂在线约 40 分钟，指回档案页而不是落进 SPA 兜底显示成首页。
-/digest/2026-07-15   /digest/   301
-/digest/2026-07-16   /digest/   301
-/digest/2026-07-17   /digest/   301
-/digest/2026-07-20   /digest/   301
-/digest/2026-07-21   /digest/   301
-/digest/2026-07-22   /digest/   301
-/digest/2026-07-23   /digest/   301
-/digest/2026-07-24   /digest/   301
-/digest/2026-07-26   /digest/   301
-/digest/2026-07-28   /digest/   301
-/digest/2026-07-29   /digest/   301
-/digest/2026-07-30   /digest/   301
-/digest/2026-07-31   /digest/   301
-/digest/2026-08-01   /digest/   301
-/digest/2026-08-04   /digest/   301
-/digest/2026-08-05   /digest/   301
-/digest/2026-08-06   /digest/   301
-/digest/2026-08-07   /digest/   301
-/digest/2026-08-08   /digest/   301
