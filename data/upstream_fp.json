@@ -1,0 +1,15 @@
+{
+ "series": {
+  "VIXHY": {
+   "through": "08/14/2026",
+   "rows": 3681,
+   "sha": "a5b9636fbfcd5440b2f656d955ecab765a87dd4e230bd0b48c20240ea95677ae"
+  },
+  "VIXIG": {
+   "through": "08/14/2026",
+   "rows": 3674,
+   "sha": "962dc968002d0c0269c0bcf07a0c832e2006f53eb46ff75dcf220e2fcbc30962"
+  }
+ },
+ "updated": "2026-08-25T23:48:22+00:00"
+}

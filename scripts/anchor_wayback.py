@@ -60,6 +60,7 @@ def targets(sha: str | None) -> list[str]:
                                               # 前提就是这里每天有人作证。排第三：判断层优先于门面。
         f"{SITE}/",
         f"{SITE}/data/leaps_gauge.json",
+        f"{SITE}/data/credit_witness.json",  # 信用线两门哈希承诺（2026-08-25 加·08-11 设计落地）：纯指纹零数据
     ]
     if sha:
         t.insert(1, f"https://github.com/klaywang24/market-chronicle/commit/{sha}")

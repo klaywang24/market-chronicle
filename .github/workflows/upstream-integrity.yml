@@ -1,0 +1,72 @@
+name: upstream-integrity
+# 上游序列回改警报器 · 云端侧（2026-08-25 建 · 08-11 设计「站仓 CI 侧」落地）。
+#
+# 🔑 为什么住云端而不只在本地：本地采集器（每日 18:35）会做同样的比对并记台账，
+#    但它跑在一台会合盖的笔记本上——笔记本死了，它的警报跟着死（witness-watchdog
+#    同一课：daily 死掉 4 天没人发现，因为告警和被告警的是同一台机器）。
+#    本 workflow 是哨兵：只回答「历史动没动」，账房断电时兜底。
+# 🔑 公开仓里只有指纹（data/upstream_fp.json 的 SHA256 前缀哈希），上游数据零字节入仓。
+on:
+  schedule:
+    - cron: '40 13 * * 1-5'   # 工作日 UTC 13:40 ≈ 美东 09:40，与 daily(22:00)/watchdog(13:00) 错开
+  workflow_dispatch: {}
+permissions:
+  contents: write            # 指纹步进要提交
+  issues: write              # 检出回改要开 Issue
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      # 退出码 1 = 检出回改（正常输出不是错误）——witness-watchdog 同款处理：
+      # || true 吞掉预期非零，判据从捕获的退出码读，不靠 fail-fast
+      - name: integrity check
+        id: chk
+        run: |
+          set +e
+          python scripts/check_upstream_integrity.py > /tmp/integrity.txt 2>&1
+          RC=$?
+          set -e
+          cat /tmp/integrity.txt
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+          { echo 'report<<INTEG_EOF'; cat /tmp/integrity.txt; echo 'INTEG_EOF'; } >> "$GITHUB_OUTPUT"
+      - name: commit fingerprint step
+        if: steps.chk.outputs.rc == '0'
+        run: |
+          git config user.name "Klay" && git config user.email "klaywang24@gmail.com"
+          git add data/upstream_fp.json
+          git diff --cached --quiet || git commit -m "integrity: 指纹步进（历史未动）"
+          git pull --rebase && git push
+      - name: open or update issue on revision
+        if: always() && steps.chk.outputs.rc == '1'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🔶 上游序列的历史被修改了';
+            const body = [
+              '云端回改哨兵检出：上游 CDN 的**已发布历史**与基线指纹不符。',
+              '这不是站点故障。按转录者条款该做的是：核对本地账房（credit-inst 18:35）',
+              '有没有同步记回改台账并跟随；若本地线已死，这就是双倍警报。',
+              '',
+              '```',
+              `${{ steps.chk.outputs.report }}`,
+              '```',
+              '',
+              `运行：${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+            ].join('\n');
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'upstream-integrity',
+            });
+            if (open.data.length) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: open.data[0].number, body });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: ['upstream-integrity'] });
+            }
