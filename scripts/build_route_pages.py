@@ -135,6 +135,10 @@ def expected_sitemap_urls(root=ROOT):
         urls.append(f"{BASE}/digest/{f.stem}")
     for f in sorted((root / "digest").glob("*-weekly.en.html")):
         urls.append(f"{BASE}/digest/{f.stem}")    # EN 周报（2026-08-25·canonical 为无扩展 .en 形态，与页内一致）
+    for f in sorted((root / "digest").glob("20??-??-??.html")):
+        urls.append(f"{BASE}/digest/{f.stem}")    # 日更页（2026-08-25·Klay 拍板日更往期上站，T+1）
+    for f in sorted((root / "digest").glob("20??-??-??.en.html")):
+        urls.append(f"{BASE}/digest/{f.stem}")    # 日更 EN 页
     return urls
 
 

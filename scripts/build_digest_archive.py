@@ -380,7 +380,9 @@ def write_feed(done):
     图用绝对地址（相对路径导过去会断）。"""
     import xml.sax.saxutils as su
     entries = []
-    for slug, date, title, *_ in sorted(done, key=lambda x: x[1], reverse=True):
+    # 2026-08-25 日更页上站后 feed 会逐日增长：RSS 惯例只送近期，cap 最近 60 期
+    # （Substack 的一次性导入早已完成，现在 feed 的消费者只有 RSS 订阅者）。
+    for slug, date, title, *_ in sorted(done, key=lambda x: x[1], reverse=True)[:60]:
         body = open(os.path.join(OUT, f"{slug}.html"), encoding="utf-8").read()
         m = re.search(r"<!--BODY-->(.*?)<!--/BODY-->", body, re.S)
         if not m or len(m.group(1)) < 200:
@@ -411,12 +413,15 @@ def write_feed(done):
     return len(entries)
 
 def write_ledger(done):
-    """§45 那张表原本靠 Buttondown 存档页取标题链接，平台已死 ⇒ 改成本地生成。"""
+    """§45 那张表原本靠 Buttondown 存档页取标题链接，平台已死 ⇒ 改成本地生成。
+    🔒 RULES 十三：每日 digest 永不进本表（只收周报/月报）——2026-08-25 日更页上站后
+    这条不变：日更页走 digest/index.html 归档与 sitemap 曝光，头版存档墙照旧只见周报。"""
     import json
     items = [{"date": d, "slug": s, "title": t, "url": f"{SITE}/digest/{s}",
-              "kind": "weekly" if s.endswith("-weekly") else "daily",
+              "kind": "weekly",
               "title_en": en, "url_en": (f"{SITE}/digest/{s}.en.html" if en else None)}
-             for s, d, t, _, en in sorted(done, key=lambda x: x[1], reverse=True)]
+             for s, d, t, _, en in sorted(done, key=lambda x: x[1], reverse=True)
+             if s.endswith("-weekly")]
     out = {"generated_at": datetime.datetime.now(datetime.timezone.utc)
                               .strftime("%Y-%m-%dT%H:%M:%SZ"),
            "count": len(items), "items": items}
@@ -433,6 +438,12 @@ def parse(path):
     body = re.sub(r"^#\s*.+", "", body, count=1)
     body = re.sub(r"^\s*发布:.*$", "", body, flags=re.M)
     body = re.sub(r"^\s*存档链接.*$", "", body, flags=re.M)
+    # 单行 fancy-HTML 导出（buttondown 富文本模式，07-22/07-23 两封）：整封正文挤在一行，
+    # 下游全部按行工作（中英切分、buttondown.com 行清除、English edition 字面量定位），
+    # 单行进去＝中英两侧都切成 0 字节、空页上站（2026-08-25 日更上站时暴露）。
+    # ⇒ 在源头按块级标签补换行，恢复「一块一行」，下游逻辑不用改。
+    if body.count("\n") < 3 and body.count("</p>") > 3:
+        body = re.sub(r"(</p>|</figure>|</h\d>|<hr\s*/?>)", r"\1\n", body)
     return date, title, body.strip(), s
 
 
@@ -488,7 +499,15 @@ def parse_live(path):
             start = raw.index(mark)
             break
     if start < 0:
-        raise RuntimeError(f"{path}: 没有「## ⚡ / ## 三行干货」起点，格式变了先对齐 to_substack 再说")
+        # 2026-08-25 对齐 to_substack.py 的兜底判据（08-19 起稿子干脆去掉了三行速览节）：
+        # 第一个**非元数据** ## 小节即正文起点。元数据关键词照抄 to_substack 的 _META。
+        _META = ("标题候选", "副标题", "English edition", "标题", "图槽")
+        _cands = [m.start() for m in re.finditer(r"^## (.+)$", raw, re.M)
+                  if not any(k in m.group(1) for k in _META)]
+        if _cands:
+            start = _cands[0]
+    if start < 0:
+        raise RuntimeError(f"{path}: 没有「## ⚡ / 三行干货」起点，也没有非元数据 ## 小节，格式变了先对齐 to_substack 再说")
     ends = [i for i in (raw.find("\n" + h, start) for h in INTERNAL_HEADS) if i > 0]
     body = raw[start:min(ends)] if ends else raw[start:]
     out, skip = [], False
@@ -525,6 +544,26 @@ def ledger_special(folder_date):
     hits = [r for r in rows
             if folder_date <= (r.get("date") or "") <= end
             and re.search(r"回顾|收官", (r.get("content_type") or "") + (r.get("title") or ""))
+            and (r.get("title") or "").strip()]
+    if not hits:
+        return None
+    pref = next((r for r in hits if r.get("platform") in ("substack", "buttondown")), hits[0])
+    return pref["title"].strip(), pref["date"]
+
+def ledger_daily(folder_date):
+    """活源日更的**发布证明**（2026-08-25 日更上站随行加的闸，机理同 ledger_special）：
+    台账里数据日起 2 天内、content_type 以「日更」开头的行＝发出去了；「浏览量回访·」
+    开头的是回访行不是发布行，不算。标题优先邮件平台的实发（多平台标题可能各改各的），
+    没有邮件平台行就取首行实发。没有任何行＝还没发 ⇒ 不上站，防「写好没发」的稿泄漏。"""
+    import csv as _csv
+    end = (datetime.date.fromisoformat(folder_date) + datetime.timedelta(days=2)).isoformat()
+    try:
+        rows = list(_csv.DictReader(open(LEDGER, encoding="utf-8")))
+    except FileNotFoundError:
+        return None
+    hits = [r for r in rows
+            if folder_date <= (r.get("date") or "") <= end
+            and (r.get("content_type") or "").startswith("日更")
             and (r.get("title") or "").strip()]
     if not hits:
         return None
@@ -685,7 +724,7 @@ def main():
         except RuntimeError as e:
             if _is_special_path:
                 raise
-            print(f"  ⚠️  日更解析失败，按 §46 反正不进站，跳过不阻断：{e}")
+            print(f"  ⚠️  日更解析失败，跳过不阻断（2026-08-25 起日更要上站：这一条=缺一页，请修稿件格式）：{e}")
             continue
         special = False
         if parser is parse_live:
@@ -700,17 +739,23 @@ def main():
                 title, pub = led
                 special = True
                 print(f"  [台账] {date} 特刊按实发标题进站（发布于 {pub}）：{title[:30]}")
+            else:
+                # 活源日更（2026-08-25 起上站）：同样凭发布台账行放行——没有行＝还没发，
+                # 不上站（防「写好没发」的稿泄漏）；标题取台账实发（规矩：标题一律取实发）。
+                led = ledger_daily(date)
+                if not led:
+                    print(f"  ⏳ {date} 日更未见发布台账行，待发布后自动进站：{title[:22]}")
+                    continue
+                title = led[0]
         if a.only and date != a.only:
             continue
         if date >= today:                      # 时间墙：当日永不上站
             print(f"  ⏭  {date} 是当日/未来，按时间墙跳过")
             continue
-        # §46 口径（2026-08-11 Klay 复核后维持）：**站上档案只收周报/月报**。
-        # 日更正文不上本站——它们公开在 Substack 归档里（2026-08-11 经 RSS 导入）。
-        # 判据只有这一处实现，别在别处另写一份（活源特刊由台账放行，等价于同一判据）。
-        if not special and not re.search(r"回顾|收官", title):
-            print(f"  ⏭  {date} 日更，按 §46 不进站（公开在 Substack）：{title[:22]}")
-            continue
+        # §46 口径迭代史：08-11 Klay 复核「站上只收周报/月报」→ **2026-08-25 Klay 拍板推翻**：
+        # 日更往期也上站（T+1，时间墙判据不变），理由=SEO 线：每日内容的权重此前全部流向
+        # Substack，站上逐日归档才能收敛内容量差距。承诺不变（当日订户专享/往期公开），变的
+        # 只是「往期公开在哪」。digest_archive.json 仍只收周报（RULES 十三），见 write_ledger。
         title = with_week_range(title, date)
         # 🚨 一天可能发两封（2026-07-26：日更 + 本周回顾）。同名会静默覆盖，
         #    而两封都照样打 ✅ ——日志会骗人，所以这里必须显式撞车守卫。
