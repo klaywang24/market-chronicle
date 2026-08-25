@@ -127,9 +127,14 @@ def expected_sitemap_urls(root=ROOT):
     urls += [f"{BASE}/{r}" for r in ROUTES]
     urls.append(f"{BASE}/options")
     urls.append(f"{BASE}/f13")          # 13F 开奖独立页（2026-08-18·与期权页数据完全不互通）
+    urls.append(f"{BASE}/kapx")         # KAPX 术语页（2026-08-25·独立平铺页，定义/公式/口径/FAQ）
+    urls.append(f"{BASE}/fear-price")   # 恐惧的标价术语页（2026-08-25·同上）
     urls.append(f"{BASE}/digest/")
+    urls.append(f"{BASE}/digest/index.en.html")   # EN 归档索引（2026-08-25·其 canonical 即带 .html 形态）
     for f in sorted((root / "digest").glob("*-weekly.html")):
         urls.append(f"{BASE}/digest/{f.stem}")
+    for f in sorted((root / "digest").glob("*-weekly.en.html")):
+        urls.append(f"{BASE}/digest/{f.stem}")    # EN 周报（2026-08-25·canonical 为无扩展 .en 形态，与页内一致）
     return urls
 
 

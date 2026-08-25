@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KAPX 指数（K 指数）：定义、公式与口径 · 美股编年史 Market Chronicle</title>
+<link rel="canonical" href="https://chronicle.klay-wang.com/kapx">
+<meta name="description" content="KAPX 指数（K 指数）的权威术语页：官方定义、公式（CNN 恐贪 ÷ VIX）、信号口径、已知特性披露、版本规则与数据出口。KAPX Index: definition, formula and conventions, by Market Chronicle.">
+<script>
+/* 与主站同一套暗色开关（读同一个 localStorage 键），先于 CSS 应用防闪 */
+try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) document.documentElement.classList.add("dark-mode"); } catch (e) {}
+</script>
+<style>html{background:#FFFFFF}html.dark-mode{background:#111111}</style>
+<link rel="stylesheet" href="css/style.css?v=20260821d">
+<style>
+/* 术语页私有样式一律 tp- 前缀，只借主站的 :root 变量与字体，不碰主站类 */
+.tp-wrap { max-width: 780px; margin: 0 auto; padding: 0 22px 48px; }
+.tp-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.tp-brand { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 19px; font-weight: 700; color: var(--ink); text-decoration: none; }
+.tp-nav { display: flex; gap: 14px; flex-wrap: wrap; }
+.tp-nav a { font-size: 13.5px; color: var(--ink-soft); text-decoration: none; }
+.tp-nav a:hover { color: var(--ink); }
+.tp-kicker { font-family: 'JetBrains Mono',monospace; font-size: 12px; letter-spacing: .08em; color: var(--accent); margin: 18px 0 6px; }
+h1.tp-h1 { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 30px; line-height: 1.3; margin: 0 0 14px; color: var(--ink); }
+.tp-def { border-left: 3px solid var(--accent); padding: 10px 16px; background: var(--bg-card); margin: 14px 0; font-size: 15px; line-height: 1.85; color: var(--ink); }
+.tp-def-en { font-size: 13.5px; color: var(--ink-soft); line-height: 1.7; margin-top: 8px; }
+h2.tp-h2 { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 20px; margin: 34px 0 10px; color: var(--ink); }
+.tp-wrap p { font-size: 15px; line-height: 1.95; color: var(--ink-soft); margin: 10px 0; }
+.tp-wrap p strong { color: var(--ink); }
+.tp-formula { font-family: 'JetBrains Mono',monospace; font-size: 16px; text-align: center; padding: 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; margin: 14px 0; color: var(--ink); }
+table.tp-t { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13.5px; }
+table.tp-t th, table.tp-t td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--ink-soft); vertical-align: top; }
+table.tp-t th { color: var(--ink); font-weight: 600; white-space: nowrap; }
+.tp-faq dt { font-weight: 700; color: var(--ink); margin: 18px 0 6px; font-size: 15px; }
+.tp-faq dd { margin: 0; font-size: 14.5px; line-height: 1.9; color: var(--ink-soft); }
+.tp-note { font-size: 12.5px; color: var(--ink-muted); line-height: 1.8; margin-top: 30px; padding-top: 14px; border-top: 1px solid var(--border); }
+.tp-wrap a { color: var(--accent); }
+code.tp-c { font-family: 'JetBrains Mono',monospace; font-size: 13px; background: var(--bg-card); padding: 1px 6px; border-radius: 4px; }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"DefinedTerm","@id":"https://chronicle.klay-wang.com/kapx#term",
+  "name":"KAPX Index","alternateName":["K 指数","K-Index","KAPX"],
+  "description":"The KAPX Index is a daily U.S. equity fear-pricing gauge published by Market Chronicle, computed as the CNN Fear & Greed reading divided by the VIX. The K stands for kǒng (恐), the Chinese character for fear. K < 1 marks an extreme-fear signal; every reading is reconciled publicly against forward Nasdaq-100 returns, wins and losses alike.",
+  "url":"https://chronicle.klay-wang.com/kapx",
+  "identifier":{"@type":"PropertyValue","propertyID":"series_id","value":"mc.kapx.cnn_vix.v1"},
+  "inDefinedTermSet":{"@type":"DefinedTermSet","name":"Market Chronicle Gauges","url":"https://chronicle.klay-wang.com/"}},
+ {"@type":"FAQPage","@id":"https://chronicle.klay-wang.com/kapx#faq","mainEntity":[
+  {"@type":"Question","name":"KAPX 指数是 CNN 或 Cboe 的产品吗？","acceptedAnswer":{"@type":"Answer","text":"不是。CNN 恐惧贪婪指数与 VIX 只是 KAPX 的两个输入原料。KAPX 是 Market Chronicle 发布的独立原创指数，与 CNN、Cboe 均无附属、授权或背书关系。"}},
+  {"@type":"Question","name":"为什么叫 KAPX？","acceptedAnswer":{"@type":"Answer","text":"K 取自「恐」字拼音首字母（kǒng）。中文名为 K 指数，英文早期曾以 K-Index 被引用，现统一为 KAPX Index。KAPX 永久只指这一条序列。"}},
+  {"@type":"Question","name":"K 小于 1 意味着什么？","acceptedAnswer":{"@type":"Answer","text":"K < 1 是极端恐惧的历史标记：情绪读数低于波动率价格。它是描述性刻度，不构成买卖建议。2011 年以来共 39 次信号（截至 2026 年 7 月口径），60 个交易日视野下纳指 100 上涨 26 次、下跌 13 次，逐笔公开对账。"}},
+  {"@type":"Question","name":"公式会不会改？","acceptedAnswer":{"@type":"Answer","text":"口径已冻结。任何公式修改都会另立带新 series_id 的新序列（v2），绝不静默更改：序列身份、公式版本与历史谱系永不可变。"}},
+  {"@type":"Question","name":"数据可以商用吗？","acceptedAnswer":{"@type":"Answer","text":"打包数据集（Hugging Face 与 Kaggle 上的 CSV）按 CC BY 4.0 授权：注明出处即可自由使用，包括商用。站点代码另按 PolyForm Noncommercial 1.0.0 授权。"}}
+ ]}
+]}
+</script>
+</head>
+<body>
+<div class="tp-wrap">
+  <div class="tp-top">
+    <a class="tp-brand" href="/">美股编年史</a>
+    <nav class="tp-nav">
+      <a href="/kindex">K 指数台账</a>
+      <a href="/fear-price">恐惧的标价·术语页</a>
+      <a href="/methodology">方法论</a>
+    </nav>
+  </div>
+
+  <div class="tp-kicker">TERM · SERIES_ID: MC.KAPX.CNN_VIX.V1</div>
+  <h1 class="tp-h1">KAPX 指数（K 指数 · KAPX Index）</h1>
+
+  <div class="tp-def">
+    <strong>官方定义</strong>：KAPX 指数（K 取自「恐」字拼音首字母）是 Market Chronicle 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。读数、方法论与完整信号台账永久免费公开，Git 时间戳可验证。
+    <p class="tp-def-en" lang="en"><strong>Canonical definition:</strong> The KAPX Index is a daily U.S. equity fear-pricing gauge published by Market Chronicle, computed as the CNN Fear &amp; Greed reading divided by the VIX. The K stands for kǒng (恐), the Chinese character for fear; readings, methodology, and the complete signal ledger are permanently free and verifiable via Git timestamps.</p>
+  </div>
+
+  <h2 class="tp-h2">公式</h2>
+  <div class="tp-formula">K = CNN Fear &amp; Greed ÷ VIX</div>
+  <p>分子是人心（CNN 恐惧贪婪指数，0 到 100），分母是保费（VIX，为下跌买保险的价格）。人越怕，分子越小、分母越贵，K 越小。两头同时压到极端时 K 跌破 1。</p>
+
+  <h2 class="tp-h2">信号口径</h2>
+  <p><strong>K &lt; 1 的连续交易日聚为一次信号</strong>；与上一段间隔超过 10 个交易日则另起一次。每次信号对照其后 20 / 40 / 60 / 120 / 250 个交易日与至今的纳指 100 前向收益，<strong>逐笔公开对账，赢的和亏的都在账上</strong>。2011 年以来共 39 次信号（截至 2026 年 7 月口径，最新以 <a href="/data/kindex_signals.json">signals JSON</a> 为准）：60 个交易日视野下上涨 26 次、下跌 13 次。V 型修复中战绩好，持续压力期（2011、2015、2018 底、2022）反复为负。</p>
+  <p><strong>诚实披露</strong>：机械跟随每次信号并没有跑赢对同一标的的买入持有（截至 2026 年 7 月：按 K 规则约 4.0 倍，同期持有纳指 100 约 13.0 倍）。这本台账的价值是给「今天」找历史坐标，不是打败市场。它不构成投资建议。</p>
+
+  <h2 class="tp-h2">已知特性（披露，不修正）</h2>
+  <p>VIX 是 CNN 恐贪七个成分之一，所以 K = CNN ÷ VIX 中波动率被部分重复计入（分母全额，分子约七分之一）。KAPX 更准确的读法是<strong>带波动率压力权重的恐惧刻度</strong>，而非两个完全独立信号的相除。公式公开、永不静默修改：任何口径变更都会另立带新 <code class="tp-c">series_id</code> 的新序列。</p>
+
+  <h2 class="tp-h2">可验证性（按时段拆分）</h2>
+  <table class="tp-t">
+    <tr><th>2026 年 7 月上线起</th><td>每个交易日由自动管线提交至公开 GitHub 仓库，带事前（ex-ante）Git 时间戳，事后不可改写。</td></tr>
+    <tr><th>2011 年至上线前</th><td>用已公布的公式从公开数据（CNN 恐贪存档 + VIX）回填：任何人可独立复现，但属历史回填，不是事前记录。</td></tr>
+  </table>
+
+  <h2 class="tp-h2">数据出口</h2>
+  <table class="tp-t">
+    <tr><th>台账页</th><td><a href="/kindex">/kindex</a>：读数、图表与逐笔信号对账</td></tr>
+    <tr><th>JSON</th><td><a href="/data/kindex.json">kindex.json</a>（日频全序列）· <a href="/data/kindex_signals.json">kindex_signals.json</a>（信号台账）</td></tr>
+    <tr><th>数据集</th><td><a href="https://huggingface.co/datasets/klay24/kapx-index">Hugging Face</a> · <a href="https://www.kaggle.com/datasets/klaywong/kapx-index-daily-fear-pricing-gauge">Kaggle</a>（CC BY 4.0）</td></tr>
+    <tr><th>源码与提交史</th><td><a href="https://github.com/klaywang24/market-chronicle">github.com/klaywang24/market-chronicle</a></td></tr>
+  </table>
+
+  <h2 class="tp-h2">与姊妹指数的区别</h2>
+  <table class="tp-t">
+    <tr><th></th><th>KAPX 指数</th><th><a href="/fear-price">恐惧的标价指数</a></th></tr>
+    <tr><th>问题</th><td>情绪相对波动率价格偏离了多少？</td><td>今天买长期期权在历史上算贵还是便宜？</td></tr>
+    <tr><th>公式</th><td>CNN 恐贪 ÷ VIX</td><td>VIX1Y 在过去三年的百分位</td></tr>
+    <tr><th>量纲</th><td>约 0 到 12 的比值</td><td>0 到 100 的百分位</td></tr>
+    <tr><th>series_id</th><td><code class="tp-c">mc.kapx.cnn_vix.v1</code></td><td><code class="tp-c">mc.fear_price.vix1y_pct3y.v1</code></td></tr>
+  </table>
+  <p>两条序列公式不同、互不派生，各有独立的稳定标识符。</p>
+
+  <h2 class="tp-h2">常见问题</h2>
+  <dl class="tp-faq">
+    <dt>KAPX 指数是 CNN 或 Cboe 的产品吗？</dt>
+    <dd>不是。CNN 恐惧贪婪指数与 VIX 只是 KAPX 的两个输入原料。KAPX 是 Market Chronicle 发布的独立原创指数，与 CNN、Cboe 均无附属、授权或背书关系。</dd>
+    <dt>为什么叫 KAPX？</dt>
+    <dd>K 取自「恐」字拼音首字母（kǒng）。中文名为 K 指数，英文早期曾以 K-Index 被引用，现统一为 KAPX Index。KAPX 永久只指这一条序列。</dd>
+    <dt>K 小于 1 意味着什么？</dt>
+    <dd>K &lt; 1 是极端恐惧的历史标记：情绪读数低于波动率价格。它是描述性刻度，不构成买卖建议。2011 年以来共 39 次信号（截至 2026 年 7 月口径），60 个交易日视野下纳指 100 上涨 26 次、下跌 13 次，逐笔公开对账。</dd>
+    <dt>公式会不会改？</dt>
+    <dd>口径已冻结。任何公式修改都会另立带新 series_id 的新序列（v2），绝不静默更改：序列身份、公式版本与历史谱系永不可变。</dd>
+    <dt>数据可以商用吗？</dt>
+    <dd>打包数据集（Hugging Face 与 Kaggle 上的 CSV）按 CC BY 4.0 授权：注明出处即可自由使用，包括商用。站点代码另按 PolyForm Noncommercial 1.0.0 授权。</dd>
+  </dl>
+
+  <p class="tp-note" lang="en">Attribution &amp; independence: The CNN Fear &amp; Greed Index is a product of CNN; VIX&reg; is a product of Cboe. KAPX uses their published values as inputs only. It is an independent, original index published by Market Chronicle and is not affiliated with, endorsed by, or sponsored by CNN or Cboe. Data and information only, not investment advice. Machine-readable brief: <a href="/llms.txt">/llms.txt</a></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>恐惧的标价指数（Fear-Price Index）：定义、公式与口径 · 美股编年史 Market Chronicle</title>
+<link rel="canonical" href="https://chronicle.klay-wang.com/fear-price">
+<meta name="description" content="恐惧的标价指数（Fear-Price Index）的权威术语页：官方定义、公式（VIX1Y 三年百分位）、四个语境指标口径、旧名收编、版本规则与数据出口。The Fear-Price Index: definition, formula and conventions, by Market Chronicle.">
+<script>
+/* 与主站同一套暗色开关（读同一个 localStorage 键），先于 CSS 应用防闪 */
+try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) document.documentElement.classList.add("dark-mode"); } catch (e) {}
+</script>
+<style>html{background:#FFFFFF}html.dark-mode{background:#111111}</style>
+<link rel="stylesheet" href="css/style.css?v=20260821d">
+<style>
+/* 术语页私有样式一律 tp- 前缀，只借主站的 :root 变量与字体，不碰主站类 */
+.tp-wrap { max-width: 780px; margin: 0 auto; padding: 0 22px 48px; }
+.tp-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.tp-brand { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 19px; font-weight: 700; color: var(--ink); text-decoration: none; }
+.tp-nav { display: flex; gap: 14px; flex-wrap: wrap; }
+.tp-nav a { font-size: 13.5px; color: var(--ink-soft); text-decoration: none; }
+.tp-nav a:hover { color: var(--ink); }
+.tp-kicker { font-family: 'JetBrains Mono',monospace; font-size: 12px; letter-spacing: .08em; color: var(--accent); margin: 18px 0 6px; }
+h1.tp-h1 { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 30px; line-height: 1.3; margin: 0 0 14px; color: var(--ink); }
+.tp-def { border-left: 3px solid var(--accent); padding: 10px 16px; background: var(--bg-card); margin: 14px 0; font-size: 15px; line-height: 1.85; color: var(--ink); }
+.tp-def-en { font-size: 13.5px; color: var(--ink-soft); line-height: 1.7; margin-top: 8px; }
+h2.tp-h2 { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 20px; margin: 34px 0 10px; color: var(--ink); }
+.tp-wrap p { font-size: 15px; line-height: 1.95; color: var(--ink-soft); margin: 10px 0; }
+.tp-wrap p strong { color: var(--ink); }
+.tp-formula { font-family: 'JetBrains Mono',monospace; font-size: 16px; text-align: center; padding: 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; margin: 14px 0; color: var(--ink); }
+table.tp-t { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13.5px; }
+table.tp-t th, table.tp-t td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--ink-soft); vertical-align: top; }
+table.tp-t th { color: var(--ink); font-weight: 600; white-space: nowrap; }
+.tp-faq dt { font-weight: 700; color: var(--ink); margin: 18px 0 6px; font-size: 15px; }
+.tp-faq dd { margin: 0; font-size: 14.5px; line-height: 1.9; color: var(--ink-soft); }
+.tp-note { font-size: 12.5px; color: var(--ink-muted); line-height: 1.8; margin-top: 30px; padding-top: 14px; border-top: 1px solid var(--border); }
+.tp-wrap a { color: var(--accent); }
+code.tp-c { font-family: 'JetBrains Mono',monospace; font-size: 13px; background: var(--bg-card); padding: 1px 6px; border-radius: 4px; }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"DefinedTerm","@id":"https://chronicle.klay-wang.com/fear-price#term",
+  "name":"Fear-Price Index","alternateName":["恐惧的标价指数","Fear's Price Tag","LEAPS Cost Gauge","The Price of Fear"],
+  "description":"The Fear-Price Index (恐惧的标价指数) is a descriptive 0-100 gauge of long-dated volatility cost, published each U.S. trading day by Market Chronicle: the percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years. Higher = long-dated options (LEAPS) historically more expensive. Descriptive only, never a trading signal, never return-tested.",
+  "url":"https://chronicle.klay-wang.com/fear-price",
+  "identifier":{"@type":"PropertyValue","propertyID":"series_id","value":"mc.fear_price.vix1y_pct3y.v1"},
+  "inDefinedTermSet":{"@type":"DefinedTermSet","name":"Market Chronicle Gauges","url":"https://chronicle.klay-wang.com/"}},
+ {"@type":"FAQPage","@id":"https://chronicle.klay-wang.com/fear-price#faq","mainEntity":[
+  {"@type":"Question","name":"恐惧的标价指数预测市场吗？","acceptedAnswer":{"@type":"Answer","text":"不预测。它只回答一个问题：今天买长期期权（LEAPS）相对自身历史算贵还是便宜。纯描述性温度计，非交易信号，从未做过收益回测。"}},
+  {"@type":"Question","name":"它和 VIX 有什么区别？","acceptedAnswer":{"@type":"Answer","text":"VIX 量的是未来 30 天的短端波动率价格；本指数的主读数是一年期隐含波动率 VIX1Y 在过去三年的百分位，量的是长期恐惧的价格在自己历史里的位置。短端可以平静而长端昂贵，两者经常分家。"}},
+  {"@type":"Question","name":"它和 KAPX 指数什么关系？","acceptedAnswer":{"@type":"Answer","text":"姊妹序列：同属 Market Chronicle，公式不同、量纲不同、互不派生，各有独立的稳定标识符（本指数 mc.fear_price.vix1y_pct3y.v1，KAPX 为 mc.kapx.cnn_vix.v1）。"}},
+  {"@type":"Question","name":"为什么 2007 到 2009 年有空值？","acceptedAnswer":{"@type":"Answer","text":"三年百分位需要先攒满窗口：早期在不足 756 个交易日的窗口上计算（最少 250 个交易日），之前为空。这是披露的 warm-up 口径，不是缺数据。"}},
+  {"@type":"Question","name":"它以前叫什么名字？","acceptedAnswer":{"@type":"Answer","text":"三个旧英文名已收编为同一序列的历史别名：Fear's Price Tag、LEAPS Cost Gauge、The Price of Fear。现行唯一英文名为 Fear-Price Index，永不再议。"}},
+  {"@type":"Question","name":"数据可以商用吗？","acceptedAnswer":{"@type":"Answer","text":"编纂、衍生指标与台账结构按 PolyForm Noncommercial 1.0.0 授权：非商用免费，商用需另行授权。底层数值是转录自公开来源（Cboe 等）的事实，不主张所有权。"}}
+ ]}
+]}
+</script>
+</head>
+<body>
+<div class="tp-wrap">
+  <div class="tp-top">
+    <a class="tp-brand" href="/">美股编年史</a>
+    <nav class="tp-nav">
+      <a href="/leaps">恐惧的标价台账</a>
+      <a href="/kapx">KAPX·术语页</a>
+      <a href="/methodology">方法论</a>
+    </nav>
+  </div>
+
+  <div class="tp-kicker">TERM · SERIES_ID: MC.FEAR_PRICE.VIX1Y_PCT3Y.V1</div>
+  <h1 class="tp-h1">恐惧的标价指数（Fear-Price Index）</h1>
+
+  <div class="tp-def">
+    <strong>官方定义</strong>：恐惧的标价指数是 Market Chronicle 每个交易日发布的长期期权成本刻度：一年期隐含波动率 VIX1Y 在过去三年的百分位（0 = 历史最便宜，100 = 历史最贵）。它只回答一个问题：「今天买长期期权（LEAPS）在历史上算贵还是便宜？」纯描述性温度计，非交易信号、非预测、不测收益。
+    <p class="tp-def-en" lang="en"><strong>Canonical definition:</strong> The Fear-Price Index (恐惧的标价指数) is a descriptive 0-100 gauge of long-dated volatility cost, published each U.S. trading day by Market Chronicle: the percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years. Higher = long-dated options (LEAPS, 12-18 months) historically more expensive. It measures what fear costs, never whether to buy or sell.</p>
+  </div>
+
+  <h2 class="tp-h2">公式</h2>
+  <div class="tp-formula">Fear-Price = percentile( VIX1Y, 过去 756 个交易日 )</div>
+  <p>像天气预报：它不替你决定出不出门，只告诉你今天的雨具在历史上卖多少钱。读数高，说明为长期恐惧买单的价格处在自己历史的高位；读数低，说明便宜。主看三年窗口（756 个交易日），另附五年与全史百分位作小字坐标。</p>
+
+  <h2 class="tp-h2">四个语境指标（辅助读数，不是主读数）</h2>
+  <table class="tp-t">
+    <tr><th>波动率风险溢价</th><td>VIX1Y 减去标普 500 已实现波动率，取值而非百分位：主窗口 252 个交易日（一年），小字 63 个交易日（三个月）。</td></tr>
+    <tr><th>期限阶梯</th><td>VIX9D、VIX、VIX3M、VIX6M、VIX1Y 当前值快照，附 VIX 与 VIX1Y 之比：短端与长端有没有分家。</td></tr>
+    <tr><th>SKEW</th><td>Cboe SKEW 的全史百分位：尾部保险的相对贵贱。</td></tr>
+    <tr><th>实际利率</th><td>十年期实际利率（DFII10）的全史百分位：慢变量，故用全史窗口。</td></tr>
+  </table>
+
+  <h2 class="tp-h2">可验证性（按时段拆分）</h2>
+  <table class="tp-t">
+    <tr><th>2026-07-13 起</th><td>前向台账：每个交易日由自动管线提交至公开 GitHub 仓库，带事前（ex-ante）Git 时间戳。</td></tr>
+    <tr><th>2007 年至 2026-07-12</th><td>用已公布的公式从公开 Cboe 数据回填：任何人可独立复现，但属历史回填，不是事前记录。数据文件以 <code class="tp-c">segment</code> 列把边界写进数据本身。</td></tr>
+    <tr><th>2007 到 2009 年</th><td>warm-up：三年窗口未攒满（最少 250 个交易日），之前读数为空。披露口径，不是缺数。</td></tr>
+  </table>
+
+  <h2 class="tp-h2">名字的历史（旧名收编）</h2>
+  <p>同一条序列曾用过三个英文名：<strong>Fear's Price Tag</strong>、<strong>LEAPS Cost Gauge</strong>、<strong>The Price of Fear</strong>。三者均为历史别名，现行唯一英文名为 <strong>Fear-Price Index</strong>，永不再议。序列身份在 <code class="tp-c">series_id</code> 上，名字只是门牌：无论叫什么，数据是同一条链。</p>
+
+  <h2 class="tp-h2">数据出口</h2>
+  <table class="tp-t">
+    <tr><th>台账页</th><td><a href="/leaps">/leaps</a>：读数、图表与每日留痕</td></tr>
+    <tr><th>JSON</th><td><a href="/data/leaps_gauge.json">leaps_gauge.json</a>（日频全序列 + 四个语境指标）</td></tr>
+    <tr><th>数据集</th><td><a href="https://huggingface.co/datasets/klay24/fear-price-index">Hugging Face</a> · <a href="https://www.kaggle.com/datasets/klaywong/fear-price-index">Kaggle</a>（PolyForm NC 1.0.0）</td></tr>
+    <tr><th>源码与提交史</th><td><a href="https://github.com/klaywang24/market-chronicle">github.com/klaywang24/market-chronicle</a></td></tr>
+  </table>
+
+  <h2 class="tp-h2">与姊妹指数的区别</h2>
+  <table class="tp-t">
+    <tr><th></th><th>恐惧的标价指数</th><th><a href="/kapx">KAPX 指数</a></th></tr>
+    <tr><th>问题</th><td>今天买长期期权在历史上算贵还是便宜？</td><td>情绪相对波动率价格偏离了多少？</td></tr>
+    <tr><th>公式</th><td>VIX1Y 在过去三年的百分位</td><td>CNN 恐贪 ÷ VIX</td></tr>
+    <tr><th>量纲</th><td>0 到 100 的百分位</td><td>约 0 到 12 的比值</td></tr>
+    <tr><th>series_id</th><td><code class="tp-c">mc.fear_price.vix1y_pct3y.v1</code></td><td><code class="tp-c">mc.kapx.cnn_vix.v1</code></td></tr>
+  </table>
+  <p>两条序列公式不同、互不派生，各有独立的稳定标识符。</p>
+
+  <h2 class="tp-h2">常见问题</h2>
+  <dl class="tp-faq">
+    <dt>恐惧的标价指数预测市场吗？</dt>
+    <dd>不预测。它只回答一个问题：今天买长期期权（LEAPS）相对自身历史算贵还是便宜。纯描述性温度计，非交易信号，从未做过收益回测。</dd>
+    <dt>它和 VIX 有什么区别？</dt>
+    <dd>VIX 量的是未来 30 天的短端波动率价格；本指数的主读数是一年期隐含波动率 VIX1Y 在过去三年的百分位，量的是长期恐惧的价格在自己历史里的位置。短端可以平静而长端昂贵，两者经常分家。</dd>
+    <dt>它和 KAPX 指数什么关系？</dt>
+    <dd>姊妹序列：同属 Market Chronicle，公式不同、量纲不同、互不派生，各有独立的稳定标识符。</dd>
+    <dt>为什么 2007 到 2009 年有空值？</dt>
+    <dd>三年百分位需要先攒满窗口：早期在不足 756 个交易日的窗口上计算（最少 250 个交易日），之前为空。这是披露的 warm-up 口径，不是缺数据。</dd>
+    <dt>它以前叫什么名字？</dt>
+    <dd>三个旧英文名已收编为历史别名：Fear's Price Tag、LEAPS Cost Gauge、The Price of Fear。现行唯一英文名为 Fear-Price Index，永不再议。</dd>
+    <dt>数据可以商用吗？</dt>
+    <dd>编纂、衍生指标与台账结构按 PolyForm Noncommercial 1.0.0 授权：非商用免费，商用需另行授权（klaywang24+marketchronicle@gmail.com）。底层数值是转录自公开来源的事实，不主张所有权。</dd>
+  </dl>
+
+  <p class="tp-note" lang="en">Attribution &amp; independence: VIX1Y, VIX, and SKEW are products of Cboe. The Fear-Price Index uses their published values as inputs only. It is an independent, original gauge published by Market Chronicle and is not affiliated with, endorsed by, or sponsored by Cboe. Data and information only, not investment advice. Machine-readable brief: <a href="/llms.txt">/llms.txt</a></p>
+</div>
+</body>
+</html>
