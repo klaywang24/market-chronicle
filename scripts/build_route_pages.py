@@ -38,13 +38,13 @@ BASE = "https://chronicle.klay-wang.com"
 # 文案对齐站内各 panel 的实际内容；旗舰两页（kindex / leaps）写得最满。
 ROUTES = {
     "kindex": (
-        "K 指数台账 · CNN 恐贪 ÷ VIX",
+        "K 指数（KAPX Index）台账 · CNN 恐贪 ÷ VIX",
         "K 指数（KAPX Index）：CNN 恐惧贪婪指数除以 VIX 的反向情绪指标，K < 1 标记极端恐惧。"
         "每个交易日更新读数，2011 年以来每次信号对照纳指前向收益逐笔公开对账，赢的亏的都在。"
         "The KAPX Index: CNN Fear & Greed / VIX, reconciled daily.",
     ),
     "leaps": (
-        "恐惧的标价指数 · LEAPS 成本刻度",
+        "恐惧的标价指数（Fear-Price Index）· LEAPS 成本刻度",
         "长期期权（LEAPS）现在贵不贵：以一年期隐含波动率 VIX1Y 的三年分位为主读数，"
         "辅以波动率风险溢价、期限阶梯、SKEW 与实际利率，回填至 2007 年，每个交易日留痕。"
         "纯描述性刻度，不构成交易信号。Fear-Price Index: a cost gauge for LEAPS, formerly Fear's Price Tag.",
@@ -147,13 +147,13 @@ def patch(html: str, route: str, title: str, desc: str) -> str:
     full_title = f"{title} · 美股编年史 Market Chronicle"
     subs = [
         # (旧串, 新串) —— 旧串必须与 index.html 逐字一致且全文唯一
-        ("<title>美股编年史 · Market Chronicle</title>",
+        ("<title>美股编年史 · Market Chronicle：K 指数（KAPX）与恐惧的标价指数</title>",
          f"<title>{full_title}</title>"),
         ('<link rel="canonical" href="https://chronicle.klay-wang.com/">',
          f'<link rel="canonical" href="{BASE}/{route}">'),
         ('<meta property="og:url" content="https://chronicle.klay-wang.com/">',
          f'<meta property="og:url" content="{BASE}/{route}">'),
-        ('<meta property="og:title" content="美股编年史 · Market Chronicle">',
+        ('<meta property="og:title" content="美股编年史 · Market Chronicle：K 指数（KAPX）与恐惧的标价指数">',
          f'<meta property="og:title" content="{full_title}">'),
     ]
     # description 与 og:description 整行替换（行内容随首页文案变化，锚定行首标记）
