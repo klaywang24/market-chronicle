@@ -21,6 +21,7 @@ Google 判重看正文不看 head —— canonical 声明了它也不采信，08
 2026-08-17 对修复前的仓跑本闸 → 16 页各含 17 个 panel + sitemap 缺 digest，
 共 33 条红，随后修复转绿。凡本闸绿着而 GSC 又报重复，先怀疑闸瞎了再怀疑 Google。
 """
+import json
 import pathlib
 import re
 import sys
@@ -91,6 +92,30 @@ for m in re.finditer(r"<(\w+)[^>]*class=\"tab[ \"][^>]*data-panel=\"([a-z]+)\"[^
     tag, panel = m.group(1), m.group(2)
     if tag != "a" or 'href="' not in m.group(0):
         err(f'index.html：tab data-panel="{panel}" 是 <{tag}> 不是带 href 的 <a> —— 爬虫看不见这条内链')
+
+# ⑦ JSON-LD 语法闸（2026-08-25 加·HANDOFF §64）
+# 为什么要有：GSC 08-25 对 /leaps 报「无法解析的结构化数据：含有语法错误」，
+# 当时靠人手动全站扫一遍才确认现网是好的（告警指向部署前的旧抓取）。
+# 结构化数据坏掉不会让页面报错、不会让别的闸变红——它只是静默地让富媒体结果消失，
+# 而 GSC 要隔周才告诉你。⇒ 这种「坏了没人知道」的东西必须由闸每天看，不能靠人记得。
+# 判据是逐块 json.loads：Google 的解析器只比它更严，本闸绿不保证 Google 收，
+# 但本闸红就一定是我们自己的语法错。
+ld_pages = sorted(set(
+    [ROOT / "index.html"] + [ROOT / f"{r}.html" for r in ROUTES] +
+    [ROOT / f"{n}.html" for n in ("options", "f13", "kapx", "fear-price")]
+))
+ld_checked = 0
+for p in ld_pages:
+    if not p.exists():
+        continue
+    for i, block in enumerate(re.findall(
+            r'<script type="application/ld\+json">(.*?)</script>',
+            p.read_text(encoding="utf-8"), re.S)):
+        ld_checked += 1
+        try:
+            json.loads(block)
+        except json.JSONDecodeError as e:
+            err(f"{p.name} 第 {i+1} 个 ld+json 块语法错：{e}")
 
 if errors:
     print(f"\n共 {len(errors)} 条红。路由页正文重复/sitemap 失账会直接导致 GSC 拒收，修完再提交。")
