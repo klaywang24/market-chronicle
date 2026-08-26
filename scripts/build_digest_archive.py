@@ -18,11 +18,11 @@ import argparse, datetime, glob, html, os, re, shutil, subprocess, sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BIZ = os.path.abspath(os.path.join(REPO, "..", "..", "生意与起号"))
 SRC = os.path.join(BIZ, "04-Buttondown抢救备份", "邮件正文")
-CARDS = os.path.join(BIZ, "每日 digest")
+CARDS = os.path.join(BIZ, "01-每日 digest")
 
 # ── 双源取材（2026-08-11 修死管线）：
 #   冻结源 SRC＝Buttondown 抢救快照，覆盖 ≤2026-08-09，**永不再长**；
-#   活源＝每日 digest/<日夹>[/子夹]/文案_final.md，≥ LIVE_CUTOVER 起由这里进。
+#   活源＝01-每日 digest/<日夹>[/子夹]/文案_final.md，≥ LIVE_CUTOVER 起由这里进。
 #   没有这条活源，档案永远停在 08-09（前会话验尸结论，勿删活源再犯）。
 LIVE_CUTOVER = "2026-08-10"
 # 活源对外正文的结束边界：这些内部节起，往后全是流程与判据，绝不外泄
@@ -414,7 +414,7 @@ def write_feed(done):
 
 def write_ledger(done):
     """§45 那张表原本靠 Buttondown 存档页取标题链接，平台已死 ⇒ 改成本地生成。
-    🔒 RULES 十三：每日 digest 永不进本表（只收周报/月报）——2026-08-25 日更页上站后
+    🔒 RULES 十三：01-每日 digest 永不进本表（只收周报/月报）——2026-08-25 日更页上站后
     这条不变：日更页走 digest/index.html 归档与 sitemap 曝光，头版存档墙照旧只见周报。"""
     import json
     items = [{"date": d, "slug": s, "title": t, "url": f"{SITE}/digest/{s}",
@@ -461,7 +461,7 @@ def live_files(cutover):
 
 def parse_live(path):
     """活源解析：从工作稿抽**对外正文**，内部段绝不外泄。
-    ⚠️ 三条判据与 `每日 digest/tools/to_substack.py` 保持一致（那边改了这边必须跟）：
+    ⚠️ 三条判据与 `01-每日 digest/tools/to_substack.py` 保持一致（那边改了这边必须跟）：
        ①起点 = 「## ⚡」 ②剔除 = `>` 行 / `### ` 行 / LinkedIn 节 ③图位 = 〖图N：卡名〗
     与邮件出口的两处已知差异（故意的，不是漏）：
        · 不注入换平台开场白/结尾 footer——档案页模板自带 dg-wall/dg-foot；
@@ -661,7 +661,7 @@ def en_title_of(en_body, cn_title):
     return cn_title, False
 
 # ── 英文页配图（2026-08-24 Klay 令：英文版不能只有文字）
-# 判据不是我发明的，照抄 `每日 digest/tools/to_substack.py:196` 那条既有规则：
+# 判据不是我发明的，照抄 `01-每日 digest/tools/to_substack.py:196` 那条既有规则：
 #   「中文段的 〖图N：文件名〗 顺序＝这一期真正的配图顺序，英文段照它走」，
 #   英文段源稿本来就不放图位，配图在出口按**节序**注入，用同一张卡的 _EN / _纯英文 版本。
 # 与那边保持一致的两点：①图排在小节标题**之前** ②英文 alt 不碰中文文件名（读屏/抓取会读到）。
