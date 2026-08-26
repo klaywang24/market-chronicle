@@ -3553,3 +3553,31 @@ Klay 给 token 加了 `Zone → Analytics → Read`（**编辑现有 token，非
 - **runner 不用动**：com.klay.digest-archive（launchd，08-24 接线）每日自动跑 build+commit+push，日更页从今起逐日自动累积。
 
 **遗留**：日更 EN 标题多数「源里没有，退回中文标题」（旧稿英文标题写法不一）；08-24 新稿式的英文标题在「## English edition · title + subtitle」节里但 en_title_of 没取到——影响=EN 页标题显示中文，不阻断，后续对齐。
+
+## §65（2026-08-25 20:5x–21:1x EDT）SEO 线收尾四件：llms.txt 追平 · 实体图谱闭环 · 术语页进 Wayback · 第⑦闸（本节最新，与前文冲突以本节为准）
+
+承 §64。当天大动作做完后收工自查，发现**唯一漏网的对外文件恰是最值钱的那个**。
+
+**① `llms.txt` 追平（`940b899`）**——它是当天唯一被证明有效的载体（KAPX 下午改文案、当晚 Google AI 概览逐字复述了它里面的 canonical definition 并把 HF 数据集标为数据来源），却在一整天的改动里被漏掉。修三处：
+- 🔴 **事实错误**：「daily KAPX series **since 2019**」→ 实为 `since 2011-01-03`（CSV 实测首行 2011-01-03、3909 行）。这行在公开的、专门喂给 AI 读的文件里躺了不知多久。
+- **已失效陈述**：「`/fear-price` is a permanent public alias that **redirects to** it」——§64 起它是术语真页，此句当场作废（同批已在 `77e3bc0` 撤掉 `_redirects` 里 08-07 那条归并 301）。
+- **补全**：Datasets 段加 Fear-Price 两个数据集与其 NC 许可、KAPX 卡改名同步；Pages 段把两个术语页列为 **authoritative definition page（定义术语时引用这个 URL）**。
+- 四个新写入的 URL 逐条实测 200；部署后线上复验：`since 2019` 残留 0 / 权威声明 2 处 / 旧别名陈述残留 0 / Fear-Price 数据集命中 1。
+
+**② 实体图谱双向闭环（`5c426b2`）**——此前只有术语页单向链数据集。四张卡（HF×2 + Kaggle×2）全部加 `Authoritative definition (cite this when defining the term)` 指回术语页。**四处线上拉回真相接口验收**（`kaggle datasets metadata -p` 下载核对，不信返回值——Kaggle 列表 API 有缓存）。
+- ⚠️ 过程坑：Python heredoc 里写 `\\n` 会写成**字面两个字符**，Kaggle 页面会显示 `\n` 而非换行。已修并复验「字面 \n 残留：无」。
+
+**③ 两个术语页进 Wayback 每日锚（`54fa266`）**——`scripts/anchor_wayback.py` targets 加 `/kapx`、`/fear-price`。理由写进代码注释：**数据文件见证读数没被改，术语页见证口径没被改**；家法「公式与序列身份一经公开即不静默更改」要立得住，前提是有第三方能作证「某天的定义就是这么写的」。实跑已建首张快照（`/kapx` 20260826010135、`/fear-price` 20260826010203）。
+- 同跑发现 `credit_witness.json` 报「确实无快照」＝**首次锚定的预期状态**（SPN2 异步，脚本注释自己写明「今天那张通常要到下一次运行才被确认」），线上 200、仓内有文件，**非故障**，明日自转绿。
+
+**④ `tools/check_route_pages.py` 加第⑦闸：JSON-LD 语法逐块校验（`b45cd65`）**——覆盖 index + 16 路由页 + options/f13/kapx/fear-price 共 22 页。
+- 动机：当天 GSC 对 `/leaps` 报「无法解析的结构化数据：含有语法错误」，靠**人手动扫全站**才确认现网 24 页 JSON-LD 全部合法（告警指向部署前的旧抓取）。**结构化数据坏掉不报错、不触发任何其它闸，只静默让富媒体结果消失，且隔周才由 GSC 告知** ⇒ 这类「坏了没人知道」的东西必须由每日闸看，不能靠人记得跑。
+- **已按仓规矩用负向样本证明它真会报红**：往 `kapx.html` 的 ld+json 注入缺逗号 → 🔴 报错并定位到行列；还原 → ✅ 复绿。判据是逐块 `json.loads`：Google 的解析器只会更严，**本闸绿不保证 Google 收，但本闸红一定是我们自己的语法错**。
+
+**当日 SEO 全线终态**：站 25 页 → **88 页**；两个术语页上线并进 GSC 索引队列（当天共提交 5 条 URL）；HF/Kaggle 四张卡改名+切割线+viewer 修复+Fear-Price 首次上架；命名终裁「信用的标价」＝ **CFPX Index — the Credit Fear-Price Index**（🔶 软锁，锁点＝首次公开发布，详见信用线 REG §八）。
+
+**遗留 / 观察项**（验证清单在桌面 `SEO验证清单-2026-09-09.md`，含全部基线数字）：
+- 本次要验证的核心假设＝**普通英文词组（Fear-Price Index）能否像生造词（KAPX）那样建立独立实体**。两种解释（页面年龄 vs 词素引力井）两周后见分晓，结果直接决定 CFPX 展开式的写法。
+- `/leaps` 结构化数据旧告警应自消；`credit_witness.json` 与 HF fear-price viewer 隔日复看。
+- **④B 英文扩建（16 路由页静态英文版）刻意未做**——等 GSC 跑出 4~6 周英文查询词数据再决定，不为猜想付 2~3 天。
+- 期权线 SEO **Klay 08-25 定：降级不做**（「期权异动」是红海：Options.sg／Tickwind／富途／barchart）。附带发现：`"13F 开奖"` 精确搜**全网唯一结果是本站**，那个自造词已归我方但零建设，将来捡起成本极低。
