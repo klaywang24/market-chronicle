@@ -18,7 +18,7 @@ import argparse, datetime, glob, html, os, re, shutil, subprocess, sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BIZ = os.path.abspath(os.path.join(REPO, "..", "..", "生意与起号"))
 SRC = os.path.join(BIZ, "04-Buttondown抢救备份", "邮件正文")
-CARDS = os.path.join(BIZ, "01-起号引流", "每日 digest")
+CARDS = os.path.join(BIZ, "每日 digest")
 
 # ── 双源取材（2026-08-11 修死管线）：
 #   冻结源 SRC＝Buttondown 抢救快照，覆盖 ≤2026-08-09，**永不再长**；
