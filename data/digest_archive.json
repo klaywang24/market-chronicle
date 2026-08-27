@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-25T16:59:41Z",
-  "count": 5,
+  "generated_at": "2026-08-27T02:40:31Z",
+  "count": 2,
   "items": [
     {
       "date": "2026-08-21",
@@ -19,33 +19,6 @@
       "kind": "weekly",
       "title_en": "That Exit Headline You Just Read? It Is 113 Days Old.",
       "url_en": "https://chronicle.klay-wang.com/digest/2026-08-14-weekly.en.html"
-    },
-    {
-      "date": "2026-08-09",
-      "slug": "2026-08-09-weekly",
-      "title": "你的票，看似一周没动，其实走过了千山万水· 8.3-8.7 本周回顾",
-      "url": "https://chronicle.klay-wang.com/digest/2026-08-09-weekly",
-      "kind": "weekly",
-      "title_en": "The stock you keep watching went nowhere. It travelled a very long way.",
-      "url_en": "https://chronicle.klay-wang.com/digest/2026-08-09-weekly.en.html"
-    },
-    {
-      "date": "2026-08-02",
-      "slug": "2026-08-02-weekly",
-      "title": "美股七月赚钱了吗？这里面或许有你想要的答案：7月收官 & 回顾",
-      "url": "https://chronicle.klay-wang.com/digest/2026-08-02-weekly",
-      "kind": "weekly",
-      "title_en": "美股七月赚钱了吗？这里面或许有你想要的答案：7月收官 & 回顾",
-      "url_en": "https://chronicle.klay-wang.com/digest/2026-08-02-weekly.en.html"
-    },
-    {
-      "date": "2026-07-26",
-      "slug": "2026-07-26-weekly",
-      "title": "美股跌到位了吗？· 7.20-7.24 本周回顾",
-      "url": "https://chronicle.klay-wang.com/digest/2026-07-26-weekly",
-      "kind": "weekly",
-      "title_en": "美股跌到位了吗？· 7.20-7.24 本周回顾",
-      "url_en": "https://chronicle.klay-wang.com/digest/2026-07-26-weekly.en.html"
     }
   ]
 }
