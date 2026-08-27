@@ -54,7 +54,7 @@
 <p>We do not collect personal information you submit. The only data that may be involved is:</p>
 <ul>
 <li><strong>Server access logs</strong>: when serving pages to you, the host (Cloudflare) may record technical information such as your IP and browser user-agent (basis: legitimate interest in providing the service). These logs are held and controlled by Cloudflare; we cannot access their details.</li>
-<li><strong>Browser local storage</strong>: used only to remember your "day/night theme" and "interface language" — functionally necessary, stored on your own device, never uploaded, and containing no personally identifying information.</li>
+<li><strong>Browser local storage</strong>: used only to remember your day/night theme and interface language — functionally necessary, stored on your own device, never uploaded, and containing no personally identifying information.</li>
 </ul>
 <h3>Cookies</h3>
 <p>We <strong>set no tracking cookies of our own and run no in-house analytics</strong>. The third-party components below may set their own cookies; you can block or clear them in your browser at any time.</p>
@@ -68,13 +68,13 @@
 <li>Cloudflare Pages (pages.dev) — the website host.</li>
 </ul>
 <h3>What we don't do</h3>
-<p>We <strong>do not sell, rent or trade your personal information</strong> (including any "sale / sharing" as defined by California's CCPA), and we run no targeted advertising.</p>
+<p>We <strong>do not sell, rent or trade your personal information</strong> (including any sale and sharing as defined by California's CCPA), and we run no targeted advertising.</p>
 <h3>Your rights</h3>
 <p>Under applicable law (such as the EU GDPR, UK GDPR, and California CCPA/CPRA) you may have rights to access, correct, delete, restrict or object to processing, and to data portability. Because we hold almost no data that identifies you, most requests can be fulfilled simply by clearing your browser data; if you need our help, email us and we will respond within a reasonable time. You also have the right to complain to your local data protection authority.</p>
 <h3>Children</h3>
 <p>This site is not directed at children under 13, and we do not knowingly collect their information.</p>
 <h3>Changes &amp; contact</h3>
-<p>Any update will be noted with a "last updated" date at the top of this page. For privacy questions, email <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>` },
+<p>Any update will be noted with a last updated date at the top of this page. For privacy questions, email <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>` },
     },
 
     terms: {
@@ -86,7 +86,7 @@
 <h3>Purpose &amp; not investment advice</h3>
 <p>All content is for information and education only and <strong>does not constitute investment, financial, legal or tax advice</strong>. Any data may be delayed, inaccurate or incomplete; do not rely on it alone for trading or investment decisions.</p>
 <h3>No warranty</h3>
-<p>The site is provided "as is" and "as available", without any express or implied warranty as to accuracy, completeness, availability or fitness for a particular purpose.</p>
+<p>The site is provided as is and as available, without any express or implied warranty as to accuracy, completeness, availability or fitness for a particular purpose.</p>
 <h3>Limitation of liability</h3>
 <p>To the maximum extent permitted by law, we are not liable for any direct or indirect loss arising from your use of, or inability to use, this site.</p>
 <h3>Intellectual property &amp; third parties</h3>
