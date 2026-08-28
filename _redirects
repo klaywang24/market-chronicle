@@ -83,6 +83,26 @@
 #   对外公开场合（简介、社媒、群）发 /subscribe；要分人看数才发 /r/<码>。
 /subscribe        https://fearprice.substack.com/subscribe   302
 
+# ── 按平台订阅入口 /s/<平台> ──
+# 2026-08-27（Klay 定第一性原理：识别来源→到站行为→是否订阅/付费，**来源和转化两端必须连起来**，
+#   中间可丢）：/ft 等入站短链只回答「谁把人送来了」，/subscribe 只回答「有多少人想订」，
+#   两者对不上 ⇒ 无法回答「富途来的人订了几个」。本块把订阅意向按平台拆开：
+#   各平台正文里的订阅链接发 /s/<平台>，点击记在自己站的域名层（服务端计数，302 照数），
+#   来源↔订阅意向在自己服务器上闭合，不依赖 utm（§60：Cloudflare 归因只认路径不认 utm）。
+# 落点带 utm_source 是给 **Substack 侧**的归因试验：它的 growth_sources 认不认 utm 未验证，
+#   认了是白赚（连到最终转化），不认也不损失本站计数——两层尺子各自独立（见上「哪把尺子」条）。
+# 命名空间：/s/ 未被任何真路径占用（与 /r/ 同理不加 splat 兜底）；一律全小写。
+# 采集侧：cloudflare_analytics.py 的 SHORT_PATHS 已同步加这 8 条（清单不同步＝建成即盲，
+#   /subscribe 2026-08-11 建、08-27 才进清单的教训）。
+/s/ft            https://fearprice.substack.com/subscribe?utm_source=futu        302
+/s/xq            https://fearprice.substack.com/subscribe?utm_source=xueqiu      302
+/s/lb            https://fearprice.substack.com/subscribe?utm_source=longbridge  302
+/s/li            https://fearprice.substack.com/subscribe?utm_source=li          302
+/s/mm            https://fearprice.substack.com/subscribe?utm_source=moomoo      302
+/s/rd            https://fearprice.substack.com/subscribe?utm_source=reddit      302
+/s/wx            https://fearprice.substack.com/subscribe?utm_source=wechat      302
+/s/xhs           https://fearprice.substack.com/subscribe?utm_source=xhs         302
+
 # ── 推荐人短路径 /r/<码> ──
 # 干什么：给某个人一条专属短链，他分享出去后能看出流量是谁带来的。
 #
