@@ -20,7 +20,10 @@ import datetime, os, shutil, subprocess, sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BIZ = os.path.join(os.path.dirname(os.path.dirname(REPO)), "生意与起号")
 LOG = os.path.join(REPO, "data", "_digest_archive.log")
-WATCH = ["digest", "feed.xml", "data/digest_archive.json"]
+# 2026-08-28 Klay 拍板加 sitemap.xml：本工具加了 digest 页却从不重跑路由生成器 ⇒ sitemap
+# 失账 ⇒ nightly 撞 check_route_pages 红（08-22 f390123 / 08-28 各一次，同族二犯）。
+# 末尾带跑 build_route_pages（见 main 内），其产物 sitemap.xml 随本轮一起提交。
+WATCH = ["digest", "feed.xml", "data/digest_archive.json", "sitemap.xml"]
 # launchd 的 PATH 极简：cwebp 在 homebrew 里，不补这一行 to_webp 必炸
 os.environ["PATH"] = "/opt/homebrew/bin:" + os.environ.get("PATH", "/usr/bin:/bin")
 
@@ -54,6 +57,31 @@ def main():
             "（日更漂移只告警不阻断，周报漂移才会硬抛）")
         return r.returncode
 
+    # 🔴 2026-08-28（Klay 拍板·sitemap 失账同族二犯后）：加完页重跑路由生成器，sitemap 当晚入账。
+    #    ⚠️ 前置依赖：index 源与产物已同步（0da9848 拆雷）——源脏时生成器会回滚定稿，
+    #    所以要有源漂移守门。守门的两条铁律（首版实犯换来的，同晚被自己咬）：
+    #      ① 检测与还原**只许**落在生成器自己的产物清单内（从它的 stdout「生成 X」逐行解析，
+    #         不硬编码——清单会长）；② 绝不 `git checkout -- .`：多 agent 共仓，全仓还原会
+    #         吞掉别人（和自己）的未提交工作——首版就把本工具自己的未提交改动斩了。
+    g = subprocess.run([sys.executable, os.path.join(REPO, "scripts", "build_route_pages.py")],
+                       cwd=REPO, capture_output=True, text=True)
+    with open(LOG, "a", encoding="utf-8") as fh:
+        fh.write(g.stdout + g.stderr)
+    if g.returncode != 0:
+        say(f"❌ 路由生成器退出码 {g.returncode} —— sitemap 本轮没入账，会在 nightly 撞红")
+        return g.returncode
+    drift = False
+    produced = [ln.split("生成 ", 1)[1].split("（")[0].strip()
+                for ln in g.stdout.splitlines() if ln.startswith("生成 ") and ".html" in ln]
+    if produced:
+        dirty_pages = [l[3:].strip() for l in
+                       git("status", "--porcelain", "--", *produced).stdout.splitlines() if l.strip()]
+        if dirty_pages:
+            git("checkout", "--", *dirty_pages)      # 只还原路由页产物，别的一概不碰
+            say("🔴 路由页产物被生成器改写（index 源疑似又与产物漂移，有人只改产物没改源）。"
+                "已仅还原这些页、不提交，sitemap 照常入账：" + " ".join(dirty_pages[:6]))
+            drift = True   # 红要落到退出码上（launchd 才看得见），但 sitemap 记账照走
+
     # 变化判定必须**排除纯时间戳漂移**：digest_archive.json 的 generated_at 每跑一次就变，
     # 不排掉就天天产生一笔「什么都没变」的提交——既是噪声，也会把 GitHub contributions
     # 灌成机器数（§125：测量工具自己制造被测指标）。
@@ -65,7 +93,7 @@ def main():
     if not real and not untracked:
         say("✅ 跑通，无实质变化（只有 generated_at 时间戳漂移），不提交")
         git("checkout", "--", "data/digest_archive.json")
-        return 0
+        return 1 if drift else 0
 
     n = len([l for l in git("status", "--porcelain", "--", *WATCH).stdout.splitlines() if l.strip()])
     git("add", "-A", *WATCH)
@@ -81,7 +109,7 @@ def main():
             f"{(p.stderr or p.stdout).strip()[:200]}")
         return 1
     say(f"✅ 已提交并推送：{n} 处变化 · {git('log', '-1', '--format=%h').stdout.strip()}")
-    return 0
+    return 1 if drift else 0
 
 
 if __name__ == "__main__":
