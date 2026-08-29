@@ -206,7 +206,7 @@
   </div>
 </div>
 <p class="pay-methods"><span class="pay-label"><strong>Payment methods</strong>: </span><span class="pay-body"><img class="pay-ico" src="icons/pay/visa.svg" alt="" loading="lazy">Visa / <img class="pay-ico" src="icons/pay/mastercard.svg" alt="" loading="lazy">Mastercard / <img class="pay-ico" src="icons/pay/paypal.svg" alt="" loading="lazy">PayPal / <img class="pay-ico" src="icons/pay/applepay.svg" alt="" loading="lazy">Apple Pay / <img class="pay-ico" src="icons/pay/unionpay.svg" alt="" loading="lazy">UnionPay credit cards.<br><img class="pay-ico" src="icons/pay/alipay.svg" alt="" loading="lazy">Alipay / <img class="pay-ico" src="icons/pay/wechatpay.svg" alt="" loading="lazy">WeChat Pay / <img class="pay-ico" src="icons/pay/unionpay.svg" alt="" loading="lazy">UnionPay debit cards are not supported.</span></p>
-<p><strong>The numbers are everywhere, free forever.</strong> The archive earns its keep on every selloff that comes after — that morning, you are already holding a reading whose method has not changed in fifteen years.</p>
+<p><strong>The numbers are everywhere, free forever.</strong> The archive earns its keep on every selloff that comes after: that morning, you are already holding a reading whose method has not changed in fifteen years.</p>
 <p class="pricing-inst"><strong>Institutional / data licensing</strong> (series licensing, index licensing, redistribution) — <a href="contact">contact us</a>; unpriced.</p>
 <p>Annual = 10 months' price ($290 / $990). Payment is handled by Paddle; this site provides data and information only, and is not investment advice or any buy or sell recommendation.</p>
 <p class="doc-fineprint">Pro and API are later plans; email us if you need them.</p>` },
