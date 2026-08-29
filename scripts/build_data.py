@@ -649,7 +649,9 @@ def _yoy(s: pd.Series, nd: int = 2):
 
 
 def build_macro():
-    """资金面 / 信用 / 物价 / 增长与就业。全部 FRED 公开序列，2000 年起。"""
+    """资金面 / 信用 / 物价 / 增长与就业 / **传导链管道层**。全部 FRED 公开序列，2000 年起。
+    传导链管道层用到的三个已在此：hy_oas / ig_oas（信用价差·与 VIXHY 的信用波动率互为表里）、
+    rrp（流动性水位）、discount_window（2026-08-28 加）。"""
     print("== 宏观（FRED）")
     out = {}
     fetch_plan = {
@@ -667,6 +669,11 @@ def build_macro():
         "t10y2y": ("T10Y2Y", lambda s: _weekly(s)),
         "hy_oas": ("BAMLH0A0HYM2", lambda s: _weekly(s)),
         "ig_oas": ("BAMLC0A0CM", lambda s: _weekly(s)),
+        # 🆕 2026-08-28（传导链第三层「管道层」）：贴现窗口借款＝银行**已经在跑向央行**的直接证据。
+        #    序列已 double check：2023 SVB 那周 4,581 → **152,853** 百万美元（33 倍，全史峰值就在
+        #    2023-03-15），最新 2026-08-26 回落到 4,890 常态 ⇒ 确认这个号就是要的东西，不是贴现「利率」
+        #    （那是 DPCREDIT，实测返回 2.25 的利率值，差一个字母意思全变）。
+        "discount_window": ("WLCFLPCL", lambda s: _weekly(s, 0)),   # 百万美元·周频
         # 物价（同比）
         "cpi_yoy": ("CPIAUCSL", _yoy),
         "core_pce_yoy": ("PCEPILFE", _yoy),
@@ -1273,6 +1280,135 @@ def build_cot_vix():
         "latest": series[-1],
         "short_weeks_52": sum(1 for s in series[-52:] if s["lev_net"] < 0),
         "series": series,
+    })
+
+
+def build_move():
+    """ICE BofA MOVE 指数（美债期权隐含波动率）→ data/move.json（2026-08-28 新建·传导链保费层·利率腿）。
+
+    ━━ 它在传导链里是什么 ━━
+    MOVE 之于债市 = VIX 之于股市：**利率保险的市场价**。它与本仓 VIXHY（信用保险的波动率）
+    构成保费层的两根**历史长腿**——我们自己的 TLT/银行 IV 序列 2026-08-28 才起算、补不回来，
+    而这两根有十几年史，回测与分位判据全靠它们。
+
+    ━━ 2026-08-28 回测实证（建线依据，别删）━━
+    · 两条腿会分家：2016 能源债危机 信用响而利率哑（MOVE 峰值仅 41 分位）；
+      2022 加息 利率响而信用哑（VIXHY 峰值 89 未破 90）。⇒ 测的是两种不同的恐惧。
+    · 先响者指认危机类型：2016/2018=信用型先响；2020/2022/2023/2025=利率型先响。
+    · **误报率必须随读数一起公布**：3 年分位首破 90 的报警，MOVE 命中 4/8、VIXHY 5/13（9 个月窗）
+      ⇒ 本线定性为**仪表盘不是预测器**，只报"市场在为哪种灾难付保费"，不预测会不会出事。
+
+    🚫 FRED 无 MOVE（ICE 专有指数，实测 VIXCLS 通而 MOVE 无号）⇒ 走 yfinance ^MOVE。
+    """
+    print("== MOVE（美债期权隐含波动率·传导链利率腿）")
+    df = yf.download("^MOVE", period="max", interval="1d", auto_adjust=False, progress=False)
+    if df is None or df.empty:
+        raise RuntimeError("^MOVE 返回空")
+    s_ = df["Close"]
+    if hasattr(s_, "columns"):
+        s_ = s_.iloc[:, 0]
+    s_ = s_.dropna()
+    pct = s_.rolling(756, min_periods=252).apply(lambda x: (x <= x[-1]).mean() * 100, raw=True)
+    write_json("move.json", {
+        "_what": "ICE BofA MOVE：美债期权隐含波动率＝利率保险的市场价。pctl_3y=756 交易日滚动百分位"
+                 "（与恐惧的标价/信用的标价同一把尺）。",
+        "_caveat": "报警（分位≥90）历史命中率约 4/8 —— 仪表盘不是预测器。",
+        "latest": {"date": s_.index[-1].strftime("%Y-%m-%d"), "value": round(float(s_.iloc[-1]), 2),
+                   "pctl_3y": (None if pd.isna(pct.iloc[-1]) else round(float(pct.iloc[-1]), 1))},
+        "dates": dates(s_.index), "values": rnd(s_, 2),
+        "pctl_3y": [None if pd.isna(v) else round(float(v), 1) for v in pct],
+    })
+
+
+def build_cot_rates():
+    """CFTC TFF 里**利率/国债期货**的机构站位 → data/cot_rates.json（2026-08-28 新建·传导链第一层「火药层」）。
+
+    ━━ 为什么要它（与 cot_vix 分开的理由）━━
+    传导链三层：**火药层（谁挤在船一边）→ 保费层（谁先买保险）→ 管道层（堵没堵）**。
+    cot_vix 量的是"怕波动的人"的站位；本函数量的是**国债期货里堆了多大的杠杆赌注**——
+    杠杆基金在超长债/10Y 的巨额净空 ≈ 基差交易（basis trade）规模，2020-03 国债市场断流
+    的直接导火索。这是"债券先出事再传导到银行"那条路径上唯一能被公开数据看见的火药桶。
+    2026-08-28 实测当期：超长债杠杆净空 -848,988 手、10Y -372,157、SOFR-3M -2,596,865。
+
+    ━━ 市场名逐字实测，不许拼写猜（2026-08-28）━━
+    首次扫描用 limit=60 **只扫到部分**（UST BOND / ULTRA 两个 / FED FUNDS / SOFR 三个），
+    2Y/5Y/10Y NOTE 全被截在后面；提到 limit=80 才拿全 12 个。⇒ 全名一律取自实测返回，
+    并在下方写死；日后若 CFTC 改名，本函数会因该市场零行而在 status 里露出来（不静默）。
+    """
+    print("== CFTC COT（利率/国债期货站位·传导链火药层）")
+    # 🚨 **CFTC 在 2022-02 改过市场命名**，只认新名会静默丢掉 2022 年之前的全部历史
+    #    （2026-08-28 首跑实测：只用新名 ⇒ 全史起点 2022-02-08、仅 238 期；而 VIX 那条有 20 年）。
+    #    而本线的价值恰恰在 2008/2020 那些老案发现场 ⇒ 每个市场登记「新名 + 历史别名」，合并去重。
+    #    别名同样逐字实测（对 2015-08-25 那期扫全名取得），不许拼写猜。
+    markets = {                     # 键=短名（进 JSON）；值=该市场的全部历史称谓（新→旧）
+        "ust_2y":       ["UST 2Y NOTE - CHICAGO BOARD OF TRADE",
+                         "2-YEAR U.S. TREASURY NOTES - CHICAGO BOARD OF TRADE"],
+        "ust_5y":       ["UST 5Y NOTE - CHICAGO BOARD OF TRADE",
+                         "5-YEAR U.S. TREASURY NOTES - CHICAGO BOARD OF TRADE"],
+        "ust_10y":      ["UST 10Y NOTE - CHICAGO BOARD OF TRADE",
+                         "10-YEAR U.S. TREASURY NOTES - CHICAGO BOARD OF TRADE"],
+        "ust_ultra10y": ["ULTRA UST 10Y - CHICAGO BOARD OF TRADE",
+                         "ULTRA 10-YEAR U.S. TREASURY NOTES - CHICAGO BOARD OF TRADE"],
+        "ust_bond":     ["UST BOND - CHICAGO BOARD OF TRADE",
+                         "U.S. TREASURY BONDS - CHICAGO BOARD OF TRADE"],
+        "ust_ultrabond": ["ULTRA UST BOND - CHICAGO BOARD OF TRADE",
+                          "LONG-TERM U.S. TREASURY BONDS - CHICAGO BOARD OF TRADE"],
+        "fed_funds":    ["FED FUNDS - CHICAGO BOARD OF TRADE"],
+        "sofr_3m":      ["SOFR-3M - CHICAGO MERCANTILE EXCHANGE"],
+        "sofr_1m":      ["SOFR-1M - CHICAGO MERCANTILE EXCHANGE"],
+        # 🔑 欧洲美元期货＝SOFR 的前身（2023 前的短端杠杆都在这里），单列成腿而不是并进 sofr_3m：
+        #    两者合约规格与规模量级不同，拼成一条序列会造出一个假跳变（同本仓「换源＝废表」的家法）。
+        "eurodollar_3m": ["3-MONTH EURODOLLARS - CHICAGO MERCANTILE EXCHANGE"],
+    }
+    out, missing = {}, []
+    for key, names in markets.items():
+        try:
+            _in = ",".join("'" + n.replace("'", "''") + "'" for n in names)
+            r = requests.get(COT_TFF, params={
+                "$where": f"market_and_exchange_names in({_in})",
+                "$order": "report_date_as_yyyy_mm_dd ASC",
+                "$limit": "5000",
+                "$select": ("report_date_as_yyyy_mm_dd,lev_money_positions_long,lev_money_positions_short,"
+                            "asset_mgr_positions_long,asset_mgr_positions_short,open_interest_all"),
+            }, headers=UA, timeout=60)
+            r.raise_for_status()
+            series = []
+            for row in r.json():
+                try:
+                    ll, ls = int(row["lev_money_positions_long"]), int(row["lev_money_positions_short"])
+                    al, am = int(row["asset_mgr_positions_long"]), int(row["asset_mgr_positions_short"])
+                    # 四条腿原样保留（同 cot_vix：净额看不出"空头平了还是多头加了"）
+                    series.append({
+                        "date": row["report_date_as_yyyy_mm_dd"][:10],
+                        "lev_long": ll, "lev_short": ls, "lev_net": ll - ls,
+                        "am_long": al, "am_short": am, "am_net": al - am,
+                        "oi": int(row["open_interest_all"]),
+                    })
+                except (KeyError, ValueError):
+                    pass
+            if not series:
+                missing.append(key); continue
+            series.sort(key=lambda x: x["date"])
+            # 同一市场跨改名合并后按日期排序去重（改名当周可能新旧名各一行）
+            ded = {r["date"]: r for r in series}
+            series = [ded[d] for d in sorted(ded)]
+            out[key] = {"market": names[0], "aliases": names[1:], "latest": series[-1],
+                        "series": series}
+        except Exception as e:
+            print(f"  {key} failed: {e}")
+            missing.append(key)
+        time.sleep(0.6)
+    if not out:
+        raise RuntimeError("CFTC 利率 COT 全部市场返回空")
+    if missing:
+        print(f"  ⚠️ 这些市场没取到（可能 CFTC 改名，查全名）：{missing}")
+    write_json("cot_rates.json", {
+        "_what": "CFTC TFF 利率/国债期货持仓（传导链火药层）。lev_*=杠杆基金(对冲基金)，am_*=资管。"
+                 "杠杆基金在长端的巨额净空≈基差交易规模。周五 15:30 ET 发布周二数据。",
+        "_caveat": "🚫 净空扩大≠必然出事：它是火药量不是引信。与保费层(MOVE/VIXHY/银行IV)、"
+                   "管道层(贴现窗口/OAS)三层合读，单看一层无判断力。",
+        "missing": missing,
+        "markets": out,
     })
 
 
@@ -2144,6 +2280,10 @@ def main():
     _guard("恐惧的标价指数", build_leaps_index, gspc, vix)   # ← 唯一在赚钱的读数，失败必须吵
     _guard("VX 期限结构", build_vx_curve, vix)
     _guard("COT 持仓", build_cot_vix)
+    # 🆕 2026-08-28 传导链（Klay 拍板）：火药层=利率/国债期货持仓；保费层利率腿=MOVE。
+    #    管道层三个走 build_macro 的 fetch_plan（hy_oas/ig_oas/rrp 早已在拉，08-28 补 discount_window）。
+    _guard("COT 利率持仓（传导链火药层）", build_cot_rates)
+    _guard("MOVE（传导链利率腿）", build_move)
     _guard("波动率家族", build_vol_family, vix)
     _guard("做空成交结构", build_short_flow)   # 增量：日常只补 1 天；回填另用大 max_backfill 手动跑
     _guard("做空持仓", build_short_interest)   # 双月，滞后约 2 周；只追加、修订另注
