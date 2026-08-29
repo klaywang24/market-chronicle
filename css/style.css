@@ -1835,16 +1835,27 @@ html:not([lang^="zh"]) .jt-en { display: block; }
    本站 .sub-row 只出现在定价页 Free 档这一处（17 个 html 是同一套外壳的副本，
    表单都在 #panel-pricing 里），改它不影响别处。 */
 /* 🔴 2026-08-29 Klay 令「这三行对齐一下」：三张定价卡底部结构本来不同——
-   Free 是「按钮 + 一行说明」，Standard 只有按钮，Pro 只有虚线占位框，
-   于是三个动作元素落在三个高度上。
-   修法：三张卡的底部块统一成 .ptier-foot / .ledger-sub，margin-top:auto 沉到底，
-   再给一个共同的 min-height 并让内容顶对齐 —— 这样三个按钮的**上沿**在同一条线，
-   而 Free 那行说明落在预留区里，不再把自己的按钮顶高。
-   ⚠️ min-height 取 92px：Free 实测最高一档＝按钮约 38 + 间距 7 + 说明两行约 32 ≈ 77，
-   留出余量；超出只会在卡底多一点留白，不会错位。改说明文案时若变三行，这里要跟着抬。 */
+   Free 是「按钮 + 一行说明」（英文版还多一个邮箱输入框），Standard 只有按钮，
+   Pro 只有虚线占位框，于是三个动作元素落在三个高度上。
+
+   修法＝**按底边对齐**，不按顶边：
+   ① 底部块统一 .ptier-foot / .ledger-sub，margin-top:auto 沉到底；
+   ② 把 Free 那行说明 absolute 拿出文档流，钉在卡底，卡片统一留 padding-bottom 给它；
+   ③ 于是每张卡的「最后一个动作元素」的**下沿**都落在同一条线上。
+   为什么不用 min-height 顶对齐：英文版 Free 卡在按钮上方还有邮箱输入框，
+   任何固定的 min-height 都会被它撑破（08-29 首版实测中文对齐、英文错位）。
+   ⚠️ padding-bottom 62px ＝ 说明两行约 39 + 与按钮间距 7 + 卡底留白 16。
+   说明文案若加长到三行，这里要跟着抬。 */
+/* 🔴 2026-08-29 Klay 令「这里不要换行」：定价页这两段小字在 15px 下折成两行。
+   实测（1440 与 1920 下容器恒为 760px）：「数字，随处可见…」单行需 761px（只差 1px），
+   「年付 = 10 个月价…」需 801px（差 41px）。容器被 doc-body 限死，加宽会动全站阅读宽度，
+   所以从字号下手：14px 下两段分别需 710 / 748px，都落在 760 内还有余量。
+   ⚠️ 窄屏仍会折行，那是对的；改这两句文案若加长，要重新量单行宽度。 */
+.doc-body p.pricing-fine { font-size: 14px; }
+.ptier { padding-bottom: 62px; }
 .ptier > .ledger-sub,
-.ptier > .ptier-foot { margin-top: auto; min-height: 92px; display: flex; flex-direction: column;
-                       justify-content: flex-start; }
+.ptier > .ptier-foot { margin-top: auto; }
+.ptier .sub-note { position: absolute; left: 20px; right: 20px; bottom: 16px; margin-top: 0; }
 .ledger-sub { margin-top: 12px; }
 .sub-row { display: flex; flex-direction: column; gap: 8px; }
 .sub-input {
