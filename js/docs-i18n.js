@@ -185,7 +185,6 @@
      售卖页不留不在交付的承诺。⚠️ 改定价权益必须中英同改：EN 版定价面板由本文件整块替换。 -->
       <li>Options-structure data table — the dozen-odd names carrying the most US options volume; the list follows liquidity</li>
     </ul>
-    <div class="ptier-soon">Activated within 24 hours (done by hand); the digest then arrives before every open. Full 14-day refund.</div>
     <a class="ptier-cta" href="#" id="pay-btn"><span class="p-m">Subscribe $29 / mo</span><span class="p-y">Subscribe $290 / yr</span></a>
 <!-- 2026-07-26 用户裁：同步删除英文版创始价次级 CTA（EN 定价面板由本文件整块替换）。 -->
   </div>
