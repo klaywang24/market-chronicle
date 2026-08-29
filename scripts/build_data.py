@@ -667,6 +667,10 @@ def build_macro():
         "dgs20": ("DGS20", lambda s: _weekly(s)),
         "dgs30": ("DGS30", lambda s: _weekly(s)),
         "t10y2y": ("T10Y2Y", lambda s: _weekly(s)),
+        # 🆕 2026-08-28（Klay 点名补·传导链管道层）：10Y-3M 是**纽约联储衰退模型**用的那条曲线，
+        #    比 10Y-2Y 更标准。已 double check：1982 起 11,167 点、2019-08-27 倒挂 -0.49、
+        #    2023-05-04 最深 -1.89、最近一次倒挂 2025-10-16、今日 +0.83（已转正）。两条并存不互替。
+        "t10y3m": ("T10Y3M", lambda s: _weekly(s)),
         "hy_oas": ("BAMLH0A0HYM2", lambda s: _weekly(s)),
         "ig_oas": ("BAMLC0A0CM", lambda s: _weekly(s)),
         # 🆕 2026-08-28（传导链第三层「管道层」）：贴现窗口借款＝银行**已经在跑向央行**的直接证据。
