@@ -185,7 +185,9 @@
      售卖页不留不在交付的承诺。⚠️ 改定价权益必须中英同改：EN 版定价面板由本文件整块替换。 -->
       <li>Options-structure data table — the dozen-odd names carrying the most US options volume; the list follows liquidity</li>
     </ul>
-    <a class="ptier-cta" href="#" id="pay-btn"><span class="p-m">Subscribe $29 / mo</span><span class="p-y">Subscribe $290 / yr</span></a>
+    <div class="ptier-foot">
+      <a class="ptier-cta" href="#" id="pay-btn"><span class="p-m">Subscribe $29 / mo</span><span class="p-y">Subscribe $290 / yr</span></a>
+    </div>
 <!-- 2026-07-26 用户裁：同步删除英文版创始价次级 CTA（EN 定价面板由本文件整块替换）。 -->
   </div>
   <div class="ptier t-pro">
@@ -198,14 +200,16 @@
       <li>Email notice when a reading crosses your threshold</li>
       <li>API (later)</li>
     </ul>
-    <div class="ptier-soon">Opens 3–6 months after Standard launches</div>
+    <div class="ptier-foot">
+      <div class="ptier-soon">Opens 3–6 months after Standard launches</div>
+    </div>
   </div>
 </div>
 <p class="pay-methods"><span class="pay-label"><strong>Payment methods</strong>: </span><span class="pay-body"><img class="pay-ico" src="icons/pay/visa.svg" alt="" loading="lazy">Visa / <img class="pay-ico" src="icons/pay/mastercard.svg" alt="" loading="lazy">Mastercard / <img class="pay-ico" src="icons/pay/paypal.svg" alt="" loading="lazy">PayPal / <img class="pay-ico" src="icons/pay/applepay.svg" alt="" loading="lazy">Apple Pay / <img class="pay-ico" src="icons/pay/unionpay.svg" alt="" loading="lazy">UnionPay credit cards.<br><img class="pay-ico" src="icons/pay/alipay.svg" alt="" loading="lazy">Alipay / <img class="pay-ico" src="icons/pay/wechatpay.svg" alt="" loading="lazy">WeChat Pay / <img class="pay-ico" src="icons/pay/unionpay.svg" alt="" loading="lazy">UnionPay debit cards are not supported.</span></p>
 <p><strong>The numbers are everywhere, free forever.</strong> The archive earns its keep on every selloff that comes after — that morning, you are already holding a reading whose method has not changed in fifteen years.</p>
 <p class="pricing-inst"><strong>Institutional / data licensing</strong> (series licensing, index licensing, redistribution) — <a href="contact">contact us</a>; unpriced.</p>
-<p>Annual = 10 months' price ($290 / $990) · 14-day no-questions refund, no trial (the free tier is the trial) · cancel anytime via the manage link in your subscription email. Orders and payments are handled by a Merchant of Record, whose name will appear on your statement. <strong>Data and information only; not investment advice; no buy or sell recommendations.</strong></p>
-<p class="doc-fineprint">Pro and API are later plans, not a final commitment; launch dates TBD.</p>` },
+<p>Annual = 10 months' price ($290 / $990). Payment is handled by Paddle; this site provides data and information only, and is not investment advice or any buy or sell recommendation.</p>
+<p class="doc-fineprint">Pro and API are later plans; email us if you need them.</p>` },
     },
   };
 

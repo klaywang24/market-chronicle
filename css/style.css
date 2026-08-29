@@ -1834,6 +1834,17 @@ html:not([lang^="zh"]) .jt-en { display: block; }
       grid 侧已用 minmax(0,1fr) 兜住，这里再把 width:100% 钉死，两道锁不指望任何一道单独成立。
    本站 .sub-row 只出现在定价页 Free 档这一处（17 个 html 是同一套外壳的副本，
    表单都在 #panel-pricing 里），改它不影响别处。 */
+/* 🔴 2026-08-29 Klay 令「这三行对齐一下」：三张定价卡底部结构本来不同——
+   Free 是「按钮 + 一行说明」，Standard 只有按钮，Pro 只有虚线占位框，
+   于是三个动作元素落在三个高度上。
+   修法：三张卡的底部块统一成 .ptier-foot / .ledger-sub，margin-top:auto 沉到底，
+   再给一个共同的 min-height 并让内容顶对齐 —— 这样三个按钮的**上沿**在同一条线，
+   而 Free 那行说明落在预留区里，不再把自己的按钮顶高。
+   ⚠️ min-height 取 92px：Free 实测最高一档＝按钮约 38 + 间距 7 + 说明两行约 32 ≈ 77，
+   留出余量；超出只会在卡底多一点留白，不会错位。改说明文案时若变三行，这里要跟着抬。 */
+.ptier > .ledger-sub,
+.ptier > .ptier-foot { margin-top: auto; min-height: 92px; display: flex; flex-direction: column;
+                       justify-content: flex-start; }
 .ledger-sub { margin-top: 12px; }
 .sub-row { display: flex; flex-direction: column; gap: 8px; }
 .sub-input {
