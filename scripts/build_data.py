@@ -678,6 +678,13 @@ def build_macro():
         #    2023-03-15），最新 2026-08-26 回落到 4,890 常态 ⇒ 确认这个号就是要的东西，不是贴现「利率」
         #    （那是 DPCREDIT，实测返回 2.25 的利率值，差一个字母意思全变）。
         "discount_window": ("WLCFLPCL", lambda s: _weekly(s, 0)),   # 百万美元·周频
+        # 🆕 2026-08-28（Klay 点名·补「离岸美元荒」盲区）：央行流动性互换余额。
+        #    与贴现窗口同性格＝**确凿证据不是预警**：国内银行跑向美联储看 discount_window，
+        #    **外国**央行跑来借美元看这个。已 double check：2008-12-17 峰值 583,135 百万、
+        #    2020-05-27 峰值 448,946 百万，而 1237 周里有 328 周（27%）读数为 0 ⇒
+        #    「平时是 0，出事才有」得到证实；今日 121 百万≈零。
+        #    🚫 它替代不了交叉货币基差（那是**事前**的价格信号、付费墙），只覆盖**事后**的余额。
+        "cb_swaps": ("SWPT", lambda s: _weekly(s, 0)),              # 百万美元·周频
         # 物价（同比）
         "cpi_yoy": ("CPIAUCSL", _yoy),
         "core_pce_yoy": ("PCEPILFE", _yoy),
@@ -1321,6 +1328,130 @@ def build_move():
                    "pctl_3y": (None if pd.isna(pct.iloc[-1]) else round(float(pct.iloc[-1]), 1))},
         "dates": dates(s_.index), "values": rnd(s_, 2),
         "pctl_3y": [None if pd.isna(v) else round(float(v), 1) for v in pct],
+    })
+
+
+def build_policy_path():
+    """联邦基金期货隐含利率 → data/policy_path.json（2026-08-28 新建·Klay 拍板）。
+
+    ━━ 为什么自己算而不用 CME FedWatch ━━
+    · CME 官网实测 **403**（fedwatch/probabilities 与行情端点都被挡），且条款不许再分发
+      ⇒ 抓它＝把管线架在随时会断的墙上（本仓红线：抓取被掐＝整条线断粮）。
+    · FedWatch 的「降息概率 78%」是**被它的模型加工过的二手数字**；我们要的是
+      **预期翻转的速度**，用原始隐含利率更干净：隐含利率 = 100 − 期货价（一个减法，
+      公式可公开、可复现、永不静默改 —— 与本站三条指数同一个性格）。
+
+    ━━ 读法（Klay 定）━━
+    **翻转速度才是恐慌信号，绝对水平不是。** 故本 JSON 除水平值外，重点给
+    `chg_5d` / `chg_20d`（隐含利率的 5/20 交易日变化，单位 bp）与其 3 年分位。
+    2023-03 SVB 那周市场对政策路径的定价 48 小时内翻转，比银行股崩得还快。
+
+    ⚠️ ZQ=F 是**连续合约**，换月当日会有跳变 —— 变化量因此可能出现假尖峰。
+       本函数如实记录不做平滑（家法：表只存事实，判据留给读的人），
+       但在 _caveat 写明；日后若要精确，须改用分月合约自行接续（另一个工程）。
+    ⚠️ SOFR 期货（SR3=F）实测 yfinance 只回 1 天历史 ⇒ **本次不采**，只用 ZQ。
+    """
+    print("== 联邦基金期货隐含利率（政策路径）")
+    df = yf.download("ZQ=F", period="max", interval="1d", auto_adjust=False, progress=False)
+    if df is None or df.empty:
+        raise RuntimeError("ZQ=F 返回空")
+    px = df["Close"]
+    if hasattr(px, "columns"):
+        px = px.iloc[:, 0]
+    px = px.dropna()
+    implied = 100.0 - px                       # 期货价 → 隐含联邦基金利率（%）
+    d1 = (implied.diff() * 100)                # 单日变化 bp
+    # 🚨 **换月检测（2026-08-28 首跑当场抓到，不是预防性代码）**：
+    #    实测当日 ZQ 单日跳 +15.5bp，而**前 11 个交易日全在 ±0.3bp** 内（3.63 一线纹丝不动）
+    #    ⇒ 真实政策重定价不会这样，那是连续合约从 9 月换到 10 月合约的接缝。
+    #    若不标出来，它会让 |5日变化| 冲到 98 分位、在仪表盘上伪装成「市场刚刚改主意了」。
+    #    **判据**：|单日变化| > 8bp 且 前 5 日 |单日变化| 中位数 < 1bp ⇒ 判为换月跳变。
+    #    （只标记不删除——表只存事实，家法；读的人据 roll_flag 自行剔除。）
+    _med5 = d1.abs().rolling(5).median().shift(1)
+    roll_flag = ((d1.abs() > 8) & (_med5 < 1)).fillna(False)
+    chg5 = (implied.diff(5) * 100).dropna()    # bp
+    chg20 = (implied.diff(20) * 100).dropna()
+    def _pctl(x, win=756):
+        return x.rolling(win, min_periods=252).apply(lambda v: (v <= v[-1]).mean() * 100, raw=True)
+    p5 = _pctl(chg5.abs())                     # 用绝对值：**翻转速度**不分方向
+    write_json("policy_path.json", {
+        "_what": "ZQ=F(联邦基金期货)收盘 → 隐含利率=100−价格。chg_5d/chg_20d 单位 bp；"
+                 "pctl_abs_chg5d=|5日变化|的 756 交易日滚动分位＝**翻转速度**分位。",
+        "_caveat": "🚫 ZQ=F 是连续合约，换月当日跳变会造成变化量假尖峰（本表如实记录不平滑）。"
+                   "🚫 隐含利率≠降息概率：后者要对整条曲线建模，本表只给单一近月合约的水平与变化。",
+        "roll_flag_note": "True=该日被判为连续合约换月跳变（|单日变化|>8bp 且前 5 日中位<1bp），"
+                          "其 chg_5d/chg_20d 在其后 5/20 日内均不可信 —— 读的人自行剔除，本表不删事实。",
+        "latest": {
+            "date": implied.index[-1].strftime("%Y-%m-%d"),
+            "is_roll": bool(roll_flag.iloc[-1]),
+            "price": round(float(px.iloc[-1]), 4),
+            "implied_rate": round(float(implied.iloc[-1]), 4),
+            "chg_5d_bp": (None if chg5.empty else round(float(chg5.iloc[-1]), 1)),
+            "chg_20d_bp": (None if chg20.empty else round(float(chg20.iloc[-1]), 1)),
+            "pctl_abs_chg5d": (None if p5.empty or pd.isna(p5.iloc[-1]) else round(float(p5.iloc[-1]), 1)),
+        },
+        "dates": dates(implied.index), "implied_rate": rnd(implied, 4),
+        "chg5_dates": dates(chg5.index), "chg_5d_bp": rnd(chg5, 1),
+        "roll_flag": [bool(v) for v in roll_flag.reindex(implied.index).fillna(False)],
+        "pctl_abs_chg5d": [None if pd.isna(v) else round(float(v), 1) for v in p5],
+    })
+
+
+# 银行优先股＝单名 CDS 的免费替代（2026-08-28 Klay 拍板）。
+# 逻辑最接近 CDS：同样问「这家银行还不还得上钱」，只是从**资本结构的中间层**看。
+# 2023 瑞信 AT1 被清零那次，优先股早于普通股崩 ⇒ 真危机时它与股票期权分岔，正是我们要的那一维。
+# 代码逐个 yfinance 实测（2026-08-28，6mo≥100 天才收）；C-PK 实测无数据已剔除。
+BANK_PREFERRED = {
+    "BAC-PL": "美国银行 优先股 L", "BAC-PK": "美国银行 优先股 K",
+    "C-PN": "花旗 优先股 N",
+    "JPM-PC": "摩根大通 优先股 C", "JPM-PD": "摩根大通 优先股 D",
+    "WFC-PL": "富国 优先股 L", "GS-PA": "高盛 优先股 A",
+    "PFF": "优先股 ETF（全市场·粗尺）", "KBWB": "银行股 ETF（对照组）",
+}
+
+
+def build_bank_credit():
+    """银行优先股/银行 ETF 价格 → data/bank_credit.json（单名 CDS 的免费替代）。
+
+    ⚠️ **它不是 CDS**，差别必须随读数一起说：CDS 是「违约保险的年费」，优先股价是「股权价」；
+       平时高度相关，**真出事时优先股会先于普通股崩**（2023 瑞信 AT1 清零）——我们要的正是这个分岔。
+    🚫 不做跨银行横向比价（各家票息/赎回条款不同，价格不可直接比）；
+       只看**每只自己 vs 自己历史**（同 cm-iv「各自跟自己比，换源才致命」的家法）。
+    """
+    print("== 银行优先股/ETF（单名 CDS 替代）")
+    out, missing = {}, []
+    for tkr, label in BANK_PREFERRED.items():
+        try:
+            df = yf.download(tkr, period="5y", interval="1d", auto_adjust=False, progress=False)
+            px = df["Close"]
+            if hasattr(px, "columns"):
+                px = px.iloc[:, 0]
+            px = px.dropna()
+            if len(px) < 100:
+                missing.append(tkr); continue
+            dd = (px / px.rolling(252, min_periods=60).max() - 1) * 100   # 距一年高点回撤 %
+            out[tkr] = {
+                "label": label,
+                "latest": {"date": px.index[-1].strftime("%Y-%m-%d"),
+                           "close": round(float(px.iloc[-1]), 2),
+                           "dd_1y_pct": (None if pd.isna(dd.iloc[-1]) else round(float(dd.iloc[-1]), 2))},
+                "dates": dates(px.index), "close": rnd(px, 2),
+                "dd_1y_pct": [None if pd.isna(v) else round(float(v), 2) for v in dd],
+            }
+        except Exception as e:
+            print(f"  {tkr} failed: {e}")
+            missing.append(tkr)
+        time.sleep(0.4)
+    if not out:
+        raise RuntimeError("银行优先股全部取空")
+    if missing:
+        print(f"  ⚠️ 未取到：{missing}")
+    write_json("bank_credit.json", {
+        "_what": "银行优先股与银行/优先股 ETF 收盘价 + 距一年高点回撤。单名 CDS 的免费替代"
+                 "（CDS 付费墙）。dd_1y_pct 为负＝距一年高点的回撤幅度。",
+        "_caveat": "🚫 不是 CDS：它是股权价不是违约保险年费；只看各自 vs 自己历史，"
+                   "🚫 不做跨银行横向比价（票息/赎回条款不同）。",
+        "missing": missing, "series": out,
     })
 
 
@@ -2288,6 +2419,8 @@ def main():
     #    管道层三个走 build_macro 的 fetch_plan（hy_oas/ig_oas/rrp 早已在拉，08-28 补 discount_window）。
     _guard("COT 利率持仓（传导链火药层）", build_cot_rates)
     _guard("MOVE（传导链利率腿）", build_move)
+    _guard("政策路径（联邦基金期货隐含利率）", build_policy_path)   # 2026-08-28 Klay 拍板
+    _guard("银行优先股（单名 CDS 替代）", build_bank_credit)        # 同上
     _guard("波动率家族", build_vol_family, vix)
     _guard("做空成交结构", build_short_flow)   # 增量：日常只补 1 天；回填另用大 max_backfill 手动跑
     _guard("做空持仓", build_short_interest)   # 双月，滞后约 2 周；只追加、修订另注
