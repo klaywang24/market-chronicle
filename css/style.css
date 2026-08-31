@@ -263,9 +263,21 @@ a.tab-ext:hover { color: var(--ink); border-bottom: none; }
 /* 2026-08-31（§70·Klay 拍板）：EN 态全站恒用短标签。全长 EN 文案（KAPX · Ledger /
    Fear-Price Index · Ledger）在 SPA 的 1100–1280px 区间断行，在 /f13 /options 的
    1080px 页头则结构性放不下：一套导航两种行为＝「拼凑感」。统一收在这一处，
-   两张独立页 2026-08-31 之前的页内特例已撤。zh 不受影响。 */
+   两张独立页 2026-08-31 之前的页内特例已撤。zh 不受影响。
+   §71 起顶层导航改双语节点（下方 .i18n-en/.i18n-zh），EN 直接取短文案不再走这条；
+   本条留作**兜底**：下拉菜单项与将来漏改双语节点的地方仍靠它收住。 */
 html:not([lang^="zh"]) .tab .t-full { display: none; }
 html:not([lang^="zh"]) .tab .t-short { display: inline; }
+/* ---------- 导航双语节点（2026-08-31 §71）----------
+   根治「EN 首帧闪中文」（Klay：点 13F 还是先出现中文，很短但看得见）。
+   病因：导航文字一直靠 JS 加载后置换（SPA 走 i18n.js、两张独立页各走内联字典），
+   而这些脚本都在 body 末尾 ⇒ EN 访客必然先看见一瞬中文，早期 lang 戳只治版式治不了文字。
+   ⇒ 顶层导航七项改成中英两个 span 常驻 DOM，纯 CSS 按 lang 显示：**第一帧就是对的**。
+   ⚠️ 只做导航（chrome 里最刺眼的一处）；正文仍走 JS 置换 —— 那要预渲染，另一个量级。
+   ⚠️ i18n.js 照旧会翻译 .i18n-zh 里的文本节点（它是隐藏的，无害），切回中文时原样还原。 */
+.i18n-en { display: none; }
+html:not([lang^="zh"]) .i18n-zh { display: none; }
+html:not([lang^="zh"]) .i18n-en { display: inline; }
 @media (max-width: 700px) {
   .tabs { gap: 6px; }
   .tab, .tab-trigger { padding: 7px 9px; font-size: 13px; }
@@ -840,14 +852,24 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
 }
 .toc::-webkit-scrollbar { display: none; }
 .toc.open { display: block; }
-/* ≥1280px：目录常驻左栏，正文右移让位，互不遮挡 */
-@media (min-width: 1280px) {
+/* ═══ 2026-08-31 §71（Klay 拍板）：撤销「容器给目录让位」，全站容器恒定居中 ═══
+   病象：今日页无目录 ⇒ 不让位 ⇒ 居中；其余页有目录 ⇒ 让位 ⇒ 右移。实测 1440px EN
+   容器 left 123→254（右跳 131px、正文缩 139px），顶栏 tab 一并跳（147→278）；
+   而且 has-toc/no-toc 是 JS 渲染完才打的 class ⇒ 跳发生在肉眼可见的第二帧。
+   🔑 关键事实：`.toc` 本身是 `position:fixed` 浮层、**根本不占流** —— 让位只是为了不被它遮住。
+   ⇒ 那就换个办法避让：容器永远居中，**目录只在左侧空白够宽时（≥1660px）才常驻**，
+     窄于此走既有的 ☰ 抽屉（.toc-toggle + .toc.open，2026-07-26 就存在的机制，非新建）。
+   1660px 的来历：容器居中时左空白 =(100vw−1180)/2；EN 目录 left18+width216=右缘 234，
+   需 (100vw−1180)/2 ≥ 234 ⇒ 100vw ≥ 1648，取整 1660。zh 目录窄 40px，同断点更宽松。
+   ⚠️ 由此作废的四条让位规则（原 §26/§36 时代产物）：.container ×2（zh/EN）、.tabs、.topbar-row。 */
+/* ≥1660px：左侧空白够宽，目录常驻且不遮正文（容器仍居中，不再让位） */
+@media (min-width: 1660px) {
   html.has-toc .toc { display: block; }   /* 见上方「反过来写」注释：未知态不显示 */
-  .toc-toggle { display: none; }
-  .container {
-    margin-left: max(214px, calc((100vw - 1180px) / 2));
-    margin-right: max(24px, calc((100vw - 1180px) / 2));
-  }
+  html.has-toc .toc-toggle { display: none; }
+}
+/* 无章节的页（今日头版）连按钮都不该有：点开是空的比没有更糟 */
+html.no-toc .toc-toggle { display: none; }
+@media (min-width: 1280px) {
   /* 顶栏布局：品牌住进左侧留白（贴视口左缘），tab 栏起点与正文左缘像素对齐 */
   .topbar-inner {
     max-width: none;
@@ -914,13 +936,7 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
 /* 西语系目录条目更长：加宽目录列 + 缩小字号，保持单行 */
 html:not([lang^="zh"]) .toc { width: 216px; }
 html:not([lang^="zh"]) .toc a { font-size: 11.5px; }
-@media (min-width: 1280px) {
-  html:not([lang^="zh"]) .container {
-    margin-left: max(254px, calc((100vw - 1180px) / 2));
-    margin-right: max(24px, calc((100vw - 1180px) / 2));
-  }
-  html:not([lang^="zh"]) .tabs { margin-left: calc(max(254px, (100vw - 1180px) / 2) - 7px); }
-}
+/* 2026-08-31 §71 作废：EN 容器/tabs 的 254px 让位（容器已恒定居中，见上方 §71 注释块）。 */
 
 /* ---------- 无目录页真居中 · 撤销让位（2026-07-26，接文件上部同名注释） ----------
    必须写在上面那条 EN 规则之后：两者特异性同为 (0,2,1)，同分靠顺序决胜。
@@ -931,16 +947,8 @@ html:not([lang^="zh"]) .toc a { font-size: 11.5px; }
    两者在**中等宽度**才分叉：1585px 时只差 11px（此前测不出问题），
    但 ~1300px 时正文在 238、顶栏在 84 —— 差 150px，tab 明显跑到正文左边（用户截图即此情形）。
    故有目录时让 .topbar-row 用与 .container 完全相同的边距公式；无目录时（html.no-toc）保持纯居中。 */
-@media (min-width: 1280px) {
-  html:not(.no-toc) .topbar-row {
-    max-width: none;
-    margin-left: max(214px, calc((100vw - 1180px) / 2));
-    margin-right: max(24px, calc((100vw - 1180px) / 2));
-  }
-  html:not(.no-toc):not([lang^="zh"]) .topbar-row {
-    margin-left: max(254px, calc((100vw - 1180px) / 2));
-  }
-}
+/* 2026-08-31 §71 作废：顶栏跟随正文让位。容器不再让位 ⇒ 顶栏纯居中即与正文同左缘，
+   原先那条「有目录才让位」正是切页时顶栏跟着跳的直接原因。 */
 
 @media (min-width: 1280px) {
   html.no-toc .container { margin-left: auto; margin-right: auto; }
@@ -1055,16 +1063,9 @@ td.left-col { text-align: left; }
 /* 桌面：页脚与正文同一左缩进，否则页脚居中(margin:auto)时左缘会滑到固定目录(.toc)
    底下重叠（2026-07-20 用户指出）。⚠️ 本块必须放在上面 base .site-footer 之后——
    base 的 `margin:auto` 简写在源码里靠后，同优先级会覆盖任何靠前的 margin-left 覆盖。 */
-@media (min-width: 1280px) {
-  .site-footer {
-    max-width: none;
-    margin-left: max(214px, calc((100vw - 1180px) / 2));
-    margin-right: max(24px, calc((100vw - 1180px) / 2));
-  }
-  html:not([lang^="zh"]) .site-footer {
-    margin-left: max(254px, calc((100vw - 1180px) / 2));
-  }
-}
+/* 2026-08-31 §71 作废：页脚让位。容器已恒定居中，页脚 margin:auto 即与正文同左缘；
+   而原来那条「跟着目录让位」会让页脚与正文一起在切页时左右跳（同族最后一处）。
+   ≥1660px 目录常驻时右缘 234px < 容器左缘 240px，不会再压到页脚。 */
 .footer-cols {
   display: flex;
   justify-content: space-between;

@@ -12,10 +12,15 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 try { var _l = localStorage.getItem("mc-lang"); if (_l && _l !== "zh") document.documentElement.lang = _l; } catch (e) {}
 </script>
 <style>html{background:#FFFFFF}html.dark-mode{background:#111111}</style>
-<link rel="stylesheet" href="css/style.css?v=20260831a">
+<link rel="stylesheet" href="css/style.css?v=20260831b">
 <style>
 /* 页面私有样式一律 f13- 前缀，只借主站 :root 变量与字体，不碰主站类 */
 .f13-wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 6px; }
+/* 2026-08-31 §71：页脚与本页正文同宽同缘。主站 .site-footer 是 1180px 容器，
+   而本页正文是 1080px ⇒ 页脚左缘比正文外扩 50px，正是「像两个系统拼的」那类观感缺口
+   （此前更远：页脚还带 254px 让位，差 161px）。就近对齐，不改主站 base。 */
+.site-footer { max-width: 1080px; }
+
 .f13-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; }
 .f13-brand { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 19px; font-weight: 700; color: var(--ink); text-decoration: none; }
 /* 2026-08-18 Klay 点名切不同 tab 视觉比例不一样：根因＝站上两套导航实现
@@ -149,13 +154,13 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
            app.js 也没加载 ⇒ 点击照常走 href 整页跳转。
            短标签的 EN 值照抄 js/i18n.js:169/484，并已补进本页内联字典（原来只有全长版那两个键）。 -->
       <nav class="tabs">
-      <a class="tab" href="/">今日</a>
-      <a class="tab" href="/kindex" data-panel="kindex"><span class="t-full">K 指数 · 台账</span><span class="t-short">K 指数</span></a>
-      <a class="tab" href="/leaps" data-panel="leaps"><span class="t-full">恐惧的标价 · 台账</span><span class="t-short">恐惧的标价</span></a>
-      <a class="tab tab-ext" href="/options">期权异动</a>
-      <a class="tab tab-ext active" href="/f13">13F 开奖</a>
-      <a class="tab" href="/macro">宏观</a>
-      <a class="tab" href="/spy">百年档案</a>
+      <a class="tab" href="/"><span class="i18n-zh">今日</span><span class="i18n-en">Today</span></a>
+      <a class="tab" href="/kindex" data-panel="kindex"><span class="i18n-zh"><span class="t-full">K 指数 · 台账</span><span class="t-short">K 指数</span></span><span class="i18n-en">KAPX</span></a>
+      <a class="tab" href="/leaps" data-panel="leaps"><span class="i18n-zh"><span class="t-full">恐惧的标价 · 台账</span><span class="t-short">恐惧的标价</span></span><span class="i18n-en">Fear-Price Index</span></a>
+      <a class="tab tab-ext" href="/options"><span class="i18n-zh">期权异动</span><span class="i18n-en">Options</span></a>
+      <a class="tab tab-ext active" href="/f13"><span class="i18n-zh">13F 开奖</span><span class="i18n-en">13F</span></a>
+      <a class="tab" href="/macro"><span class="i18n-zh">宏观</span><span class="i18n-en">Macro</span></a>
+      <a class="tab" href="/spy"><span class="i18n-zh">百年档案</span><span class="i18n-en">The Archive</span></a>
     </nav>
     <div class="f13-navctl">
       <a class="f13-subbtn" href="/pricing">订阅</a>

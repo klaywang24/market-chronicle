@@ -229,7 +229,10 @@
   }
 
   // 收进「百年档案」下拉的七个面板（2026-07-25 导航精简）。与 index.html #archive-menu 保持一致。
-  const ARCHIVE_PANELS = new Set(["macro", "spy", "qqq", "tech", "fin", "consumer", "luxury"]);
+  // 2026-08-31（§71）：删掉 "macro"。它 08-20 已从本下拉提到顶层成为独立 tab，
+  // 但这个集合没跟着改 ⇒ 停在宏观页时「宏观」和「百年档案」**同时**带下划线（Klay 截图）。
+  // 🔑 同族第 N 例：改导航结构时，"谁属于哪一组"的判定表是第二处实现，不会自己跟着改。
+  const ARCHIVE_PANELS = new Set(["spy", "qqq", "tech", "fin", "consumer", "luxury"]);
 
   const panelDone = new Set();
   async function activatePanel(name) {
