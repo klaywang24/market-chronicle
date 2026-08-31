@@ -35,7 +35,8 @@
 | **改导航/页面 chrome 词条必须同步 `f13.html` 与 `options.html` 的内联字典**：两张独立页不加载 i18n.js，各有一本自己的 TR 账，i18n.js 改了≠它们改了。独立页新增在 `<script>` 之后渲染的区块（如页脚）时，同步 walker 看不见它——要么挂 MutationObserver（f13/options 现行做法），要么把键写进后渲染的路径 | §68 |
 | **EN 态导航全站恒用短标签**，规则只住 `css/style.css` 一处（`html:not([lang^="zh"]) .tab .t-full/.t-short`），禁再写页内特例；**新建任何独立页 `<head>` 必须带早期语言戳**（主题戳旁那行 try/catch），否则 EN 首帧按中式版式画、加载完弹一下 | §70 |
 | **顶层导航文字走双语节点**（`<span class="i18n-zh">中</span><span class="i18n-en">EN</span>`，CSS 按 lang 切换），不靠 JS 置换——置换脚本在 body 末尾，EN 必然先闪一瞬中文。新增导航项照此写，三张源页（index/f13/options）都要加 | §71 |
-| 🚨 **`.toc` 是 `position:fixed` 浮层、不占流；容器一律居中，禁止再给它加 `margin-left` 让位**。要避让就调常驻断点（现 1660px，公式：EN 目录右缘 234px ≤ (100vw−1180)/2），窄屏走既有 ☰ 抽屉。让位规则曾散在 `.container`/`.tabs`/`.topbar-row`/`.site-footer` **五处**，漏改任一处就会切页跳 | §71 |
+| 🚨 **固定目录（`.toc` / `.op-toc`）是 `position:fixed` 浮层、不占流；容器一律居中，禁止再给它加 `margin-left`/`padding-left` 让位**。要避让就调常驻断点（现 1660px），窄屏走 ☰ 抽屉或直接隐藏。这个错误设计**在本仓写过三份**（style.css、style.css 的 EN 变体、options 页内），§71 只撤前两份就误判为根治 ⇒ **改这类问题的验收判据是「全仓 grep 再无第二个实现」，不是「我改的那处生效了」** | §71 · §72 |
+| **全站只有一条正文左缘**：`.container` / `.f13-wrap` / `.op-wrap` / `.f13-layout` 一律 `max-width:1180px; margin:0 auto; padding:0 24px`。判据＝同宽度下跨页量品牌左缘，delta 必须为 0（1440px 实测三页同为 147）。新建独立页照此，别再另起一套宽度 | §72 |
 | **改导航结构必须同步 `app.js` 的 `ARCHIVE_PANELS`**（「谁属于哪一组」的判定表是第二处实现）：08-20 宏观提到顶层却留在该集合里，宏观页两个 tab 同时亮下划线 | §71 |
 
 ## 三、发布与缓存

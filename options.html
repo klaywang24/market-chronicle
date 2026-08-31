@@ -16,11 +16,9 @@ try { var _l = localStorage.getItem("mc-lang"); if (_l && _l !== "zh") document.
 <link rel="stylesheet" href="css/style.css?v=20260831b">
 <style>
 /* 页面私有样式一律 op- 前缀，只借主站的 :root 变量与字体，不碰主站类 */
-.op-wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 24px; } /* 底垫 80→24（2026-08-21 Klay 令收底部空白） */
-/* 2026-08-31 §71：页脚与本页正文同宽同缘。主站 .site-footer 是 1180px 容器，
-   而本页正文是 1080px ⇒ 页脚左缘比正文外扩 50px，正是「像两个系统拼的」那类观感缺口
-   （此前更远：页脚还带 254px 让位，差 161px）。就近对齐，不改主站 base。 */
-.site-footer { max-width: 1080px; }
+/* 2026-08-31 §72：宽度与 padding 对齐主站 .container（1180 / 24px），消跨页右跳。 */
+.op-wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px 24px; } /* 底垫 80→24（2026-08-21 Klay 令收底部空白） */
+/* 2026-08-31 §72：§71 那条 1080px 页脚对齐已撤——本页容器回到 1180，与主站 base 同宽即自然齐平。 */
 
 .op-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; }
 .op-brand { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 19px; font-weight: 700; color: var(--ink); text-decoration: none; }
@@ -119,16 +117,19 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
 .op-score .sc.next { border-style: dashed; }
 .op-score .sc.next b { font-size: 14px; padding-top: 4px; }
 .op-toc { display: none; }
-@media (min-width: 1280px) {
-  /* 2026-08-05 Klay：字太小、位置要和正文对齐。
-     left 跟随内容列（.op-wrap max-width 1290 居中），不再贴死视口左缘；
-     top 由 JS 在渲染后量 kicker 的实际位置对齐（写死像素在不同标题高度下会漂）。 */
-  .op-toc { display: block; position: fixed; left: max(20px, calc((100vw - 1290px) / 2 + 20px)); top: 128px; width: 176px; font-size: 14px; }
+/* 2026-08-31 §72：本页目录是**同一个病的第三个副本** —— .op-toc 是 fixed 浮层不占流，
+   却让 .op-wrap 用 padding-left:210px + max-width:1290px 给它让位 ⇒ 本页正文左缘与全站差
+   131px（1440px 实测品牌 147→278）。按 §71 定下的规则改：容器恒定 1180 居中不让位，
+   目录只在左侧空白够宽时（≥1660px）常驻，窄于此不显示（本页无抽屉机制，藏比遮好）。
+   left 公式：容器左缘 (100vw−1180)/2 减去目录宽 176 再留 20px 间隙。
+   top 仍由 JS 渲染后量 kicker 对齐（写死像素会随标题高度漂）。 */
+@media (min-width: 1660px) {
+  .op-toc { display: block; position: fixed; left: max(20px, calc((100vw - 1180px) / 2 - 196px)); top: 128px; width: 176px; font-size: 14px; }
   .op-toc-h { font-size: 12px; color: var(--ink-muted); letter-spacing: .08em; padding-bottom: 9px; border-bottom: 1px solid var(--border); margin-bottom: 9px; }
   .op-toc a { display: block; color: var(--ink-soft); text-decoration: none; padding: 5px 0 5px 10px; border-left: 2px solid transparent; line-height: 1.55; }
   .op-toc a:hover { color: var(--ink); }
   .op-toc a.on { color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
-  .op-wrap { padding-left: 210px; max-width: 1290px; }
+  /* §72 作废：.op-wrap 的 210px 让位 —— 容器恒定 1180 居中，见本块顶部注释。 */
 }
 @media (max-width: 700px) { .op-chart { height: 260px; } .op-chart.tall { height: 340px; } .op-table { font-size: 12px; } }
 </style>
@@ -143,7 +144,8 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
       <!-- 🔴 2026-08-18 修：本块原为 `<div class="tabs">`，而全站中和规则写的是
            `html .topbar-navband nav.tabs { margin-left: 0 }`（css/style.css:112，选择器带 nav）。
            ⇒ div 版吃不到中和，于是被老布局遗留的
-           `html:not([lang^="zh"]) .tabs { margin-left: calc(max(254px, …)) }`（style.css:911）
+           `html:not([lang^="zh"]) .tabs { margin-left: calc(max(254px, …)) }`（该规则已于
+           2026-08-31 §71 整条撤销，此处保留是记录当时的病因，别再去 style.css 找它）
            右推约 254px —— **英文态左边空出一大块、且少掉的宽度把导航挤成两行**。
            中文态没有那条 EN 规则，所以只有英文页坏，中文页一直是好的。
            ⇒ 改回站上通用写法 `<nav class="tabs">`（index/kindex/leaps/spy 全是它，只有本页与

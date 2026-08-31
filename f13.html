@@ -15,11 +15,11 @@ try { var _l = localStorage.getItem("mc-lang"); if (_l && _l !== "zh") document.
 <link rel="stylesheet" href="css/style.css?v=20260831b">
 <style>
 /* 页面私有样式一律 f13- 前缀，只借主站 :root 变量与字体，不碰主站类 */
-.f13-wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 6px; }
-/* 2026-08-31 §71：页脚与本页正文同宽同缘。主站 .site-footer 是 1180px 容器，
-   而本页正文是 1080px ⇒ 页脚左缘比正文外扩 50px，正是「像两个系统拼的」那类观感缺口
-   （此前更远：页脚还带 254px 让位，差 161px）。就近对齐，不改主站 base。 */
-.site-footer { max-width: 1080px; }
+/* 2026-08-31 §72：宽度与 padding 对齐主站 .container（1180 / 24px）。原 1080/22px ⇒
+   从 SPA 点进本页，品牌与导航整体右移 48px（1440px 实测 147→195）——这就是 Klay 说的
+   「点 option 和 13F 还是会右跳」。站上只该有一条正文左缘。 */
+.f13-wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px 6px; }
+/* 2026-08-31 §72：§71 那条 1080px 页脚对齐已撤——本页容器回到 1180，与主站 base 同宽即自然齐平。 */
 
 .f13-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; }
 .f13-brand { font-family: 'Noto Serif SC','Songti SC','STSong',serif; font-size: 19px; font-weight: 700; color: var(--ink); text-decoration: none; }
@@ -64,7 +64,9 @@ html:not([lang^="zh"]) .f13-nav2 a.tab { padding: 6px 10px; }
    并去掉机构 logo/字母头像（Klay：只写名字就行）。
    实心/描边这条判据不靠色块表达，改为**文字浓淡 + 分组小标题**：
    集中决策＝正常墨色，只报规模＝弱化色，语义不丢而视觉不吵。 */
-.f13-layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 24px; align-items: start; padding: 0 16px 24px; } /* 底垫 80→24（2026-08-21 Klay 令收底部空白） */
+/* 2026-08-31 §72：本块原先**没有任何居中约束**（1440px 实测 left=0、宽 1425 铺满视口），
+   于是正文比它自己的导航还宽 250px，页内就先自相矛盾。补 max-width+auto 与 .f13-wrap 同槽。 */
+.f13-layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 24px; align-items: start; max-width: 1180px; margin: 0 auto; padding: 0 24px 24px; } /* 底垫 80→24（2026-08-21 Klay 令收底部空白） */
 .f13-main > .f13-panel:last-child { margin-bottom: 0; } /* 末面板不再垫 40px 尾边距，面板间节奏不动 */
 .f13-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 6px; }
 /* 2026-08-18 Klay：左侧目录换胶囊 UI。
@@ -138,7 +140,8 @@ table.f13 td.iss { font-family: inherit; max-width: 240px; overflow: hidden; tex
       <!-- 🔴 2026-08-18 修：本块原为 `<div class="tabs">`，而全站中和规则写的是
            `html .topbar-navband nav.tabs { margin-left: 0 }`（css/style.css:112，选择器带 nav）。
            ⇒ div 版吃不到中和，于是被老布局遗留的
-           `html:not([lang^="zh"]) .tabs { margin-left: calc(max(254px, …)) }`（style.css:911）
+           `html:not([lang^="zh"]) .tabs { margin-left: calc(max(254px, …)) }`（该规则已于
+           2026-08-31 §71 整条撤销，此处保留是记录当时的病因，别再去 style.css 找它）
            右推约 254px —— **英文态左边空出一大块、且少掉的宽度把导航挤成两行**。
            中文态没有那条 EN 规则，所以只有英文页坏，中文页一直是好的。
            ⇒ 改回站上通用写法 `<nav class="tabs">`（index/kindex/leaps/spy 全是它，只有本页与
