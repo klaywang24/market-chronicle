@@ -105,6 +105,18 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
 .op-detail td { background: color-mix(in srgb, var(--border) 30%, transparent); font-family: inherit; font-size: 12.5px; color: var(--ink-soft); line-height: 1.7; }
 .op-detail .ev { margin: 4px 0; }
 .op-detail .ev b { color: var(--ink); font-weight: 600; }
+/* 2026-08-31：开奖从表格第五列移进展开面板，置顶并与原文块分区；原文块标明存证。 */
+.op-detail .op-settle { padding: 2px 0 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+.op-detail .op-orig-h { font-size: 11px; letter-spacing: .04em; color: var(--ink-muted); margin-bottom: 6px; }
+/* 🚨 全站 `td { white-space: nowrap }`（css/style.css:525）是给数字表定的，本表第三列却是
+   整句判断：继承 nowrap ⇒ 表宽按最长那句算，实测撑到 1575px 而容器只有 1132 ⇒ 页面长出
+   横滚条、Status 列被推出可视区（Klay 截图里那条横滚条就是它）。中文时每格约 60 字尚可，
+   换成英文摘要后一句 150 字符立刻显形。⇒ 本表的判断列与展开面板显式放开换行。
+   （同族：站上早有一次「全站 td{text-align:right} 撞本页 th{left}」的表头错位。
+     🔑 全局表格规则是为数字表写的，任何长文本列都要显式退出，别指望它自己适配。） */
+#op-ledger td:nth-child(3), #op-ledger .op-detail td, #op-ledger .op-detail .ev { white-space: normal; }
+.op-case { cursor: pointer; }
+.op-case:hover td { background: color-mix(in srgb, var(--border) 18%, transparent); }
 .op-caliber { border: 1px dashed var(--border); border-radius: 10px; padding: 16px 18px; font-size: 13px; color: var(--ink-soft); line-height: 1.8; margin-top: 40px; }
 .op-caliber b { color: var(--ink); }
 .op-cta { margin: 26px 0 0; font-size: 14px; }
@@ -339,7 +351,7 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
     new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach((n) => n.nodeType === 1 && opWalk(n))))
       .observe(document.body, { childList: true, subtree: true });
     $("op-dek").textContent = "An option is an opinion with money behind it: protection costs premium, upside costs a deposit, and neither is refundable. Talk is free; positions are not. This page never counts how many names rose or fell. It watches three things: where real money landed today, how far those strikes sit from spot, and whether the judgments we filed yesterday have been settled. Updated after each trading day's close. Delayed data, never real-time.";
-    $("op-n3").innerHTML = "This is the page's source of credit: why believe Chapter IV's attributions? Because every judgment we make is <b>filed first, settled by pre-agreed conditions, and left standing when wrong</b>. The ledger only grows thicker; it is never rewritten. Click a row for the original filing and its verification terms. Judgments are archived in their original Chinese.";
+    $("op-n3").innerHTML = "This is the page's source of credit: why believe Chapter IV's attributions? Because every judgment we make is <b>filed first, settled by pre-agreed conditions, and left standing when wrong</b>. The ledger only grows thicker; it is never rewritten. Click any row for the settlement and the original filing; filings and verification terms are archived verbatim in Chinese.";
     $("op-cal").innerHTML = "<b>How to read this page (calibration first)</b><br>" +
       "· One row = one contract's <b>full-day total</b>, not a single trade. We have no per-trade timestamps and no aggressor side, so premium is stated as <b>traded</b>, never as bought or sold: who bought and who sold, we cannot see and do not guess.<br>" +
       "· Every reading is cross-checked verbatim against <b>two independent sources</b> and updated once after the close; nothing here is real-time.<br>" +
@@ -662,16 +674,19 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
     const rows = D.ledger.filter(c => lf === "all" || c.status === lf)
       .sort((a, b) => a.status === b.status ? (a.events[0].date < b.events[0].date ? 1 : -1)
                                             : (a.status === "待开奖" ? -1 : 1));
+    /* 2026-08-31（Klay 令）：开奖不再占一列 —— 它是整段长文，摊在第五列会把表格撑出容器
+       （实测底部长出横滚条、开奖列被推到可视区外），页面也被拉得很长。改成点行展开。
+       摘要层按语言取：EN 有 judgment_en 就用它，没有则回退中文（不硬翻、不留空）。 */
+    const enJ = c => (L === "en" && c.events[0].judgment_en) ? c.events[0].judgment_en : null;
     $("op-ledger").innerHTML =
-      `<tr><th>${tr("立案日","Filed")}</th><th>${tr("标的","Name")}</th><th style="width:46%">${tr("判断","Judgment")}</th><th>${tr("状态","Status")}</th><th>${tr("开奖","Settlement")}</th></tr>` +
+      `<tr><th>${tr("立案日","Filed")}</th><th>${tr("标的","Name")}</th><th style="width:58%">${tr("判断","Judgment")}</th><th>${tr("状态","Status")}</th></tr>` +
       rows.map(c => {
         const f = c.events[0], i = D.ledger.indexOf(c);
-        const open = c.status === "待开奖" ? (f.expected ? tr("预计 ","est. ") + dot(f.expected) : "—")
-                                           : (c.outcome || "—");
+        const en = enJ(c), txt = en || f.judgment, cut = en ? 150 : 60;
         return `<tr class="op-case" data-i="${i}" id="case-${f.date.slice(5)}">` +
           `<td>${dot(f.date)}</td><td>${c.ticker}</td>` +
-          `<td class="zh">${f.judgment.length > 60 ? f.judgment.slice(0, 60) + "…" : f.judgment}</td>` +
-          `<td>${badge(c)}</td><td class="zh">${open}</td></tr>`;
+          `<td${en ? "" : ' class="zh"'}>${txt.length > cut ? txt.slice(0, cut) + "…" : txt}</td>` +
+          `<td>${badge(c)}</td></tr>`;
       }).join("");
   }
   $("op-lfilter").innerHTML = [["all", tr("全部","All")], ["待开奖", tr("待开奖","Open")], ["已开奖", tr("已开奖","Settled")]]
@@ -683,16 +698,33 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
     renderLedger();
   });
   renderLedger();
+  /* 🐛 2026-08-31 修：本处原把行元素也命名为 `tr`，**遮蔽了同名的翻译函数** ⇒ 下面每次
+     调用 tr(...) 都抛 `tr is not a function`，展开面板从建页起一次都没打开过，
+     而页面还写着「Click a row for the original filing」——**承诺挂在页面上、功能是死的**。
+     ⇒ 行元素改名 row；tr 只作翻译函数用。
+     面板顺序按 Klay 定的：开奖结论在最上（它离开表格后要有落点），下面才是立案原文。 */
+  const EV_EN = { "立案": "Filed", "开奖": "Settled", "更正": "Corrected", "勘误": "Erratum" };
   $("op-ledger").addEventListener("click", e => {
-    const tr = e.target.closest(".op-case"); if (!tr) return;
-    const nxt = tr.nextElementSibling;
+    const row = e.target.closest(".op-case"); if (!row) return;
+    const nxt = row.nextElementSibling;
     if (nxt && nxt.classList.contains("op-detail")) { nxt.remove(); return; }
     document.querySelectorAll(".op-detail").forEach(x => x.remove());
-    const c = D.ledger[+tr.dataset.i];
-    const html = c.events.map(ev =>
-      `<div class="ev"><b>${dot(ev.date)} ${tr(ev.type, ({"立案":"Filed","开奖":"Settled","更正":"Corrected"})[ev.type] || ev.type)}</b>（${tr("置信度","confidence")}：${ev.confidence || "—"}）<br>` +
-      `${ev.judgment}<br>${tr("验证条件","Verify")}：${ev.verify || "—"}${ev.result ? "<br>" + tr("结果","Result") + "：" + ev.result : ""}</div>`).join("");
-    tr.insertAdjacentHTML("afterend", `<tr class="op-detail"><td colspan="5">${html}</td></tr>`);
+    const c = D.ledger[+row.dataset.i], f = c.events[0];
+    const outEn = (L === "en" && c.outcome_en) ? c.outcome_en : null;
+    const out = outEn || c.outcome;
+    const settle = c.status === "待开奖"
+      ? `<div class="ev op-settle"><b>${tr("待开奖","Open")}</b>` +
+        (f.expected ? " · " + tr("预计开奖 ", "expected ") + dot(f.expected) : "") + `</div>`
+      : `<div class="ev op-settle"><b>${tr("开奖","Settlement")}</b><br>` +
+        `<span${outEn ? "" : ' class="zh"'}>${out || "—"}</span></div>`;
+    /* 原文块：中文立案原文＋验证条件一字不动。这不是"还没翻译"，是刻意存证 ——
+       立案原文不可改是这条线的家法，英文只在摘要层做，原文永远是当时写下的那句。 */
+    const orig = `<div class="op-orig"><div class="op-orig-h">` +
+      tr("以下为立案原文与验证条件 · 原样存证不改", "Original filing and verification terms, archived verbatim in Chinese") +
+      `</div>` + c.events.map(ev =>
+      `<div class="ev zh"><b>${dot(ev.date)} ${L === "en" ? (EV_EN[ev.type] || ev.type) : ev.type}</b>（${tr("置信度","confidence")}：${ev.confidence || "—"}）<br>` +
+      `${ev.judgment}<br>${tr("验证条件","Verify")}：${ev.verify || "—"}${ev.result ? "<br>" + tr("结果","Result") + "：" + ev.result : ""}</div>`).join("") + `</div>`;
+    row.insertAdjacentHTML("afterend", `<tr class="op-detail"><td colspan="4">${settle + orig}</td></tr>`);
   });
   // 深链：/options#08-01 → 滚到台账并高亮当日立案
   const m = location.hash.match(/^#(\d{2}-\d{2})$/);
