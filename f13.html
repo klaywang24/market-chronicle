@@ -17,8 +17,14 @@ try { var _l = localStorage.getItem("mc-lang"); if (_l && _l !== "zh") document.
 /* 页面私有样式一律 f13- 前缀，只借主站 :root 变量与字体，不碰主站类 */
 /* 2026-08-31 §72：宽度与 padding 对齐主站 .container（1180 / 24px）。原 1080/22px ⇒
    从 SPA 点进本页，品牌与导航整体右移 48px（1440px 实测 147→195）——这就是 Klay 说的
-   「点 option 和 13F 还是会右跳」。站上只该有一条正文左缘。 */
-.f13-wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px 6px; }
+   「点 option 和 13F 还是会右跳」。站上只该有一条正文左缘。
+   🔄 §73（Klay 08-31 拍板「整列贴到页面左缘」）：本页改「左栏＋正文」两段式 ——
+   机构列表是**常驻导航**不是章节目录，把它关在 1180 居中容器里，左边白扔 147px，
+   而列表本身还得挤在 232px 里出滚动条。⇒ 本页整体贴左：品牌／导航／侧栏／正文
+   共用同一条页面左缘（24px），页内自洽。
+   ⚠️ 代价说清楚：本页因此**不再与 SPA 的居中版式同左缘**（§72 那条「全站一条左缘」
+   在本页让位于「页内自洽」）。这是 Klay 明确选的，不是漂移。 */
+.f13-wrap { max-width: none; margin: 0; padding: 0 24px 6px; }
 /* 2026-08-31 §72：§71 那条 1080px 页脚对齐已撤——本页容器回到 1180，与主站 base 同宽即自然齐平。 */
 
 .f13-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; }
@@ -64,9 +70,10 @@ html:not([lang^="zh"]) .f13-nav2 a.tab { padding: 6px 10px; }
    并去掉机构 logo/字母头像（Klay：只写名字就行）。
    实心/描边这条判据不靠色块表达，改为**文字浓淡 + 分组小标题**：
    集中决策＝正常墨色，只报规模＝弱化色，语义不丢而视觉不吵。 */
-/* 2026-08-31 §72：本块原先**没有任何居中约束**（1440px 实测 left=0、宽 1425 铺满视口），
-   于是正文比它自己的导航还宽 250px，页内就先自相矛盾。补 max-width+auto 与 .f13-wrap 同槽。 */
-.f13-layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 24px; align-items: start; max-width: 1180px; margin: 0 auto; padding: 0 24px 24px; } /* 底垫 80→24（2026-08-21 Klay 令收底部空白） */
+/* §73：与 .f13-wrap 同槽全宽贴左（§72 那版的 1180 居中在本页被 Klay 否掉，见上方注释）。
+   正文列给 max-width：超宽屏下让表格无限拉宽只会更难读，1180 是站上既有的正文宽度。 */
+.f13-layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 28px; align-items: start; max-width: none; margin: 0; padding: 0 24px 24px; }
+.f13-main { max-width: 1180px; } /* 底垫 80→24（2026-08-21 Klay 令收底部空白） */
 .f13-main > .f13-panel:last-child { margin-bottom: 0; } /* 末面板不再垫 40px 尾边距，面板间节奏不动 */
 .f13-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto; padding-right: 6px; }
 /* 2026-08-18 Klay：左侧目录换胶囊 UI。
