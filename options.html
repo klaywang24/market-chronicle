@@ -9,9 +9,11 @@
 <script>
 /* 与主站同一套暗色开关（读同一个 localStorage 键），先于 CSS 应用防闪 */
 try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) document.documentElement.classList.add("dark-mode"); } catch (e) {}
+/* 早期语言戳（2026-08-31 §70）：EN 版式规则挂在 html:not([lang^="zh"])，不抢在首帧设 lang 会先中式版式再弹一下。 */
+try { var _l = localStorage.getItem("mc-lang"); if (_l && _l !== "zh") document.documentElement.lang = _l; } catch (e) {}
 </script>
 <style>html{background:#FFFFFF}html.dark-mode{background:#111111}</style>
-<link rel="stylesheet" href="css/style.css?v=20260819a">
+<link rel="stylesheet" href="css/style.css?v=20260831a">
 <style>
 /* 页面私有样式一律 op- 前缀，只借主站的 :root 变量与字体，不碰主站类 */
 .op-wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 24px; } /* 底垫 80→24（2026-08-21 Klay 令收底部空白） */
@@ -30,9 +32,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
    同宽度下中文一行、英文两行。f13 页早有这三条收紧规则，本页当时漏抄 ⇒ 实测 1000px 英文仍两行。
    ⇒ 照搬 f13 的现成写法（§80：用站上已有的语言，别再发明第三套）。 */
 html:not([lang^="zh"]) .op-nav { gap: 8px; }
-/* 2026-08-31（§69·同 f13）：容器 1080px 装不下 EN 全长标签 ⇒ EN 态一律短标签，zh 不动。 */
-html:not([lang^="zh"]) .op-nav .tab .t-full { display: none; }
-html:not([lang^="zh"]) .op-nav .tab .t-short { display: inline; }
+/* 2026-08-31（§70）：EN 恒短标签已全站统一进 css/style.css（§69 的页内特例撤销，一处规则一个实现）。 */
 html:not([lang^="zh"]) .op-nav .tabs { gap: 6px; }
 html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
 .op-navctl { margin-left: auto; display: flex; align-items: center; gap: 10px; }
@@ -254,33 +254,16 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
 </div><!-- /op-main -->
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 <script>
-(async function () {
+/* 语言 chrome 前移（2026-08-31 §70）：原排在 echarts CDN 之后，CDN 下载阻塞多久，EN 访客就
+   看多久中文（Klay 实感「先中文再回英文」）。此块只做换装：标题 + TR 字典走查 + 观察器 +
+   三段英文文案。主脚本的 L/tr 各自另读 localStorage，两处独立、无共享状态。 */
+(function () {
   "use strict";
-  const $ = id => document.getElementById(id);
-  /* 中英切换 = 存 mc-lang + 整页刷新（2026-08-05）。刷新制而非热切换：
-     本页所有内容一次渲染完，热切换要把十几个渲染点全改成可重入函数，
-     复杂度换不来什么（切语言是低频动作），刷新一次最稳。
-     mc-lang 与主站同一把钥匙：从主站带语言态过来，这页自动跟。 */
+  const $ = (id) => document.getElementById(id);
   const L = localStorage.getItem("mc-lang") === "en" ? "en" : "zh";
-  const tr = (zh, en) => L === "en" ? en : zh;
-  if (L === "en") document.documentElement.lang = "en";
-  const langBtn = $("op-lang");
-  langBtn.textContent = L === "zh" ? "EN" : "简";
-  langBtn.addEventListener("click", () => {
-    localStorage.setItem("mc-lang", L === "zh" ? "en" : "zh");
-    location.reload();
-  });
-  // 日夜切换（图标与行为对齐主站 app.js；配色在图表 init 时定死 ⇒ 与语言同用刷新制）
-  const themeBtn = $("op-theme"), rootEl = document.documentElement;
-  themeBtn.textContent = rootEl.classList.contains("dark-mode") ? "☾" : "☀";
-  themeBtn.addEventListener("click", () => {
-    rootEl.classList.toggle("dark-mode");
-    localStorage.setItem("mc-theme", rootEl.classList.contains("dark-mode") ? "dark" : "light");
-    location.reload();
-  });
-  if (L === "en") {
+  if (L !== "en") return;
+  document.documentElement.lang = "en";
     document.title = "Options Flow & Analysis · Market Chronicle";
     const TR = {
       "美股编年史": "Market Chronicle", "订阅": "Subscribe",
@@ -358,7 +341,35 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
       "· The big board lists only rechecked A-grade rows. It is not the full dataset, and raw data is not provided on this page.<br>" +
       "· Gap chapter: gap = open vs prior close; intraday = close vs open; a true gap = today's low above yesterday's high (or the reverse), stricter than the opening print. The five financials are reference only.<br>"+
       "· <b>Data and information only; not investment advice; no buy or sell recommendations.</b>";
-  }
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script>
+(async function () {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  /* 中英切换 = 存 mc-lang + 整页刷新（2026-08-05）。刷新制而非热切换：
+     本页所有内容一次渲染完，热切换要把十几个渲染点全改成可重入函数，
+     复杂度换不来什么（切语言是低频动作），刷新一次最稳。
+     mc-lang 与主站同一把钥匙：从主站带语言态过来，这页自动跟。 */
+  const L = localStorage.getItem("mc-lang") === "en" ? "en" : "zh";
+  const tr = (zh, en) => L === "en" ? en : zh;
+  if (L === "en") document.documentElement.lang = "en";
+  const langBtn = $("op-lang");
+  langBtn.textContent = L === "zh" ? "EN" : "简";
+  langBtn.addEventListener("click", () => {
+    localStorage.setItem("mc-lang", L === "zh" ? "en" : "zh");
+    location.reload();
+  });
+  // 日夜切换（图标与行为对齐主站 app.js；配色在图表 init 时定死 ⇒ 与语言同用刷新制）
+  const themeBtn = $("op-theme"), rootEl = document.documentElement;
+  themeBtn.textContent = rootEl.classList.contains("dark-mode") ? "☾" : "☀";
+  themeBtn.addEventListener("click", () => {
+    rootEl.classList.toggle("dark-mode");
+    localStorage.setItem("mc-theme", rootEl.classList.contains("dark-mode") ? "dark" : "light");
+    location.reload();
+  });
+  /* EN chrome 换装（标题/TR 字典走查/观察器/三段英文文案）已前移到 echarts 之前的独立 <script>（2026-08-31 §70），此处不再重复。 */
   const dark = document.documentElement.classList.contains("dark-mode");
   const INK = dark ? "#e8e4dc" : "#1a1a1a", MUTED = dark ? "#8a867e" : "#8a8a8a",
         BORDER = dark ? "#3a3833" : "#e5e0d8", RED = "#FF2400", GREEN = dark ? "#34D96C" : "#00A86B",

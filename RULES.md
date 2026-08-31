@@ -33,6 +33,7 @@
 | 长段落文档页**不走短词条字典**，走 `js/docs-i18n.js` 的 `DOC_TR` | §9.2 |
 | `SRC_OVERRIDES` 的源名不走 i18n，**源名一律纯英文** | §26.10 |
 | **改导航/页面 chrome 词条必须同步 `f13.html` 与 `options.html` 的内联字典**：两张独立页不加载 i18n.js，各有一本自己的 TR 账，i18n.js 改了≠它们改了。独立页新增在 `<script>` 之后渲染的区块（如页脚）时，同步 walker 看不见它——要么挂 MutationObserver（f13/options 现行做法），要么把键写进后渲染的路径 | §68 |
+| **EN 态导航全站恒用短标签**，规则只住 `css/style.css` 一处（`html:not([lang^="zh"]) .tab .t-full/.t-short`），禁再写页内特例；**新建任何独立页 `<head>` 必须带早期语言戳**（主题戳旁那行 try/catch），否则 EN 首帧按中式版式画、加载完弹一下 | §70 |
 
 ## 三、发布与缓存
 

@@ -260,6 +260,12 @@ a.tab-ext:hover { color: var(--ink); border-bottom: none; }
    「百年档案」被切在右边缘、用户不知道能滑。收紧内距+字号+间距共省约 50px，四项一次排满不横滚。
    ⚠️ 改 tab 文案或再加一级项后必须重测这里。 */
 .tab .t-short { display: none; }
+/* 2026-08-31（§70·Klay 拍板）：EN 态全站恒用短标签。全长 EN 文案（KAPX · Ledger /
+   Fear-Price Index · Ledger）在 SPA 的 1100–1280px 区间断行，在 /f13 /options 的
+   1080px 页头则结构性放不下：一套导航两种行为＝「拼凑感」。统一收在这一处，
+   两张独立页 2026-08-31 之前的页内特例已撤。zh 不受影响。 */
+html:not([lang^="zh"]) .tab .t-full { display: none; }
+html:not([lang^="zh"]) .tab .t-short { display: inline; }
 @media (max-width: 700px) {
   .tabs { gap: 6px; }
   .tab, .tab-trigger { padding: 7px 9px; font-size: 13px; }

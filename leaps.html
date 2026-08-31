@@ -15,6 +15,12 @@
   if (m) location.replace("/" + m[1] + location.search + location.hash);
 })();
 </script>
+<script>
+// 早期语言戳（2026-08-31 §70）：EN 版式规则全挂在 html:not([lang^="zh"]) 上，而 lang
+// 原先要等 i18n.js 跑完才设 ⇒ 每次整页加载 EN 访客先看中式版式、随后整体弹一下（Klay 实感「右跳」）。
+// 与上面主题的早期戳同款：只抢 lang 属性让首帧版式就位；正式 lang 码仍由 i18n.js 按 LANG_META 设。
+(function () { try { var l = localStorage.getItem("mc-lang"); if (l && l !== "zh") document.documentElement.lang = l; } catch (e) {} })();
+</script>
 <title>恐惧的标价指数（Fear-Price Index）· LEAPS 成本刻度 · 美股编年史 Market Chronicle</title>
 <!-- SEO / GEO：主推域名 canonical + 摘要 + 社交卡片 + 结构化数据 -->
 <link rel="canonical" href="https://chronicle.klay-wang.com/leaps">
@@ -74,7 +80,7 @@
      阻塞加载会白屏数秒；display=swap 保证先用系统字渲染，字体到达再替换） -->
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="css/style.css?v=20260821d">
+<link rel="stylesheet" href="css/style.css?v=20260831a">
 <script>
 // 主题先于渲染应用，避免闪白
 (function () {

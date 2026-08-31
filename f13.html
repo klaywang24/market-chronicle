@@ -8,9 +8,11 @@
 <meta name="description" content="机构 13F 持仓对账：季末到披露日之间那段走势，披露当天就是已知的、可复算的。只对账，不算机构盈亏，不给跟不跟。">
 <script>
 try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) document.documentElement.classList.add("dark-mode"); } catch (e) {}
+/* 早期语言戳（2026-08-31 §70）：EN 版式规则挂在 html:not([lang^="zh"])，不抢在首帧设 lang 会先中式版式再弹一下。 */
+try { var _l = localStorage.getItem("mc-lang"); if (_l && _l !== "zh") document.documentElement.lang = _l; } catch (e) {}
 </script>
 <style>html{background:#FFFFFF}html.dark-mode{background:#111111}</style>
-<link rel="stylesheet" href="css/style.css?v=20260819a">
+<link rel="stylesheet" href="css/style.css?v=20260831a">
 <style>
 /* 页面私有样式一律 f13- 前缀，只借主站 :root 变量与字体，不碰主站类 */
 .f13-wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 6px; }
@@ -29,11 +31,7 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 html:not([lang^="zh"]) .f13-nav2 { gap: 8px; }
 html:not([lang^="zh"]) .f13-nav2 .tabs { gap: 6px; }
 html:not([lang^="zh"]) .f13-nav2 a.tab { padding: 6px 10px; }
-/* 2026-08-31（§69）：容器锁 1080px，EN 全长标签（KAPX · Ledger / Fear-Price Index · Ledger）
-   加右侧控件在任何视口都放不进一行（1600px 实测照样两行）⇒ EN 态一律用短标签。
-   短标签本就有 t-short 节点且键在内联字典里；zh 不受影响。1024px 实测一行（tabs 769px+控件 188px）。 */
-html:not([lang^="zh"]) .f13-nav2 .tab .t-full { display: none; }
-html:not([lang^="zh"]) .f13-nav2 .tab .t-short { display: inline; }
+/* 2026-08-31（§70）：EN 恒短标签已全站统一进 css/style.css（§69 的页内特例撤销，一处规则一个实现）。 */
 .f13-navctl { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 /* 🐛 2026-08-18 修：`.f13-nav2 a`(0,1,1) 特异性压过 `.f13-subbtn`(0,1,0)，
    padding 被覆盖成 2px 0 ⇒ 按钮塌成 29×29 + 20px 圆角 = 红圆球（Klay 两次圈图）。
