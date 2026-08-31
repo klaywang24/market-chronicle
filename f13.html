@@ -29,6 +29,11 @@ try { var _t = localStorage.getItem("mc-theme"); if (_t ? _t === "dark" : true) 
 html:not([lang^="zh"]) .f13-nav2 { gap: 8px; }
 html:not([lang^="zh"]) .f13-nav2 .tabs { gap: 6px; }
 html:not([lang^="zh"]) .f13-nav2 a.tab { padding: 6px 10px; }
+/* 2026-08-31（§69）：容器锁 1080px，EN 全长标签（KAPX · Ledger / Fear-Price Index · Ledger）
+   加右侧控件在任何视口都放不进一行（1600px 实测照样两行）⇒ EN 态一律用短标签。
+   短标签本就有 t-short 节点且键在内联字典里；zh 不受影响。1024px 实测一行（tabs 769px+控件 188px）。 */
+html:not([lang^="zh"]) .f13-nav2 .tab .t-full { display: none; }
+html:not([lang^="zh"]) .f13-nav2 .tab .t-short { display: inline; }
 .f13-navctl { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 /* 🐛 2026-08-18 修：`.f13-nav2 a`(0,1,1) 特异性压过 `.f13-subbtn`(0,1,0)，
    padding 被覆盖成 2px 0 ⇒ 按钮塌成 29×29 + 20px 圆角 = 红圆球（Klay 两次圈图）。
