@@ -402,7 +402,7 @@
       "Kapital, Kredit, Preise und Wachstum — vier vorgelagerte Variablen des Index, alle aus FRED, täglich aktualisiert.",
       "Capital, crédito, precios y crecimiento: cuatro variables aguas arriba del índice, todas de FRED, actualizadas a diario."],
     // 2026-08-31 §76（Klay：「为什么宏观是中英文混杂的」）：这五个键原为「资金面 · CAPITAL」
-    // 这类中英混排 —— 全站其余 40+ 个章节标题都是纯中文（「成长的对照」「组合的脾气」…），
+    // 这类中英混排：全站其余 40+ 个章节标题都是纯中文（「成长的对照」「组合的脾气」…），
     // 只有宏观页把英文塞进了标题本身，于是**中文态**读者看到中英夹杂（英文态一直是好的）。
     // ⇒ 中文标题去掉英文后缀，英文译文原样不动。kicker 那行纯英文小标是刻意的，不在此列。
     "资金面": ["Capital · Liquidity", "Capitaux · liquidité", "Kapital · Liquidität", "Capital · liquidez"],
