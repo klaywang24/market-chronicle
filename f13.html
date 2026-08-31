@@ -24,7 +24,14 @@ try { var _l = localStorage.getItem("mc-lang"); if (_l && _l !== "zh") document.
    共用同一条页面左缘（24px），页内自洽。
    ⚠️ 代价说清楚：本页因此**不再与 SPA 的居中版式同左缘**（§72 那条「全站一条左缘」
    在本页让位于「页内自洽」）。这是 Klay 明确选的，不是漂移。 */
-.f13-wrap { max-width: none; margin: 0; padding: 0 24px 6px; }
+.f13-wrap { max-width: none; margin: 0; padding: 0 24px 6px 284px; }
+/* §73.1（Klay：「这个 tab 和正文对齐不行吗」）：两段式改完，品牌与导航贴在页面左缘 24px，
+   而正文列从 284px 起 ⇒ tab 又悬在正文左边 —— 站上为这件事定过规矩（原 .topbar-row 那条
+   「有目录时顶栏跟着正文走」，注释里记着 ~1300px 时 tab 与正文差 150px 的实况）。
+   ⇒ 顶栏左缘＝正文列左缘：24(layout 内距) + 232(侧栏) + 28(gap) = 284。
+   🔑 品牌与导航一起移，不拆开 —— 「单色顶栏下品牌与导航共用同一条左边线（彭博/WSJ 皆如此）」
+      是 2026-07-26 定下的，本页不另起一套。
+   ⚠️ 窄屏 ≤860px 时 grid 塌成单列、正文回到 24px，顶栏同步回收（见下方同断点媒体查询）。 */
 /* 2026-08-31 §72：§71 那条 1080px 页脚对齐已撤——本页容器回到 1180，与主站 base 同宽即自然齐平。 */
 
 .f13-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 10px; }
@@ -103,7 +110,15 @@ html:not([lang^="zh"]) .f13-nav2 a.tab { padding: 6px 10px; }
 .f13-cap.dis:hover { background: var(--bg-card); border-color: var(--border); }
 .f13-groupttl { font-size: 10.5px; color: var(--ink-muted); letter-spacing: .08em; margin: 16px 0 6px; padding-left: 10px; opacity: .75; }
 .f13-groupttl:first-child { margin-top: 0; }
-@media (max-width: 860px) { .f13-layout { grid-template-columns: 1fr; } .f13-side { position: static; max-height: none; } }
+@media (max-width: 860px) { .f13-layout { grid-template-columns: 1fr; } .f13-side { position: static; max-height: none; }
+  .f13-wrap { padding-left: 24px; } }   /* §73.1：单列时正文回到 24，顶栏跟着回收 */
+/* 🐛 §73.1 顺手修（既有问题，非本轮引入）：主站 @820px 那套窄屏顶栏给 `.tabs` 打了
+   `order:3 + flex:0 0 100%`，是为主站的「品牌/控件/tabs 三兄弟」排的（tabs 占满第三行）。
+   本页 nav 里只有 tabs 与 .f13-navctl 两个孩子，且本页已用 `.f13-nav2 .tabs { flex:1 }`
+   覆盖了 flex —— **却没覆盖 order** ⇒ 借了主站的类只接住一半规则，
+   窄屏下 tabs(order 3) 排到控件(order 0)后面：785px 实测「订阅/EN/主题」在左、导航在右。
+   ⇒ 本页显式收回 order。断点取 820 与主站那条对齐，不自己另起一个。 */
+@media (max-width: 820px) { .f13-nav2 .tabs { order: 0; } }
 .f13-panel { border: 1px solid var(--border); border-radius: 14px; background: var(--bg-card); padding: 20px 22px 24px; margin: 0 0 40px; }
 .f13-panel h2 { font-family: 'Noto Serif SC',serif; font-size: 20px; margin: 0 0 4px; color: var(--ink); }
 .f13-panel .pmeta { font-size: 12.5px; color: var(--ink-muted); font-family: 'JetBrains Mono',monospace; margin-bottom: 14px; }
