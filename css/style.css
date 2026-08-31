@@ -867,12 +867,25 @@ tr.clickable td:first-child { color: var(--accent-deep); font-weight: 600; }
    1660px 的来历：容器居中时左空白 =(100vw−1180)/2；EN 目录 left18+width216=右缘 234，
    需 (100vw−1180)/2 ≥ 234 ⇒ 100vw ≥ 1648，取整 1660。zh 目录窄 40px，同断点更宽松。
    ⚠️ 由此作废的四条让位规则（原 §26/§36 时代产物）：.container ×2（zh/EN）、.tabs、.topbar-row。 */
-/* ≥1660px：左侧空白够宽，目录常驻且不遮正文（容器仍居中，不再让位） */
-@media (min-width: 1660px) {
+/* ═══ 2026-08-31 §75（Klay 定：「所有页面都留足目录的位置，今日页没有目录就留白」）═══
+   §71 让容器恒定居中、目录只在 ≥1660px 常驻，代价是常用宽度（1440–1600）目录要点 ☰ 才出来。
+   Klay 的选择是反过来：**版面为目录固定留位**，哪怕那一页没有章节也留着。
+   🔑 与 §71 之前那套让位的**决定性区别**：那时是「有目录才让位」，两类页面天生两个左缘 ⇒ 切页跳；
+      现在**所有页面无条件让位**，位置恒定 ⇒ 目录常驻与零跳动同时成立（§71 那次的取舍在这里消失了）。
+   公式：左边距 = max(218px, 居中值)。218 = 目录 left 18 + 宽 176 + 间隙 24。
+   窗口宽到居中值超过 218 时自动回到真居中（此时左空白本就够，目录跟着正文左缘走，见 .toc 的 left）。
+   右边距同取 max(24px, 居中值)：窄屏时容器自动收窄，不会被推出视口。 */
+@media (min-width: 1280px) {
   html.has-toc .toc { display: block; }   /* 见上方「反过来写」注释：未知态不显示 */
   html.has-toc .toc-toggle { display: none; }
+  .container, .topbar-row, .site-footer {
+    max-width: 1180px;
+    margin-left: max(218px, calc((100vw - 1180px) / 2));
+    margin-right: max(24px, calc((100vw - 1180px) / 2));
+  }
 }
-/* 无章节的页（今日头版）连按钮都不该有：点开是空的比没有更糟 */
+/* 无章节的页（今日头版）连按钮都不该有：点开是空的比没有更糟。
+   ⚠️ 但**位置照留**（上面那条 margin 不分 has-toc/no-toc）—— 这正是 Klay 要的「留白」。 */
 html.no-toc .toc-toggle { display: none; }
 @media (min-width: 1280px) {
   /* 顶栏布局：品牌住进左侧留白（贴视口左缘），tab 栏起点与正文左缘像素对齐 */
@@ -962,7 +975,11 @@ html:not([lang^="zh"]) .toc a { font-size: 11.5px; -webkit-line-clamp: 3; line-h
    原先那条「有目录才让位」正是切页时顶栏跟着跳的直接原因。 */
 
 @media (min-width: 1280px) {
-  html.no-toc .container { margin-left: auto; margin-right: auto; }
+  /* §75 作废：`html.no-toc .container { margin:auto }`（2026-07-26 的「无目录页真居中」）。
+     它的特异性 (0,2,1) 压过 §75 那条统一让位 (0,1,0) ⇒ 今日页仍居中、其余页让位，
+     1485px 实测左缘 153 vs 218 —— **跳动照旧**，我加完统一让位没复查它，闸也不会报。
+     🔑 撤销一条旧规则时，得连它的「例外规则」一起找出来，否则例外会变成新的主规则。
+     Klay 08-31 定：所有页面一律留位，今日页留白。 */
   /* 🚨 这里**不要**再给 .tabs 加 margin 覆盖。踩过两次：
      ① `margin-left:0` → tab 停在 x=24，与正文（203）错位 179px；
      ② `calc((100vw-1180px)/2 - 11px)` → 去掉了原公式里的 `max(214px, …)` 下限，
@@ -1081,9 +1098,17 @@ td.left-col { text-align: left; }
 /* 桌面：页脚与正文同一左缩进，否则页脚居中(margin:auto)时左缘会滑到固定目录(.toc)
    底下重叠（2026-07-20 用户指出）。⚠️ 本块必须放在上面 base .site-footer 之后——
    base 的 `margin:auto` 简写在源码里靠后，同优先级会覆盖任何靠前的 margin-left 覆盖。 */
-/* 2026-08-31 §71 作废：页脚让位。容器已恒定居中，页脚 margin:auto 即与正文同左缘；
-   而原来那条「跟着目录让位」会让页脚与正文一起在切页时左右跳（同族最后一处）。
-   ≥1660px 目录常驻时右缘 234px < 容器左缘 240px，不会再压到页脚。 */
+/* §75：页脚跟随统一让位。⚠️ 必须写在 base `.site-footer{margin:40px auto 0}` **之后** ——
+   那条 margin 简写在源码里靠后，同优先级下会吃掉任何写在前面的 margin-left 覆盖
+   （2026-07-20 就踩过一次，§71 的注释里也记着）。实测：§75 那条统一让位写在 ~870 行，
+   容器与顶栏都到了 218，唯独页脚停在 153 —— 就是被这条 base 压的。 */
+@media (min-width: 1280px) {
+  .site-footer {
+    max-width: 1180px;
+    margin-left: max(218px, calc((100vw - 1180px) / 2));
+    margin-right: max(24px, calc((100vw - 1180px) / 2));
+  }
+}
 .footer-cols {
   display: flex;
   justify-content: space-between;

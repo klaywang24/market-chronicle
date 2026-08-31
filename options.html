@@ -135,13 +135,18 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
    目录只在左侧空白够宽时（≥1660px）常驻，窄于此不显示（本页无抽屉机制，藏比遮好）。
    left 公式：容器左缘 (100vw−1180)/2 减去目录宽 176 再留 20px 间隙。
    top 仍由 JS 渲染后量 kicker 对齐（写死像素会随标题高度漂）。 */
-@media (min-width: 1660px) {
-  .op-toc { display: block; position: fixed; left: max(20px, calc((100vw - 1180px) / 2 - 196px)); top: 128px; width: 176px; font-size: 14px; }
+@media (min-width: 1280px) {
+  /* §75（Klay 08-31：「所有页面都留足目录的位置」）：与主站同一套 —— 版面为目录固定留位，
+     正文左边距 max(218px, 居中值)，目录咬在正文左缘往左 24px。断点从 §72 的 1660 降到 1280：
+     有让位就不必再等左空白自然够宽，本页目录也因此在常用宽度下常驻，不用点。 */
+  .op-wrap { max-width: 1180px; margin-left: max(218px, calc((100vw - 1180px) / 2)); margin-right: max(24px, calc((100vw - 1180px) / 2)); }
+  .op-toc { display: block; position: fixed; left: max(18px, calc((100vw - 1180px) / 2 - 200px)); top: 128px; width: 176px; font-size: 14px; }
   .op-toc-h { font-size: 12px; color: var(--ink-muted); letter-spacing: .08em; padding-bottom: 9px; border-bottom: 1px solid var(--border); margin-bottom: 9px; }
   .op-toc a { display: block; color: var(--ink-soft); text-decoration: none; padding: 5px 0 5px 10px; border-left: 2px solid transparent; line-height: 1.55; }
   .op-toc a:hover { color: var(--ink); }
   .op-toc a.on { color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
-  /* §72 作废：.op-wrap 的 210px 让位 —— 容器恒定 1180 居中，见本块顶部注释。 */
+  /* §72 曾作废 .op-wrap 的 210px 让位（那时正文恒定居中）；§75 改为**统一让位**后
+     它以新形式回来了 —— 区别是现在**不分有没有目录、所有页一律留位**，故不会再造成切页跳。 */
 }
 @media (max-width: 700px) { .op-chart { height: 260px; } .op-chart.tall { height: 340px; } .op-table { font-size: 12px; } }
 </style>
