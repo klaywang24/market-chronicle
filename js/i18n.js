@@ -401,11 +401,15 @@
       "Capitaux, crédit, prix et croissance — quatre variables amont de l'indice, via FRED, actualisées chaque jour.",
       "Kapital, Kredit, Preise und Wachstum — vier vorgelagerte Variablen des Index, alle aus FRED, täglich aktualisiert.",
       "Capital, crédito, precios y crecimiento: cuatro variables aguas arriba del índice, todas de FRED, actualizadas a diario."],
-    "资金面 · CAPITAL": ["Capital · Liquidity", "Capitaux · liquidité", "Kapital · Liquidität", "Capital · liquidez"],
-    "信用 · CREDIT": ["Credit", "Crédit", "Kredit", "Crédito"],
-    "物价 · PRICES": ["Prices", "Prix", "Preise", "Precios"],
-    "增长与就业 · GROWTH": ["Growth & Jobs", "Croissance & emploi", "Wachstum & Arbeitsmarkt", "Crecimiento y empleo"],
-    "仓位与杠杆 · POSITIONING": ["Positioning & Leverage", "", "", ""],
+    // 2026-08-31 §76（Klay：「为什么宏观是中英文混杂的」）：这五个键原为「资金面 · CAPITAL」
+    // 这类中英混排 —— 全站其余 40+ 个章节标题都是纯中文（「成长的对照」「组合的脾气」…），
+    // 只有宏观页把英文塞进了标题本身，于是**中文态**读者看到中英夹杂（英文态一直是好的）。
+    // ⇒ 中文标题去掉英文后缀，英文译文原样不动。kicker 那行纯英文小标是刻意的，不在此列。
+    "资金面": ["Capital · Liquidity", "Capitaux · liquidité", "Kapital · Liquidität", "Capital · liquidez"],
+    "信用": ["Credit", "Crédit", "Kredit", "Crédito"],
+    "物价": ["Prices", "Prix", "Preise", "Precios"],
+    "增长与就业": ["Growth & Jobs", "Croissance & emploi", "Wachstum & Arbeitsmarkt", "Crecimiento y empleo"],
+    "仓位与杠杆": ["Positioning & Leverage", "", "", ""],
     "专业管理人实际把多少钱押在股票上？（嘴会说谎，仓位不会）": ["How much are professional managers actually betting on stocks? (Mouths lie; positions don't)", "", "", ""],
     "NAAIM 经理人敞口指数（2006 年至今 · 周频）": ["NAAIM Exposure Index (2006–present, weekly)", "", "", ""],
     "NAAIM 会员主动管理人的平均股票敞口：0 = 空仓，100 = 满仓，大于 100 = 加杠杆；历史底部常见 20 以下 · 尾标为最新读数 · 底部滑块可拖拽缩放。CFTC 期货持仓与融资余额将陆续入列": ["Average equity exposure of NAAIM member active managers: 0 = all cash, 100 = fully invested, above 100 = levered; historic bottoms often print below 20 · end label = latest reading · drag the bottom slider to zoom. CFTC futures positioning and margin debt will join this chapter", "", "", ""],
