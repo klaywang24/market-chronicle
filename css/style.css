@@ -545,7 +545,9 @@ tr:hover td { background: var(--bg-card-hover); }
 .pulse-layer {
   background: var(--bg);
   color: var(--ink);
-  padding: 26px 56px 48px;
+  /* 2026-09-01：底部 48px 改 24px —— 它下面还叠着 main 的 24px 与 footer 的 40px，
+     三层累计 112px，末尾那块图表下方显得空。左右/顶部不动（那是封面留白，不是空白）。 */
+  padding: 26px 56px 24px;
   display: flex;
   flex-direction: column;
   gap: 26px;
@@ -1929,7 +1931,11 @@ html:not([lang^="zh"]) .jt-en { display: block; }
 .lv-line .fwd-n { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--accent); }
 
 /* ---------- 2026-07-26 §45：自有板块涨跌图 + 往期存档墙 ---------- */
-.sector-breadth { height: 400px; width: 100%; }
+/* 2026-09-01 Klay 圈图「首页底部空白」：400px 装 11 个板块 × barWidth 15px ⇒ 每类目 36px、
+   条间隙 21px（远宽于条本身），且 canvas 内容只画到 367px、底部空 34px。
+   改 320px：每类目 29px、间隙 14px≈条宽，条形铺满 canvas（实测底部空白 34px→1px）。
+   ⚠️ 与 .pulse-layer 的 padding-bottom 是同一块空白的两半，改一处不够（实测两处合计省 137px）。 */
+.sector-breadth { height: 320px; width: 100%; }
 @media (max-width: 640px) { .sector-breadth { height: 440px; } }
 
 .digest-archive {
