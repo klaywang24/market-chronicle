@@ -1,14 +1,23 @@
 {
-  "generated_at": "2026-09-01T05:37:03Z",
-  "count": 3,
+  "generated_at": "2026-09-01T10:12:26Z",
+  "count": 4,
   "items": [
+    {
+      "date": "2026-08-31",
+      "slug": "2026-08-31-weekly",
+      "title": "8月美股赚钱了吗？这里面或许有你想要的答案 · 8月收官 & 回顾",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-31-weekly",
+      "kind": "weekly",
+      "title_en": "August's Four Biggest Gainers Were July's Five Biggest Losers",
+      "url_en": "https://chronicle.klay-wang.com/digest/2026-08-31-weekly.en.html"
+    },
     {
       "date": "2026-08-28",
       "slug": "2026-08-28-weekly",
       "title": "本周回顾：美股七姐妹财报纷纷引爆超预期波动？ChatGPT 时代首次！ · 8.24-8.28",
       "url": "https://chronicle.klay-wang.com/digest/2026-08-28-weekly",
       "kind": "weekly",
-      "title_en": "本周回顾：美股七姐妹财报纷纷引爆超预期波动？ChatGPT 时代首次！ · 8.24-8.28",
+      "title_en": "The Magnificent 7 Just Blew Through Their Own Options Fences. First Time Since ChatGPT.",
       "url_en": "https://chronicle.klay-wang.com/digest/2026-08-28-weekly.en.html"
     },
     {
