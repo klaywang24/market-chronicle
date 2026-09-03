@@ -314,10 +314,22 @@ def main() -> int:
             enqueue(pend, r["url"], today,
                     "确实无快照" if r["probe"] == "none"
                     else f"超期 {r.get('confirmed_age_days')} 天")
-    seen_now = {r["url"] for r in results}
-    queue = [e for e in pend["pending"] if e["url"] not in seen_now]   # 当轮刚探过的不重复打
-    queue.sort(key=lambda x: (x.get("last_try") or "", x.get("since", "")))   # 最久没试的优先
     resolved, retried, skipped = [], 0, 0
+    # 🔴 常设 URL（每天都在主锚里探）一旦入队，必须**用当轮主锚的结果结算**，
+    #    不能只是「跳过不重复打 IA」——那样它既不 resolve 也不计次，会**永远躺在队列里**，
+    #    正好造出条件三要防的那个「永不排空的队列」。（本条是实现当天自己踩出来的：
+    #    第一版写 `queue = [不在 seen_now 的]`，对 options_page.json 这类目标就是永久滞留。）
+    _now_by_url = {r["url"]: r for r in results}
+    for e in list(pend["pending"]):
+        r = _now_by_url.get(e["url"])
+        if r and r["probe"] != "unknown" and r["within_sla"]:
+            resolved.append({"url": e["url"], "on": today,
+                             "timestamp": r.get("timestamp")})
+    # 剩下的才需要额外补探；当轮已探过的不重复打 IA（省预算，主锚刚给过答案）
+    queue = [e for e in pend["pending"]
+             if e["url"] not in _now_by_url
+             and e["url"] not in {d["url"] for d in resolved}]
+    queue.sort(key=lambda x: (x.get("last_try") or "", x.get("since", "")))   # 最久没试的优先
     for e in queue[:RETRY_BUDGET]:
         p2, s2 = latest_snapshot(e["url"])
         a2 = snapshot_age_days(s2)
