@@ -108,7 +108,7 @@ a{color:var(--bad)}
 <table>
 <tr><th>层</th><th>什么时候跑</th><th>怎么通知你</th><th>管什么</th></tr>
 <tr><td><b>①本页</b></td><td>你打开时</td><td>你自己看</td><td>随时想查就查</td></tr>
-<tr><td><b>②daily 内</b></td><td>每交易日 18:00 美东</td><td>Discord 推送</td><td>当天出问题当天知道</td></tr>
+<tr><td><b>②daily 内</b></td><td>排定 18:00 美东<br><span style="color:var(--muted)">cron 只入队不准时，实测起跑 19:5x–次日 02:00</span></td><td>Discord 推送</td><td>当天出问题当天知道</td></tr>
 <tr><td><b>③看门狗</b></td><td>每天 09:00 美东<br>（独立任务）</td><td><b>开 GitHub Issue<br>→ 自动发邮件</b></td>
     <td><b>连 daily 自己死了也能报</b><br>②在 daily 里面，daily 死了它也没了</td></tr>
 </table>
@@ -118,10 +118,16 @@ a{color:var(--bad)}
 <script>
 const RAW="RAW_URL", REPO="REPO_URL";
 const ICON={ok:"✓",bad:"!",unknown:"?"}, COLOR={ok:"var(--ok)",bad:"var(--bad)",unknown:"var(--unk)"};
-const SLA={chain:4, anchor:4, snap:3, daily:4, opt:4};   // opt=期权页，与 check_witness_health 同值
+const SLA={chain:4, anchor:4, daily:4, opt:4};   // opt=期权页，与 check_witness_health 同值（snap 是 manual 卡，无判据键）
 const days=s=>{if(!s)return null;const t=s.length>8?Date.parse(s.slice(0,10)):
   Date.parse(s.slice(0,4)+"-"+s.slice(4,6)+"-"+s.slice(6,8));
   return isNaN(t)?null:Math.floor((Date.now()-t)/864e5)};
+// 🔴 2026-08-26 修：days() 可能返回 null，而 null<=SLA 在 JS 里是 true ⇒ 日期字段一坏就假绿。
+//    所有「新鲜度」判据一律走这个函数：解析不出日期 = unknown，不是 ok。没查到 ≠ 没问题。
+// 🚨 2026-09-03 回填：这三行此前**只改在产物 HTML 上、没回生成器**（生成器停在 08-18）——
+//    任何人重跑一次生成器就会把它们整体抹掉、假绿复活。**改产物不改生成器＝装了一颗定时雷。**
+const stat=(a,sla)=>a===null?"unknown":(a<=sla?"ok":"bad");
+const ago=a=>a===null?"日期未解析":`${a} 天前`;
 
 async function txt(u){const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw 0;return r.text()}
 async function lastJsonl(u){const t=await txt(u);const L=t.trim().split("\\n").filter(Boolean);
@@ -138,24 +144,38 @@ function card(name,st,detail,why){
 
   // ① 链最后一行
   try{const {last}=await lastJsonl(RAW+"/data/ledger_hashes.jsonl");const a=days(last.date);
-    out.push({n:"链最后一行",s:a<=SLA.chain?"ok":"bad",
-      d:`${last.date}（${a} 天前）· 链头 <code>${last.chain.slice(0,16)}…</code>`,
+    out.push({n:"链最后一行",s:stat(a,SLA.chain),
+      d:`${last.date}（${ago(a)}）· 链头 <code>${last.chain.slice(0,16)}…</code>`,
       w:"数据本身还在不在逐日入链"});
   }catch(e){out.push({n:"链最后一行",s:"unknown",d:"拉取失败",w:"没查到 ≠ 没问题"})}
 
   // ② 锚定日志
+  //    🔴 2026-09-03 修（Klay 令）：判据从**抽样**改成**聚合**。
+  //    病：原来只读 `results[0]`（一条记录里 5~9 个探针的第 1 个），结论却挂在整张卡上；
+  //        而每条记录**顶层现成就有** within_sla / out_of_sla / not_probed 三个聚合数。
+  //    🔬 实测代价：31 条记录里 **20 天** out_of_sla>0 或 not_probed>0，其中 **18 天**
+  //        results[0] 恰好正常 ⇒ **卡片报绿**（最近：09-01 超期 2、08-28 超期 2）。
+  //        而同一页下面的历史表把「超期 2」直接印了出来 —— **证据与绿灯同框**，
+  //        和 08-18 期权卡那次是同一个病的第二个发病部位，隔了半个月没人发现。
+  //    🔑 第一性：**结论的覆盖面不许大于判据的覆盖面。** 量了 1 个探针就只能说这 1 个。
+  //        推论：**绿灯的文案必须逐字等于判据** —— 人只会读那句话，不会去读代码。
   try{const {last,all}=await lastJsonl(RAW+"/data/anchor_log.jsonl");const a=days(last.date);
     const h=(last.results||[])[0]||{};
-    let s="ok",d=`${last.date}（${a} 天前）`;
-    if(a>SLA.anchor){s="bad";d+=" · 超过 "+SLA.anchor+" 天没有新记录"}
-    else if(h.probe==="unknown"){s="unknown";d+=" · 那次未能查证（IA 限流）"}
-    else if(!h.within_sla){s="bad";d+=` · 链头快照已 ${h.confirmed_age_days} 天前`}
-    else{d+=` · 链头快照 <code>${h.timestamp||"?"}</code>`}
-    out.push({n:"锚定日志",s,d,w:"存档结果有没有被留档（2026-08-04 之前它从未存在过）"});
+    const nOk=last.within_sla??null, nOut=last.out_of_sla??null, nUnk=last.not_probed??null;
+    let s="ok",d=`${last.date}（${ago(a)}）`;
+    if(a===null){s="unknown";d+=" · 记录里的日期解析不出来"}
+    else if(a>SLA.anchor){s="bad";d+=" · 超过 "+SLA.anchor+" 天没有新记录"}
+    // 聚合字段缺失 = 没测到，不是没问题（旧格式记录会走到这里）
+    else if(nOut===null&&nUnk===null){s="unknown";d+=" · 这条记录没有聚合字段，无法判定全部探针"}
+    else if(nOut>0){s="bad";d+=` · <b>${nOut} 个存档超期</b>（SLA 内 ${nOk} · 未测到 ${nUnk}）`}
+    else if(nUnk>0){s="unknown";d+=` · ${nUnk} 个未能查证（IA 限流）· SLA 内 ${nOk}`}
+    else{d+=` · ${nOk} 个存档全部在 SLA 内 · 链头快照 <code>${h.timestamp||"?"}</code>`}
+    out.push({n:"锚定日志",s,d,w:"存档结果有没有被留档 —— 判据＝该条记录的**全部**探针，不是第一个"});
     window.__hist=all;
-  }catch(e){out.push({n:"锚定日志",s:"bad",
-      d:"<b>anchor_log.jsonl 还不存在</b>",
-      w:"第一条记录由 daily 生成；若长期不出现说明自我提交那步没生效"})}
+  }catch(e){out.push({n:"锚定日志",s:"unknown",
+      d:"anchor_log.jsonl 取不到",
+      w:"🚫 不替它断定是哪一种：原文案写死「文件还不存在」，而任何一次网络抖动都会走到这里——"
+        +"那句话本闸从没验证过。取不到就是取不到（家规：没查到 ≠ 没问题）"})}
 
   // ③ 链头快照 —— 浏览器跨域查不了 IA，给直达链接，不假装查过。
   //    manual:true = 不计入总体状态（2026-08-05 修：它永远是 ❔，算进去的话
@@ -167,8 +187,8 @@ function card(name,st,detail,why){
   // ④ daily 是否还活着
   try{const r=await fetch("https://api.github.com/repos/klaywang24/market-chronicle/commits?path=data/kindex.json&per_page=1",{cache:"no-store"});
     const j=await r.json();const dt=j[0].commit.committer.date;const a=days(dt);
-    out.push({n:"daily 是否还活着",s:a<=SLA.daily?"ok":"bad",
-      d:`最后一次更新数据 ${dt.slice(0,10)}（${a} 天前）`,
+    out.push({n:"daily 是否还活着",s:stat(a,SLA.daily),
+      d:`最后一次更新数据 ${dt.slice(0,10)}（${ago(a)}）`,
       w:"最严重的一项：2026-07-12 那次 daily 整个死掉 4 天没人发现"});
   }catch(e){out.push({n:"daily 是否还活着",s:"unknown",d:"GitHub API 拉取失败",w:"没查到 ≠ 没问题"})}
 
@@ -201,8 +221,8 @@ function card(name,st,detail,why){
       ? {n:"期权页是否在更新",s:"bad",
          d:`期权页 ${m.data_date} 数据不完整：${stale.length} 只票仍非官方收盘价（${stale.slice(0,6).join(", ")}${stale.length>6?"…":""}）`,
          w:"多半是收盘价落库前那一班生成的版本卡在站上 —— 看本机 eod-scan 日志有没有 push/rebase 未成功"}
-      : {n:"期权页是否在更新",s:a<=SLA.opt?"ok":"bad",
-         d:`数据日 ${m.data_date}（${a} 天前）${stale.length?" · 盘中临时读数":""} · ${m.n_tickers} 只标的`,
+      : {n:"期权页是否在更新",s:stat(a,SLA.opt),
+         d:`数据日 ${m.data_date}（${ago(a)}）${stale.length?" · 盘中临时读数":""} · ${m.n_tickers} 只标的`,
          w:"本机 launchd 那条链路的唯一体温计：它停了说明定时任务/生成器/推送里有一环断了"});
   }catch(e){out.push({n:"期权页是否在更新",s:"unknown",d:"拉取失败",w:"没查到 ≠ 没问题"})}
 
@@ -233,7 +253,7 @@ function card(name,st,detail,why){
           return `<tr><td>${r.date}</td><td>${r.within_sla??"-"}</td><td>${r.out_of_sla??"-"}</td>
           <td>${r.not_probed??"-"}</td><td><code>${h.timestamp||"-"}</code></td></tr>`}).join("")
       + `</table>`
-    : `<p class="note">还没有锚定记录。第一条由 daily 生成（每交易日 18:00 美东）。</p>`;
+    : `<p class="note">锚定记录没读到 —— 可能是取数失败，也可能确实还没有第一条。不替它断定是哪一种。</p>`;
 })();
 </script>
 </div></body></html>
