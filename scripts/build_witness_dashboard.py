@@ -119,9 +119,18 @@ a{color:var(--bad)}
 const RAW="RAW_URL", REPO="REPO_URL";
 const ICON={ok:"✓",bad:"!",unknown:"?"}, COLOR={ok:"var(--ok)",bad:"var(--bad)",unknown:"var(--unk)"};
 const SLA={chain:4, anchor:4, daily:4, opt:4};   // opt=期权页，与 check_witness_health 同值（snap 是 manual 卡，无判据键）
-const days=s=>{if(!s)return null;const t=s.length>8?Date.parse(s.slice(0,10)):
-  Date.parse(s.slice(0,4)+"-"+s.slice(4,6)+"-"+s.slice(6,8));
-  return isNaN(t)?null:Math.floor((Date.now()-t)/864e5)};
+// 🔴 2026-09-03 修（Klay 令）：原来拿 `Date.now()`（**浏览器本地时区**）去减一个
+//    按 UTC 午夜解析的日期。Klay 人在中国，北京比美东快 12 小时 ⇒ 同一份数据
+//    在北京早晨会被算成多 1 天；而期权卡的 `a>=1` 是**硬边界** ⇒ 北京早晨打开看到**假红**。
+//    （站侧 check_witness_health 用的是 days_since(..., et=True)，一直是对的 —— 又一处两把尺子。）
+//    改法：两边都归一到**美东日历日**再相减，浏览器在哪个时区都得同一个数。
+//    🔑 假红不是"偏保守"，它和假绿一样会养出麻木——只是死法不同。
+const etDay=d=>new Intl.DateTimeFormat("en-CA",{timeZone:"America/New_York",
+  year:"numeric",month:"2-digit",day:"2-digit"}).format(d);          // → "YYYY-MM-DD"
+const days=s=>{if(!s)return null;
+  const iso=s.length>8?s.slice(0,10):s.slice(0,4)+"-"+s.slice(4,6)+"-"+s.slice(6,8);
+  const t=Date.parse(iso+"T00:00:00Z"), n=Date.parse(etDay(new Date())+"T00:00:00Z");
+  return (isNaN(t)||isNaN(n))?null:Math.round((n-t)/864e5)};
 // 🔴 2026-08-26 修：days() 可能返回 null，而 null<=SLA 在 JS 里是 true ⇒ 日期字段一坏就假绿。
 //    所有「新鲜度」判据一律走这个函数：解析不出日期 = unknown，不是 ok。没查到 ≠ 没问题。
 // 🚨 2026-09-03 回填：这三行此前**只改在产物 HTML 上、没回生成器**（生成器停在 08-18）——
