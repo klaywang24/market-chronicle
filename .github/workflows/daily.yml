@@ -108,8 +108,12 @@ jobs:
         continue-on-error: true
         run: |
           python scripts/anchor_wayback.py --sha "$(git rev-parse HEAD)"
-          if [ -n "$(git status --porcelain data/anchor_log.jsonl)" ]; then
-            git add data/anchor_log.jsonl
+          # 🔴 2026-09-03 加 anchor_pending.json（Klay 令·补探队列）：
+          #    本步是**自提交**，runner 随后销毁 ⇒ **没被 git add 的文件等于没写过**。
+          #    补探队列必须跨轮存活（CI 每次都是全新机器，内存里的名单活不过一轮），
+          #    所以它和 anchor_log 一样必须逐个点名 add。**加新产物必须回来改这一行。**
+          if [ -n "$(git status --porcelain data/anchor_log.jsonl data/anchor_pending.json)" ]; then
+            git add data/anchor_log.jsonl data/anchor_pending.json
             git commit -m "anchor: wayback log $(TZ=America/New_York date +%F)"
             git pull --rebase -q origin main || true
             git push

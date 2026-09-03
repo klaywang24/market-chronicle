@@ -1,0 +1,45 @@
+{
+ "_what": "锚定补探队列：当轮「确实无快照/已超期」的 URL 排这里，以后每轮回头补探+重提交。**必须进 git** —— CI 每次都是全新机器，不入仓则重试只存在于当轮的想象里。",
+ "_rule": "unknown（没测到）不入队、也不计 attempts；只有『测到了且在 SLA 内』才离队。attempts ≥ 10 仍未离队的单独报——永不排空的队列就是下一个僵尸。",
+ "_seed": "2026-09-03 Klay 令播种：GH 每日 commit 页是**永久 URL**，今天重新提交照样能存档——证据链从「永久缺口」变成「晚补齐、带标注」。capture 日期会晚于 commit 日期，这点必须如实标注，不许当成当天存的。",
+ "updated": "2026-09-03",
+ "queue_len": 5,
+ "pending": [
+  {
+   "url": "https://github.com/klaywang24/market-chronicle/commit/27419203d5a40d5c06fdf60be3af22fbf2d1984e",
+   "since": "2026-08-20",
+   "attempts": 0,
+   "last_try": null,
+   "why": "实核：IA availability 至今零快照（2026-09-03 复核·已用两个已知有快照的 URL 做过对照）"
+  },
+  {
+   "url": "https://github.com/klaywang24/market-chronicle/commit/7054124138a411bb1f3407f0082591829c3efb39",
+   "since": "2026-08-24",
+   "attempts": 0,
+   "last_try": null,
+   "why": "实核：IA availability 至今零快照（2026-09-03 复核）"
+  },
+  {
+   "url": "https://github.com/klaywang24/market-chronicle/commit/5d496706faa15b24d70a7605267f16eeacc03f10",
+   "since": "2026-08-25",
+   "attempts": 0,
+   "last_try": null,
+   "why": "当轮判『确实无快照』·**未独立复核**（2026-09-03 复核时被 IA 429 拦下）—— 未验 ≠ 也丢了"
+  },
+  {
+   "url": "https://github.com/klaywang24/market-chronicle/commit/ba4feea78518d8c12c1e6ca37d0684aa845d7812",
+   "since": "2026-08-26",
+   "attempts": 0,
+   "last_try": null,
+   "why": "当轮判『确实无快照』·**未独立复核**（同上·IA 429）"
+  },
+  {
+   "url": "https://github.com/klaywang24/market-chronicle/commit/604486cd8aa630ff08d3c1d0b5fd291192ad566d",
+   "since": "2026-08-28",
+   "attempts": 0,
+   "last_try": null,
+   "why": "实核：IA availability 至今零快照（2026-09-03 复核）·当轮 save_http=523（Cloudflare 源站不可达）"
+  }
+ ],
+ "resolved_recent": []
+}

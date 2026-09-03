@@ -158,6 +158,61 @@ def latest_snapshot(url: str, retries: int = 3) -> tuple[str, dict | None]:
 # 连续 3 天没有新快照才是真的断供 —— 这是要有人去看的信号。
 STALE_DAYS = 3
 
+# ── 🆕 补探队列（2026-09-03 建·Klay 令）────────────────────────────────────
+# 【病】GH 每日 commit 页的 URL **每天都是新的**（/commit/<sha>），只在「刚提交完」
+#   那一刻被探一次，此后永远不会被再探 ⇒ SPN2 提交失败那天，那一页**永久没有存档**：
+#   没有重试、没有补救、也不会有第二次机会发现。
+#   🔬 实证（2026-09-03）：08-20 / 08-24 / 08-28 三条抽验，IA availability **至今零快照**。
+#      那 5 天的 save_http ＝ 4 次 -1 + 1 次 523（Cloudflare 源站不可达）⇒ **提交本身失败了**。
+#      ⚠️ 该结论先用**两个已知有快照的 URL 做对照**才下的（先试的 CDX 路子对照组也返回空
+#      ＝尺子坏了；不做对照就会拿坏尺子得出「没存上」）。
+# 【修】把「今天没存上／已超期」的 URL 排进队列，**以后每轮回头补探 + 重新提交**。
+#   一举两得：救回失败的；让「当天没测到」不再冒充「确实没有」。
+# 🔒 队列必须是**仓里的文件、且随本步一起 git add** —— CI 每次都是全新机器，
+#   内存里的名单活不过一轮。daily.yml 的 anchor 步已同步点名它；**加新产物必须回去改那一行**。
+# 🚦 预算：补探排在当日主锚**之后**，每轮最多 RETRY_BUDGET 条 ——
+#   IA 会限流（2026-09-03 本机实测被 429 多次），别让补旧账把当天的正事饿死。
+PENDING = ROOT / "data" / "anchor_pending.json"
+RETRY_BUDGET = 3        # 每轮补探上限
+ZOMBIE_ATTEMPTS = 10    # 补这么多轮仍未成 ⇒ 单独报：永不排空的队列就是下一个僵尸
+
+
+def _load_pending() -> dict:
+    try:
+        d = json.loads(PENDING.read_text(encoding="utf-8"))
+        if isinstance(d.get("pending"), list):
+            return d
+    except Exception:
+        pass
+    return {"pending": [], "resolved_recent": []}
+
+
+def enqueue(state: dict, url: str, today: str, why: str) -> bool:
+    """把「确实无快照／已超期」的目标排进队列。已在队列里就不重复排。
+    🚫 probe=unknown 的**不排** —— 那是没测到，排进去等于把测量失败当成结论。"""
+    if any(e.get("url") == url for e in state["pending"]):
+        return False
+    state["pending"].append({"url": url, "since": today, "attempts": 0,
+                             "last_try": None, "why": why})
+    return True
+
+
+def apply_probe(entry: dict, probe: str, within_sla: bool, today: str) -> str:
+    """对一条队列项应用补探结果，返回 'resolve' / 'retry' / 'skip'。
+
+    · ok 且在 SLA 内 ⇒ **resolve，必须离开队列**（永不排空的队列＝下一个僵尸）
+    · ok 但超期 / none ⇒ retry（重新提交，attempts+1）
+    · unknown         ⇒ skip：这次没量到，**不计 attempts** ——
+      拿 IA 的限流把条目推向僵尸线，等于用测量失败给它定罪。
+    """
+    if probe == "unknown":
+        return "skip"
+    if within_sla:
+        return "resolve"
+    entry["attempts"] = int(entry.get("attempts", 0)) + 1
+    entry["last_try"] = today
+    return "retry"
+
 
 def snapshot_age_days(snap: dict | None) -> int | None:
     if not snap or not snap.get("timestamp"):
@@ -166,11 +221,63 @@ def snapshot_age_days(snap: dict | None) -> int | None:
     return (datetime.now(timezone.utc) - t).days
 
 
+def _selftest() -> int:
+    """补探队列的纯逻辑自检（零网络）。双向：该离队的必须离队，该留的必须留。
+
+    🔑 负向的核心不是「会不会报红」，是「**队列会不会排空**」——
+       一个永不排空的 pending 名单，就是下一个僵尸。
+    """
+    ok = bad = 0
+
+    def chk(name, got, want):
+        nonlocal ok, bad
+        good = got == want
+        print(f"  {'✅' if good else '❌'} {name}: 期望 {want} 实得 {got}")
+        ok += good
+        bad += not good
+
+    st = {"pending": [], "resolved_recent": []}
+    chk("入队：新 URL 排进去", enqueue(st, "u1", "2026-09-03", "确实无快照"), True)
+    chk("入队：同一 URL 不重复排", enqueue(st, "u1", "2026-09-04", "又一次"), False)
+    chk("入队后队列长度", len(st["pending"]), 1)
+
+    e = st["pending"][0]
+    # 负向①：没测到 ⇒ 不计 attempts（别拿 IA 限流给条目定罪）
+    chk("unknown ⇒ skip", apply_probe(e, "unknown", False, "2026-09-04"), "skip")
+    chk("unknown 后 attempts 不变", e["attempts"], 0)
+    # 负向②：确实没有 ⇒ 留队并计次
+    chk("none ⇒ retry", apply_probe(e, "none", False, "2026-09-05"), "retry")
+    chk("retry 后 attempts=1", e["attempts"], 1)
+    chk("测到但超期 ⇒ retry", apply_probe(e, "ok", False, "2026-09-06"), "retry")
+    chk("attempts 累加到 2", e["attempts"], 2)
+    # 正向：确认到了 ⇒ 必须离队
+    chk("ok 且在 SLA 内 ⇒ resolve", apply_probe(e, "ok", True, "2026-09-07"), "resolve")
+
+    # 🔑 排空判据：resolve 的条目从队列里消失
+    st["pending"] = [x for x in st["pending"] if x["url"] not in {"u1"}]
+    chk("resolve 后队列排空", len(st["pending"]), 0)
+
+    # 僵尸判据：补够轮数仍未离队的要能被点名
+    st2 = {"pending": [{"url": "z", "attempts": ZOMBIE_ATTEMPTS, "since": "2026-08-01"}],
+           "resolved_recent": []}
+    chk("僵尸能被点名",
+        len([x for x in st2["pending"] if x["attempts"] >= ZOMBIE_ATTEMPTS]), 1)
+    chk("没到线的不算僵尸",
+        len([x for x in [{"url": "y", "attempts": ZOMBIE_ATTEMPTS - 1}]
+             if x["attempts"] >= ZOMBIE_ATTEMPTS]), 0)
+
+    print(f"\n队列自检 {ok} 过 / {bad} 败")
+    return 1 if bad else 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--sha", help="当日 commit SHA（同时锚定其 commit 页）")
     ap.add_argument("--check-only", action="store_true", help="只查现状不发起存档")
+    ap.add_argument("--selftest", action="store_true", help="补探队列纯逻辑自检（零网络）")
     args = ap.parse_args()
+    if args.selftest:
+        return _selftest()
 
     # 日志行标签=美东日历日（2026-08-06 改，与链行同一把尺子；体检按美东读它，
     # 此前按 UTC 写 ⇒ 美东晚 8 点后手跑会差一天，同 anchor_hashes 的病）
@@ -200,8 +307,55 @@ def main() -> int:
 
     # ⚠️ 字段语义：save_http = 今天这次调用；confirmed_* = 此刻已完成并可查的快照，
     #    因 SPN2 异步，今天的那张通常要到下一次运行才会被确认。审计读 confirmed_*。
+    # ── 补探队列：入队 → 预算内补探 → 回写（详见 PENDING 上方注释）──
+    pend = _load_pending()
+    for r in results:
+        if r["probe"] != "unknown" and not r["within_sla"]:
+            enqueue(pend, r["url"], today,
+                    "确实无快照" if r["probe"] == "none"
+                    else f"超期 {r.get('confirmed_age_days')} 天")
+    seen_now = {r["url"] for r in results}
+    queue = [e for e in pend["pending"] if e["url"] not in seen_now]   # 当轮刚探过的不重复打
+    queue.sort(key=lambda x: (x.get("last_try") or "", x.get("since", "")))   # 最久没试的优先
+    resolved, retried, skipped = [], 0, 0
+    for e in queue[:RETRY_BUDGET]:
+        p2, s2 = latest_snapshot(e["url"])
+        a2 = snapshot_age_days(s2)
+        act = apply_probe(e, p2, a2 is not None and a2 <= STALE_DAYS, today)
+        if act == "resolve":
+            resolved.append({"url": e["url"], "on": today,
+                             "timestamp": (s2 or {}).get("timestamp")})
+        elif act == "retry":
+            retried += 1
+            if not args.check_only:
+                save(e["url"])
+                time.sleep(6)
+        else:
+            skipped += 1
+        print(f"  ↻ 补探 {e['url'][-48:]:<48} → {act}（已试 {e.get('attempts', 0)} 轮）")
+    _done = {d["url"] for d in resolved}
+    pend["pending"] = [e for e in pend["pending"] if e["url"] not in _done]
+    pend["resolved_recent"] = (resolved + pend.get("resolved_recent", []))[:20]
+    zombies = [e for e in pend["pending"] if int(e.get("attempts", 0)) >= ZOMBIE_ATTEMPTS]
+    pend.update({
+        "_what": "锚定补探队列：当轮「确实无快照/已超期」的 URL 排这里，以后每轮回头补探+重提交。"
+                 "**必须进 git** —— CI 每次都是全新机器，不入仓则重试只存在于当轮的想象里。",
+        "_rule": "unknown（没测到）不入队、也不计 attempts；只有『测到了且在 SLA 内』才离队。"
+                 f"attempts ≥ {ZOMBIE_ATTEMPTS} 仍未离队的单独报——永不排空的队列就是下一个僵尸。",
+        "updated": today, "queue_len": len(pend["pending"]),
+    })
+    PENDING.write_text(json.dumps(pend, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    print(f"\n补探队列：待补 {len(pend['pending'])} 条 · 本轮解决 {len(resolved)}"
+          f" · 重提交 {retried} · 没测到 {skipped}")
+    if zombies:
+        print(f"  🔴 队列僵尸（补 ≥{ZOMBIE_ATTEMPTS} 轮仍未成，{len(zombies)} 条）："
+              + "；".join(z["url"][-44:] for z in zombies)
+              + "\n     —— 要么真存不上、要么判据错了，去看一眼；别让它在队列里挂成常态。")
+
     rec = {"date": today, "sha": args.sha, "stale_days_sla": STALE_DAYS,
            "within_sla": fresh, "out_of_sla": stale, "not_probed": unknown,
+           "pending_len": len(pend["pending"]), "pending_resolved": len(resolved),
+           "pending_zombies": len(zombies),
            "results": results}
     if not args.check_only:
         LOG.parent.mkdir(parents=True, exist_ok=True)
