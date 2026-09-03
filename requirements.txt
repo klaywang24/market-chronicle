@@ -1,0 +1,29 @@
+# 本机开发用依赖清单 —— ⚠️ 这是**重建的，不是 pip freeze 导出的，没有版本号**
+#
+# 2026-09-03 删掉本仓 .venv（181 MB）时，`pip freeze` 执行失败，
+# 而我没有检查它的返回就继续删了 ⇒ **原 venv 的精确版本号已永久丢失**。
+# 本文件按三条证据重建，只保证「装上这些能跑」，不保证与原环境版本一致：
+#   ① 删除前当场 ls 过 site-packages（bs4 / certifi / cffi / charset_normalizer /
+#      curl_cffi / dateutil / et_xmlfile / google / idna / lxml / markdown_it /
+#      mdurl / multitasking / numpy / pandas / pygments，列表被截断，可能不全）
+#   ② scripts/*.py 的实际 import：numpy pandas requests yfinance
+#   ③ CI 显式安装（.github/workflows/daily.yml 与 weekly.yml）：
+#      yfinance pandas requests lxml openpyxl
+#
+# 建 venv 时的解释器是 Python 3.14.7。
+# 重建：python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+#
+# 注：站点 CI **不读本文件**，它自己 pip install（python 3.12）；
+#     本机 com.klay.digest-archive 用的是 /opt/homebrew/bin/python3。
+#     这个 venv 只服务于「手动在本仓跑脚本」，最后一次被动过是 2026-07-03。
+
+# ── 脚本与 CI 都要的（有把握）──
+yfinance
+pandas
+requests
+lxml
+openpyxl
+
+# ── 删除前在 site-packages 里见过、多为上面几个的传递依赖（可不显式装）──
+beautifulsoup4
+curl_cffi
