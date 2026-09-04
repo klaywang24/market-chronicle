@@ -1,5 +1,42 @@
 {
-  "generated_at": "2026-09-04T00:33:13Z",
-  "count": 0,
-  "items": []
+  "generated_at": "2026-09-04T00:35:52Z",
+  "count": 4,
+  "items": [
+    {
+      "date": "2026-08-31",
+      "slug": "2026-08-31-weekly",
+      "title": "8月美股赚钱了吗？这里面或许有你想要的答案 · 8月收官 & 回顾",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-31-weekly",
+      "kind": "weekly",
+      "title_en": "August's Four Biggest Gainers Were July's Five Biggest Losers",
+      "url_en": "https://chronicle.klay-wang.com/digest/2026-08-31-weekly.en.html"
+    },
+    {
+      "date": "2026-08-28",
+      "slug": "2026-08-28-weekly",
+      "title": "本周回顾：美股七姐妹财报纷纷引爆超预期波动？ChatGPT 时代首次！ · 8.24-8.28",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-28-weekly",
+      "kind": "weekly",
+      "title_en": "The Magnificent 7 Just Blew Through Their Own Options Fences. First Time Since ChatGPT.",
+      "url_en": "https://chronicle.klay-wang.com/digest/2026-08-28-weekly.en.html"
+    },
+    {
+      "date": "2026-08-21",
+      "slug": "2026-08-21-weekly",
+      "title": "特朗普又开始卖股票了？8.17-8.21 本周回顾",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-21-weekly",
+      "kind": "weekly",
+      "title_en": "Is Trump Selling Stocks Again? The Week of August 17 to 21",
+      "url_en": "https://chronicle.klay-wang.com/digest/2026-08-21-weekly.en.html"
+    },
+    {
+      "date": "2026-08-14",
+      "slug": "2026-08-14-weekly",
+      "title": "还在看 13F ？真正赚钱的人都是这样操作和复盘 - 本周回顾 · 8.10-8.14",
+      "url": "https://chronicle.klay-wang.com/digest/2026-08-14-weekly",
+      "kind": "weekly",
+      "title_en": "That Exit Headline You Just Read? It Is 113 Days Old.",
+      "url_en": "https://chronicle.klay-wang.com/digest/2026-08-14-weekly.en.html"
+    }
+  ]
 }

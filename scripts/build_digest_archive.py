@@ -45,18 +45,23 @@ def search_dirs(date_str):
     base = datetime.date.fromisoformat(date_str)
     out = []
     for off in range(0, 4):
-        p = os.path.join(CARDS, (base - datetime.timedelta(days=off)).isoformat())
-        if os.path.isdir(p):
-            out.append(p)
-            out += [d.rstrip("/") for d in glob.glob(p + "/*/")]
+        day = (base - datetime.timedelta(days=off)).isoformat()
+        cands = [os.path.join(CARDS, day)] + [d.rstrip("/") for d in glob.glob(os.path.join(CARDS, "*", day) + "/")]
+        for p in cands:
+            if os.path.isdir(p):
+                out.append(p)
+                out += [d.rstrip("/") for d in glob.glob(p + "/*/")]
     return out
 
 def infer_dir(date_str):
     """给顺序推断用：只返回一个目录。周末回顾走周五的 `本周回顾/` 子目录。"""
     base = datetime.date.fromisoformat(date_str)
     for off in range(0, 4):
-        p = os.path.join(CARDS, (base - datetime.timedelta(days=off)).isoformat())
-        if not os.path.isdir(p):
+        day = (base - datetime.timedelta(days=off)).isoformat()
+        p = next((q for q in [os.path.join(CARDS, day)] +
+                  [d.rstrip("/") for d in glob.glob(os.path.join(CARDS, "*", day) + "/")]
+                  if os.path.isdir(q)), None)
+        if p is None:
             continue
         subs = [d.rstrip("/") for d in glob.glob(p + "/*/") if "本周回顾" in d]
         if subs:
@@ -451,8 +456,14 @@ def live_files(cutover):
     """活源清单：<日夹>/文案_final.md 与 <日夹>/<子夹>/文案_final.md（周回顾在子夹）。
     只收日夹日期 ≥ cutover 的——冻结快照覆盖 ≤2026-08-09，重叠会撞 slug 守卫。"""
     out = []
+    # 🔴 2026-09-03 修：原来只扫顶层 `20*/`。日更目录当天按月归档进 `7 月/`、`8 月/` 之后
+    #    这个 glob 当场扫不到七八月，生成器把它们当成「不存在」，一次运行删掉了
+    #    feed.xml 3754 行与两个索引页各 21 条（bff56e82，已推线上）。
+    #    第一性原理同 gitignore 与 gate_all：**认「叫 2026-08-20 的那个日夹」，不认它在第几层。**
     for p in sorted(glob.glob(os.path.join(CARDS, "20*", "文案_final.md")) +
-                    glob.glob(os.path.join(CARDS, "20*", "*", "文案_final.md"))):
+                    glob.glob(os.path.join(CARDS, "20*", "*", "文案_final.md")) +
+                    glob.glob(os.path.join(CARDS, "*", "20*", "文案_final.md")) +
+                    glob.glob(os.path.join(CARDS, "*", "20*", "*", "文案_final.md"))):
         m = re.search(r"/(\d{4}-\d{2}-\d{2})/", p.replace(os.sep, "/"))
         if m and m.group(1) >= cutover:
             out.append(p)
