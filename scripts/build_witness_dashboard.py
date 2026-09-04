@@ -116,7 +116,7 @@ a{color:var(--bad)}
 三样通知一个都没有、本页又是绿的，才叫真的正常。</p>
 
 <script>
-const RAW="RAW_URL", REPO="REPO_URL";
+const RAW="RAW_URL";   // REPO 常量 2026-09-03 删：声明了从没用过
 const ICON={ok:"✓",bad:"!",unknown:"?"}, COLOR={ok:"var(--ok)",bad:"var(--bad)",unknown:"var(--unk)"};
 const SLA={chain:4, anchor:4, daily:4, opt:4};   // opt=期权页，与 check_witness_health 同值（snap 是 manual 卡，无判据键）
 // 🔴 2026-09-03 修（Klay 令）：原来拿 `Date.now()`（**浏览器本地时区**）去减一个
@@ -140,7 +140,8 @@ const ago=a=>a===null?"日期未解析":`${a} 天前`;
 
 async function txt(u){const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw 0;return r.text()}
 async function lastJsonl(u){const t=await txt(u);const L=t.trim().split("\\n").filter(Boolean);
-  return {last:JSON.parse(L[L.length-1]), all:L.map(x=>JSON.parse(x))}}
+  // 2026-09-03：只解析尾部 60 行——历史表只看最近 10 条，全量 parse 会随日志线性变慢
+  return {last:JSON.parse(L[L.length-1]), all:L.slice(-60).map(x=>JSON.parse(x))}}
 
 function card(name,st,detail,why){
   return `<div class="c" style="border-left-color:${COLOR[st]}">
@@ -235,6 +236,28 @@ function card(name,st,detail,why){
          w:"本机 launchd 那条链路的唯一体温计：它停了说明定时任务/生成器/推送里有一环断了"});
   }catch(e){out.push({n:"期权页是否在更新",s:"unknown",d:"拉取失败",w:"没查到 ≠ 没问题"})}
 
+  // ⑦ CI 体检末条（2026-09-03 加·Klay 令「按第一性原理」）
+  //    看板此前缺 CI 的两项：「daily 定时有没有触发」和「unknown 连续 N 天升级为 bad（stale_ok）」。
+  //    🔑 第一性：问题不是"看板少两个判据"，是**「CI 已经算出的结论，人唯一会打开的页面上看不见」**。
+  //       CI 在写 health_log 之前就做了 stale_ok 升级（check_witness_health 第 393 行），
+  //       daily 没触发则 health_log 根本不会有新行 —— 两件事 CI 那把尺子都量了，只是没人看。
+  //    ⇒ 不在 JS 里再写一遍那两条判据（那是第二把尺子，必漂），**原样搬 CI 的末条结论**。
+  //       本页自己的 ①②④⑤ 是独立的第二尺，本卡是 CI 那把尺——两把尺子并排，不互抄。
+  //    🔑 本卡的**新鲜度本身**就是「daily 有没有跑」的信号：CI 不跑，这条日志就不会长。
+  try{const {last}=await lastJsonl(RAW+"/data/health_log.jsonl");const a=days(last.date);
+    const ch=last.checks||{};
+    const bads=Object.entries(ch).filter(([,v])=>v==="bad").map(([k])=>k);
+    const unks=Object.entries(ch).filter(([,v])=>v==="unknown").map(([k])=>k);
+    let s="ok",d=`${last.date}（${ago(a)}）· CI 判 <code>${last.overall||"?"}</code>`;
+    if(a===null){s="unknown";d+=" · 记录里的日期解析不出来"}
+    else if(a>SLA.daily){s="bad";d+=` · <b>CI 已 ${a} 天没记体检</b> —— daily 没跑或压根没触发，<b>这是 CI 自己报不出的那种沉默</b>`}
+    else if(bads.length){s="bad";d+=` · 红：<b>${bads.join("、")}</b>（含连续 5 天未测到升级来的）`}
+    else if(unks.length){s="unknown";d+=` · 未测到：${unks.join("、")}（未满 5 天，CI 尚未升级）`}
+    else{d+=` · ${Object.keys(ch).length} 项全过`}
+    out.push({n:"CI 体检末条（7 项·含 stale_ok 升级）",s,d,
+      w:"CI 那把尺子的原样结论（含「daily 定时有没有触发」与「连续 5 天未测到⇒红」）。本卡不新鲜＝daily 没在跑"});
+  }catch(e){out.push({n:"CI 体检末条（7 项·含 stale_ok 升级）",s:"unknown",d:"health_log.jsonl 取不到",w:"没查到 ≠ 没问题"})}
+
   // ⑥ 与存档逐字对账 —— 浏览器做不了（跨域 + 要下整份存档字节），给命令，不假装查过。
   //    manual:true ⇒ 不计入总体状态，理由同③（永远黄的横幅等于没有横幅）。
   out.push({n:"与存档逐字对账（要跑命令）",s:"unknown",manual:true,
@@ -246,7 +269,9 @@ function card(name,st,detail,why){
   const auto=out.filter(o=>!o.manual);
   const bad=auto.filter(o=>o.s==="bad"), unk=auto.filter(o=>o.s==="unknown");
   const st=bad.length?"bad":(unk.length?"unknown":"ok");
-  const T={ok:["一切正常",`${auto.length} 项自动体检全绿，见证链在正常工作。另有 ${out.length-auto.length} 项需手动跑（卡片里有命令/链接）。`],
+  // 2026-09-03 改：原写「一切正常」——但只查了自动那几项，2 项手动的从没被检查过。
+  //    文案不许大于判据：查了几项就说几项。
+  const T={ok:["自动体检全绿",`${auto.length} 项自动体检全绿。另有 ${out.length-auto.length} 项**未查**（要手动跑，卡片里有命令/链接）——它们不在这个绿灯的覆盖面里。`],
            bad:[`${bad.length} 项异常`,"见证链有问题，往下看「红了怎么办」。异常："+bad.map(b=>b.n).join("、")],
            unknown:["部分未查到","不是故障，但本次结果不完整："+unk.map(b=>b.n).join("、")]}[st];
   const big=document.getElementById("big");
@@ -258,8 +283,11 @@ function card(name,st,detail,why){
   const H=window.__hist;
   document.getElementById("hist").innerHTML = H&&H.length
     ? `<table><tr><th>日期</th><th>SLA 内</th><th>超期</th><th>没测到</th><th>链头快照</th></tr>`
-      + H.slice(-10).reverse().map(r=>{const h=(r.results||[])[0]||{};
-          return `<tr><td>${r.date}</td><td>${r.within_sla??"-"}</td><td>${r.out_of_sla??"-"}</td>
+      + (()=>{ // 2026-09-03：同一天跑多次会有多条记录（08-06/08-25/08-26/08-28 各两条），
+               //   卡片读的是最后一条，表也只留最后一条并标 ×N，别让人以为是两天
+               const byDay=new Map(); for(const r of H){const p=byDay.get(r.date); byDay.set(r.date,{r,n:(p?p.n:0)+1})}
+               return [...byDay.values()].slice(-10).reverse(); })().map(({r,n})=>{const h=(r.results||[])[0]||{};
+          return `<tr><td>${r.date}${n>1?` <span style="color:var(--muted)">×${n}</span>`:""}</td><td>${r.within_sla??"-"}</td><td>${r.out_of_sla??"-"}</td>
           <td>${r.not_probed??"-"}</td><td><code>${h.timestamp||"-"}</code></td></tr>`}).join("")
       + `</table>`
     : `<p class="note">锚定记录没读到 —— 可能是取数失败，也可能确实还没有第一条。不替它断定是哪一种。</p>`;
