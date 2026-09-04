@@ -366,8 +366,14 @@ def main() -> int:
 
     rec = {"date": today, "sha": args.sha, "stale_days_sla": STALE_DAYS,
            "within_sla": fresh, "out_of_sla": stale, "not_probed": unknown,
+           # 🔑 2026-09-03 首跑当晚补：原来只记 len/resolved/zombies，
+           #    **分不出「探了 3 条全没测到」和「压根没探」** —— 而首跑正好全是 skip，
+           #    从仓里看不出机制跑没跑（「没测到 3」只活在 Actions 日志里＝没人读）。
+           #    补 probed/retried/skipped 三个数，让「它动过」这件事进入可查的产物。
            "pending_len": len(pend["pending"]), "pending_resolved": len(resolved),
            "pending_zombies": len(zombies),
+           "pending_probed": min(len(queue), RETRY_BUDGET),
+           "pending_retried": retried, "pending_skipped": skipped,
            "results": results}
     if not args.check_only:
         LOG.parent.mkdir(parents=True, exist_ok=True)
