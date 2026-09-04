@@ -1422,12 +1422,23 @@ def build_bank_credit():
     out, missing = {}, []
     for tkr, label in BANK_PREFERRED.items():
         try:
-            df = yf.download(tkr, period="5y", interval="1d", auto_adjust=False, progress=False)
-            px = df["Close"]
-            if hasattr(px, "columns"):
-                px = px.iloc[:, 0]
-            px = px.dropna()
+            # 🔧 2026-09-03 修：原来一发不中就丢。实测 C-PN 连打三次＝0 行 / 32 行 / 0 行
+            # ——**雅虎对同一个符号的回答本身在抖**，无重试等于把抖动当事实。
+            # 照本文件指数行情那处的家法（退避 5/15 秒，第三次不再等）。
+            px = None
+            for _at, _wait in ((0, 5), (1, 15), (2, 0)):
+                df = yf.download(tkr, period="5y", interval="1d", auto_adjust=False, progress=False)
+                px = df["Close"]
+                if hasattr(px, "columns"):
+                    px = px.iloc[:, 0]
+                px = px.dropna()
+                if len(px) >= 100 or not _wait:
+                    break
+                print(f"  {tkr} 第 {_at + 1} 次只取到 {len(px)} 根，退避 {_wait}s 重试")
+                time.sleep(_wait)
             if len(px) < 100:
+                # 🚫 不许静默：说清是「取不到」还是「取到但太短」——两者的下一步不同
+                print(f"  ⚠️ {tkr} 三次后仍只有 {len(px)} 根（<100，不足以算一年回撤），本轮跳过")
                 missing.append(tkr); continue
             dd = (px / px.rolling(252, min_periods=60).max() - 1) * 100   # 距一年高点回撤 %
             out[tkr] = {

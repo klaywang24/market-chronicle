@@ -109,7 +109,7 @@ a{color:var(--bad)}
 <tr><th>层</th><th>什么时候跑</th><th>怎么通知你</th><th>管什么</th></tr>
 <tr><td><b>①本页</b></td><td>你打开时</td><td>你自己看</td><td>随时想查就查</td></tr>
 <tr><td><b>②daily 内</b></td><td>排定 18:00 美东<br><span style="color:var(--muted)">cron 只入队不准时，实测起跑 19:5x–次日 02:00</span></td><td>Discord 推送</td><td>当天出问题当天知道</td></tr>
-<tr><td><b>③看门狗</b></td><td>每天 09:00 美东<br>（独立任务）</td><td><b>开 GitHub Issue<br>→ 自动发邮件</b></td>
+<tr><td><b>③看门狗</b></td><td>排定 09:00 美东（独立任务）<br><span style="color:var(--muted)">cron 只入队不准时：08-26 前延迟 &lt;1h，<b>08-27 起实测 12:5x–18:5x（迟 4–10h）</b></span></td><td><b>开 GitHub Issue<br>→ 自动发邮件</b></td>
     <td><b>连 daily 自己死了也能报</b><br>②在 daily 里面，daily 死了它也没了</td></tr>
 </table>
 <p class="note">③ 恢复后会自动关闭 Issue，免得旧告警一直挂着让人麻木。
