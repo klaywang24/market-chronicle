@@ -17,7 +17,10 @@ import argparse, datetime, glob, html, os, re, shutil, subprocess, sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BIZ = os.path.abspath(os.path.join(REPO, "..", "..", "生意与起号"))
-SRC = os.path.join(BIZ, "04-Buttondown抢救备份", "邮件正文")
+# 🔴 2026-09-03 修：冻结快照 08-26 重编号时被搬进 _归档_…（生意与起号 a9d099d），本常量没跟着改
+#    ⇒ glob 静默返回 0 份，当晚 22:40 那班把 feed 35 条写成 14 条、7 月 14 条索引全掉（fbd53e16），
+#    八天没人发现。冻结源按定义永远存在：找不到＝硬红（见 main 开头），不许静默当空。
+SRC = os.path.join(BIZ, "_归档_Buttondown迁移-2026-08", "抢救备份-API全量-0810", "邮件正文")
 CARDS = os.path.join(BIZ, "01-每日 digest")
 
 # ── 双源取材（2026-08-11 修死管线）：
@@ -717,12 +720,72 @@ def inject_en_figures(en, names):
         out += ["", f"![{nm}](local://card)"]
     return "\n".join(out)
 
+FEED_CAP = 60   # write_feed 的 [:60]；闸的期望值必须与它同口径
+
+def feed_slugs(xml_text):
+    """从 feed.xml 文本抽 slug 集合（<link>…/digest/<slug></link>）。"""
+    return set(re.findall(r"<link>[^<]*/digest/([^<]+)</link>", xml_text))
+
+def baseline_feed():
+    """闸的参照物＝**已上线的那版**（HEAD:feed.xml），不是工作树里的——工作树可能已被上一次坏跑改小
+    （「有没有发生过」的参照物必须是事件前状态）。取不到 git 时退回磁盘文件并注明。"""
+    r = subprocess.run(["git", "show", "HEAD:feed.xml"], cwd=REPO, capture_output=True, text=True)
+    if r.returncode == 0 and r.stdout:
+        return r.stdout, "HEAD:feed.xml"
+    p = os.path.join(REPO, "feed.xml")
+    return (open(p, encoding="utf-8").read() if os.path.exists(p) else ""), "feed.xml(磁盘·取不到 git)"
+
+def shrink_check(new_slugs, baseline_xml, cap=FEED_CAP):
+    """缩水闸：返回「上线版有、这次没有」的 slug 列表。空＝放行。
+    🔴 2026-09-03 立：源被搬走（08-26 冻结源重编号 / 09-03 日夹按月归档）时生成器只会少出、不会报错；
+    少出的产物照样有实质 diff ⇒ 22:40 那班照样提交上线（fbd53e16 / bff56e82 两次实犯）。
+    窗口已满（≥cap 条）时被挤出窗口的最老条目不算缩水。真要删条目走 --allow-shrink。"""
+    new = set(new_slugs)
+    miss = feed_slugs(baseline_xml) - new
+    if len(new) >= cap and new:
+        floor = min(x[:10] for x in new)
+        miss = {x for x in miss if x[:10] >= floor}
+    return sorted(miss)
+
+def _selftest():
+    ok = True
+    def chk(name, cond):
+        nonlocal ok
+        ok &= bool(cond); print(("  ✅ " if cond else "  🔴 ") + name)
+    mk = lambda slugs: "".join(f"<item><link>{SITE}/digest/{x}</link></item>" for x in slugs)
+    base22 = [f"2026-08-{d:02d}" for d in range(10, 32)]
+    chk("合成：22→2 必红", len(shrink_check(base22[:2], mk(base22))) == 20)
+    chk("合成：22→22 放行", shrink_check(base22, mk(base22)) == [])
+    chk("合成：22→23 放行", shrink_check(base22 + ["2026-09-02"], mk(base22)) == [])
+    w = [(datetime.date(2026, 1, 1) + datetime.timedelta(days=i)).isoformat() for i in range(61)]
+    chk("合成：窗口满 60 滑一天（最老被挤出）放行", shrink_check(w[1:], mk(w[:60])) == [])
+    chk("合成：窗口满 60 却少了中间一条 必红", shrink_check(w[1:30] + w[31:] + ["2026-12-31"], mk(w[:60])) == [w[30]])
+    for good, bad, why in (("69110db7", "bff56e82", "09-03 日夹按月归档"),
+                           ("1b9d161f", "fbd53e16", "08-26 冻结源重编号")):
+        g = subprocess.run(["git", "show", f"{good}:feed.xml"], cwd=REPO, capture_output=True, text=True)
+        b = subprocess.run(["git", "show", f"{bad}:feed.xml"], cwd=REPO, capture_output=True, text=True)
+        if g.returncode or b.returncode:
+            chk(f"实史：{why}（取不到提交）", False); continue
+        miss = shrink_check(feed_slugs(b.stdout), g.stdout)
+        chk(f"实史回放：{why} {len(feed_slugs(g.stdout))}→{len(feed_slugs(b.stdout))} 必红（缺 {len(miss)}）", len(miss) > 0)
+    print("selftest", "全过" if ok else "有红")
+    return 0 if ok else 1
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", help="只出这一天，用于样张")
     ap.add_argument("--live-cutover", default=LIVE_CUTOVER,
                     help="活源起始日。默认=冻结快照终点次日；改小仅用于测试样张，生产别动")
+    ap.add_argument("--allow-shrink", action="store_true",
+                    help="明知要删条目时才带：放行「比上线版少」的产物。默认少一条就硬红不写")
+    ap.add_argument("--selftest", action="store_true", help="缩水闸自检（合成 + 两次真实事故回放）")
     a = ap.parse_args()
+    if a.selftest:
+        sys.exit(_selftest())
+    if not os.path.isdir(SRC):
+        print(f"🔴 冻结快照源不存在：{SRC}\n   它按定义永远存在（≤2026-08-09 的 22 期只在这里）。"
+              "搬了就改 SRC，不许让它静默变空（08-26 实犯：静默变空 ⇒ feed 35→14 上线八天）。")
+        sys.exit(2)
     today = datetime.date.today().isoformat()
     os.makedirs(OUT, exist_ok=True)
     entries = ([(f, parse) for f in sorted(glob.glob(os.path.join(SRC, "*.md")))] +
@@ -843,6 +906,18 @@ def main():
         done.append((slug, date, title, first, en_title if has_en else None))
     print(f"\n  共出 {len(done)} 页 → {OUT}")
     if not a.only:
+        # 🔴 缩水闸（2026-09-03 立）：写 feed/索引/台账之前先跟**上线版**比，少了就硬红、一个字不写。
+        base_xml, base_name = baseline_feed()
+        planned = [x[0] for x in sorted(done, key=lambda x: x[1], reverse=True)[:FEED_CAP]]
+        missing = shrink_check(planned, base_xml)
+        if missing and not a.allow_shrink:
+            print(f"\n🔴 缩水闸：上线版（{base_name}）{len(feed_slugs(base_xml))} 条里有 {len(missing)} 条这次没出"
+                  f"（本次共 {len(planned)} 条），feed/索引/台账一个字不写：\n   缺 " + "、".join(missing[:8])
+                  + ("…" if len(missing) > 8 else "")
+                  + "\n   多半是源被搬走/改名（日夹按月归档、冻结源重编号）。真要删条目带 --allow-shrink。")
+            sys.exit(2)
+        if missing:
+            print(f"  ⚠️ --allow-shrink：明知少 {len(missing)} 条仍写盘：" + "、".join(missing[:8]))
         ncn, nen = write_index(done, "cn"), write_index(done, "en")
         print(f"  索引页 中 {ncn} 条 / EN {nen} 条 · feed {write_feed(done)} 条 · 台账 {write_ledger(done)} 条")
     return done

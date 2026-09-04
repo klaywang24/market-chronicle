@@ -35,6 +35,15 @@ def say(msg):
     print(line)
 
 
+def notify(title, body):
+    """macOS 通知：launchd 那班的红只落在退出码里没人看（「失败时的出口是谁在看」）。失败只记不抛。"""
+    try:
+        subprocess.run(["osascript", "-e", f'display notification "{body}" with title "{title}"'],
+                       capture_output=True, timeout=10)
+    except Exception as e:
+        print(f"（通知没发出去：{e}）")
+
+
 def git(*args, **kw):
     return subprocess.run(["git", *args], cwd=REPO, capture_output=True, text=True, **kw)
 
@@ -53,8 +62,9 @@ def main():
     with open(LOG, "a", encoding="utf-8") as fh:
         fh.write(r.stdout + r.stderr)
     if r.returncode != 0:
-        say(f"❌ 生成器退出码 {r.returncode} —— 多半是周报稿件格式又漂移了"
-            "（日更漂移只告警不阻断，周报漂移才会硬抛）")
+        tail = " ⏎ ".join((r.stdout + r.stderr).strip().splitlines()[-4:])[:400]
+        say(f"❌ 生成器退出码 {r.returncode}（2=缩水闸/冻结源不见 · 其它多半是周报稿件格式漂移）：{tail}")
+        notify("判读档案没上站", f"生成器退出码 {r.returncode}，看 data/_digest_archive.log")
         return r.returncode
 
     # 🔴 2026-08-28（Klay 拍板·sitemap 失账同族二犯后）：加完页重跑路由生成器，sitemap 当晚入账。
