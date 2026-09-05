@@ -2,7 +2,7 @@
 
 > 本文档面向未来的维护者（包括未来的我和任何 AI 助手）。
 > 读完本文即可独立维护、修改、扩展本站的一切。
-> **最后更新：2026-08-31 EDT（§68–§75 同日八笔）｜线上现行 i18n.js?v=20260825a · style.css?v=20260831b · app.js?v=20260831b｜最新章节：第75节（§74–§75，目录修重叠/截断/按钮被挡 + 全站统一为目录留位）｜08-07 结构变更：常设规则已抽出到 [RULES.md](RULES.md)，本文降为编年档案**
+> **最后更新：2026-09-05 EDT（§76）｜线上现行 i18n.js?v=20260825a · style.css?v=20260831b · app.js?v=20260831b（本次只改 scripts/data/机器可读层，**未动 JS/CSS 故不 bump**）｜最新章节：第76节（机器可读层 openapi.json + api-catalog + llms-full.txt；build_macro 加水位层四条序列）
 > ⚠️ **改本文正文时，必须同时改上面这行。** 它已经过期过多次（07-16 三行全错；07-18 停在 §22 却已到 §30；07-19 停在 §34 却已到 §36）。抬头是读者判断"这文档还算不算数"的唯一依据，过期比没有更糟。
 > ⚠️ **本文按时间追加，越靠后越新。与前文冲突处，一律以编号最大的那节为准。**
 
@@ -3695,3 +3695,60 @@ Klay 三连问：「这里是不是 overlap 了」「恐慌页目录不会自动
 🔑 **教训：撤销一条旧规则时，要连它的「例外规则」一起找出来，否则例外会变成新的主规则。** 两处都是靠实测左缘发现的，闸不会报。
 
 **验收**：1485px 中英双态 × 今日/K指数/恐惧/宏观 —— 容器、顶栏、页脚三者跨页**全部 218**（左缘唯一值只有一个），目录常驻、间隙 24px、零截断、无横向溢出；1905px 目录跟随正文、间隙 40px；options 页与 SPA 同左缘 218、6 张图正常。
+
+---
+
+## §76（2026-09-05）机器可读层：openapi.json + api-catalog + llms-full.txt，与 build_macro 新增水位层四条序列（本节最新，与前文冲突以本节为准）
+
+### 起因：一次竞品扫描
+Klay 让看 `lite.marketgrep.com/zh/13f` 的 13F 工具与它的 GitHub 代码。结论是**它不开源**
+（GREP ADVISORY PTE. LTD. 的闭源产品，GitHub 上 `grep24` 组织只有两个发布壳和一个 fork），
+但它的姐妹站 **`dollarliquidity.com` 把整套数据以 CC0 公共领域释出**，配 `llms.txt` + `openapi.json`
++ `.well-known/api-catalog`，四个独立域名各吃一个关键词族。
+⇒ 这套打法正对着 SEO 那条判断：**造词战场是 AI 引用不是关键词排名，而 llms.txt 是最有效载体且最易漏**。
+
+### 我们缺的不是 llms.txt，是 API 那一半
+`llms.txt`(10KB) / `sitemap.xml` / `robots.txt` / `LICENSE` 早就有；
+`data/` 下 398 个公开 JSON 事实上已经是一套只读 API（免鉴权、CORS 开放、每交易日更新）。
+**缺的是机器可读的目录**：模型和聚合站没法知道有哪些端点、各自是什么、各自什么授权。
+
+新增三样，全部由 `scripts/build_machine_readable.py` 生成（**别手写，手写必与实际文件漂移**）：
+| 产物 | 是什么 |
+|---|---|
+| `openapi.json` | OpenAPI 3.1 · 19 个端点（只登记 llms.txt 与 data/README **已点名**的对外契约，面板中间产物不进）· 逐端点带 `x-license` 与 `x-series-id` |
+| `.well-known/api-catalog` | RFC 9727 标准发现位，linkset 指向 openapi + 方法文档 + 授权 |
+| `llms-full.txt` | llms.txt + data/README.md 全文（27KB）——模型抓 llms.txt 只拿到索引，抓这份才拿到「怎么正确使用」 |
+`llms.txt` 加了「Machine-readable entry points」一段把发现链闭合。
+
+### 🔴 授权：一个字都没多给（这条别改）
+站上早有一套刻意的三段划分，写在 llms.txt 与 data/README：
+**编纂/派生指标/台账结构**＝PolyForm Noncommercial；**原始数值**＝转录自公开源的事实，不主张所有权；
+**Kaggle 与 HF 上的季度提取物**＝另以 CC BY 4.0 释出。
+本次只是把它写成机器读得懂的形式。
+🚫 **不跟竞品走整站 CC0**——那是放弃一切权利换引用，而恐惧的标价是刻意留在 PolyForm 的
+（llms.txt 原话「数字要跑，台账不跑」）。要不要改是**商业决定不是工程决定**，别在生成器里顺手做掉。
+⚠️ 顺带记一个现状：`data/` 下 398 个 JSON 里 **389 个带 PolyForm `_notice`，9 个没有**
+（`anchor_pending.json` 等）。本次未动，留给后来人判断该补还是本就不该有。
+
+### CI 闸：`daily.yml` 加 `verify machine-readable layer fresh`
+判据＝`build_machine_readable.py --check`：产物与「照当前源应生成的内容」不一致即红。
+**手改了 llms.txt 或 data/README 不重出，机器可读层就会静静过期，而过期的契约比没有更坏**
+（模型会照着旧的引用）。🚫 刻意**不**在 CI 里自动重写：CI 悄悄改对外契约必须过人眼。
+负向样本已验：污染 llms.txt ⇒ 报红并点名 `llms-full.txt`；还原 ⇒ 绿。
+
+### ⚠️ 量尺记一笔：Cloudflare Pages 的 200 不能当「文件存在」
+本站是 Cloudflare Pages，**对未命中路径一律回 200 + 整份 index.html**（`_redirects` 头注早写过）。
+所以 `curl -o /dev/null -w "%{http_code}"` 去测一个新文件在不在，**永远得到 200**。
+判据要看 **content-type**：真文件是 `text/plain`/`application/json`，不存在的回 `text/html`。
+（本次实测：llms.txt → text/plain 真在；openapi.json 推之前 → text/html 其实不在。）
+
+### `scripts/build_data.py` · build_macro 新增四条序列
+给期权管线的传导链补一个「④水位层」（答「池子里还有多少钱」；原三层全在答「压力大不大」）：
+`tga`(WTREGEN→十亿美元) · `reserves`(WRESBAL→万亿美元) · `term_premium`(THREEFYTP10) · `iorb`(IORB)。
+`walcl` 与 `sofr` 本来就在 plan 里。
+🔑 **为什么加在云端而不是本机新写取数器**：管线家法「不许两处 fetch FRED，必漂移」——
+本机侧只做镜像。全仓仍只有 `_fred` 一个实现。
+🚫 **SOFR-IORB 价差不在这里算**：存两条原始腿，派生值留给读的人（存派生值＝立第二把尺子）。
+落库前已用独立源逐位交叉：reserves 2.895T / term_premium 0.875% / walcl 6.737T 与
+dollarliquidity.com（CC0 公开 API）完全吻合；`tga` 因**周频(H.4.1 周三) vs 其日频**而不同，
+属口径差非错值，已写进注释。
