@@ -1,0 +1,29 @@
+{
+ "linkset": [
+  {
+   "anchor": "https://chronicle.klay-wang.com/",
+   "service-desc": [
+    {
+     "href": "https://chronicle.klay-wang.com/openapi.json",
+     "type": "application/openapi+json"
+    }
+   ],
+   "service-doc": [
+    {
+     "href": "https://chronicle.klay-wang.com/data/README.md",
+     "type": "text/markdown"
+    },
+    {
+     "href": "https://chronicle.klay-wang.com/llms.txt",
+     "type": "text/plain"
+    }
+   ],
+   "license": [
+    {
+     "href": "https://polyformproject.org/licenses/noncommercial/1.0.0",
+     "title": "PolyForm Noncommercial 1.0.0"
+    }
+   ]
+  }
+ ]
+}

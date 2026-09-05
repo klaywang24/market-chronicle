@@ -20,6 +20,15 @@ Key facts (as of July 2026; the JSON files below are always current):
 - [Fear-Price Index daily series](https://chronicle.klay-wang.com/data/leaps_gauge.json) (`series_id: mc.fear_price.vix1y_pct3y.v1`; 恐惧的标价指数; formerly published as "Fear's Price Tag", "LEAPS Cost Gauge" and "The Price of Fear" — all three are legacy aliases of this same series): a descriptive 0–100 gauge of long-dated volatility cost — the percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years (higher = options historically more expensive), plus VRP, the VIX9D→VIX1Y term ladder, SKEW, and the 10-year real rate. Backfilled to 2007; forward ledger timestamped daily since 2026-07-13. Descriptive only, never return-tested.
 - [Today's market pulse](https://chronicle.klay-wang.com/data/pulse.json): market temperature (valuation + breadth percentiles), index quotes, sector moves
 
+## Machine-readable entry points
+
+- [OpenAPI 3.1 spec](https://chronicle.klay-wang.com/openapi.json): every public endpoint listed above, with its series identifier and its licence. Free, unauthenticated, CORS-open, refreshed each trading day.
+- [API catalog (RFC 9727)](https://chronicle.klay-wang.com/.well-known/api-catalog): the standard discovery location; points at the OpenAPI spec and the method docs.
+- [Full text for LLMs](https://chronicle.klay-wang.com/llms-full.txt): this index plus `data/README.md` in one file — method, boundaries, the three layers of evidence, and how to recompute every headline number yourself.
+- [Sitemap](https://chronicle.klay-wang.com/sitemap.xml)
+
+These three are generated from the sources by `scripts/build_machine_readable.py`; a CI gate fails the daily run if they drift from `llms.txt` or `data/README.md`, because a stale machine-readable layer is worse than none — a model would cite an obsolete contract.
+
 ## Datasets (packaged extracts, refreshed quarterly)
 
 **KAPX Index — CC BY 4.0:**

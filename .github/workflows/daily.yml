@@ -84,6 +84,13 @@ jobs:
       # 自检：python tools/check_jsonld.py --selftest（一正两负三样本）
       - name: verify JSON-LD parses
         run: python tools/check_jsonld.py
+      # 🔴 2026-09-05 建（Klay 令做 llms.txt + openapi 那套）：机器可读层是**生成物**，
+      # 而 llms.txt 与 data/README.md 是手改的 —— 手改了不重出，llms-full.txt 与 openapi.json
+      # 就会静静地过期，且**过期的机器可读层比没有更坏**（模型会照着旧契约引用）。
+      # 判据＝生成器 --check：产物与「照当前源应生成的内容」不一致即红，逼人重出。
+      # 🚫 刻意不在 CI 里自动重写：那会让 CI 悄悄改站上的对外契约，改契约必须过人眼。
+      - name: verify machine-readable layer fresh
+        run: python scripts/build_machine_readable.py --check
       - name: commit data
         run: |
           git config user.name "klaywang24"
