@@ -2,7 +2,7 @@
 
 > 本文档面向未来的维护者（包括未来的我和任何 AI 助手）。
 > 读完本文即可独立维护、修改、扩展本站的一切。
-> **最后更新：2026-09-05 EDT（§76）｜线上现行 i18n.js?v=20260825a · style.css?v=20260831b · app.js?v=20260831b（本次只改 scripts/data/机器可读层，**未动 JS/CSS 故不 bump**）｜最新章节：第76节（机器可读层 openapi.json + api-catalog + llms-full.txt；build_macro 加水位层四条序列）
+> **最后更新：2026-09-05 EDT（§76）｜线上现行 i18n.js?v=20260825a · style.css?v=20260831b · app.js?v=20260831b（本次只改 scripts/data/机器可读层，**未动 JS/CSS 故不 bump**）｜最新章节：第76节（机器可读层 openapi.json + api-catalog + llms-full.txt；build_macro 加水位层四条序列；§76 续＝_headers 治 MIME + 发现链 19/19 实抓 + Cloudflare 挡 Python-urllib 待拍板）
 > ⚠️ **改本文正文时，必须同时改上面这行。** 它已经过期过多次（07-16 三行全错；07-18 停在 §22 却已到 §30；07-19 停在 §34 却已到 §36）。抬头是读者判断"这文档还算不算数"的唯一依据，过期比没有更糟。
 > ⚠️ **本文按时间追加，越靠后越新。与前文冲突处，一律以编号最大的那节为准。**
 
@@ -3752,3 +3752,32 @@ Klay 让看 `lite.marketgrep.com/zh/13f` 的 13F 工具与它的 GitHub 代码�
 落库前已用独立源逐位交叉：reserves 2.895T / term_premium 0.875% / walcl 6.737T 与
 dollarliquidity.com（CC0 公开 API）完全吻合；`tga` 因**周频(H.4.1 周三) vs 其日频**而不同，
 属口径差非错值，已写进注释。
+
+### §76 续（同日）· 上线后的三件实测
+
+**① MIME 类型要单独治**：`.well-known/api-catalog` **没有扩展名**，Pages 按扩展名猜类型，
+回的是 `application/octet-stream`，而 RFC 9727 要求 `application/linkset+json`。
+按类型判断的客户端（正是我们想要的那批：模型、聚合站、API 目录爬虫）会因此拒收。
+⇒ 新增 `_headers`（Cloudflare Pages 响应头规则，此前本仓没有这个文件）：
+api-catalog → `application/linkset+json`，openapi.json → `application/openapi+json`，
+`/data/*` → 显式 `Access-Control-Allow-Origin: *`。
+🔑 **判据不是「下不下得到」，是「类型对不对」——这两件事在浏览器里长得一模一样。**
+
+**② 发现链端到端已验**：api-catalog → service-desc → openapi.json（19 端点）→ 逐个实抓，
+**19/19 返回 200**。授权、`x-auth=none`、`x-cors=*` 均随规格一起可读。
+
+**③ ⚠️ Cloudflare 挡的是 `Python-urllib`，不是 AI 抓取方**（本次实测，重要且反直觉）：
+
+| User-Agent | openapi.json | llms.txt | data/kindex.json |
+|---|---|---|---|
+| `Python-urllib/3.x`（默认） | **403** | **403** | **403** |
+| GPTBot / ClaudeBot / PerplexityBot | 200 | 200 | 200 |
+| curl / 浏览器 / 空 UA | 200 | 200 | 200 |
+
+⇒ **AI 引用这条路没被挡**（这是本次机器可读层的主要目的，目的达成）。
+但**「研究者拿 Python 随手抓一下」这条路被挡了** —— `urllib.request.urlopen(url)` 不设 UA 时必 403，
+而那恰恰是一个研究者会写的第一行代码。本仓自己的 `_fred`/`fetch_transmission._get` 都显式设了 UA，
+所以内部从来没撞到过。
+⏳ **未决（要 Klay 拍板）**：要不要在 Cloudflare 后台给 `/data/*`、`llms*.txt`、`openapi.json`、
+`.well-known/*` 放宽 Bot Fight。放宽＝对研究者友好，代价是这几个路径的爬虫防护变松。
+**本次没动**：那是控制台设置、且是对外可达性的决定，不该由一次工程收口顺手改掉。
