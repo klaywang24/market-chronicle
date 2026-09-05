@@ -685,6 +685,20 @@ def build_macro():
         #    「平时是 0，出事才有」得到证实；今日 121 百万≈零。
         #    🚫 它替代不了交叉货币基差（那是**事前**的价格信号、付费墙），只覆盖**事后**的余额。
         "cb_swaps": ("SWPT", lambda s: _weekly(s, 0)),              # 百万美元·周频
+        # 🆕 2026-09-05（传导链新增「④水位层」＝池子里还有多少钱）。
+        #    起因：管道层那七条全在答「压力大不大」，**没有一条答「水有多少」**。
+        #    竞品扫描（dollarliquidity.com，CC0 授权、33 指标）当天暴露的正是这个缺口。
+        #    🔑 为什么加在这里而不是本机新写一个 FRED 取数器：家法「不要自己打 FRED 原始端点，
+        #       两处 fetch 必漂移」——`walcl` 早就在本 plan 里，新的三条走同一扇门，
+        #       本机侧只做镜像（fetch_transmission.do_liquidity），全仓仍只有 _fred 一个实现。
+        #    单位与 walcl 对齐：H.4.1 三条原始单位都是百万美元。
+        "tga": ("WTREGEN", lambda s: _weekly(s / 1e3, 1)),          # 财政部一般账户·百万→十亿美元
+        "reserves": ("WRESBAL", lambda s: _weekly(s / 1e6, 3)),     # 银行准备金·百万→万亿美元
+        # 期限溢价：长端「额外要的补偿」，与 dgs10 的水平是两回事（水平涨可能只是短端预期涨）。
+        "term_premium": ("THREEFYTP10", lambda s: _weekly(s, 3)),   # ACM 10 年期限溢价·%
+        # 准备金余额利率：与已在拉的 sofr 配对才能算 SOFR-IORB 融资压力价差。
+        # 🚫 价差本身**不在这里算**——存两条原始腿，派生值留给读的人（存派生值＝立第二把尺子）。
+        "iorb": ("IORB", lambda s: _weekly(s, 2)),                  # 准备金余额利率·%
         # 物价（同比）
         "cpi_yoy": ("CPIAUCSL", _yoy),
         "core_pce_yoy": ("PCEPILFE", _yoy),
