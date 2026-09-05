@@ -1,0 +1,19 @@
+# Cloudflare Pages 响应头规则（2026-09-05 建 · 站仓 §76）
+#
+# 为什么需要：`.well-known/api-catalog` **没有扩展名**，Pages 按扩展名猜类型，
+# 于是回 `application/octet-stream`。RFC 9727 规定它必须是 `application/linkset+json` ——
+# 按类型判断的客户端（正是我们想要的那批：模型、聚合站、API 目录爬虫）会因此拒收。
+# 🔑 判据不是「能不能下载到」，是「类型对不对」；这两件事在浏览器里长得一模一样。
+/.well-known/api-catalog
+  Content-Type: application/linkset+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+# openapi.json 的正确类型是 application/openapi+json（Pages 默认给 application/json，
+# 能用但不精确）。同样对机器可读性有意义，对浏览器没区别。
+/openapi.json
+  Content-Type: application/openapi+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+
+# 公开数据本来就是给人抓的，显式声明 CORS 开放（站自己的 JS 也吃这些文件）。
+/data/*
+  Access-Control-Allow-Origin: *
