@@ -21,10 +21,24 @@
    digest 存档两条标题（数据契约＝邮件标题原样照录，且链接指向中文内容）、语言按钮的「简」
    （显示的是切过去会变成的语言）、KAPX/Fear-Price 官方定义段里的中文名（命名台账的双语身份）。
 """
-import functools, http.server, json, os, re, socketserver, subprocess, sys, threading
+import functools, http.server, json, os, re, shutil, socketserver, subprocess, sys, threading
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓根 = 本文件的上一级
-CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+def find_chrome():
+    # 2026-09-05：原为写死的 macOS 路径。挂进 daily.yml（ubuntu-latest）前必须改，
+    # 否则这道闸会天天红在一个与 i18n 无关的原因上。取法与 check_chart_overflow.py 一致：
+    # CHROME_BIN 只是首选、不是断言，找不到再按常见位置探测下去。
+    cands = [os.environ.get("CHROME_BIN"),
+             "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+             "/usr/bin/google-chrome", "google-chrome", "google-chrome-stable",
+             "chromium-browser", "chromium"]
+    cands = [c for c in cands if c]
+    for c in cands:
+        if os.path.isfile(c) or shutil.which(c):
+            return c if os.path.isfile(c) else shutil.which(c)
+    sys.exit("🔴 找不到 Chrome。设 CHROME_BIN 环境变量指向可执行文件。")
+
+CHROME = find_chrome()
 PAGE = sys.argv[1] if len(sys.argv) > 1 else "index.html"
 LANG = sys.argv[2] if len(sys.argv) > 2 else "en"   # zh = 负向自验：中文态必须扫出成百上千条
 

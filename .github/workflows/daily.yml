@@ -61,6 +61,17 @@ jobs:
       # exit 2 = 测量失败（解析漂移），与红同样挡住流水线，绝不算绿。
       - name: verify i18n no duplicate keys
         run: python tools/check_i18n_dupes.py
+      # EN 态中文残留闸（2026-09-05 接线）。闸本体 2026-08-07 就建好了，但从未挂进流水线：
+      # 全仓 grep 零处 run，于是它在仓里躺了 29 天，一次也没拦过东西。
+      # 出身：09-05 发现英文站 12 处中文残留。根因是「标点四禁」把 HTML 里的引号与直角引号
+      # 清掉了，却没同步改 js/i18n.js 的查表 key —— applyTo 按整节点逐字精确匹配，key 差
+      # 一个字符就整句 fallback 成中文。check_site_punctuation 的提示里本就写着这条警告。
+      # 本闸自带负向自验：zh 态若扫不出 100 条以上即 exit 2 报量尺失效，防止假绿。
+      # 接线当天实测：en 态 exit 0（仅剩 5 条有意保留），zh 态扫出 824 条 —— 尺子是活的。
+      - name: verify no Chinese leaking into EN
+        run: python tools/check_i18n_leak.py
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
       # 禁词闸（2026-08-07 命名线接线，见 HANDOFF §58）。
       # 「恐慌指数」是 VIX 的中文俗名：自称它 = 把检索流量捐给 Cboe，且与自家
       # 「恐惧的标价指数」撞名。但归属性提及 VIX 本身放行（行情条标签「VIX 恐慌指数」

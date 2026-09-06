@@ -656,6 +656,7 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
 
   /* ── Ⅲ 开奖台账（行展开 + 深链 #MM-DD 高亮）── */
   const isWrong = c => /错/.test(c.outcome);
+  const trTicker = t => L === "en" ? String(t || "").replace(/^(.*?)等(\d+)只$/, "$2 names incl. $1").replace(/^(\d+)只$/, "$1 names") : t;
   const badge = c => c.status === "待开奖" ? `<span class="op-badge wait">${tr("待开奖","Open")}</span>` :
     isWrong(c) ? `<span class="op-badge wrong">${tr("已开奖","Settled")}</span>` : `<span class="op-badge done">${tr("已开奖","Settled")}</span>`;
 
@@ -670,7 +671,7 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
     `<div class="sc"><b>${D.ledger.length}</b><span>${tr("累计立案（自 " + dot(D.meta.ledger_since) + "）", "Cases filed since " + dot(D.meta.ledger_since))}</span></div>` +
     `<div class="sc"><b>${tr(`${done.length - wrong} 对 · ${wrong} 错`, `${done.length - wrong} right · ${wrong} wrong`)}</b><span>${tr("已开奖 " + done.length + " 案，输赢都在账上", done.length + " settled, wins and losses alike")}</span></div>` +
     `<div class="sc"><b>${wait.length}</b><span>${tr("待开奖","Open")}${todayNew ? tr(" · 数据日新立案 " + todayNew, " · filed on data date: " + todayNew) : ""}</span></div>` +
-    (nextUp ? `<div class="sc next"><b>${nextUp.c.ticker} · ${tr("预计 ","est. ")}${dot(nextUp.d)}</b><span>${tr("下一个开奖，回来对答案","Next settlement: come back and check")}</span></div>` : "");
+    (nextUp ? `<div class="sc next"><b>${trTicker(nextUp.c.ticker)} · ${tr("预计 ","est. ")}${dot(nextUp.d)}</b><span>${tr("下一个开奖，回来对答案","Next settlement: come back and check")}</span></div>` : "");
 
   // 过滤 + 渲染：待开奖排前（它们是「还没完的事」），已开奖按日期倒序归档
   let lf = "all";
@@ -689,7 +690,7 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
         const f = c.events[0], i = D.ledger.indexOf(c);
         const en = enJ(c), txt = en || f.judgment, cut = en ? 150 : 60;
         return `<tr class="op-case" data-i="${i}" id="case-${f.date.slice(5)}">` +
-          `<td>${dot(f.date)}</td><td>${c.ticker}</td>` +
+          `<td>${dot(f.date)}</td><td>${trTicker(c.ticker)}</td>` +
           `<td${en ? "" : ' class="zh"'}>${txt.length > cut ? txt.slice(0, cut) + "…" : txt}</td>` +
           `<td>${badge(c)}</td></tr>`;
       }).join("");
@@ -709,6 +710,7 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
      ⇒ 行元素改名 row；tr 只作翻译函数用。
      面板顺序按 Klay 定的：开奖结论在最上（它离开表格后要有落点），下面才是立案原文。 */
   const EV_EN = { "立案": "Filed", "开奖": "Settled", "更正": "Corrected", "勘误": "Erratum" };
+  const CONF_EN = { "倾向于": "Leaning", "更像": "More likely", "无法归因": "Not attributable", "已确认": "Confirmed" };
   $("op-ledger").addEventListener("click", e => {
     const row = e.target.closest(".op-case"); if (!row) return;
     const nxt = row.nextElementSibling;
@@ -727,8 +729,8 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
     const orig = `<div class="op-orig"><div class="op-orig-h">` +
       tr("以下为立案原文与验证条件 · 原样存证不改", "Original filing and verification terms, archived verbatim in Chinese") +
       `</div>` + c.events.map(ev =>
-      `<div class="ev zh"><b>${dot(ev.date)} ${L === "en" ? (EV_EN[ev.type] || ev.type) : ev.type}</b>（${tr("置信度","confidence")}：${ev.confidence || "—"}）<br>` +
-      `${ev.judgment}<br>${tr("验证条件","Verify")}：${ev.verify || "—"}${ev.result ? "<br>" + tr("结果","Result") + "：" + ev.result : ""}</div>`).join("") + `</div>`;
+      `<div class="ev zh"><b>${dot(ev.date)} ${L === "en" ? (EV_EN[ev.type] || ev.type) : ev.type}</b>${L === "en" ? " (" : "（"}${tr("置信度","confidence")}${L === "en" ? ": " : "："}${(L === "en" ? (CONF_EN[ev.confidence] || ev.confidence) : ev.confidence) || "—"}${L === "en" ? ")" : "）"}<br>` +
+      `${ev.judgment}<br>${tr("验证条件","Verify")}${L === "en" ? ": " : "："}${ev.verify || "—"}${ev.result ? "<br>" + tr("结果","Result") + (L === "en" ? ": " : "：") + ev.result : ""}</div>`).join("") + `</div>`;
     row.insertAdjacentHTML("afterend", `<tr class="op-detail"><td colspan="4">${settle + orig}</td></tr>`);
   });
   // 深链：/options#08-01 → 滚到台账并高亮当日立案
