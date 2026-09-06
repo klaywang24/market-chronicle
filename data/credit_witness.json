@@ -1,10 +1,10 @@
 {
- "date": "2026-09-05",
- "prev": "bc212726765e0b6890214a750c4535c2c06cc96fa32ecc426893bcce6cb126fe",
+ "date": "2026-09-06",
+ "prev": "2f314fb00a9221787c447605dac919dbfcdab34734d34de507b8a4b03f343f17",
  "files": {
   "每日恒定期限IV.csv": "567c110d040aede6840e914d4148fafdf3ba7ee8c606fefb8e0b2b09c5684831",
   "数据快照/VIXHY.csv": "3133147b2c89d2cacf894267956ceaf6c5639e8c0c3d97d70fd468ea6888d318",
   "数据快照/VIXIG.csv": "c2b40de2910815e744bd02c4a0addae53ebd91d9670e810bbac0f9f22a15d468"
  },
- "chain": "2f314fb00a9221787c447605dac919dbfcdab34734d34de507b8a4b03f343f17"
+ "chain": "9dc3551ff53d9242a97f9430baf4f1eb7cc756c1eb05d7dc7056e1f1fc28f7b3"
 }
