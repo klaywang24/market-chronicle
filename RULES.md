@@ -141,6 +141,30 @@
 | **盘点监控先查「已有的闸响过没有」，再谈加新闸** | §17.10 |
 | 上游+后备双失败**明确抛错，绝不静默** | §49.10 |
 
+## 十之二、图表溢出闸的出身与那条量尺陷阱
+
+> 2026-09-06 从根 README.md 整段搬来。原先它挂在 README 末尾，等于把内部运维笔记摆在公开仓门面上；
+> 内容一字未改，出处即本段原文（2026-08-02 记）。搬家不影响管线：daily.yml 直接调 `tools/check_chart_overflow.py`，与 README 无关。
+
+## 🔴 改 js/app.js 或图表配置后必跑（2026-08-02 起）
+
+```bash
+python3 tools/check_chart_overflow.py
+```
+
+自带临时 http server，直接跑即可。它遍历首页十个面板 84 张图，查两件事：
+① `inst.getWidth()` 是否等于容器 `clientWidth`（因）② 各 series 末点是否落在绘图区内（果）。
+
+**已挂进 `daily.yml`**（在 `commit data` 之前），所以每天自动跑一次；本地改动时手动跑一次能更早发现。
+
+**背景**：2026-08-02 全站图表画到绘图区外面，根因是 ECharts 记的容器宽度是旧的
+（`getWidth()`=1086 而 `clientWidth`=867）。站上原有的两处 resize（切面板后、`window.resize`）
+都是**在某个时刻主动调一次**，治不了那个时刻之后发生的布局变化。已改为 `ResizeObserver`
+由尺寸变化驱动（见 `app.js` 的 `observeSize`），外加 `visibilitychange` 兜底。
+
+⚠️ **别在 Claude 预览标签里验证这类问题**：那里 `visibilityState` 是 `hidden`，
+`requestAnimationFrame` 与 `ResizeObserver` 回调被浏览器整体暂停，会得到「修复没生效」的假结论。
+
 ## 十一、验收与量尺
 
 | 规则 | 出处 |
