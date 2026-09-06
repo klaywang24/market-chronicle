@@ -699,6 +699,23 @@ def build_macro():
         # 准备金余额利率：与已在拉的 sofr 配对才能算 SOFR-IORB 融资压力价差。
         # 🚫 价差本身**不在这里算**——存两条原始腿，派生值留给读的人（存派生值＝立第二把尺子）。
         "iorb": ("IORB", lambda s: _weekly(s, 2)),                  # 准备金余额利率·%
+        # 🆕 2026-09-06（Klay 令补 09-05 遗漏的那条）：银行现金分层。
+        #    上面几条答「系统里有多少钱」，这两条答**「钱在谁手里」**——
+        #    2023 SVB 那次的形态正是**总量没少、但钱从小行搬到了大行**，只看总量的指标全程哑火。
+        #    源＝FRED H.8 周报（季调），四条原始腿，比率在**展示层**算：
+        #      现金缓冲 ＝ 现金资产 ÷ 总资产（全部商业银行）
+        #      现金分层 ＝ 大型行现金比 − 小型行现金比（单位 pp）
+        #    🚫 **只存四条腿，不存那两个比率**——同 §「不存净流动性派生值」：
+        #       比率是派生值，存下来就成了会与分子分母漂移的第二把尺子。
+        #    落库前已用独立源逐位交叉（dollarliquidity.com·CC0）：
+        #      缓冲 2943.5/25629.5＝11.485% vs 其 11.485% ✅
+        #      分层 8.575%−6.925%＝+1.650pp vs 其 1.65pp ✅
+        "bank_cash_all": ("CASACBW027SBOG", lambda s: _weekly(s, 1)),    # 现金资产·全部商业银行·十亿
+        "bank_assets_all": ("TLAACBW027SBOG", lambda s: _weekly(s, 1)),  # 总资产·全部
+        "bank_cash_large": ("CASLCBW027SBOG", lambda s: _weekly(s, 1)),  # 现金资产·大型
+        "bank_assets_large": ("TLALCBW027SBOG", lambda s: _weekly(s, 1)),
+        "bank_cash_small": ("CASSCBW027SBOG", lambda s: _weekly(s, 1)),  # 现金资产·小型
+        "bank_assets_small": ("TLASCBW027SBOG", lambda s: _weekly(s, 1)),
         # 物价（同比）
         "cpi_yoy": ("CPIAUCSL", _yoy),
         "core_pce_yoy": ("PCEPILFE", _yoy),
