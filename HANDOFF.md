@@ -3798,4 +3798,6 @@ api-catalog → `application/linkset+json`，openapi.json → `application/opena
 
 **验收（终局量，§63 规矩）**：GSC 里 `/digest/index.en` 进「已编入索引」；本节只证明「替换成功」。⚠️ 需要 Klay 在 GSC 对 chronicle 的 sitemap 重提一次，并对 `/digest/index.en` 请求编入索引。
 
+**GSC 后台核实（Klay 09-07 01:5x 截图）**：①`/digest/index.en` 本就在索引里（「网址已收录到 Google」），Klay 已重提 sitemap 并对它点了「请求编入索引」，让 Google 按新 canonical 重抓；②「网页会自动重定向」共 **36** 条，逐条看全是 `.html` 形态（`2026-08-05.en.html`、`2026-08-04.html`、`index.en.html`……），上次抓取 08-28，趋势线 08-23 前后从个位数跳到 36 ⇒ 就是 §64 日更上站时索引页与中英切换链带 `.html` 被 Google 顺着爬进来的那批，本次修复后站内已无 `.html` 链接，不再新增；这些地址继续 308 是正确终局，**不点「验证修正情况」**（会判失败，因为它们本来就该跳转）。③「备用网页」1 条＝index.en 那个环；「被 noindex 排除」3 条＝转化页，故意；「已发现/已抓取尚未编入索引」16+4 条＝Google 排队，小站常态；「重复网页」0 ⇒ §63 修复持续有效。
+
 **教训**：①「其 canonical 即带 .html 形态」这句注释把一个错误固化成了规则，写注释的人只看了页内 canonical、没 curl 那条 URL；**任何写进 sitemap 的 URL，必须 curl 出 200 且 canonical 自指**，这就是闸⑧存在的理由。②中文索引恰好写对（`""`→`/digest/`）掩盖了英文索引写错，同一函数里两条对称分支只测了一条。
