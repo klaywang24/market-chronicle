@@ -130,7 +130,7 @@ def expected_sitemap_urls(root=ROOT):
     urls.append(f"{BASE}/kapx")         # KAPX 术语页（2026-08-25·独立平铺页，定义/公式/口径/FAQ）
     urls.append(f"{BASE}/fear-price")   # 恐惧的标价术语页（2026-08-25·同上）
     urls.append(f"{BASE}/digest/")
-    urls.append(f"{BASE}/digest/index.en.html")   # EN 归档索引（2026-08-25·其 canonical 即带 .html 形态）
+    urls.append(f"{BASE}/digest/index.en")   # EN 归档索引（§77 2026-09-07：改无扩展。08-25 那版写 .html，Pages 把 .html 308 到无扩展 ⇒ sitemap 条目是跳转页、页内 canonical 又指回跳转页，GSC 09-06 拒收）
     for f in sorted((root / "digest").glob("*-weekly.html")):
         urls.append(f"{BASE}/digest/{f.stem}")
     for f in sorted((root / "digest").glob("*-weekly.en.html")):

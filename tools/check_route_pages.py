@@ -117,6 +117,26 @@ for p in ld_pages:
         except json.JSONDecodeError as e:
             err(f"{p.name} 第 {i+1} 个 ld+json 块语法错：{e}")
 
+# ⑧ sitemap / canonical / hreflang 不许出现 .html 形态（2026-09-07 加·HANDOFF §77）
+# 为什么要有：Cloudflare Pages 把 /x.html 一律 308 到 /x（无扩展）。08-25 把 EN 归档索引以
+# /digest/index.en.html 形态写进 sitemap，且页内 canonical 也写成 .html ⇒ sitemap 条目是跳转页、
+# 落地页 /digest/index.en 的 canonical 又指回那个跳转页，成环。GSC 09-06 两封邮件：
+# 「站点地图中的网页会自动重定向」+「备用网页（有适当的规范标记）」。本闸把「URL 形态必须是
+# Pages 实际 200 的那个」变成机器判据：sitemap 的 <loc>、digest 页的 canonical 与 hreflang 三处
+# 都不许带 .html。负向实证：对修复前的仓跑本闸 → 红（见 §77），修复后转绿。
+for u in sorted(in_map):
+    if u.endswith(".html"):
+        err(f"sitemap 条目带 .html：{u} —— Pages 会 308 到无扩展形态，Google 记成「网页会自动重定向」")
+for f in sorted((ROOT / "digest").glob("*.html")):
+    html = f.read_text(encoding="utf-8")
+    stem = "" if f.name == "index.html" else f.name[:-5]
+    want = f'<link rel="canonical" href="{BASE}/digest/{stem}">'
+    if want not in html:
+        err(f"digest/{f.name}：canonical 不是 Pages 实际 200 的形态（应为 {BASE}/digest/{stem}）")
+    for alt in re.findall(r'<link rel="alternate" hreflang="[^"]+" href="([^"]+)"', html):
+        if alt.endswith(".html"):
+            err(f"digest/{f.name}：hreflang 指向带 .html 的 {alt} —— 落地会 308，语言对儿对不上")
+
 if errors:
     print(f"\n共 {len(errors)} 条红。路由页正文重复/sitemap 失账会直接导致 GSC 拒收，修完再提交。")
     sys.exit(1)

@@ -349,7 +349,7 @@ def write_index(done, kind="cn"):
         tag = '<span class="dg-tag">' + lab + '</span>' if slug.endswith("-weekly") else ""
         thumb = ('<img class="dg-thumb" src="' + first_img + '" alt="" loading="lazy">'
                  if first_img else '<div class="dg-thumb"></div>')
-        href = "./" + slug if cn else "./" + slug + ".en.html"
+        href = "./" + slug if cn else "./" + slug + ".en"   # 无扩展：Pages 会把 .html 308 到无扩展形态（§77）
         shown = title if cn else en_title
         items.append('<a class="dg-item" href="' + href + '">' + thumb +
                      '<div><div class="dg-meta">' + date + '</div>'
@@ -359,8 +359,8 @@ def write_index(done, kind="cn"):
         IDX_HEAD.format(
             site=SITE, items="\n".join(items),
             htmllang="zh-CN" if cn else "en",
-            canon="" if cn else "index.en.html",
-            othercanon="index.en.html" if cn else "",
+            canon="" if cn else "index.en",       # §77：canonical 必须是 Pages 实际 200 的无扩展形态，带 .html 会 308 成环
+            othercanon="index.en" if cn else "",
             otherlang="en" if cn else "zh-CN",
             h1="判读档案" if cn else "The Archive",
             desc=("美股编年史每日判读的往期归档，逐日累积。当日判读只进订户邮箱，往期公开可查。"
@@ -379,7 +379,7 @@ def write_index(done, kind="cn"):
                       "The full current issue goes to subscribers before the open: "
                       '<a href="' + SITE + '/subscribe">subscribe</a>. Past issues are public here.'),
             themejs=THEME_JS, togglejs=TOGGLE_JS, ctlcss=CTL_CSS,
-            ctl=controls("./index.en.html" if cn else "./", "EN" if cn else "中文")))
+            ctl=controls("./index.en" if cn else "./", "EN" if cn else "中文")))
     return sum(1 for d in done if cn or d[4])
 
 
@@ -427,7 +427,7 @@ def write_ledger(done):
     import json
     items = [{"date": d, "slug": s, "title": t, "url": f"{SITE}/digest/{s}",
               "kind": "weekly",
-              "title_en": en, "url_en": (f"{SITE}/digest/{s}.en.html" if en else None)}
+              "title_en": en, "url_en": (f"{SITE}/digest/{s}.en" if en else None)}
              for s, d, t, _, en in sorted(done, key=lambda x: x[1], reverse=True)
              if s.endswith("-weekly")]
     out = {"generated_at": datetime.datetime.now(datetime.timezone.utc)
@@ -869,17 +869,17 @@ def main():
                 vbody = inject_en_figures(vbody, [e for _, e in sibs if e])
             body_html = build_body(vbody, date, vslug, log)
             desc = re.sub(r"<[^>]+>", "", body_html)[:110].replace('"', "'").strip()
-            other = (slug + ".en.html") if kind == "cn" else (slug + ".html")
+            other = (slug + ".en") if kind == "cn" else slug   # §77：站内互链与 hreflang 一律无扩展
             open(os.path.join(OUT, f"{vslug}.html"), "w", encoding="utf-8").write(
                 HEAD.format(
                     htmllang="zh-CN" if kind == "cn" else "en",
                     title=html.escape(vtitle), date=date, slug=vslug,
                     desc=html.escape(desc), site=SITE, body=body_html,
                     alt=(f'<link rel="alternate" hreflang="{"en" if kind=="cn" else "zh-CN"}" '
-                         f'href="{SITE}/digest/{other[:-5]}">' if has_en else ""),
+                         f'href="{SITE}/digest/{other}">' if has_en else ""),
                     themejs=THEME_JS, togglejs=TOGGLE_JS, ctlcss=CTL_CSS,
                     ctl=controls(other if has_en else "", "EN" if kind == "cn" else "中文"),
-                    backhref="./" if kind == "cn" else "./index.en.html",
+                    backhref="./" if kind == "cn" else "./index.en",
                     backtext="← 判读档案" if kind == "cn" else "← Archive",
                     walltext=("这是往期归档。当日判读全文只在盘前送进订户邮箱："
                               f'<a href="{SITE}/subscribe">订阅</a>后每个交易日开盘前送达。'

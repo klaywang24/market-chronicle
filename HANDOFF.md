@@ -2,7 +2,7 @@
 
 > 本文档面向未来的维护者（包括未来的我和任何 AI 助手）。
 > 读完本文即可独立维护、修改、扩展本站的一切。
-> **最后更新：2026-09-05 EDT（§76）｜线上现行 i18n.js?v=20260825a · style.css?v=20260831b · app.js?v=20260831b（本次只改 scripts/data/机器可读层，**未动 JS/CSS 故不 bump**）｜最新章节：第76节（机器可读层 openapi.json + api-catalog + llms-full.txt；build_macro 加水位层四条序列；§76 续＝_headers 治 MIME + 发现链 19/19 实抓 + Cloudflare 挡 Python-urllib 待拍板）
+> **最后更新：2026-09-07 EDT（§77）｜线上现行 i18n.js?v=20260825a · style.css?v=20260831b · app.js?v=20260831b（本次只改 scripts/tools 与 digest 产物，**未动 JS/CSS 故不 bump**）｜最新章节：第77节（EN 归档索引 .html 形态成环：sitemap/canonical/hreflang 三处改无扩展 + 闸⑧；GSC 09-06 两封邮件的根因与修复）
 > ⚠️ **改本文正文时，必须同时改上面这行。** 它已经过期过多次（07-16 三行全错；07-18 停在 §22 却已到 §30；07-19 停在 §34 却已到 §36）。抬头是读者判断"这文档还算不算数"的唯一依据，过期比没有更糟。
 > ⚠️ **本文按时间追加，越靠后越新。与前文冲突处，一律以编号最大的那节为准。**
 
@@ -3781,3 +3781,21 @@ api-catalog → `application/linkset+json`，openapi.json → `application/opena
 ⏳ **未决（要 Klay 拍板）**：要不要在 Cloudflare 后台给 `/data/*`、`llms*.txt`、`openapi.json`、
 `.well-known/*` 放宽 Bot Fight。放宽＝对研究者友好，代价是这几个路径的爬虫防护变松。
 **本次没动**：那是控制台设置、且是对外可达性的决定，不该由一次工程收口顺手改掉。
+
+## §77（2026-09-07 01:xx EDT）GSC 09-06 三封邮件：EN 归档索引 `.html` 形态成环（sitemap/canonical/hreflang 三处改无扩展 + 闸⑧）（本节最新，与前文冲突以本节为准）
+
+**起因**：09-06 17:1x 三封 GSC 邮件。编年史站两封：「站点地图中的网页会自动重定向」+「备用网页（有适当的规范标记）」；个人站一封「站点地图中的网页会自动重定向」。Klay 09-07 令「赶紧修」。Chrome 扩展未连，GSC 后台读不到具体 URL，全部靠对两站 sitemap 逐条 curl 探测定位。
+
+**编年史站根因（一条 URL，两封邮件）**：§64 ④A 08-25 把 EN 归档索引以 `/digest/index.en.html` 形态写进 `expected_sitemap_urls()`，注释还写着「其 canonical 即带 .html 形态」。**漏掉的事实：Cloudflare Pages 把任何 `/x.html` 一律 308 到 `/x`**（`/digest/index.html`→`/digest/` 同理，只是那个 canonical 恰好写对了）。于是：sitemap 条目 `index.en.html` 是跳转页（邮件一）；落地页 `/digest/index.en` 的 canonical 又指回 `index.en.html`（邮件二：Google 视 `/digest/index.en` 为「备用网页」，规范页是那个会跳转的 URL）⇒ 成环，英文档案索引无论如何进不了索引。探测实证：sitemap 110 条里唯一非 200 的就是它（308）；`/digest/index.en` 200 而 canonical 指 `.html`。同批 EN 周报/日更页 08-25 就写成无扩展 `.en`，没事。
+
+**修**（`scripts/build_digest_archive.py` 七处 + `scripts/build_route_pages.py` 一处）：EN 索引 canonical/og:url → `/digest/index.en`；中文索引 hreflang → `/digest/index.en`；索引页列表项、日更页「← Archive」返回链、中英切换链（此前带 `.html`，中英两侧都改）、页内 hreflang、`digest_archive.json` 的 `url_en` 全部改无扩展；sitemap 条目改 `/digest/index.en`。文件名 `index.en.html` 不动（盘上还是它，Pages 靠它映射）。旧 URL `/digest/index.en.html` 继续 308 到新 canonical，环解开。重新生成 47+42 页，diff 只有链接形态，正文零变化（grep 实证）。
+
+**闸⑧（`tools/check_route_pages.py`）**：sitemap `<loc>`、`digest/*.html` 的 canonical、hreflang 三处都不许带 `.html`；canonical 必须等于 Pages 实际 200 的形态。**负向实证：对修复前产物跑 → 5 条红**（sitemap 缺/多各 1、带 .html 1、canonical 错 1、hreflang 错 1），修复后转绿。已在 daily.yml 里（同一脚本）。
+
+**个人站（klay-wang.com）查了没改**：sitemap 102 条逐条 curl（含 Googlebot UA、中英 Accept-Language 三种头）全部 200 无跳转；live sitemap 无 `/category/shares`。唯一会跳转的 URL 是 `/category/shares` → 301 `/category/essays`（个人站仓 `14f3c4d`，07-30 故意加的，Google 此前记它为 noindex，09-06 重爬后第一次归到「会重定向」类，于是发「新原因」邮件）。**判断：那是终局正确状态，不是故障**。若 GSC 列的不是这条 URL，再回来查。
+
+**顺手看到没修**：`tools/check_site_punctuation.py` 对 macro.html（直角引号 ×1）与 methodology.html（×10）报红，本次未动这两页，属存量；改它要碰 i18n D 键源文本，口径类改动等 Klay。
+
+**验收（终局量，§63 规矩）**：GSC 里 `/digest/index.en` 进「已编入索引」；本节只证明「替换成功」。⚠️ 需要 Klay 在 GSC 对 chronicle 的 sitemap 重提一次，并对 `/digest/index.en` 请求编入索引。
+
+**教训**：①「其 canonical 即带 .html 形态」这句注释把一个错误固化成了规则，写注释的人只看了页内 canonical、没 curl 那条 URL；**任何写进 sitemap 的 URL，必须 curl 出 200 且 canonical 自指**，这就是闸⑧存在的理由。②中文索引恰好写对（`""`→`/digest/`）掩盖了英文索引写错，同一函数里两条对称分支只测了一条。
