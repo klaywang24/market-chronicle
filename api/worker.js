@@ -5,7 +5,7 @@
  *       永远敞开——那是站本身、GEO 引用和「网站永远免费」承诺的地基，锁它=自毁。
  *       这扇门卖的是：带 SLA 的稳定端点 + key 管理 + 用量计费 —— Pro 档「API（远期）」的实体。
  *
- * 部署（约 10 分钟，见 api/README.md）：
+ * 部署（约 10 分钟，部署说明在维护者私有文档，不随公开仓分发）：
  *   1. npx wrangler kv namespace create API_KEYS
  *   2. 把返回的 id 填进 wrangler.toml
  *   3. npx wrangler deploy
