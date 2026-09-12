@@ -939,8 +939,8 @@
     "QQQ PE (TTM · ETF 口径)": ["QQQ P/E (TTM, ETF basis)", "PER QQQ (TTM, base ETF)", "QQQ-KGV (TTM, ETF-Basis)", "PER QQQ (TTM, base ETF)"],
     "QQQ 远期 PE": ["QQQ forward P/E", "PER prospectif QQQ", "QQQ-Forward-KGV", "PER adelantado QQQ"],
     "SPY PE 对照": ["SPY P/E for reference", "PER SPY en référence", "SPY-KGV als Referenz", "PER SPY de referencia"],
-    "指数级的纳指 PE 长历史与远期 PE 无免费公开数据源（原站为 Bloomberg 手动维护），此处仅展示 QQQ ETF 口径的当前值；个股级的 20 年 PE 历史请进入金融/消费/奢侈品板块的个股页查看。": [
-      "No free public source exists for index-level Nasdaq P/E history or forward P/E (the original site maintains Bloomberg files by hand); only current QQQ ETF-basis values are shown here. For 20-year P/E histories, open any stock page in the Financials / Consumer / Luxury tabs.",
+    "指数级的纳指 PE 长历史与远期 PE 无免费公开数据源，此处仅展示 QQQ ETF 口径的当前值；个股级的 20 年 PE 历史请进入金融/消费/奢侈品板块的个股页查看。": [
+      "No free public source exists for index-level Nasdaq P/E history or forward P/E; only current QQQ ETF-basis values are shown here. For 20-year P/E histories, open any stock page in the Financials / Consumer / Luxury tabs.",
       "Pas de source publique gratuite pour l'historique du PER du Nasdaq ; seules les valeurs actuelles base ETF sont affichées. Voir les fiches valeurs pour 20 ans de PER.",
       "Keine freie Quelle für die Nasdaq-KGV-Historie; hier nur aktuelle ETF-Werte. 20-Jahres-KGV auf den Aktienseiten.",
       "No hay fuente gratuita para el histórico del PER del Nasdaq; aquí solo valores actuales base ETF. Vea 20 años de PER en las páginas de valores."],
