@@ -94,6 +94,11 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
    只有末列（对／错／预计 xx）保持右对齐，便于纵向扫读结果。 */
 #op-ledger th, #op-ledger td { text-align: left; }
 #op-ledger th:last-child, #op-ledger td:last-child { text-align: right; }
+.op-ledger-scroll { max-height: 62vh; overflow-y: auto; overscroll-behavior: contain; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+.op-ledger-scroll #op-ledger th { position: sticky; top: 0; background: var(--bg); z-index: 1; }
+.op-ledger-scroll::-webkit-scrollbar { width: 6px; }
+.op-ledger-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.op-scroll-hint { font-size: 11.5px; color: var(--ink-muted); margin: 0 0 4px; }
 .op-pos { position: relative; height: 8px; min-width: 120px; background: linear-gradient(90deg, color-mix(in srgb, #FF2400 18%, transparent), color-mix(in srgb, #00A86B 18%, transparent)); border-radius: 4px; }
 .op-pos i { position: absolute; top: 50%; transform: translate(-50%,-50%); width: 9px; height: 9px; border-radius: 50%; background: var(--ink); border: 2px solid var(--bg); }
 .op-badge { display: inline-block; font-size: 11px; font-weight: 600; border-radius: 10px; padding: 2px 9px; font-family: inherit; }
@@ -223,7 +228,10 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
 <p class="op-note" style="margin-bottom:10px" id="op-n3">这是本页的信用来源：第四章那些归因凭什么可信？凭我们对异动的每一次判断都<b>先立案、按约定条件开奖、错了原样留着</b>。台账只会变厚，不会被改写。点行展开看立案原文与验证条件。</p>
 <div id="op-score" class="op-score"></div>
 <div class="op-chips" id="op-lfilter" style="margin:10px 0 12px"></div>
-<table class="op-table" id="op-ledger"></table>
+<!-- 2026-09-12（Klay 令）：台账只会变厚，全表平铺会把页面越拉越长 ⇒ 改成框内滚动：
+     待开奖永远排最前、表头吸顶、全部案子仍在 DOM 里（深链 #MM-DD 与行展开照旧），只是页面高度封顶。 -->
+<div class="op-ledger-scroll" id="op-ledger-wrap"><table class="op-table" id="op-ledger"></table></div>
+<p class="op-scroll-hint" id="op-lhint"></p>
 <p class="op-fresh" id="fr3"></p>
 
 <!-- Ⅳ ──────────────────────────────── -->
@@ -688,6 +696,11 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
        （实测底部长出横滚条、开奖列被推到可视区外），页面也被拉得很长。改成点行展开。
        摘要层按语言取：EN 有 judgment_en 就用它，没有则回退中文（不硬翻、不留空）。 */
     const enJ = c => (L === "en" && c.events[0].judgment_en) ? c.events[0].judgment_en : null;
+    $("op-ledger-wrap").setAttribute("aria-label", tr(`台账 ${rows.length} 案，框内滚动`, `${rows.length} cases, scroll inside`));
+    $("op-ledger-wrap").scrollTop = 0;
+    $("op-lhint").textContent = rows.length > 8
+      ? tr(`共 ${rows.length} 案都在这张表里，待开奖排最前，框内往下滚看更早的`, `All ${rows.length} cases are in this table — open ones first; scroll inside for older ones`)
+      : "";
     $("op-ledger").innerHTML =
       `<tr><th>${tr("立案日","Filed")}</th><th>${tr("标的","Name")}</th><th style="width:58%">${tr("判断","Judgment")}</th><th>${tr("状态","Status")}</th></tr>` +
       rows.map(c => {
