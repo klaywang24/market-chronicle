@@ -27,8 +27,8 @@ ROOT = Path(__file__).resolve().parent.parent
 # 红的时候会变成别人的弹药。仓内那份的 .gitignore 条目保留作兜底。
 PROJECT = ROOT.parent.parent                     # KAPX/ 的上一层
 OUT = (PROJECT / "见证链看板.html") if PROJECT.is_dir() else (ROOT / "见证链看板.html")
-RAW = "https://raw.githubusercontent.com/klaywang24/market-chronicle/main"
-REPO = "https://github.com/klaywang24/market-chronicle"
+RAW = "https://raw.githubusercontent.com/klaywang24/fear-price/main"
+REPO = "https://github.com/klaywang24/fear-price"
 
 HTML = """<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
@@ -195,7 +195,7 @@ function card(name,st,detail,why){
     w:"浏览器跨域查不了 Internet Archive；假装查过比不查更糟。CI 每天替你查并记进②"});
 
   // ④ daily 是否还活着
-  try{const r=await fetch("https://api.github.com/repos/klaywang24/market-chronicle/commits?path=data/kindex.json&per_page=1",{cache:"no-store"});
+  try{const r=await fetch("https://api.github.com/repos/klaywang24/fear-price/commits?path=data/kindex.json&per_page=1",{cache:"no-store"});
     const j=await r.json();const dt=j[0].commit.committer.date;const a=days(dt);
     out.push({n:"daily 是否还活着",s:stat(a,SLA.daily),
       d:`最后一次更新数据 ${dt.slice(0,10)}（${ago(a)}）`,

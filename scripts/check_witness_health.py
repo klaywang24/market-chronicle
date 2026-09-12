@@ -338,7 +338,7 @@ def check_daily_dispatched() -> dict:
     """
     try:
         req = urllib.request.Request(
-            "https://api.github.com/repos/klaywang24/market-chronicle/actions/"
+            "https://api.github.com/repos/klaywang24/fear-price/actions/"
             "workflows/daily.yml/runs?event=schedule&per_page=10",
             headers={"Accept": "application/vnd.github+json",
                      "User-Agent": "witness-watchdog"})

@@ -69,7 +69,7 @@ def targets(sha: str | None) -> list[str]:
         f"{SITE}/fear-price",
     ]
     if sha:
-        t.insert(1, f"https://github.com/klaywang24/market-chronicle/commit/{sha}")
+        t.insert(1, f"https://github.com/klaywang24/fear-price/commit/{sha}")
     return t
 
 

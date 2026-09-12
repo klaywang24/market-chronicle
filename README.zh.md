@@ -4,8 +4,8 @@
 > 22 只行业龙头的完整履历，以及两个自研市场指标（K 指数——英文官方名 **KAPX Index**——与 LEAPS 窗口），
 > 放进一份"金融报刊"式的静态网页。**纯静态、零服务器、零运行成本。**
 
-[![每日行情更新](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml)
-[![每周基本面更新](https://github.com/klaywang24/market-chronicle/actions/workflows/weekly.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/weekly.yml)
+[![每日行情更新](https://github.com/klaywang24/fear-price/actions/workflows/daily.yml/badge.svg)](https://github.com/klaywang24/fear-price/actions/workflows/daily.yml)
+[![每周基本面更新](https://github.com/klaywang24/fear-price/actions/workflows/weekly.yml/badge.svg)](https://github.com/klaywang24/fear-price/actions/workflows/weekly.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21783004.svg)](https://doi.org/10.5281/zenodo.21783004)
 [![License](https://img.shields.io/badge/license-PolyForm--Noncommercial--1.0.0-4a5d3a)](LICENSE)
 [![在线访问](https://img.shields.io/badge/%E5%9C%A8%E7%BA%BF%E8%AE%BF%E9%97%AE-chronicle.klay--wang.com-a0392f)](https://chronicle.klay-wang.com/)
@@ -80,7 +80,7 @@ GitHub Pages 自动发布
 ## 本地运行
 
 ```bash
-git clone https://github.com/klaywang24/market-chronicle.git
+git clone https://github.com/klaywang24/fear-price.git
 cd market-chronicle
 python3 -m venv .venv && source .venv/bin/activate
 pip install yfinance pandas requests lxml

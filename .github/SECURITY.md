@@ -6,7 +6,7 @@
 
 ## 报告问题
 
-如果你发现以下任一情况，欢迎通过 [GitHub Issues](https://github.com/klaywang24/market-chronicle/issues) 或私信仓库所有者反馈：
+如果你发现以下任一情况，欢迎通过 [GitHub Issues](https://github.com/klaywang24/fear-price/issues) 或私信仓库所有者反馈：
 
 - **数据错误 / 可疑数字**：与出处对不上、明显失真的图表或统计；
 - **前端安全问题**：如第三方脚本、XSS、供应链相关隐患；

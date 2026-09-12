@@ -5,8 +5,8 @@
 > home-grown market indicators (KAPX Index & LEAPS Window) — packaged as an
 > editorial-style static site. **No server, no build step, zero running cost.**
 
-[![daily-update](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/daily.yml)
-[![weekly-fundamentals](https://github.com/klaywang24/market-chronicle/actions/workflows/weekly.yml/badge.svg)](https://github.com/klaywang24/market-chronicle/actions/workflows/weekly.yml)
+[![daily-update](https://github.com/klaywang24/fear-price/actions/workflows/daily.yml/badge.svg)](https://github.com/klaywang24/fear-price/actions/workflows/daily.yml)
+[![weekly-fundamentals](https://github.com/klaywang24/fear-price/actions/workflows/weekly.yml/badge.svg)](https://github.com/klaywang24/fear-price/actions/workflows/weekly.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21783004.svg)](https://doi.org/10.5281/zenodo.21783004)
 [![License](https://img.shields.io/badge/license-PolyForm--Noncommercial--1.0.0-4a5d3a)](LICENSE)
 [![Live](https://img.shields.io/badge/live-chronicle.klay--wang.com-a0392f)](https://chronicle.klay-wang.com/)
@@ -71,7 +71,7 @@ Metrics without a reliable free source are left blank and labeled — never fake
 ## Run locally
 
 ```bash
-git clone https://github.com/klaywang24/market-chronicle.git
+git clone https://github.com/klaywang24/fear-price.git
 cd market-chronicle
 python3 -m venv .venv && source .venv/bin/activate
 pip install yfinance pandas requests lxml

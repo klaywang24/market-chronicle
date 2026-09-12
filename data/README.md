@@ -52,7 +52,7 @@
 **不是数据。是这本账。**
 
 - 你今天可以把这个目录整个下载走 —— 拿到的是**一张快照**。明天还得再下一次。
-- 而你**无法证明自己没有编** —— 因为证明在这个仓库的 [commit 历史](https://github.com/klaywang24/market-chronicle/commits/main)里。
+- 而你**无法证明自己没有编** —— 因为证明在这个仓库的 [commit 历史](https://github.com/klaywang24/fear-price/commits/main)里。
 - **一份被复制的时间戳台账，没有时间戳。**
 
 我们卖的从来不是数字，是「这个数字是那天记下的，公开可查」。
