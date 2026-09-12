@@ -603,6 +603,18 @@ def ledger_daily(folder_date):
             and (r.get("title") or "").strip()]
     if not hits:
         return None
+    # 🔴 2026-09-12：日更隔天早上发，2 天窗口会同时框进「昨天数据日」的发布行（台账 09-11 那天
+    #   记的是数据日0910 的发布），09-10/09-11 两页因此顶着前一天的标题上了站。台账 09-09 起
+    #   content_type 带「数据日MMDD」，有这个标签就只认标签；没标签的旧行才退回窗口匹配。
+    tag = "数据日" + folder_date[5:7] + folder_date[8:10]
+    tagged = [r for r in hits if tag in (r.get("content_type") or "")]
+    if tagged:
+        hits = tagged
+    elif any("数据日" in (r.get("content_type") or "") for r in hits):
+        untagged = [r for r in hits if "数据日" not in (r.get("content_type") or "")]
+        if not untagged:
+            return None
+        hits = untagged
     pref = next((r for r in hits if r.get("platform") in ("substack", "buttondown")), hits[0])
     return pref["title"].strip(), pref["date"]
 
