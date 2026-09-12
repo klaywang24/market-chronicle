@@ -461,7 +461,7 @@
         <div class="chapter-head"><span class="chapter-no">第四章</span><h2>时间的纹理</h2></div>
         <div class="grid-2">
           <div class="card"><h3>滚动 5 年年化</h3><div class="chart short" id="${basket}-sd-roll"></div></div>
-          <div class="card"><h3>月度季节性</h3><div class="chart short" id="${basket}-sd-season"></div></div>
+          <div class="card"><h3>十二个月的脾气</h3><div class="chart short" id="${basket}-sd-season"></div></div>
         </div>
         <div class="card"><h3>已实现波动率（20 日年化）</h3><div class="chart short" id="${basket}-sd-vol"></div></div>
       </div>
