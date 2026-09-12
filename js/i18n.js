@@ -477,7 +477,7 @@
     "LEAPS 窗口：恐惧的定价": ["LEAPS Window: Pricing Fear", "Fenêtre LEAPS : le prix de la peur", "LEAPS-Fenster: Der Preis der Angst", "Ventana LEAPS: el precio del miedo"],
 
     // ---- 章节标题 ----
-    "头版 · 世纪尺度": ["Front Page · Century Scale", "Une · échelle du siècle", "Titelseite · Jahrhundertmaßstab", "Portada · escala secular"],
+    "头版 · 一百年": ["Front Page · One Hundred Years", "Une · cent ans", "Titelseite · hundert Jahre", "Portada · cien años"],
     "年度结账": ["Annual Ledger", "Bilan annuel", "Jahresabrechnung", "Cierre anual"],
     "入场与离场": ["Entry and Exit", "Entrée et sortie", "Ein- und Ausstieg", "Entrada y salida"],
     "滚动年化": ["Rolling Returns", "Rendements glissants", "Rollierende Renditen", "Rentabilidades móviles"],
@@ -506,11 +506,11 @@
     "窗口对账": ["Window Audit", "Audit des fenêtres", "Fensterprüfung", "Auditoría de ventanas"],
     "上市以来": ["Since Listing", "Depuis l'introduction", "Seit Börsengang", "Desde la salida a bolsa"],
     "回报的形状": ["The Shape of Returns", "La forme des rendements", "Die Form der Renditen", "La forma de los rendimientos"],
-    "危机的节奏": ["The Rhythm of Crises", "Le rythme des crises", "Der Rhythmus der Krisen", "El ritmo de las crisis"],
+    "大跌纪年": ["Crash Chronology", "Chronologie des krachs", "Chronologie der Einbrüche", "Cronología de las caídas"],
     "时间的纹理": ["The Texture of Time", "La texture du temps", "Die Textur der Zeit", "La textura del tiempo"],
     "关键指标仪表盘": ["Key Metrics Dashboard", "Tableau de bord des indicateurs", "Kennzahlen-Dashboard", "Panel de métricas clave"],
     "资本效率": ["Capital Efficiency", "Efficacité du capital", "Kapitaleffizienz", "Eficiencia del capital"],
-    "估值的锚": ["The Valuation Anchor", "L'ancre de valorisation", "Der Bewertungsanker", "El ancla de valoración"],
+    "估值的位置": ["Where Valuation Sits", "Où se situe la valorisation", "Wo die Bewertung steht", "Dónde está la valoración"],
     "估值驱动 vs EPS 驱动": ["Multiple-Driven vs EPS-Driven", "Multiple vs BPA", "Multiple- vs. EPS-getrieben", "Múltiplo vs BPA"],
     "股东回报": ["Shareholder Returns", "Retour à l'actionnaire", "Aktionärsrendite", "Retorno al accionista"],
     "同业对比": ["Peer Comparison", "Comparaison sectorielle", "Peer-Vergleich", "Comparación entre pares"],
@@ -530,7 +530,7 @@
     "PE（TTM，1871 年至今）": ["P/E, TTM (since 1871)", "PER (depuis 1871)", "KGV (seit 1871)", "PER (desde 1871)"],
     "PE（TTM）与三条历史中位数": ["P/E (TTM) and three historical medians", "PER et trois médianes historiques", "KGV und drei historische Mediane", "PER y tres medianas históricas"],
     "标普 500 EPS（TTM · 对数坐标）": ["S&P 500 EPS (TTM, log scale)", "BPA du S&P 500 (log)", "S&P-500-EPS (log)", "BPA del S&P 500 (log)"],
-    "VIX · 保险费的账本": ["VIX · The Insurance Ledger", "VIX · le registre des primes", "VIX · das Prämienbuch", "VIX · el libro de primas"],
+    "VIX · 保护的价钱": ["VIX · The Price of Protection", "VIX · le prix de la protection", "VIX · der Preis der Absicherung", "VIX · el precio de la protección"],
     "VXN · 纳指的保险费": ["VXN · Nasdaq's insurance premium", "VXN · la prime du Nasdaq", "VXN · die Nasdaq-Prämie", "VXN · la prima del Nasdaq"],
     "各月平均涨跌与上涨概率": ["Average monthly return and win rate", "Rendement mensuel moyen et taux de hausse", "Monatsrendite und Gewinnquote", "Rendimiento mensual medio y probabilidad de subida"],
     "GICS 行业分布（按家数）": ["GICS sector breakdown (by count)", "Répartition GICS (par nombre)", "GICS-Sektoren (nach Anzahl)", "Sectores GICS (por número)"],
@@ -837,8 +837,8 @@
     "距前高的百分比距离（周频）": ["Percent below prior peak (weekly)", "Écart au sommet précédent (hebdo)", "Abstand zum Hoch in % (wöchentlich)", "Distancia al máximo previo (semanal)"],
     "几乎每一年都有回撤，多数年份仍收正": ["Nearly every year has a drawdown; most still close positive", "Presque chaque année connaît un repli ; la plupart finissent positives", "Fast jedes Jahr hat einen Drawdown; die meisten schließen positiv", "Casi todos los años hay caídas; la mayoría cierra en positivo"],
     "全历史（1871→）· 近 50 年 · 2010 年以来，三条虚线即三个回归锚": ["All history (1871→), last 50 years, and 2010→ — three dashed anchors of mean reversion", "Tout l'historique (1871→), 50 ans, 2010→ — trois ancres de retour à la moyenne", "Gesamthistorie (1871→), 50 Jahre, 2010→ — drei Anker der Rückkehr zum Mittel", "Todo el histórico (1871→), 50 años y 2010→: tres anclas de reversión a la media"],
-    "VIX 衡量市场对未来 30 天的波动预期：冲破 30，意味着投资者已经在为下一轮风险付保费。叠加 20 日 / 60 日年化已实现波动率（周频）。": [
-      "VIX prices the next 30 days of expected volatility — above 30, investors are already paying premium for the next storm. Overlaid with 20d/60d realized vol (weekly).",
+    "VIX 是市场给未来 30 天波动开的价：过了 30，说明已经有人在为下一段路买保护。叠加 20 日 / 60 日年化已实现波动率（周频）。": [
+      "VIX is the market's price for the next 30 days of volatility: above 30, someone is already buying protection for the road ahead. Overlaid with 20d/60d realized vol (weekly).",
       "Le VIX cote la volatilité attendue à 30 jours — au-dessus de 30, la prime de risque est déjà payée. Superposé aux vols réalisées 20 j/60 j.",
       "Der VIX bepreist die erwartete Volatilität der nächsten 30 Tage — über 30 zahlen Anleger bereits Prämie für den nächsten Sturm. Mit realisierter 20T/60T-Vol.",
       "El VIX cotiza la volatilidad esperada a 30 días: por encima de 30, ya se paga prima por la próxima tormenta. Superpuesto con vol realizada 20d/60d."],

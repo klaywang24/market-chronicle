@@ -453,7 +453,7 @@
         </div>
       </div>
       <div class="chapter">
-        <div class="chapter-head"><span class="chapter-no">第三章</span><h2>危机的节奏</h2></div>
+        <div class="chapter-head"><span class="chapter-no">第三章</span><h2>大跌纪年</h2></div>
         <div class="card"><h3>历史回撤曲线</h3><div class="chart short" id="${basket}-sd-dd"></div></div>
         <div class="card"><h3>深度回撤一览（≥10%）</h3><div class="table-wrap"><table id="${basket}-sd-ddtable"></table></div></div>
       </div>
@@ -488,7 +488,7 @@
         </div>
       </div>
       <div class="chapter" id="${basket}-fd-valuation">
-        <div class="chapter-head"><span class="chapter-no"></span><h2>估值的锚</h2></div>
+        <div class="chapter-head"><span class="chapter-no"></span><h2>估值的位置</h2></div>
         <p class="chapter-q">现在的价格，在自己的历史里算贵吗？</p>
         <div class="k-status" id="${basket}-fd-valstats"></div>
         <div class="grid-2">
