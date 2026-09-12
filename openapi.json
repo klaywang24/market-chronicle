@@ -3,7 +3,7 @@
  "info": {
   "title": "Fear-Price 公开数据 · Public Data",
   "summary": "恐惧的标价的公开 JSON：KAPX 指数、恐惧的标价指数、宏观与传导链序列、每日自核与哈希链。免鉴权、CORS 开放、每交易日更新。",
-  "description": "本规格登记的是 llms.txt 与 data/README.md 已点名的对外契约端点。站自己的前端也吃这些文件，所以它们不会被锁——**免费门永远敞开**是这个站的地基（锁它＝自断 AI 引用，也自毁「网站永远免费」的承诺）。\n\n口径与如实披露、三层证据、怎么自己重算一遍：见 https://chronicle.klay-wang.com/data/README.md。\n\n授权：三段划分，别混：**编纂/派生指标/台账结构**＝Klay Wang，PolyForm Noncommercial 1.0.0（非商业免费，商用另谈 klaywang24+marketchronicle@gmail.com）；**原始数值**＝转录自公开源（Cboe / FRED / FINRA / CFTC / Yahoo Finance / CNN）的事实，受各自源条款约束，我们不主张所有权；**Kaggle 与 Hugging Face 上的季度提取物**＝另以 CC BY 4.0 释出（署名即可，含商用）。",
+  "description": "本规格登记的是 llms.txt 与 data/README.md 已点名的对外契约端点。站自己的前端也吃这些文件，所以它们不会被锁——**免费门永远敞开**是这个站的地基（锁它＝自断 AI 引用，也自毁「网站永远免费」的承诺）。\n\n口径与如实披露、三层证据、怎么自己重算一遍：见 https://chronicle.klay-wang.com/data/README.md。\n\n授权：三段划分，别混：**编纂/派生指标/台账结构**＝Klay Wang，PolyForm Noncommercial 1.0.0（非商业免费，商用另谈 klaywang24+fearprice@gmail.com）；**原始数值**＝转录自公开源（Cboe / FRED / FINRA / CFTC / Yahoo Finance / CNN）的事实，受各自源条款约束，我们不主张所有权；**Kaggle 与 Hugging Face 上的季度提取物**＝另以 CC BY 4.0 释出（署名即可，含商用）。",
   "version": "1.0.0",
   "contact": {
    "name": "Fear-Price",
@@ -19,7 +19,7 @@
    "url": "https://chronicle.klay-wang.com"
   }
  ],
- "x-license-note": "三段划分，别混：**编纂/派生指标/台账结构**＝Klay Wang，PolyForm Noncommercial 1.0.0（非商业免费，商用另谈 klaywang24+marketchronicle@gmail.com）；**原始数值**＝转录自公开源（Cboe / FRED / FINRA / CFTC / Yahoo Finance / CNN）的事实，受各自源条款约束，我们不主张所有权；**Kaggle 与 Hugging Face 上的季度提取物**＝另以 CC BY 4.0 释出（署名即可，含商用）。",
+ "x-license-note": "三段划分，别混：**编纂/派生指标/台账结构**＝Klay Wang，PolyForm Noncommercial 1.0.0（非商业免费，商用另谈 klaywang24+fearprice@gmail.com）；**原始数值**＝转录自公开源（Cboe / FRED / FINRA / CFTC / Yahoo Finance / CNN）的事实，受各自源条款约束，我们不主张所有权；**Kaggle 与 Hugging Face 上的季度提取物**＝另以 CC BY 4.0 释出（署名即可，含商用）。",
  "x-machine-readable": {
   "llms": "https://chronicle.klay-wang.com/llms.txt",
   "llmsFull": "https://chronicle.klay-wang.com/llms-full.txt",

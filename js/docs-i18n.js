@@ -4,7 +4,7 @@
 (function () {
   "use strict";
   const IDS = ["about", "contact", "privacy", "terms", "refunds", "pricing", "methodology"];
-  const EMAIL = "klaywang24+marketchronicle@gmail.com";
+  const EMAIL = "klaywang24+fearprice@gmail.com";
 
   // 各平台品牌图标（inline SVG，随文本色，各语言通用）
   const ICON = {

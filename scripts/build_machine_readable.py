@@ -76,7 +76,7 @@ POLYFORM = {"name": "PolyForm Noncommercial 1.0.0",
             "url": "https://polyformproject.org/licenses/noncommercial/1.0.0"}
 LICENSE_NOTE = (
     "三段划分，别混：**编纂/派生指标/台账结构**＝Klay Wang，PolyForm Noncommercial 1.0.0"
-    "（非商业免费，商用另谈 klaywang24+marketchronicle@gmail.com）；**原始数值**＝转录自公开源"
+    "（非商业免费，商用另谈 klaywang24+fearprice@gmail.com）；**原始数值**＝转录自公开源"
     "（Cboe / FRED / FINRA / CFTC / Yahoo Finance / CNN）的事实，受各自源条款约束，我们不主张所有权；"
     "**Kaggle 与 Hugging Face 上的季度提取物**＝另以 CC BY 4.0 释出（署名即可，含商用）。")
 

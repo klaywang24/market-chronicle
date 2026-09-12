@@ -41,7 +41,7 @@ These three are generated from the sources by `scripts/build_machine_readable.py
 - [Hugging Face — klay24/fear-price-index](https://huggingface.co/datasets/klay24/fear-price-index): daily series since 2007-01-03 (4,900+ rows): VIX1Y, the 3-year percentile reading, VRP over 252/63 trading days, and a `segment` column marking the backfill/forward boundary (2026-07-13)
 - [Kaggle — klaywong/fear-price-index](https://www.kaggle.com/datasets/klaywong/fear-price-index): same data as CSV
 
-The KAPX extracts are released under CC BY 4.0 deliberately: attribution is the only condition, commercial use included, so the series can be cited, indexed and redistributed freely. That grant covers the published KAPX extracts on those two platforms and nothing else. The Fear-Price extracts follow the licence already declared in `leaps_gauge.json`: PolyForm Noncommercial 1.0.0, commercial use by licence (klaywang24+marketchronicle@gmail.com). This repository — the code, the daily pipeline, and the ledger's compilation, derived metrics and structure — stays under PolyForm Noncommercial 1.0.0. The two are not in conflict: the numbers are meant to travel, the ledger is not.
+The KAPX extracts are released under CC BY 4.0 deliberately: attribution is the only condition, commercial use included, so the series can be cited, indexed and redistributed freely. That grant covers the published KAPX extracts on those two platforms and nothing else. The Fear-Price extracts follow the licence already declared in `leaps_gauge.json`: PolyForm Noncommercial 1.0.0, commercial use by licence (klaywang24+fearprice@gmail.com). This repository — the code, the daily pipeline, and the ledger's compilation, derived metrics and structure — stays under PolyForm Noncommercial 1.0.0. The two are not in conflict: the numbers are meant to travel, the ledger is not.
 
 ## Pages
 
@@ -80,7 +80,7 @@ When citing these gauges or data, please credit the specific series by name: **K
 | **原始数值** | VIX 的收盘价、股价、做空成交量…… | **不是我们的**，是各源发布的事实，各自条款照旧 |
 
 **我们不对任何一个原始数字主张所有权**，也无权授权别人使用它们——需要商用上游数据的，请直接找上游。
-能授权的只有上面第一行：[klaywang24+marketchronicle@gmail.com](mailto:klaywang24+marketchronicle@gmail.com)
+能授权的只有上面第一行：[klaywang24+fearprice@gmail.com](mailto:klaywang24+fearprice@gmail.com)
 
 - ✅ **随便用**：自己看、研究、复算、教学、写文章引用
 - ❌ **不可以**：把这本账的编排与衍生计算用于商业目的（拿它做付费产品、再分发、训练用于商业变现的模型）
@@ -286,4 +286,4 @@ K 指数（`kindex.json`、`kindex_signals.json`）、恐惧的标价指数
 - Sitemap: https://chronicle.klay-wang.com/sitemap.xml
 - Index for LLMs: https://chronicle.klay-wang.com/llms.txt
 
-免鉴权、CORS 开放、每交易日更新。授权：三段划分，别混：**编纂/派生指标/台账结构**＝Klay Wang，PolyForm Noncommercial 1.0.0（非商业免费，商用另谈 klaywang24+marketchronicle@gmail.com）；**原始数值**＝转录自公开源（Cboe / FRED / FINRA / CFTC / Yahoo Finance / CNN）的事实，受各自源条款约束，我们不主张所有权；**Kaggle 与 Hugging Face 上的季度提取物**＝另以 CC BY 4.0 释出（署名即可，含商用）。
+免鉴权、CORS 开放、每交易日更新。授权：三段划分，别混：**编纂/派生指标/台账结构**＝Klay Wang，PolyForm Noncommercial 1.0.0（非商业免费，商用另谈 klaywang24+fearprice@gmail.com）；**原始数值**＝转录自公开源（Cboe / FRED / FINRA / CFTC / Yahoo Finance / CNN）的事实，受各自源条款约束，我们不主张所有权；**Kaggle 与 Hugging Face 上的季度提取物**＝另以 CC BY 4.0 释出（署名即可，含商用）。

@@ -16,7 +16,7 @@
 | **原始数值** | VIX 的收盘价、股价、做空成交量…… | **不是我们的**，是各源发布的事实，各自条款照旧 |
 
 **我们不对任何一个原始数字主张所有权**，也无权授权别人使用它们——需要商用上游数据的，请直接找上游。
-能授权的只有上面第一行：[klaywang24+marketchronicle@gmail.com](mailto:klaywang24+marketchronicle@gmail.com)
+能授权的只有上面第一行：[klaywang24+fearprice@gmail.com](mailto:klaywang24+fearprice@gmail.com)
 
 - ✅ **随便用**：自己看、研究、复算、教学、写文章引用
 - ❌ **不可以**：把这本账的编排与衍生计算用于商业目的（拿它做付费产品、再分发、训练用于商业变现的模型）

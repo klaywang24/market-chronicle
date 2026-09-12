@@ -42,7 +42,7 @@ MULTPL_CAPE = "https://www.multpl.com/shiller-pe/table/by-month"
 # 能授权的只有编排、衍生计算与台账结构；原始数值各归各源。
 NOTICE = ("Compilation, derived metrics and ledger structure © Klay Wang — "
           "PolyForm Noncommercial 1.0.0; commercial use requires a license "
-          "(klaywang24+marketchronicle@gmail.com). "
+          "(klaywang24+fearprice@gmail.com). "
           "Underlying values are facts transcribed from public sources "
           "(Cboe, FRED, FINRA, CFTC, Yahoo Finance, CNN) and remain subject to those "
           "sources' own terms — no ownership is claimed over them. "
