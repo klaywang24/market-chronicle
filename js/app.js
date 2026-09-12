@@ -289,6 +289,9 @@
       const setOpen = (open) => {
         menu.hidden = !open;
         trig.setAttribute("aria-expanded", String(open));
+        // ≤820px 的 .tabs 带 mask-image 渐隐，会把这个 fixed 菜单一起裁掉；开着时摘遮罩（style.css .tabs.menu-open）
+        const tabsEl = document.getElementById("tabs");
+        if (tabsEl) tabsEl.classList.toggle("menu-open", open);
         if (open) place();
       };
       trig.addEventListener("click", (e) => { e.stopPropagation(); setOpen(menu.hidden); });
