@@ -83,6 +83,11 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
 .op-table td { padding: 7px 8px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono',monospace; font-size: 12.5px; }
 .op-table td.zh { font-family: inherit; font-size: 13px; }
 .op-table th.n, .op-table td.n { text-align: right; }
+/* 2026-09-12：宇宙 21→34 后墙表/大单榜在 390px 视口横向溢出（scrollWidth 682），改成框内横滚：
+   表在 wrapper 里按内容取宽、首列吸左，body 永不横滚（RULES 五·html-template 红线）。不折叠——「墙」要横比。 */
+.op-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+.op-scroll .op-table { width: max-content; min-width: 100%; }
+.op-scroll .op-table th:first-child, .op-scroll .op-table td:first-child { position: sticky; left: 0; background: var(--bg); z-index: 1; }
 
 /* 🔴 2026-08-05 修：台账表「表头在左、内容在右」（Klay 截图点名）。
    根因是两条规则对撞 —— 全站约定 `td { text-align: right }`（css/style.css:488，
@@ -223,7 +228,7 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
 <!-- Ⅰ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch1"><span class="chapter-no">第一章</span><h2>今天，谁贴着自己的墙</h2></div>
 <p class="op-note" style="margin-bottom:10px">墙 = 期权持仓最厚的价位：下方的厚 put 是别人付过保费的保护层，上方的厚 call 是别人付过定金的目标价。价格离墙越近，那笔已经付出去的钱越有话语权。圆点 = 现价在两墙之间的位置。</p>
-<table class="op-table" id="op-walls"></table>
+<div class="op-scroll"><table class="op-table" id="op-walls"></table></div>
 <p class="op-fresh" id="fr1"></p>
 
 <!-- Ⅱ ──────────────────────────────── -->
@@ -253,7 +258,7 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
 <!-- Ⅳ ──────────────────────────────── -->
 <div class="chapter-head" id="op-ch4"><span class="chapter-no">第四章</span><h2>大单榜：今天最贵的注</h2></div>
 <p class="op-note" style="margin-bottom:10px">只列我们逐条复核后的 A 级异动，按权利金换手额排序。我们看不见每一笔是谁买谁卖，所以只说换手了多少钱、落在哪个价位、以及一条纯算术的归因。</p>
-<table class="op-table" id="op-board"></table>
+<div class="op-scroll"><table class="op-table" id="op-board"></table></div>
 <p class="op-note" style="margin:18px 0 6px">同一天按标的汇总，call 与 put 各自的权利金换手额：</p>
 <div class="op-chart" id="ch-net"></div>
 <p class="op-fresh" id="fr4"></p>

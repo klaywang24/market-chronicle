@@ -13,3 +13,6 @@ dist/
 data/_digest_archive.log
 data/_digest_archive.std*.log
 .claude/
+
+# 影子读数只进私有管线仓，站仓一个字节不进（09-12 定）——万一放错目录也不上站
+data/_shadow*
