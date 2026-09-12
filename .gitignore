@@ -12,3 +12,4 @@ dist/
 # 定时作业运行日志（本地产物，不进仓）
 data/_digest_archive.log
 data/_digest_archive.std*.log
+.claude/
