@@ -94,10 +94,19 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
    只有末列（对／错／预计 xx）保持右对齐，便于纵向扫读结果。 */
 #op-ledger th, #op-ledger td { text-align: left; }
 #op-ledger th:last-child, #op-ledger td:last-child { text-align: right; }
-.op-ledger-scroll { max-height: 62vh; overflow-y: auto; overscroll-behavior: contain; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
-.op-ledger-scroll #op-ledger th { position: sticky; top: 0; background: var(--bg); z-index: 1; }
-.op-ledger-scroll::-webkit-scrollbar { width: 6px; }
-.op-ledger-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.op-ledger-head, #op-ledger { table-layout: fixed; width: 100%; }
+.op-ledger-head th { border-bottom: 2px solid var(--ink); }
+.op-marquee { height: 62vh; overflow: hidden; position: relative;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%, #000 95%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 5%, #000 95%, transparent); }
+.op-marquee.static { overflow-y: auto; overscroll-behavior: contain; -webkit-mask-image: none; mask-image: none; border-bottom: 1px solid var(--border); }
+.op-marquee.static #op-ledger th { position: sticky; top: 0; background: var(--bg); z-index: 1; }
+.op-track { will-change: transform; animation: op-vscroll var(--op-dur, 90s) linear infinite; }
+.op-marquee.static .op-track { animation: none; }
+.op-track:hover, .op-track.paused, .op-track.expanded { animation-play-state: paused; }
+@keyframes op-vscroll { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+@media (prefers-reduced-motion: reduce) { .op-track { animation: none; } }
+.op-scroll-hint button { font: inherit; font-size: 11.5px; color: var(--ink-soft); background: none; border: 1px solid var(--border); border-radius: 10px; padding: 1px 8px; margin-left: 8px; cursor: pointer; }
 .op-scroll-hint { font-size: 11.5px; color: var(--ink-muted); margin: 0 0 4px; }
 .op-pos { position: relative; height: 8px; min-width: 120px; background: linear-gradient(90deg, color-mix(in srgb, #FF2400 18%, transparent), color-mix(in srgb, #00A86B 18%, transparent)); border-radius: 4px; }
 .op-pos i { position: absolute; top: 50%; transform: translate(-50%,-50%); width: 9px; height: 9px; border-radius: 50%; background: var(--ink); border: 2px solid var(--bg); }
@@ -230,7 +239,12 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
 <div class="op-chips" id="op-lfilter" style="margin:10px 0 12px"></div>
 <!-- 2026-09-12（Klay 令）：台账只会变厚，全表平铺会把页面越拉越长 ⇒ 改成框内滚动：
      待开奖永远排最前、表头吸顶、全部案子仍在 DOM 里（深链 #MM-DD 与行展开照旧），只是页面高度封顶。 -->
-<div class="op-ledger-scroll" id="op-ledger-wrap"><table class="op-table" id="op-ledger"></table></div>
+<!-- 2026-09-12（Klay 令）：台账改成竖向循环滚动播放（机制照个人网站马拉松跑马灯：内容渲染两遍、
+     keyframes 平移到 -50%、hover/点击暂停、reduced-motion 关掉），只是横向改竖向。
+     表头单独一张静态表放在跑马灯外（transform 下 sticky 失效）；两张表 colgroup 同宽对齐。
+     三种情况退回静态可滚动框：深链 #MM-DD 进来 / 行数装得下 / 用户偏好减少动态。 -->
+<table class="op-table op-ledger-head" id="op-ledger-head"></table>
+<div class="op-marquee" id="op-ledger-wrap"><div class="op-track" id="op-track"><table class="op-table" id="op-ledger"></table></div></div>
 <p class="op-scroll-hint" id="op-lhint"></p>
 <p class="op-fresh" id="fr3"></p>
 
@@ -696,21 +710,58 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
        （实测底部长出横滚条、开奖列被推到可视区外），页面也被拉得很长。改成点行展开。
        摘要层按语言取：EN 有 judgment_en 就用它，没有则回退中文（不硬翻、不留空）。 */
     const enJ = c => (L === "en" && c.events[0].judgment_en) ? c.events[0].judgment_en : null;
-    $("op-ledger-wrap").setAttribute("aria-label", tr(`台账 ${rows.length} 案，框内滚动`, `${rows.length} cases, scroll inside`));
-    $("op-ledger-wrap").scrollTop = 0;
-    $("op-lhint").textContent = rows.length > 8
-      ? tr(`共 ${rows.length} 案都在这张表里，待开奖排最前，框内往下滚看更早的`, `All ${rows.length} cases are in this table — open ones first; scroll inside for older ones`)
-      : "";
-    $("op-ledger").innerHTML =
-      `<tr><th>${tr("立案日","Filed")}</th><th>${tr("标的","Name")}</th><th style="width:58%">${tr("判断","Judgment")}</th><th>${tr("状态","Status")}</th></tr>` +
-      rows.map(c => {
-        const f = c.events[0], i = D.ledger.indexOf(c);
-        const en = enJ(c), txt = en || f.judgment, cut = en ? 150 : 60;
-        return `<tr class="op-case" data-i="${i}" id="case-${f.date.slice(5)}">` +
-          `<td>${dot(f.date)}</td><td>${trTicker(c.ticker)}</td>` +
-          `<td${en ? "" : ' class="zh"'}>${txt.length > cut ? txt.slice(0, cut) + "…" : txt}</td>` +
-          `<td>${badge(c)}</td></tr>`;
-      }).join("");
+    const COLS = `<colgroup><col style="width:88px"><col style="width:22%"><col><col style="width:92px"></colgroup>`;
+    const HEAD = `<tr><th>${tr("立案日","Filed")}</th><th>${tr("标的","Name")}</th><th>${tr("判断","Judgment")}</th><th>${tr("状态","Status")}</th></tr>`;
+    $("op-ledger-head").innerHTML = COLS + HEAD;
+    /* 2026-09-12（Klay 令「读者抓不到重点」）：表格里只放**冒号前那句**。台账判断的写法是固定的：
+       冒号前＝结论，冒号后＝证据（「英伟达近端没人加价，钱在远端：三十天 IV …」）。取冒号前半句就是干货，
+       证据整段留在点开的展开面板里。没有冒号才退回按句号切第一句，再退回按长度截。**不生成新句子，只截他自己的。** */
+    const shortJ = (txt, en) => {
+      let t = txt.replace(/（[^（）]*）|\([^()]*\)/g, "").replace(/\s{2,}/g, " ").trim();   // 括号里是证据，剥掉
+      // 找第一个不在「」/“”引号里的冒号（E-0808-01 那条的冒号在引号内，切在那儿就把引文切残了）
+      let depth = 0, cutAt = -1;
+      for (let k = (en ? 30 : 6); k < t.length; k++) {   // 冒号前太短就不是结论（EN「One supply chain:」那种），退回取第一整句
+        const ch = t[k];
+        if (ch === "「" || ch === "“") depth++; else if (ch === "」" || ch === "”") depth = Math.max(0, depth - 1);
+        else if (depth === 0 && (ch === "：" || (ch === ":" && (!en || t[k + 1] === " ")))) { cutAt = k; break; }
+      }
+      if (cutAt > 0) t = t.slice(0, cutAt);
+      t = t.split(en ? /;\s/ : /；/)[0];                                                     // 分号后是第二层，砍
+      t = t.split(en ? /(?<=[.!?])\s/ : /(?<=[。！？])/)[0].replace(/[，,、；;]$/, "");
+      const cut = en ? 150 : 70;
+      return t.length > cut ? t.slice(0, cut) + "…" : t;
+    };
+    const rowHTML = (c, dupe) => {
+      const f = c.events[0], i = D.ledger.indexOf(c);
+      const en = enJ(c), txt = shortJ(en || f.judgment, !!en);
+      return `<tr class="op-case" data-i="${i}"${dupe ? ' aria-hidden="true"' : ` id="case-${f.date.slice(5)}"`}>` +
+        `<td>${dot(f.date)}</td><td>${trTicker(c.ticker)}</td>` +
+        `<td${en ? "" : ' class="zh"'}>${txt}</td>` +
+        `<td>${badge(c)}</td></tr>`;
+    };
+    const wrap = $("op-ledger-wrap"), track = $("op-track"), tbl = $("op-ledger");
+    const deepLinked = /^#\d{2}-\d{2}$/.test(location.hash);
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // 先按静态渲一遍量高度：装得下就不滚
+    tbl.innerHTML = COLS + rows.map(c => rowHTML(c, false)).join("");
+    wrap.classList.add("static"); track.classList.remove("paused", "expanded");
+    const fits = tbl.scrollHeight <= wrap.clientHeight + 1;
+    const marquee = !deepLinked && !reduced && !fits;
+    if (marquee) {
+      wrap.classList.remove("static");
+      tbl.innerHTML = COLS + rows.map(c => rowHTML(c, false)).join("") + rows.map(c => rowHTML(c, true)).join("");
+      track.style.setProperty("--op-dur", Math.max(30, rows.length * 2.6) + "s");
+    }
+    wrap.scrollTop = 0;
+    $("op-lhint").innerHTML = marquee
+      ? tr(`共 ${rows.length} 案循环滚动播放 · 待开奖排最前 · 悬停或点击暂停`, `${rows.length} cases on a loop — open ones first; hover or tap to pause`) +
+        `<button id="op-pause">${tr("⏸ 暂停","⏸ Pause")}</button>`
+      : (rows.length > 8 ? tr(`共 ${rows.length} 案都在这张表里，待开奖排最前，框内往下滚看更早的`, `All ${rows.length} cases are in this table — open ones first; scroll inside for older ones`) : "");
+    const pb = $("op-pause");
+    if (pb) pb.addEventListener("click", () => {
+      const on = track.classList.toggle("paused");
+      pb.textContent = on ? tr("▶ 继续","▶ Resume") : tr("⏸ 暂停","⏸ Pause");
+    });
   }
   $("op-lfilter").innerHTML = [["all", tr("全部","All")], ["待开奖", tr("待开奖","Open")], ["已开奖", tr("已开奖","Settled")]]
     .map(([v, n]) => `<button class="op-chip${v === "all" ? " on" : ""}" data-f="${v}">${n}</button>`).join("");
@@ -731,8 +782,9 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
   $("op-ledger").addEventListener("click", e => {
     const row = e.target.closest(".op-case"); if (!row) return;
     const nxt = row.nextElementSibling;
-    if (nxt && nxt.classList.contains("op-detail")) { nxt.remove(); return; }
+    if (nxt && nxt.classList.contains("op-detail")) { nxt.remove(); $("op-track").classList.remove("expanded"); return; }
     document.querySelectorAll(".op-detail").forEach(x => x.remove());
+    $("op-track").classList.add("expanded");   // 展开期间停住跑马灯（两半高度也不再相等，动着会跳）
     const c = D.ledger[+row.dataset.i], f = c.events[0];
     const outEn = (L === "en" && c.outcome_en) ? c.outcome_en : null;
     const out = outEn || c.outcome;
