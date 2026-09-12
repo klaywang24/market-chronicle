@@ -10,6 +10,8 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21783004.svg)](https://doi.org/10.5281/zenodo.21783004)
 [![License](https://img.shields.io/badge/license-PolyForm--Noncommercial--1.0.0-4a5d3a)](LICENSE)
 [![Live](https://img.shields.io/badge/live-chronicle.klay--wang.com-a0392f)](https://chronicle.klay-wang.com/)
+
+> **Attribution.** The chapter-style catalog is inspired by [historyofmarket.com](https://historyofmarket.com/); the static-JSON architecture by [Big Picture](https://laoqianritan-create.github.io/us-market/); the LEAPS-window concept by [feargreedindex.vercel.app](https://feargreedindex.vercel.app/); the machine-readable layer (`llms.txt` / `openapi.json` / `api-catalog`) by [dollarliquidity.com](https://dollarliquidity.com/). Underlying market values belong to their publishers (Cboe, FRED, FINRA, CFTC, CNN, Yahoo Finance) — see [`data/README.md`](data/README.md#许可--license).
 [![中文](https://img.shields.io/badge/%E4%B8%AD%E6%96%87-README-2b5f8f)](README.zh.md)
 
 **Live: <https://chronicle.klay-wang.com/>**
@@ -80,7 +82,10 @@ python3 -m http.server 8137           # open http://localhost:8137
 
 ## Credits
 
-Static-JSON architecture inspired by [Big Picture](https://laoqianritan-create.github.io/us-market/).
+- Chapter-style catalog inspired by [historyofmarket.com](https://historyofmarket.com/).
+- Static-JSON architecture inspired by [Big Picture](https://laoqianritan-create.github.io/us-market/).
+- LEAPS window concept via [feargreedindex.vercel.app](https://feargreedindex.vercel.app/).
+- Machine-readable layer (`llms.txt` / `openapi.json` / `.well-known/api-catalog`) follows the pattern published by [dollarliquidity.com](https://dollarliquidity.com/).
 
 ## Disclaimer
 
