@@ -464,6 +464,30 @@ def pick_index_quotes(idx_px, idx_spec, prev_q):
     return quotes, missing
 
 
+PULSE_MIN_COVER = 400   # 与上面 200 日广度的 cover>=400 同一条尺子：成分股当日样本不足即视为「没取到」
+
+
+def pulse_breadth_gate(tot, prev, min_cover=PULSE_MIN_COVER):
+    """涨跌家数写盘前的覆盖率闸（2026-09-12 建）。
+    返回 (ok, fields_to_reuse)：ok=True 照写；ok=False ⇒ 沿用 prev（上一份 pulse.json）里的
+    涨跌分布/温度/板块字段，并在 stale 里标明它们来自哪一天。
+    🔴 起因：2026-09-11 19:58 ET 那班 yfinance 只回 1 只成分股，1/0/0 照样写盘，
+       把同日 18:05 那班算对的 335/2/166（503 只）覆盖成「1 涨 0 平 0 跌 · 100% 百分位」，
+       首页就这么顶着一夜。同一个函数里 200 日广度早有 cover>=400 的闸，涨跌家数这一段没有。
+    🔑 判据落在样本数上，不落在「和昨天差多少」上——差多少是市场的事，样本够不够是我们的事。
+    prev 为 None（首次跑）时无旧可留 ⇒ 仍拒绝写垃圾：返回 (False, {})，调用方按缺席处理。"""
+    if tot >= min_cover:
+        return True, {}
+    keep = {}
+    if prev:
+        for k in ("adv", "flat", "dec", "total", "adv_ratio", "sent_pct", "temp", "sectors", "val_pct"):
+            if k in prev:
+                keep[k] = prev[k]
+        keep["stale"] = {"breadth_from": prev.get("date"),
+                         "why": f"本轮成分股当日样本 {tot} < {min_cover}，涨跌分布/温度/板块沿用上一份"}
+    return False, keep
+
+
 def build_pulse():
     """今日头版：市场温度（估值百分位+情绪百分位）/2、涨跌家数分布、板块当日涨跌。
     情绪 = 上涨家数占比 (涨 + 平/2)/总数 在近一年中的百分位；
@@ -593,16 +617,38 @@ def build_pulse():
         heat.append([t.replace("-", "."), sec_of.get(t, "Other"),
                      round(float(c) * 100, 2), round(mc / 1e9, 1)])
         time.sleep(0.15)
-    write_json("pulse_heatmap.json", {"date": today.strftime("%Y-%m-%d"), "rows": heat})
+    prev_pulse = None
+    try:
+        prev_pulse = json.loads((DATA / "pulse.json").read_text())
+    except Exception:
+        pass
+    gate_ok, reuse = pulse_breadth_gate(tot, prev_pulse)
+    if len(heat) >= PULSE_MIN_COVER:
+        write_json("pulse_heatmap.json", {"date": today.strftime("%Y-%m-%d"), "rows": heat})
+    else:
+        print(f"  🔴 热力图只有 {len(heat)} 只（<{PULSE_MIN_COVER}）⇒ 留旧文件不写")
 
-    write_json("pulse.json", {
+    out = {
         "date": today.strftime("%Y-%m-%d"),
         "temp": temp, "val_pct": val_pct, "sent_pct": sent_pct,
         "adv": adv, "flat": fl, "dec": dec, "total": tot,
         "adv_ratio": round(float(ratio.iloc[-1]) * 100, 1),
         "sectors": sectors, "quotes": quotes, "fng": fng, "k": k,
         "sent_window": f"{ratio.index[0].strftime('%Y-%m')}→",
-    })
+    }
+    if not gate_ok:
+        if reuse:
+            print(f"  🔴 成分股当日样本 {tot} < {PULSE_MIN_COVER} ⇒ 涨跌分布/温度/板块沿用 "
+                  f"{reuse['stale']['breadth_from']} 那份，指数行情照常更新")
+            out.update(reuse)
+        else:
+            print(f"  🔴 成分股当日样本 {tot} < {PULSE_MIN_COVER} 且无旧 pulse.json 可留 ⇒ 本轮不写 pulse.json")
+            return
+    elif not sectors and prev_pulse and prev_pulse.get("sectors"):
+        print("  🔴 板块 ETF 当日全空 ⇒ sectors 沿用上一份")
+        out["sectors"] = prev_pulse["sectors"]
+        out["stale"] = {"sectors_from": prev_pulse.get("date")}
+    write_json("pulse.json", out)
 
 
 # ---------------------------------------------------------------- 宏观（FRED）
