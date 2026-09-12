@@ -100,6 +100,7 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
 .op-badge.wait { color: var(--gold); border: 1px solid var(--gold); }
 .op-badge.done { color: #00A86B; border: 1px solid #00A86B; }
 .op-badge.wrong { color: var(--accent); border: 1px solid var(--accent); }
+.op-badge.muted { color: var(--ink-muted); border: 1px solid var(--ink-muted); }
 .op-case { cursor: pointer; }
 .op-case.hl td { background: color-mix(in srgb, var(--gold) 12%, transparent); }
 .op-detail td { background: color-mix(in srgb, var(--border) 30%, transparent); font-family: inherit; font-size: 12.5px; color: var(--ink-soft); line-height: 1.7; }
@@ -657,7 +658,10 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
   /* ── Ⅲ 开奖台账（行展开 + 深链 #MM-DD 高亮）── */
   const isWrong = c => /错/.test(c.outcome);
   const trTicker = t => L === "en" ? String(t || "").replace(/^(.*?)等(\d+)只$/, "$2 names incl. $1").replace(/^(\d+)只$/, "$1 names") : t;
+  // 2026-09-12：状态多了两种终态 —— 已撤案 / 勘误（此前生成器只发 待开奖/已开奖，撤案与勘误被显示成「待开奖」）
   const badge = c => c.status === "待开奖" ? `<span class="op-badge wait">${tr("待开奖","Open")}</span>` :
+    c.status === "已撤案" ? `<span class="op-badge muted">${tr("已撤案","Withdrawn")}</span>` :
+    c.status === "勘误" ? `<span class="op-badge muted">${tr("勘误","Erratum")}</span>` :
     isWrong(c) ? `<span class="op-badge wrong">${tr("已开奖","Settled")}</span>` : `<span class="op-badge done">${tr("已开奖","Settled")}</span>`;
 
   // 记分牌：历史感（累计数字只会涨）+ 时效性（数据日动静 + 下一个开奖）
