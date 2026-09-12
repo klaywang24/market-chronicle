@@ -210,7 +210,7 @@ def main():
         headers={
             "Content-Type": "application/json",
             # Discord/Cloudflare 会 403 掉默认的 python-urllib UA，需带正常 UA
-            "User-Agent": "MarketChronicle-Bot/1.0 (+https://chronicle.klay-wang.com/)",
+            "User-Agent": "FearPrice-Bot/1.0 (+https://chronicle.klay-wang.com/)",
         }, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=20) as r:
