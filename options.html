@@ -96,6 +96,8 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
 #op-ledger th:last-child, #op-ledger td:last-child { text-align: right; }
 .op-ledger-head, #op-ledger { table-layout: fixed; width: 100%; }
 .op-ledger-head th { border-bottom: 2px solid var(--ink); }
+#op-ledger td.tk { overflow-wrap: anywhere; word-break: break-word; white-space: normal; line-height: 1.35; }
+#op-ledger td, .op-ledger-head th { overflow: hidden; }
 .op-marquee { height: 62vh; overflow: hidden; position: relative;
   -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%, #000 95%, transparent);
   mask-image: linear-gradient(180deg, transparent, #000 5%, #000 95%, transparent); }
@@ -710,7 +712,7 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
        （实测底部长出横滚条、开奖列被推到可视区外），页面也被拉得很长。改成点行展开。
        摘要层按语言取：EN 有 judgment_en 就用它，没有则回退中文（不硬翻、不留空）。 */
     const enJ = c => (L === "en" && c.events[0].judgment_en) ? c.events[0].judgment_en : null;
-    const COLS = `<colgroup><col style="width:88px"><col style="width:22%"><col><col style="width:92px"></colgroup>`;
+    const COLS = `<colgroup><col style="width:88px"><col style="width:26%"><col><col style="width:92px"></colgroup>`;
     const HEAD = `<tr><th>${tr("立案日","Filed")}</th><th>${tr("标的","Name")}</th><th>${tr("判断","Judgment")}</th><th>${tr("状态","Status")}</th></tr>`;
     $("op-ledger-head").innerHTML = COLS + HEAD;
     /* 2026-09-12（Klay 令「读者抓不到重点」）：表格里只放**冒号前那句**。台账判断的写法是固定的：
@@ -735,7 +737,7 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
       const f = c.events[0], i = D.ledger.indexOf(c);
       const en = enJ(c), txt = shortJ(en || f.judgment, !!en);
       return `<tr class="op-case" data-i="${i}"${dupe ? ' aria-hidden="true"' : ` id="case-${f.date.slice(5)}"`}>` +
-        `<td>${dot(f.date)}</td><td>${trTicker(c.ticker)}</td>` +
+        `<td>${dot(f.date)}</td><td class="tk">${trTicker(c.ticker).replace(/,/g, ",<wbr>")}</td>` +
         `<td${en ? "" : ' class="zh"'}>${txt}</td>` +
         `<td>${badge(c)}</td></tr>`;
     };
