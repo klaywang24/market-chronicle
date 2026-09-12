@@ -1,7 +1,7 @@
 {
-  "name": "美股编年史 Market Chronicle",
-  "short_name": "编年史",
-  "description": "每个交易日自动更新的美股百年图表档案 · A century of U.S. market history, updated every trading day",
+  "name": "恐惧的标价 Fear-Price",
+  "short_name": "恐惧的标价",
+  "description": "每个交易日自动更新的美股恐惧定价档案 · U.S. equity fear-pricing ledger, updated every trading day",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

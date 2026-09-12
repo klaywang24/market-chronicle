@@ -160,7 +160,8 @@ def _rebrand(text):
     for a, b in _BRAND_LINES:
         text = text.replace(a, b)
     # 「Market Chronicle</b>： an honest record…」这类中间夹着标签/空格再接冒号的样板句
-    text = re.sub(r"Market Chronicle(?=(\s|<[^>]+>|\*)*[：:—–-])", "Fear-Price", text)   # 冒号或破折号引出的署名句
+    # 只在同一行内找标点（[ \t] 不含换行），且不把「-」算破折号：否则下一行的 markdown 分割线 --- 也会命中
+    text = re.sub(r"Market Chronicle(?=([ \t]|<[^>]+>|\*)*[：:—–])", "Fear-Price", text)   # 冒号或破折号引出的署名句
     return text
 
 
