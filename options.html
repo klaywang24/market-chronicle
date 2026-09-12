@@ -444,9 +444,16 @@ html:not([lang^="zh"]) .op-nav a.tab { padding: 6px 10px; }
     return;
   }
 
+  // 2026-09-12：宇宙变更要在页首留痕（分母换尺子时，读者与模型都得知道两个「N 只」不是同一把尺）。
+  // 历史来自 meta.universe_history（管线 build_options_page 写入）；只在有过变更时追加一句。
+  // 只认 since ≤ 数据日 的条目：变更日之前的页面不能提前宣称新分母。
+  const _uh = (D.meta.universe_history || []).filter(u => u.since <= D.meta.data_date).sort((a, b) => a.since < b.since ? -1 : 1);
+  const _last = _uh.length > 1 ? _uh[_uh.length - 1] : null, _prev = _uh.length > 1 ? _uh[_uh.length - 2] : null;
+  const _uhZh = _last ? " · " + dot(_last.since) + " 起覆盖 " + _last.n + " 只，此前 " + _prev.n + " 只" : "";
+  const _uhEn = _last ? " · " + _last.n + " names since " + dot(_last.since) + ", " + _prev.n + " before" : "";
   $("op-updated").textContent = tr(
-    "数据日 " + dot(D.meta.data_date) + " · 台账自 " + dot(D.meta.ledger_since) + " 起 " + D.ledger.length + " 案 · 覆盖 " + D.meta.n_tickers + " 只标的",
-    "Data date " + dot(D.meta.data_date) + " · ledger since " + dot(D.meta.ledger_since) + ", " + D.ledger.length + " cases · " + D.meta.n_tickers + " names");
+    "数据日 " + dot(D.meta.data_date) + " · 台账自 " + dot(D.meta.ledger_since) + " 起 " + D.ledger.length + " 案 · 覆盖 " + D.meta.n_tickers + " 只标的" + _uhZh,
+    "Data date " + dot(D.meta.data_date) + " · ledger since " + dot(D.meta.ledger_since) + ", " + D.ledger.length + " cases · " + D.meta.n_tickers + " names" + _uhEn);
   $("op-loading").style.display = "none";
   $("op-main").style.display = "";
 
