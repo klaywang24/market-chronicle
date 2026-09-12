@@ -205,7 +205,7 @@
   </div>
 
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>贵贱的历史</h2></div>
+    <div class="chapter-head"><span class="chapter-no">第二章</span><h2>三年里怎么走的</h2></div>
     <p class="chapter-q">拉长看，这个成本刻度是怎么走的？</p>
     <div class="card">
       <h3>恐惧的标价指数 · VIX1Y 三年滚动百分位（2007 年至今）</h3>
@@ -222,8 +222,8 @@
 
   <!-- ===== 恐惧的分解（2026-07-17 自头版搬入；与上方 4 context 去重后剩四卡，JS 填充 #leaps-decomp） ===== -->
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>恐惧的分解</h2></div>
-    <p class="chapter-q">怕，是能拆开读的：有多少人在买保护、纳指比大盘多付多少保费、多少只股票还站在自己的长期均线上、恐贪指数的七个零件各指向哪。</p>
+    <div class="chapter-head"><span class="chapter-no">第三章</span><h2>保护费拆成四块</h2></div>
+    <p class="chapter-q">买保护的钱，是能拆开读的：有多少人在买保护、纳指比大盘多付多少保费、多少只股票还站在自己的长期均线上、恐贪指数的七个零件各指向哪。</p>
     <div id="leaps-decomp"></div>
     <div class="card">
       <h3>谁在押注恐惧 · 杠杆基金在 VIX 期货的净头寸</h3>
@@ -235,7 +235,7 @@
   <!-- ===== 个股与板块（2026-07-18 新增；30 天口径，与上方 1 年口径不是一把尺，故用分隔带隔开） ===== -->
   <div class="lg-divider"><span>个股与板块</span><em>以下为 30 天口径，与上方 1 年口径不是同一把尺</em></div>
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">个股 · 30 天</span><h2>个股的怕，与大盘的怕</h2></div>
+    <div class="chapter-head"><span class="chapter-no">个股 · 30 天</span><h2>个股比大盘贵多少</h2></div>
     <p class="chapter-q">大盘看着平静的时候，单只股票被标价成什么样？</p>
     <div id="vf-hero"></div>
     <div class="card">
@@ -255,7 +255,7 @@
   <div class="lg-divider"><span>做空的两本账</span><em>做空有两本账：持仓（多少股票正被做空）和成交（每天有多少做空在换手）。这一节反复证明一件事：换个数法，画面可能相反，所以只把它们并排摊开，不替你下结论。</em></div>
 
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">口径实验室</span><h2>换把尺，结论就翻了</h2></div>
+    <div class="chapter-head"><span class="chapter-no">口径实验室</span><h2>换个算法就翻了</h2></div>
     <p class="chapter-q">下面这条线是 11 只大盘科技股的做空持仓，在各自历史里的平均位置。数据一个字没变，只换了衡量方式：一种数绝对股数，一种除以日均成交量。请按这个开关。</p>
     <div class="seg" id="seg-breadth">
       <button type="button" data-k="si" aria-selected="true">按持仓股数</button>
@@ -280,7 +280,7 @@
   </div>
 
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">当前横截面</span><h2>此刻，谁的空头最拥挤</h2></div>
+    <div class="chapter-head"><span class="chapter-no">当前横截面</span><h2>谁的空头最挤</h2></div>
     <p class="chapter-q">用补仓天数（持仓 ÷ 日均成交量）在自身近两年中的位置。它回答的是相对于这只票自己的流动性、空头有多挤，而不是谁被做空的股数多（大票天然多）。持仓高 ≠ 有人看空：做市商对冲、ETF 申赎套利、可转债与并购套利都会留下空头持仓。</p>
     <div class="seg" id="seg-cross">
       <button type="button" data-k="dtc" aria-selected="true">补仓天数分位</button>
@@ -296,7 +296,7 @@
   </div>
 
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">单票下钻</span><h2>一只票的两条命</h2></div>
+    <div class="chapter-head"><span class="chapter-no">单票下钻</span><h2>持仓和补仓天数</h2></div>
     <p class="chapter-q">上面是横截面，这里是纵切面。选一只票，看它的持仓（柱）与补仓天数（线）在最近 48 个结算期里怎么走。两者常常不同向：这正是「股数」与「拥挤度」不是一回事的直接证据。</p>
     <div class="tk-picker" id="tk-picker"></div>
     <div class="card">
@@ -308,7 +308,7 @@
   </div>
 
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">一个被数据否掉的提案</span><h2>「流量与存量背离」，是零</h2></div>
+    <div class="chapter-head"><span class="chapter-no">一个被数据否掉的提案</span><h2>被否掉的提案</h2></div>
     <p class="chapter-q">原本的设想是：某天做空成交占比冲高、但持仓没增，就说明那是对冲或套利而非建仓。听起来很顺：实测不成立。537 个结算窗口，横轴是流量，纵轴是持仓变化。按开关换配对方式。</p>
     <div class="seg" id="seg-scatter">
       <button type="button" data-k="lvl" aria-selected="true">流量水平 vs 持仓变化（原提案）</button>
@@ -330,7 +330,7 @@
   </div>
 
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">显著性</span><h2>四只显著，但校正后一只不剩</h2></div>
+    <div class="chapter-head"><span class="chapter-no">显著性</span><h2>校正后一只不剩</h2></div>
     <p class="chapter-q">把「流量变化 vs 持仓变化」逐票拆开，每只做 4,000 次置换检验。11 只里有 4 只 p&lt;0.05（纯随机的期望是 0.55 只）：说明确实有东西。但做多重比较校正（Bonferroni，阈值 p&lt;0.0045）之后，一只都不存活。</p>
     <div class="card">
       <h3>逐票相关系数与置换检验</h3>
@@ -341,9 +341,9 @@
   </div>
 
   <!-- ===== 历史参照：恐惧极值之后（描述性记录，非建议） ===== -->
-  <div class="lg-divider"><span>历史参照 · 恐惧极值之后</span><em>以下为描述性历史记录，不是买卖建议</em></div>
+  <div class="lg-divider"><span>历史参照 · 极端读数之后</span><em>以下为描述性历史记录，不是买卖建议</em></div>
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">历史参照</span><h2>恐惧极值之后</h2></div>
+    <div class="chapter-head"><span class="chapter-no">历史参照</span><h2>极端读数之后</h2></div>
     <p class="chapter-q">历史上每次极端恐惧（CNN 恐贪 &lt; 25）之后，市场怎么走了？以下是一份诚实的历史记录：陈列之后发生了什么，含赢的和输的，供你参照，不构成买卖建议。</p>
     <div class="k-status" id="leaps-status"></div>
     <div class="card">
@@ -355,7 +355,7 @@
   </div>
 
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">历史参照 · 逐次对账</span><h2>每次极值之后的走势</h2></div>
+    <div class="chapter-head"><span class="chapter-no">历史参照 · 逐次对账</span><h2>逐次对账</h2></div>
     <p class="chapter-q">2011 年以来每次极端恐惧，6 / 12 / 18 个月后指数在哪里？</p>
     <div class="card">
       <h3>恐贪 &lt; 25 · 逐次历史对账</h3>
@@ -376,7 +376,7 @@
   </div>
 
   <div class="chapter">
-    <div class="chapter-head"><span class="chapter-no">历史参照 · 保费</span><h2>保费与之后的走势</h2></div>
+    <div class="chapter-head"><span class="chapter-no">历史参照 · 保费</span><h2>当天保费和一年后</h2></div>
     <p class="chapter-q">当日恐慌保费越贵，之后的走势就越大吗？（描述性观察，非规律承诺）</p>
     <div class="card">
       <h3>极值当日的 VIX × 12 个月后的纳指</h3>
@@ -452,7 +452,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260906a"></script>
+<script src="js/i18n.js?v=20260912a"></script>
 <script src="js/app.js?v=20260901b"></script>
 <script src="js/docs-i18n.js?v=20260819a"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
