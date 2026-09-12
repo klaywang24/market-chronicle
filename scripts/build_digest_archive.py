@@ -707,12 +707,45 @@ EN_TITLE_PATS = (
     r"English edition[^\n]*title[^\n]*\n+(?:```[a-z]*[^\S\n]*\n)?([^\n`][^\n]*)\n",
 )
 
-def en_title_of(en_body, cn_title):
+_EN_LABELS = {"title", "subtitle", "title:", "subtitle:"}   # 09-09 起稿子里的标签行，不是标题
+
+def en_title_of(en_body, cn_title, folder_date=None):
+    # 🔴 2026-09-12 修：09-09 起稿子的英文标题段写成「Title（标签行）→ 空行 → ```真标题```」，
+    #    末条正则把标签行「Title」当成标题，09-09/09-10/09-11 三页英文版顶着 <title>Title · …</title>
+    #    上了站，Google 已收录「Title · …」。修法：标签行一律跳过；跳过后取不到 ⇒ 退回发布台账
+    #    substack_en 的实发标题（标题一律取实发）；台账也没有才退回中文标题并标 en_explicit=False。
     for pat in EN_TITLE_PATS:
         m = re.search(pat, en_body, re.M | re.S)
         if m and m.group(1).strip():
-            return m.group(1).strip(), True
+            t = m.group(1).strip()
+            if t.lower() in _EN_LABELS:
+                # 标签行之后继续找：跳过空行/标签/围栏，取第一行真文本
+                rest = en_body[m.end():].split("\n")
+                for ln in rest:
+                    x = ln.strip()
+                    if not x or x.lower() in _EN_LABELS or x.startswith("```"):
+                        continue
+                    return x, True
+                continue
+            return t, True
+    led = ledger_en(folder_date) if folder_date else None
+    if led:
+        return led, True
     return cn_title, False
+
+
+def ledger_en(folder_date):
+    """发布台账里该数据日 substack_en 的实发标题（同 ledger_daily 的「数据日MMDD」标签口径）。"""
+    import csv as _csv
+    try:
+        rows = list(_csv.DictReader(open(LEDGER, encoding="utf-8")))
+    except FileNotFoundError:
+        return None
+    tag = "数据日" + folder_date[5:7] + folder_date[8:10]
+    for r in rows:
+        if r.get("platform") == "substack_en" and tag in (r.get("content_type") or "") and (r.get("title") or "").strip():
+            return r["title"].strip()
+    return None
 
 # ── 英文页配图（2026-08-24 Klay 令：英文版不能只有文字）
 # 判据不是我发明的，照抄 `01-每日 digest/tools/to_substack.py:196` 那条既有规则：
@@ -881,7 +914,7 @@ def main():
 
         # 中英各出一页：一页只有一种语言，右上角切换是**跳转**，不是同页拼接。
         cn_body, en_body = split_cn_en(body)
-        en_title, en_explicit = en_title_of(raw, title)     # 标题去 raw 里找：08-14 的英文标题写在正文起点之前
+        en_title, en_explicit = en_title_of(raw, title, date)  # 标题去 raw 里找：08-14 的英文标题写在正文起点之前；标签行跳过、台账兜底（09-12）
         has_en = bool(en_body.strip())
         variants = [("cn", slug, cn_body, title)]
         if has_en:
