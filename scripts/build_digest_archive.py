@@ -143,7 +143,28 @@ def to_webp(src, dst):
     return dst
 
 # ── 正文：只做「换图 + markdown→html」，一个字不改（旧文不回改）
+# 站名归一（2026-09-12）：旧稿正文里的署名样板句带的是当时的站名；归档页按当前站名渲染，
+# 只换样板句，稿件源文件与叙述句（如「这是《…》盘前简报的第 N 期」）一字不动。
+_BRAND_LINES = [
+    ("恐惧的标价指数 · Market Chronicle", "恐惧的标价指数 · Fear-Price"),
+    ("Fear-Price Index · Market Chronicle", "Fear-Price Index · chronicle.klay-wang.com"),
+    ("Fear-Price Index, Market Chronicle", "Fear-Price Index, chronicle.klay-wang.com"),
+    ("Fear-Price Index by Market Chronicle", "Fear-Price Index (chronicle.klay-wang.com)"),
+    ("美股编年史 Market Chronicle", "恐惧的标价 Fear-Price"),
+    ("美股编年史 · Market Chronicle", "恐惧的标价 · Fear-Price"),
+    ("Market Chronicle · 美股编年史", "Fear-Price · 恐惧的标价"),
+    ("Market Chronicle ：", "Fear-Price ："),
+]
+def _rebrand(text):
+    for a, b in _BRAND_LINES:
+        text = text.replace(a, b)
+    # 「Market Chronicle</b>： an honest record…」这类中间夹着标签/空格再接冒号的样板句
+    text = re.sub(r"Market Chronicle(?=(\s|<[^>]+>|\*)*[：:—–-])", "Fear-Price", text)   # 冒号或破折号引出的署名句
+    return text
+
+
 def build_body(md, date_str, slug, log):
+    md = _rebrand(md)
     dirs = search_dirs(date_str)                       # 精确匹配用：跨目录
     fallback, _ = ordered_cards(infer_dir(date_str))   # 顺序推断用：锁单目录
     n = [0]
@@ -209,16 +230,16 @@ HEAD = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{title} · 美股编年史 Market Chronicle</title>
+<title>{title} · 恐惧的标价 Fear-Price</title>
 <link rel="canonical" href="{site}/digest/{slug}">
 <meta name="description" content="{desc}">
 <meta property="og:type" content="article">
-<meta property="og:title" content="{title} · 美股编年史">
+<meta property="og:title" content="{title} · 恐惧的标价">
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="{site}/digest/{slug}">
 <meta property="article:published_time" content="{date}">
 <link rel="stylesheet" href="../css/style.css">
-<link rel="alternate" type="application/rss+xml" title="美股编年史 · 判读档案" href="{site}/feed.xml">
+<link rel="alternate" type="application/rss+xml" title="恐惧的标价 · 判读档案" href="{site}/feed.xml">
 {alt}
 <script>{themejs}</script>
 <style>{ctlcss}</style>
@@ -297,14 +318,14 @@ IDX_HEAD = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{h1} · 美股编年史 Market Chronicle</title>
+<title>{h1} · 恐惧的标价 Fear-Price</title>
 <link rel="canonical" href="{site}/digest/{canon}">
 <meta name="description" content="{desc}">
 <meta property="og:type" content="website">
-<meta property="og:title" content="{h1} · 美股编年史">
+<meta property="og:title" content="{h1} · 恐惧的标价">
 <meta property="og:url" content="{site}/digest/{canon}">
 <link rel="stylesheet" href="../css/style.css">
-<link rel="alternate" type="application/rss+xml" title="美股编年史 · 判读档案" href="{site}/feed.xml">
+<link rel="alternate" type="application/rss+xml" title="恐惧的标价 · 判读档案" href="{site}/feed.xml">
 <link rel="alternate" hreflang="{otherlang}" href="{site}/digest/{othercanon}">
 <script>{themejs}</script>
 <style>{ctlcss}
@@ -363,9 +384,9 @@ def write_index(done, kind="cn"):
             othercanon="index.en" if cn else "",
             otherlang="en" if cn else "zh-CN",
             h1="判读档案" if cn else "The Archive",
-            desc=("美股编年史每日判读的往期归档，逐日累积。当日判读只进订户邮箱，往期公开可查。"
+            desc=("恐惧的标价每日判读的往期归档，逐日累积。当日判读只进订户邮箱，往期公开可查。"
                   if cn else
-                  "Archived issues of Market Chronicle's daily reading. The current issue goes to "
+                  "Archived issues of Fear-Price's daily reading. The current issue goes to "
                   "subscribers only; past issues are public."),
             lede=("每个交易日盘前一封，只做一件事：把当天的市场状态用可验证的数字讲清楚。"
                   "贵不贵、怕不怕、极端不极端。不预测方向，不做择时。"
@@ -408,7 +429,7 @@ def write_feed(done):
     feed = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-  <title>美股编年史 · 判读档案</title>
+  <title>恐惧的标价 · 判读档案</title>
   <link>{SITE}/digest/</link>
   <atom:link href="{SITE}/feed.xml" rel="self" type="application/rss+xml"/>
   <description>每个交易日盘前一封，用可验证的数字讲清当天的市场状态。往期归档。</description>
@@ -886,10 +907,10 @@ def main():
                               if kind == "cn" else
                               "This is an archived issue. The full daily reading goes to subscribers "
                               f'before the open: <a href="{SITE}/subscribe">subscribe</a>.'),
-                    foottext=("美股编年史 Market Chronicle · 本文为历史归档，数字与判断均为当日口径，事后不回改。<br>"
+                    foottext=("恐惧的标价 Fear-Price · 本文为历史归档，数字与判断均为当日口径，事后不回改。<br>"
                               "本站不提供投资建议，不预测方向，不做择时。"
                               if kind == "cn" else
-                              "Market Chronicle · Archived issue. Figures and judgments are as of that day "
+                              "Fear-Price · Archived issue. Figures and judgments are as of that day "
                               "and are never revised after the fact.<br>"
                               "No investment advice. No direction calls. No market timing.")))
             imgs = [r for r in log if r[0] in ("精", "推")]

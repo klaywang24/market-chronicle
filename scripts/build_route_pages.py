@@ -91,29 +91,29 @@ ROUTES = {
     ),
     "pricing": (
         "定价与订阅",
-        "美股编年史订阅方案：读数与台账永久免费公开，付费订阅每日 digest 解读。"
-        "月付与年付价格、创始价与退款政策入口都在这一页。Market Chronicle pricing and subscription.",
+        "恐惧的标价订阅方案：读数与台账永久免费公开，付费订阅每日 digest 解读。"
+        "月付与年付价格、创始价与退款政策入口都在这一页。Fear-Price pricing and subscription.",
     ),
     "about": (
-        "关于美股编年史",
-        "美股编年史是什么、为谁而做、指标为什么全部公开对账：站点定位与作者介绍。"
-        "About Market Chronicle and its author.",
+        "关于恐惧的标价",
+        "恐惧的标价是什么、为谁而做、指标为什么全部公开对账：站点定位与作者介绍。"
+        "About Fear-Price and its author.",
     ),
     "contact": (
         "联系我",
-        "联系美股编年史作者：邮箱与社交账号入口。Contact Market Chronicle.",
+        "联系恐惧的标价作者：邮箱与社交账号入口。Contact Fear-Price.",
     ),
     "privacy": (
         "隐私政策",
-        "美股编年史隐私政策：收集什么、不收集什么、数据如何使用。Market Chronicle privacy policy.",
+        "恐惧的标价隐私政策：收集什么、不收集什么、数据如何使用。Fear-Price privacy policy.",
     ),
     "terms": (
         "服务条款",
-        "美股编年史服务条款：内容授权、订阅规则与免责声明。Market Chronicle terms of service.",
+        "恐惧的标价服务条款：内容授权、订阅规则与免责声明。Fear-Price terms of service.",
     ),
     "refunds": (
         "退款政策",
-        "美股编年史付费订阅的退款政策与申请方式。Market Chronicle refund policy.",
+        "恐惧的标价付费订阅的退款政策与申请方式。Fear-Price refund policy.",
     ),
 }
 
@@ -153,16 +153,16 @@ def write_sitemap(root=ROOT):
 
 def patch(html: str, route: str, title: str, desc: str) -> str:
     """替换头部六处身份标记；任何一处找不到或不唯一都直接炸，绝不静默产出错页。"""
-    full_title = f"{title} · 美股编年史 Market Chronicle"
+    full_title = f"{title} · 恐惧的标价 Fear-Price"
     subs = [
         # (旧串, 新串) —— 旧串必须与 index.html 逐字一致且全文唯一
-        ("<title>美股编年史 · Market Chronicle：K 指数（KAPX）与恐惧的标价指数</title>",
+        ("<title>恐惧的标价 · Fear-Price：K 指数（KAPX）与恐惧的标价指数</title>",
          f"<title>{full_title}</title>"),
         ('<link rel="canonical" href="https://chronicle.klay-wang.com/">',
          f'<link rel="canonical" href="{BASE}/{route}">'),
         ('<meta property="og:url" content="https://chronicle.klay-wang.com/">',
          f'<meta property="og:url" content="{BASE}/{route}">'),
-        ('<meta property="og:title" content="美股编年史 · Market Chronicle：K 指数（KAPX）与恐惧的标价指数">',
+        ('<meta property="og:title" content="恐惧的标价 · Fear-Price：K 指数（KAPX）与恐惧的标价指数">',
          f'<meta property="og:title" content="{full_title}">'),
     ]
     # description 与 og:description 整行替换（行内容随首页文案变化，锚定行首标记）

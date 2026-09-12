@@ -1,4 +1,4 @@
-/* 美股编年史 — 前端逻辑：tab 切换、日夜主题、ECharts 渲染 */
+/* 恐惧的标价 — 前端逻辑：tab 切换、日夜主题、ECharts 渲染 */
 (function () {
   "use strict";
 

@@ -5,7 +5,7 @@
 ## 为什么有这道闸
 2026-08-20 的 `c25a51e`「去掉可见文本里的直引号（32 对 · 5 页）」是**全文替换**，
 把 JSON-LD 里的**结构性引号**也一并吃掉了：
-    "name":"Market Chronicle 美股编年史"  →  "name":Market Chronicle 美股编年史
+    "name":"Fear-Price 恐惧的标价"  →  "name":Fear-Price 恐惧的标价
 那些引号**根本不是可见文本**，但实现里「可见文本」这个限定词丢了。
 index.html 一处坏 ⇒ 16 个路由页由它生成 ⇒ **全站 19 页 JSON-LD 全部非法**，
 而 **没有任何闸发现**，一直到 3 天后 Google Search Console 发邮件

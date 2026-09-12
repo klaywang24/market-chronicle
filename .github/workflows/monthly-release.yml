@@ -175,7 +175,7 @@ jobs:
               echo "::notice::远端 tag $TAG 已存在且指向正确（上次断在建 Release）—— 复用，只补 Release"
             fi
             gh release create "$TAG" "dist/kapx-ledger-$M.zip" \
-              --title "Market Chronicle indicator ledger $M" \
+              --title "Fear-Price indicator ledger $M" \
               --notes-file "dist/RELEASE_NOTES-$M.md"
           fi
 

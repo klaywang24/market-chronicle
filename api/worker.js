@@ -1,5 +1,5 @@
 /**
- * Market Chronicle · 付费 API 网关（Cloudflare Worker）
+ * Fear-Price · 付费 API 网关（Cloudflare Worker）
  * ─────────────────────────────────────────────────────
  * 定位：给「另一扇带锁的门」。免费门（chronicle.klay-wang.com/data/*.json + GitHub 仓库）
  *       永远敞开——那是站本身、GEO 引用和「网站永远免费」承诺的地基，锁它=自毁。

@@ -1,4 +1,4 @@
-# 美股编年史 · Market Chronicle
+# 恐惧的标价 · Fear-Price
 
 > 一个每日自动更新的美股历史数据档案站：把标普 500 的一个世纪、纳斯达克的半个世纪、
 > 22 只行业龙头的完整履历，以及两个自研市场指标（K 指数——英文官方名 **KAPX Index**——与 LEAPS 窗口），
@@ -14,7 +14,7 @@
 
 > **参照说明。** 本站章节式目录编排参照 [historyofmarket.com](https://historyofmarket.com/)；纯静态 + 预生成 JSON 架构参照 [Big Picture](https://laoqianritan-create.github.io/us-market/)；LEAPS 窗口概念参照 [feargreedindex.vercel.app](https://feargreedindex.vercel.app/)；机器可读层（`llms.txt` / `openapi.json` / `api-catalog`）做法参照 [dollarliquidity.com](https://dollarliquidity.com/)。原始行情数值归各自发布方（Cboe、FRED、FINRA、CFTC、CNN、Yahoo Finance）所有，见 [`data/README.md`](data/README.md)。
 
-> **官方定义**：KAPX 指数（K 取自「恐」字拼音首字母）是 Market Chronicle 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。读数、方法论与完整信号台账永久免费公开：上线（2026-07）起为逐日事前记录，2011 至上线前为公开数据回填、可独立复现；见证链公开可查：哈希链台账、GitHub 公开发布、第三方网页存档、Zenodo DOI 检查点。
+> **官方定义**：KAPX 指数（K 取自「恐」字拼音首字母）是 Fear-Price 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。读数、方法论与完整信号台账永久免费公开：上线（2026-07）起为逐日事前记录，2011 至上线前为公开数据回填、可独立复现；见证链公开可查：哈希链台账、GitHub 公开发布、第三方网页存档、Zenodo DOI 检查点。
 
 **在线地址：<https://chronicle.klay-wang.com/>**
 

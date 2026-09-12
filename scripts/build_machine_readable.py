@@ -100,8 +100,8 @@ def build_openapi():
     return {
         "openapi": "3.1.0",
         "info": {
-            "title": "Market Chronicle 公开数据 · Public Data",
-            "summary": "美股编年史的公开 JSON：KAPX 指数、恐惧的标价指数、宏观与传导链序列、"
+            "title": "Fear-Price 公开数据 · Public Data",
+            "summary": "恐惧的标价的公开 JSON：KAPX 指数、恐惧的标价指数、宏观与传导链序列、"
                        "每日自核与哈希链。免鉴权、CORS 开放、每交易日更新。",
             "description": (
                 "本规格登记的是 llms.txt 与 data/README.md 已点名的对外契约端点。"
@@ -110,7 +110,7 @@ def build_openapi():
                 "口径与如实披露、三层证据、怎么自己重算一遍：见 " + SITE + "/data/README.md。\n\n"
                 "授权：" + LICENSE_NOTE),
             "version": "1.0.0",
-            "contact": {"name": "Market Chronicle", "url": SITE},
+            "contact": {"name": "Fear-Price", "url": SITE},
             "license": POLYFORM,
         },
         "servers": [{"url": SITE}],

@@ -196,13 +196,13 @@ def main():
         {"name": "📊 涨跌", "value": f"{d.get('adv')} 涨 / {d.get('flat')} 平 / {d.get('dec')} 跌", "inline": True},
     ]
     payload = {
-        "username": "美股编年史",
+        "username": "恐惧的标价",
         "embeds": [{
             "title": f"今日头版 · {d.get('date')}",
             "url": SITE,
             "color": color,
             "fields": fields,
-            "footer": {"text": "数据仅供参考，非投资建议 · Market Chronicle"},
+            "footer": {"text": "数据仅供参考，非投资建议 · Fear-Price"},
         }],
     }
     req = urllib.request.Request(

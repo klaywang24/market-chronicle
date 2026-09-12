@@ -22,7 +22,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 # 默认写到**项目文件夹**（仓库外，和 访客数据/访客看板.html 同一层级的用法）：
-#   …/美股编年史：market-chronicle/见证链看板.html
+#   …/恐惧的标价：market-chronicle/见证链看板.html
 # 放仓外而不是仓内，是因为它是本地运维工具 —— 运维状态公开挂着，
 # 红的时候会变成别人的弹药。仓内那份的 .gitignore 条目保留作兜底。
 PROJECT = ROOT.parent.parent                     # KAPX/ 的上一层
@@ -33,7 +33,7 @@ REPO = "https://github.com/klaywang24/market-chronicle"
 HTML = """<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>见证链看板 · 美股编年史</title>
+<title>见证链看板 · 恐惧的标价</title>
 <style>
 :root{--bg:#FAF8F3;--card:#fff;--ink:#1a1a1a;--soft:#5a5a5a;--muted:#8a8a8a;
       --line:#e5e0d8;--ok:#00A86B;--bad:#FF2400;--unk:#B8893E}
@@ -90,7 +90,7 @@ a{color:var(--bad)}
 <h4>红了怎么办</h4>
 <ol class="steps">
   <li><b>先本地复现一次</b>，看到底哪一项坏了：
-    <pre>cd "/Users/klay/Documents/个人 Agent/美股编年史：market-chronicle/KAPX/market-chronicle 公开 git 仓库" \\
+    <pre>cd "/Users/klay/Documents/个人 Agent/恐惧的标价：market-chronicle/KAPX/market-chronicle 公开 git 仓库" \\
   &amp;&amp; git pull -q &amp;&amp; python3 scripts/check_witness_health.py</pre></li>
   <li><b>「锚定日志」红</b> = 存档结果没被留档。看
     <a href="REPO_URL/actions/workflows/daily.yml" target="_blank">daily 的运行记录</a>，

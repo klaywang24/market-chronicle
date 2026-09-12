@@ -21,12 +21,12 @@
 // 与上面主题的早期戳同款：只抢 lang 属性让首帧版式就位；正式 lang 码仍由 i18n.js 按 LANG_META 设。
 (function () { try { var l = localStorage.getItem("mc-lang"); if (l && l !== "zh") document.documentElement.lang = l; } catch (e) {} })();
 </script>
-<title>恐惧的标价指数（Fear-Price Index）· LEAPS 成本刻度 · 美股编年史 Market Chronicle</title>
+<title>恐惧的标价指数（Fear-Price Index）· LEAPS 成本刻度 · 恐惧的标价 Fear-Price</title>
 <!-- SEO / GEO：主推域名 canonical + 摘要 + 社交卡片 + 结构化数据 -->
 <link rel="canonical" href="https://chronicle.klay-wang.com/leaps">
 <meta name="description" content="长期期权（LEAPS）现在贵不贵：以一年期隐含波动率 VIX1Y 的三年分位为主读数，辅以波动率风险溢价、期限阶梯、SKEW 与实际利率，回填至 2007 年，每个交易日留痕。纯描述性刻度，不构成交易信号。Fear-Price Index: a cost gauge for LEAPS, formerly Fear's Price Tag.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="恐惧的标价指数（Fear-Price Index）· LEAPS 成本刻度 · 美股编年史 Market Chronicle">
+<meta property="og:title" content="恐惧的标价指数（Fear-Price Index）· LEAPS 成本刻度 · 恐惧的标价 Fear-Price">
 <meta property="og:description" content="长期期权（LEAPS）现在贵不贵：以一年期隐含波动率 VIX1Y 的三年分位为主读数，辅以波动率风险溢价、期限阶梯、SKEW 与实际利率，回填至 2007 年，每个交易日留痕。纯描述性刻度，不构成交易信号。Fear-Price Index: a cost gauge for LEAPS, formerly Fear's Price Tag.">
 <meta property="og:url" content="https://chronicle.klay-wang.com/leaps">
 <meta property="og:image" content="https://chronicle.klay-wang.com/icons/icon-512.png">
@@ -36,7 +36,7 @@
 {"@context":"https://schema.org","@graph":[
  {"@type":"Person","@id":"https://klay-wang.com/#person","name":"Klay Wang","url":"https://klay-wang.com/","sameAs":["https://klay-wang.com/","https://x.com/_Klay24_","https://github.com/klaywang24","https://www.linkedin.com/in/klay-w-a593bb101/","https://www.kaggle.com/klaywong","https://huggingface.co/klay24"]},
  
- {"@type":"WebSite","name":"Market Chronicle 美股编年史","alternateName":"美股编年史","url":"https://chronicle.klay-wang.com/","inLanguage":["zh-CN","en"],
+ {"@type":"WebSite","name":"Fear-Price 恐惧的标价","alternateName":"Fear-Price","url":"https://chronicle.klay-wang.com/","inLanguage":["zh-CN","en"],
   "description":"A free, self-updating archive of a century of US market history, plus two original gauges and one public ledger of outcomes: the KAPX Index and the Fear-Price Index (formerly Fear's Price Tag), every reading reconciled daily.",
   "publisher":{"@id":"https://klay-wang.com/#person"}},
  {"@type":"Dataset","name":"KAPX Index daily series (CNN Fear & Greed ÷ VIX)","alternateName":["K 指数","K-Index","KAPX"],
@@ -101,7 +101,7 @@
 <header class="topbar">
   <div class="topbar-mast">
    <div class="topbar-row">
-    <a class="brand" href="." aria-label="回到首页 · Back to home">美股编年史<em>Market Chronicle</em></a>
+    <a class="brand" href="." aria-label="回到首页 · Back to home">恐惧的标价<em>Fear-Price</em></a>
    </div>
   </div>
   <div class="topbar-navband">
@@ -183,8 +183,8 @@
     <p class="dek">今天买长期期权（LEAPS，12–18 个月）在历史上算贵还是便宜？头条 = 1 年期市场波动率（VIX1Y）在过去 3 年的百分位：把三年里的每个交易日按贵贱排成一队，看今天排第几位，越高越贵。它只描述成本，不预测方向、不构成买卖建议：像油价牌告诉你今天油贵不贵，但不替你决定要不要开车。</p>
   </div>
 
-  <p class="ledger-intro">官方定义：恐惧的标价指数（英文名 Fear-Price Index）是 Market Chronicle 每个交易日发布的长天期期权成本刻度：取 1 年期市场波动率（VIX1Y）在过去 3 年的百分位，读数 0 到 100，高即贵。它只描述成本，不测收益、不预测方向、不构成买卖建议。<br>序列标识 mc.fear_price.vix1y_pct3y.v1，公式与序列身份一经公开即不静默更改，任何口径迭代都会另立新版本。<br>它与 KAPX 指数是两条独立序列，公式不同、互不派生。曾用英文名 Fear's Price Tag、LEAPS Cost Gauge、The Price of Fear 均指同一序列。</p>
-<noscript><p class="ledger-intro" lang="en">Canonical definition: The Fear-Price Index (Chinese: 恐惧的标价指数) is a descriptive gauge of long-dated option cost published by Market Chronicle each trading day: the percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years, read 0 to 100, higher meaning historically more expensive. Descriptive only: never return-tested, not a trading signal, not investment advice. Series identifier: mc.fear_price.vix1y_pct3y.v1; the formula and series identity are never changed silently, and any revision would launch a new version. It is a separate series from the KAPX Index: the two use different formulas and neither is derived from the other. Formerly published in English as Fear's Price Tag, the LEAPS Cost Gauge and The Price of Fear, all legacy aliases of this same series. Machine-readable data: <a href="/data/leaps_gauge.json">/data/leaps_gauge.json</a> &middot; full brief: <a href="/llms.txt">/llms.txt</a></p></noscript>
+  <p class="ledger-intro">官方定义：恐惧的标价指数（英文名 Fear-Price Index）是 Fear-Price 每个交易日发布的长天期期权成本刻度：取 1 年期市场波动率（VIX1Y）在过去 3 年的百分位，读数 0 到 100，高即贵。它只描述成本，不测收益、不预测方向、不构成买卖建议。<br>序列标识 mc.fear_price.vix1y_pct3y.v1，公式与序列身份一经公开即不静默更改，任何口径迭代都会另立新版本。<br>它与 KAPX 指数是两条独立序列，公式不同、互不派生。曾用英文名 Fear's Price Tag、LEAPS Cost Gauge、The Price of Fear 均指同一序列。</p>
+<noscript><p class="ledger-intro" lang="en">Canonical definition: The Fear-Price Index (Chinese: 恐惧的标价指数) is a descriptive gauge of long-dated option cost published by Fear-Price each trading day: the percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years, read 0 to 100, higher meaning historically more expensive. Descriptive only: never return-tested, not a trading signal, not investment advice. Series identifier: mc.fear_price.vix1y_pct3y.v1; the formula and series identity are never changed silently, and any revision would launch a new version. It is a separate series from the KAPX Index: the two use different formulas and neither is derived from the other. Formerly published in English as Fear's Price Tag, the LEAPS Cost Gauge and The Price of Fear, all legacy aliases of this same series. Machine-readable data: <a href="/data/leaps_gauge.json">/data/leaps_gauge.json</a> &middot; full brief: <a href="/llms.txt">/llms.txt</a></p></noscript>
 <!-- 2026-08-25：术语页入口（SEO 线）。定义/公式/口径/FAQ 的聚合页在 /fear-price（独立平铺页），此处只留一行链接。 -->
   <div class="poem">这把尺子的定义、公式与口径，另有一页备查 → <a href="/fear-price">恐惧的标价术语页</a></div>
 
@@ -415,7 +415,7 @@
 <footer class="site-footer">
   <div class="footer-main">
     <div class="footer-brand-col">
-      <div class="footer-brand">美股编年史<span>Market Chronicle</span></div>
+      <div class="footer-brand">恐惧的标价<span>Fear-Price</span></div>
       <div class="footer-tag">每个交易日自动更新的美股百年图表档案与读数台账</div>
       <!-- 2026-07-25 用户裁：删除页脚免费订阅行（原「极端读数出现的那天，一封免费邮件 → 免费订阅」，
            指向 Buttondown 托管页）。站上自此无免费邮件入口，订阅动线只剩付费一条：顶栏 + 三处读数送达行 + 页脚定价。
@@ -448,7 +448,7 @@
       </div>
     </div>
   </div>
-  <div class="footer-note"><span class="footer-left"><span id="meta-line">美股编年史 · 自用版</span> · <span>数据源：</span>Yahoo Finance / CNN Fear &amp; Greed / multpl.com ·<span>仅供信息与教育用途，不构成投资建议</span></span><span class="footer-copy">© 2026 Market Chronicle</span></div>
+  <div class="footer-note"><span class="footer-left"><span id="meta-line">恐惧的标价 · 自用版</span> · <span>数据源：</span>Yahoo Finance / CNN Fear &amp; Greed / multpl.com ·<span>仅供信息与教育用途，不构成投资建议</span></span><span class="footer-copy">© 2026 Fear-Price</span></div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>

@@ -21,12 +21,12 @@
 // 与上面主题的早期戳同款：只抢 lang 属性让首帧版式就位；正式 lang 码仍由 i18n.js 按 LANG_META 设。
 (function () { try { var l = localStorage.getItem("mc-lang"); if (l && l !== "zh") document.documentElement.lang = l; } catch (e) {} })();
 </script>
-<title>K 指数（KAPX Index）台账 · CNN 恐贪 ÷ VIX · 美股编年史 Market Chronicle</title>
+<title>K 指数（KAPX Index）台账 · CNN 恐贪 ÷ VIX · 恐惧的标价 Fear-Price</title>
 <!-- SEO / GEO：主推域名 canonical + 摘要 + 社交卡片 + 结构化数据 -->
 <link rel="canonical" href="https://chronicle.klay-wang.com/kindex">
 <meta name="description" content="K 指数（KAPX Index）：CNN 恐惧贪婪指数除以 VIX 的反向情绪指标，K < 1 标记极端恐惧。每个交易日更新读数，2011 年以来每次信号对照纳指前向收益逐笔公开对账，赢的亏的都在。The KAPX Index: CNN Fear & Greed / VIX, reconciled daily.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="K 指数（KAPX Index）台账 · CNN 恐贪 ÷ VIX · 美股编年史 Market Chronicle">
+<meta property="og:title" content="K 指数（KAPX Index）台账 · CNN 恐贪 ÷ VIX · 恐惧的标价 Fear-Price">
 <meta property="og:description" content="K 指数（KAPX Index）：CNN 恐惧贪婪指数除以 VIX 的反向情绪指标，K < 1 标记极端恐惧。每个交易日更新读数，2011 年以来每次信号对照纳指前向收益逐笔公开对账，赢的亏的都在。The KAPX Index: CNN Fear & Greed / VIX, reconciled daily.">
 <meta property="og:url" content="https://chronicle.klay-wang.com/kindex">
 <meta property="og:image" content="https://chronicle.klay-wang.com/icons/icon-512.png">
@@ -36,7 +36,7 @@
 {"@context":"https://schema.org","@graph":[
  {"@type":"Person","@id":"https://klay-wang.com/#person","name":"Klay Wang","url":"https://klay-wang.com/","sameAs":["https://klay-wang.com/","https://x.com/_Klay24_","https://github.com/klaywang24","https://www.linkedin.com/in/klay-w-a593bb101/","https://www.kaggle.com/klaywong","https://huggingface.co/klay24"]},
  
- {"@type":"WebSite","name":"Market Chronicle 美股编年史","alternateName":"美股编年史","url":"https://chronicle.klay-wang.com/","inLanguage":["zh-CN","en"],
+ {"@type":"WebSite","name":"Fear-Price 恐惧的标价","alternateName":"Fear-Price","url":"https://chronicle.klay-wang.com/","inLanguage":["zh-CN","en"],
   "description":"A free, self-updating archive of a century of US market history, plus two original gauges and one public ledger of outcomes: the KAPX Index and the Fear-Price Index (formerly Fear's Price Tag), every reading reconciled daily.",
   "publisher":{"@id":"https://klay-wang.com/#person"}},
  {"@type":"Dataset","name":"KAPX Index daily series (CNN Fear & Greed ÷ VIX)","alternateName":["K 指数","K-Index","KAPX"],
@@ -101,7 +101,7 @@
 <header class="topbar">
   <div class="topbar-mast">
    <div class="topbar-row">
-    <a class="brand" href="." aria-label="回到首页 · Back to home">美股编年史<em>Market Chronicle</em></a>
+    <a class="brand" href="." aria-label="回到首页 · Back to home">恐惧的标价<em>Fear-Price</em></a>
    </div>
   </div>
   <div class="topbar-navband">
@@ -164,11 +164,11 @@
     <h1>金风玉露一相逢</h1>
     <p class="dek">K 指数 = CNN 恐惧贪婪指数 ÷ VIX：分子是人心（恐贪 0–100），分母是保费（VIX，恐慌保险的价格）：人越怕、保费越贵，K 越小。当恐惧（CNN 走低）与波动（VIX 走高）交叉，K 跌破 1：多是纳指 100 深度回调、情绪触底的时刻。2011 年以来逐次对账，赢的和输的都在账上。</p>
 <!-- 2026-07-26（§41）：「官方定义」GEO 引用块自头版挪入此处 —— 字符串与 D 键逐字一致，EN 自动生效。 -->
-    <p class="ledger-intro">官方定义：KAPX 指数（K 取自「恐」字拼音首字母）是 Market Chronicle 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。</p>
+    <p class="ledger-intro">官方定义：KAPX 指数（K 取自「恐」字拼音首字母）是 Fear-Price 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。</p>
 <!-- 2026-08-02（§55）：英文靠 i18n.js 客户端替换，服务端 HTML 只有中文；不执行 JS 的抓取器
      （多数 LLM fetcher 属此类）因此只看得到中文。这段 noscript 让规范定义在无 JS 时也在 DOM 里。
      文案逐字取自 i18n.js 的同一条目，不另写一版，避免两处措辞日后漂移。 -->
-<noscript><p class="ledger-intro" lang="en">Canonical definition: The KAPX Index is a daily U.S. equity fear-pricing gauge published by Market Chronicle, computed as the CNN Fear &amp; Greed reading divided by the VIX. The K stands for k&#466;ng (&#24656;), the Chinese character for fear. K &lt; 1 marks an extreme-fear signal. Every reading is reconciled publicly against forward Nasdaq-100 returns, wins and losses alike. Machine-readable data: <a href="/data/kindex.json">/data/kindex.json</a> &middot; full brief: <a href="/llms.txt">/llms.txt</a></p></noscript>
+<noscript><p class="ledger-intro" lang="en">Canonical definition: The KAPX Index is a daily U.S. equity fear-pricing gauge published by Fear-Price, computed as the CNN Fear &amp; Greed reading divided by the VIX. The K stands for k&#466;ng (&#24656;), the Chinese character for fear. K &lt; 1 marks an extreme-fear signal. Every reading is reconciled publicly against forward Nasdaq-100 returns, wins and losses alike. Machine-readable data: <a href="/data/kindex.json">/data/kindex.json</a> &middot; full brief: <a href="/llms.txt">/llms.txt</a></p></noscript>
 <!-- 2026-08-25：术语页入口（SEO 线）。定义/公式/口径/FAQ 的聚合页在 /kapx（独立平铺页），此处只留一行链接。 -->
     <div class="poem">这把尺子的定义、公式与口径，另有一页备查 → <a href="/kapx">KAPX 术语页</a></div>
   </div>
@@ -273,7 +273,7 @@
 <footer class="site-footer">
   <div class="footer-main">
     <div class="footer-brand-col">
-      <div class="footer-brand">美股编年史<span>Market Chronicle</span></div>
+      <div class="footer-brand">恐惧的标价<span>Fear-Price</span></div>
       <div class="footer-tag">每个交易日自动更新的美股百年图表档案与读数台账</div>
       <!-- 2026-07-25 用户裁：删除页脚免费订阅行（原「极端读数出现的那天，一封免费邮件 → 免费订阅」，
            指向 Buttondown 托管页）。站上自此无免费邮件入口，订阅动线只剩付费一条：顶栏 + 三处读数送达行 + 页脚定价。
@@ -306,11 +306,11 @@
       </div>
     </div>
   </div>
-  <div class="footer-note"><span class="footer-left"><span id="meta-line">美股编年史 · 自用版</span> · <span>数据源：</span>Yahoo Finance / CNN Fear &amp; Greed / multpl.com ·<span>仅供信息与教育用途，不构成投资建议</span></span><span class="footer-copy">© 2026 Market Chronicle</span></div>
+  <div class="footer-note"><span class="footer-left"><span id="meta-line">恐惧的标价 · 自用版</span> · <span>数据源：</span>Yahoo Finance / CNN Fear &amp; Greed / multpl.com ·<span>仅供信息与教育用途，不构成投资建议</span></span><span class="footer-copy">© 2026 Fear-Price</span></div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-<script src="js/i18n.js?v=20260906a"></script>
+<script src="js/i18n.js?v=20260912c"></script>
 <script src="js/app.js?v=20260901b"></script>
 <script src="js/docs-i18n.js?v=20260819a"></script>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>

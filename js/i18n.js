@@ -43,8 +43,8 @@
     "最近战报": ["Latest entries", "", "", ""],
     "按信号首日纳指 100 收盘价计": ["returns from the Nasdaq-100 close on day one", "", "", ""],
     "每一次的逐条结果，见上方「K 指数 · 台账」与「恐惧的标价 · 台账」": ["Every entry, one by one — see the KAPX · Ledger and Fear-Price Index · Ledger tabs above", "", "", ""],
-    "官方定义：KAPX 指数（K 取自「恐」字拼音首字母）是 Market Chronicle 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。": ["Canonical definition: The KAPX Index is a daily U.S. equity fear-pricing gauge published by Market Chronicle, computed as the CNN Fear & Greed reading divided by the VIX. The K stands for kǒng (恐), the Chinese character for fear.", "", "", ""],
-    "官方定义：恐惧的标价指数（英文名 Fear-Price Index）是 Market Chronicle 每个交易日发布的长天期期权成本刻度：取 1 年期市场波动率（VIX1Y）在过去 3 年的百分位，读数 0 到 100，高即贵。它只描述成本，不测收益、不预测方向、不构成买卖建议。": ["Canonical definition: The Fear-Price Index (恐惧的标价指数) is a descriptive gauge of long-dated option cost published by Market Chronicle each trading day: the percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years, read 0 to 100, higher meaning historically more expensive. Descriptive only: never return-tested, not a trading signal, not investment advice.", "", "", ""],
+    "官方定义：KAPX 指数（K 取自「恐」字拼音首字母）是 Fear-Price 每个交易日发布的美股恐惧定价指标：用 CNN 恐贪指数除以 VIX，衡量人群情绪相对波动率价格的偏离。": ["Canonical definition: The KAPX Index is a daily U.S. equity fear-pricing gauge published by Fear-Price, computed as the CNN Fear & Greed reading divided by the VIX. The K stands for kǒng (恐), the Chinese character for fear.", "", "", ""],
+    "官方定义：恐惧的标价指数（英文名 Fear-Price Index）是 Fear-Price 每个交易日发布的长天期期权成本刻度：取 1 年期市场波动率（VIX1Y）在过去 3 年的百分位，读数 0 到 100，高即贵。它只描述成本，不测收益、不预测方向、不构成买卖建议。": ["Canonical definition: The Fear-Price Index (恐惧的标价指数) is a descriptive gauge of long-dated option cost published by Fear-Price each trading day: the percentile of 1-year implied volatility (VIX1Y) over the trailing 3 years, read 0 to 100, higher meaning historically more expensive. Descriptive only: never return-tested, not a trading signal, not investment advice.", "", "", ""],
     "序列标识 mc.fear_price.vix1y_pct3y.v1，公式与序列身份一经公开即不静默更改，任何口径迭代都会另立新版本。": ["Series identifier: mc.fear_price.vix1y_pct3y.v1; the formula and series identity are never changed silently, and any revision would launch a new version.", "", "", ""],
     "它与 KAPX 指数是两条独立序列，公式不同、互不派生。曾用英文名 Fear's Price Tag、LEAPS Cost Gauge、The Price of Fear 均指同一序列。": ["It is a separate series from the KAPX Index: the two use different formulas and neither is derived from the other. Formerly published in English as Fear's Price Tag, the LEAPS Cost Gauge and The Price of Fear, all legacy aliases of this same series.", "", "", ""],
     "十五年，每一次入场都标在这条线上": ["Fifteen years — every entry marked on this line", "", "", ""],
@@ -792,7 +792,7 @@
     "低于历史中枢": ["Below its historical anchor", "Sous l'ancre historique", "Unter dem histor. Anker", "Bajo su ancla histórica"],
     "yfinance 快照": ["yfinance snapshot", "Instantané yfinance", "yfinance-Momentaufnahme", "Instantánea de yfinance"],
     "回到": ["Back to ", "Retour à ", "Zurück zu ", "Volver a "],
-    "美股编年史 · 自用版": ["Market Chronicle · personal edition", "Market Chronicle · édition personnelle", "Market Chronicle · private Ausgabe", "Market Chronicle · edición personal"],
+    "恐惧的标价 · 自用版": ["Fear-Price · personal edition", "Fear-Price · édition personnelle", "Fear-Price · private Ausgabe", "Fear-Price · edición personal"],
     "数据更新中，稍后自动出现 · data updating": ["Data updating — will appear shortly", "Données en cours de mise à jour", "Daten werden aktualisiert", "Actualizando datos"],
 
     // ---- 长图注 / sub ----
@@ -931,7 +931,7 @@
     "(1+回报) = (1+EPS变化) × (1+估值变化)，年末对年末": ["(1+return) = (1+EPS change) × (1+multiple change), year-end to year-end", "(1+rendement) = (1+ΔBPA) × (1+Δmultiple)", "(1+Rendite) = (1+ΔEPS) × (1+ΔMultiple)", "(1+retorno) = (1+ΔBPA) × (1+Δmúltiplo)"],
 
     // ---- 残留清扫（自动扫描补充）----
-    "美股编年史": ["Market Chronicle", "Market Chronicle", "Market Chronicle", "Market Chronicle"],
+    "恐惧的标价": ["Fear-Price", "Fear-Price", "Fear-Price", "Fear-Price"],
     "纳指综指 × 纳指 100（月线 · 对数坐标）": ["Composite × Nasdaq-100 (monthly, log)", "Composite × Nasdaq-100 (mensuel, log)", "Composite × Nasdaq-100 (monatlich, log)", "Composite × Nasdaq-100 (mensual, log)"],
     "纳指 100 年度回报": ["Nasdaq-100 annual returns", "Rendements annuels du Nasdaq-100", "Nasdaq-100-Jahresrenditen", "Rendimientos anuales del Nasdaq-100"],
     "纳指 100 历史回撤曲线": ["Nasdaq-100 drawdown curve", "Courbe des replis du Nasdaq-100", "Nasdaq-100-Drawdown-Kurve", "Curva de caídas del Nasdaq-100"],
@@ -1084,7 +1084,7 @@
     [/^近50年中位 (.+)$/, ["50y median $1", "Médiane 50 ans $1", "50J-Median $1", "Mediana 50a $1"]],
     [/^2010→中位 (.+)$/, ["2010→ median $1", "Médiane 2010→ $1", "Median 2010→ $1", "Mediana 2010→ $1"]],
     [/^(VIX|VXN) = 30 · 保费警戒线$/, ["$1 = 30 · premium alert", "$1 = 30 · alerte prime", "$1 = 30 · Prämienalarm", "$1 = 30 · alerta de prima"]],
-    [/^美股编年史 · 自用版 · 数据更新于 (.+)$/, ["Market Chronicle · personal edition · data updated $1", "Market Chronicle · données mises à jour le $1", "Market Chronicle · Daten aktualisiert am $1", "Market Chronicle · datos actualizados el $1"]],
+    [/^恐惧的标价 · 自用版 · 数据更新于 (.+)$/, ["Fear-Price · personal edition · data updated $1", "Fear-Price · données mises à jour le $1", "Fear-Price · Daten aktualisiert am $1", "Fear-Price · datos actualizados el $1"]],
     [/^· 数据源：.+$/, ["· Data: Yahoo Finance / CNN Fear & Greed / multpl / FRED / macrotrends / Wikipedia · Personal research only — not investment advice",
       "· Données : Yahoo Finance / CNN / multpl / FRED / macrotrends / Wikipedia · Recherche personnelle — pas un conseil en investissement",
       "· Daten: Yahoo Finance / CNN / multpl / FRED / macrotrends / Wikipedia · Private Recherche — keine Anlageberatung",

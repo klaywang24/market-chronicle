@@ -1,4 +1,4 @@
-# 数据 · Market Chronicle
+# 数据 · Fear-Price
 
 这个目录是 [chronicle.klay-wang.com](https://chronicle.klay-wang.com) 的全部数据。每个交易日由管线自动提交，带 GitHub 时间戳，事后不可改写。
 
@@ -64,7 +64,7 @@
 ## 引用 · Citation
 
 ```
-Market Chronicle (美股编年史), KAPX Index / Fear's Price Tag.
+Fear-Price (恐惧的标价), KAPX Index / Fear's Price Tag.
 https://chronicle.klay-wang.com · retrieved YYYY-MM-DD
 ```
 
