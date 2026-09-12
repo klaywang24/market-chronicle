@@ -154,6 +154,7 @@ _BRAND_LINES = [
     ("美股编年史 · Market Chronicle", "恐惧的标价 · Fear-Price"),
     ("Market Chronicle · 美股编年史", "Fear-Price · 恐惧的标价"),
     ("Market Chronicle ：", "Fear-Price ："),
+    ("《美股编年史》", "《恐惧的标价》"),
 ]
 def _rebrand(text):
     for a, b in _BRAND_LINES:
